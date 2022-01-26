@@ -15,6 +15,7 @@ et-xmlfile==1.1.0
 factory-boy==3.2.1
 Faker==11.3.0
 flake8==4.0.1
+gunicorn==20.1.0
 importlib-metadata==4.2.0
 isort==5.10.1
 jedi==0.17.2
@@ -37,7 +38,7 @@ pycountry==22.1.10
 pydocstyle==6.1.1
 pyflakes==2.4.0
 pylint==2.12.2
-pyls-mypy==0.1.8
+pyls-mypy==0.1.8+6.g3b105b4
 python-dateutil==2.8.2
 python-jsonrpc-server==0.4.0
 python-language-server==0.36.2
