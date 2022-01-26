@@ -47,6 +47,8 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'dehy',
+	'dehy.appz.catalogue.apps.CatalogueConfig',
 	# django apps added by oscar
 	'django.contrib.sites',
 	'django.contrib.flatpages',
@@ -56,7 +58,7 @@ INSTALLED_APPS = [
 	'oscar.apps.checkout.apps.CheckoutConfig',
 	'oscar.apps.address.apps.AddressConfig',
 	'oscar.apps.shipping.apps.ShippingConfig',
-	'oscar.apps.catalogue.apps.CatalogueConfig',
+	# 'oscar.apps.catalogue.apps.CatalogueConfig'
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
 	'oscar.apps.partner.apps.PartnerConfig',

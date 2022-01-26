@@ -68,7 +68,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			```
 			```sh
 			$ (venv) django-admin startproject $PROJECT_NAME # rename to w/e your project name is
-			$ (venv) mv $PROJECT_NAME temp && mv temp/manage.py manage.py && mv temp/$PROJECT_NAME $PROJECT_NAME && rm -r temp
+			$ (venv) mv $PROJECT_NAME temp && mv temp/manage.py manage.py && mv temp/$PROJECT_NAME $PROJECT_NAME && rm -r temp #changes filestructure
 			```
 
 	- database setup:
@@ -85,10 +85,10 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			    $ psql postgres
 			    ```
 				> see [here](https://stackoverflow.com/questions/13410686/postgres-could-not-connect-to-server) for troubleshooting methods
-				
+
 		* create database/user with [optimal](https://docs.djangoproject.com/en/3.0/ref/databases/#optimizing-postgresql-s-configuration) settings
 			```
-			postgres=# CREATE DATABASE DEHY;
+			postgres=# CREATE DATABASE dehy;
 			postgres=# CREATE USER dehydevuser WITH PASSWORD 'penileZZ44yN0tT420';
 			postgres=# ALTER ROLE dehydevuser SET client_encoding TO 'utf8';
 			postgres=# ALTER ROLE dehydevuser SET default_transaction_isolation TO 'read committed';
@@ -96,7 +96,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			```
 		* grant permissions, then quit
 			```
-			postgres=# GRANT ALL PRIVILEGES ON DATABASE DEHY TO dehydevuser;
+			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy TO dehydevuser;
 			postgres=# \q
 			```
 
@@ -299,6 +299,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 
 <a name="initial_data"></a>
 2. ##### providing initial data via data migration
+	*NOTE*: when uploading fixtures via `fixture_creator.py` be sure to implement the neccessary changes to `catalogues/models.py`, ie. you must fork the app oscar_fork_app catalogue`
 
 		- dumping:
 			```sh

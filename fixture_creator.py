@@ -4,7 +4,6 @@ import pandas as pd
 import json, os, re
 from datetime import datetime as dt
 from oscar.core.loading import get_model
-from django.db import migrations
 
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dehy.settings")
@@ -150,7 +149,7 @@ def main():
 	garnish_product_class = ProductTypeClass.objects.get_or_create(name='Garnish', slug="garnish", requires_shipping=True, track_stock=False)
 	merch_product_class = ProductTypeClass.objects.get_or_create(name='Merchandise', slug="merchandise", requires_shipping=True, track_stock=True)
 
-	fc = FixtureCreator("./dehy/fixtures/DEHY_productlist.xlsx")
+	fc = FixtureCreator(os.path.abspath(os.path.join(os.path.dirname(__file__), 'deploy_tools/DEHY_productlist.xlsx')))
 	df = fc.get_dataframe()
 
 	## finalizing the data:
@@ -281,7 +280,8 @@ def main():
 
 	print('saving file')
 
-	fixture_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './dehy/fixtures/dumps'))
+	fixture_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './dehy/fixtures'))
+
 	fixture_filename = f'{dt.now().strftime("%Y-%m-%d_%H-%M-%S")}.json'
 	fixture_file = os.path.join(fixture_dir, fixture_filename)
 
