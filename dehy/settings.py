@@ -23,8 +23,8 @@ env = environ.Env(
 )
 environ.Env.read_env()
 
-env.read_env(env.str(BASE_DIR, '.env'))
-
+# env.read_env(env.str(BASE_DIR, '.env'))
+env.read_env(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -138,8 +138,8 @@ DATABASES = {
 		#'NAME': BASE_DIR / 'db.sqlite3',
 
 		'ENGINE': 'django.db.backends.postgresql',
-		'HOST': 'localhost',
-		'NAME': 'DEHY',
+		'HOST': '127.0.0.1',
+		'NAME': 'dehy',
 		'PASSWORD': 'penileZZ44yN0tT420',
 		'PORT': '5432',
 		'USER': 'dehydevuser',
