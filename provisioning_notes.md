@@ -13,26 +13,107 @@
 	- [disabling a built-in oscar feature](#disable_feature)
 	- [changing the oscar homepage](#edit_homepage)
 4. [implementing paypal payment support with django-oscar-payapl](#django_oscar_paypal)
-7. [git commands](#git_commands)
-8. [linux cli commands](#server_cli)
+5. [linux cli commands](#server_cli)
+	- [connecting to AWS](#connecting_to_AWS)
+6. [git commands](#git_commands)
+	- [authenticating github][#git_authentication]
+
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
 
 1. ##### <a name="installation"></a> Creating new django project with [oscar-django](https://django-oscar.readthedocs.io/en/3.1/internals/getting_started.html#install-oscar-and-its-dependencies)
 
+	- aws setup
+		- updating packages:
+			```sh
+			% sudo apt update
+			% sudo apt upgrade
+			```
+
+		- setting key permissions and connecting to your AWS instance (most instructions from [here](https://dev.to/rmiyazaki6499/deploying-a-production-ready-django-app-on-aws-1pk3))
+			```sh
+			$ cd Documents/$REPO_FOLDER
+			$ chmod 400 dehy.cer #
+			$ ssh -i "DEHY.cer" admin@ec2-3-135-111-34.us-east-2.compute.amazonaws.com
+			```
+
+		- setting up firewall and installing dependencies
+			```sh
+			% sudo apt-get install ufw
+			% sudo ufw enable
+			% sudo apt install git python3-venv python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx gunicorn curl
+			% sudo ufw allow OpenSSH && sudo ufw allow 'Nginx Full'
+			```
+
 	- install dependencies + virtual env setup
+		cloning the repo (might have to [authenticate github first](#connecting_to_AWS))
+			```sh
+			$ git clone git@github.com:BLCtbc/dehy.git
+			```
+
+			```sh
+			$ python3.7 -m venv venv # create the virtual environment
+			$ source venv/bin/activate # activate the virtual environment
+			$ (venv) pip install --upgrade pip
+			$ (venv) pip install -r requirements.txt
+			$ (venv) export PROJECT_NAME=dehy && export APP_FOLDER=apps
+			```
+
+		required extra dependencies (skip if you installed via `requirements.txt`)
+			```sh
+			$ (venv) pip install 'django-oscar[sorl-thumbnail]' # should also install django and various other requirements
+			$ (venv) pip install pycountry # additional dependency
+			$ (venv) pip install psycopg2-binary # PostgreSQL requirement
+			```
+			```sh
+			$ (venv) django-admin startproject $PROJECT_NAME # rename to w/e your project name is
+			$ (venv) mv $PROJECT_NAME temp && mv temp/manage.py manage.py && mv temp/$PROJECT_NAME $PROJECT_NAME && rm -r temp
+			```
+
+	- database setup:
+		#### setup database
+		* start the server and login
+		    * linux
+			    ```
+			    $ sudo -u postgres psql
+			    ```
+		    * mac (assuming installation was via [homebrew](https://wiki.postgresql.org/wiki/Homebrew))
+			    ```
+				$ brew install postgresql
+			    $ brew services start postgresql
+			    $ psql postgres
+			    ```
+				> see [here](https://stackoverflow.com/questions/13410686/postgres-could-not-connect-to-server) for troubleshooting methods
+				
+		* create database/user with [optimal](https://docs.djangoproject.com/en/3.0/ref/databases/#optimizing-postgresql-s-configuration) settings
+			```
+			postgres=# CREATE DATABASE DEHY;
+			postgres=# CREATE USER dehydevuser WITH PASSWORD 'penileZZ44yN0tT420';
+			postgres=# ALTER ROLE dehydevuser SET client_encoding TO 'utf8';
+			postgres=# ALTER ROLE dehydevuser SET default_transaction_isolation TO 'read committed';
+			postgres=# ALTER ROLE dehydevuser SET timezone TO 'America/Chicago';
+			```
+		* grant permissions, then quit
+			```
+			postgres=# GRANT ALL PRIVILEGES ON DATABASE DEHY TO dehydevuser;
+			postgres=# \q
+			```
+
+	- create and setup the `.env` file:
+
 		```sh
-		$ git clone git@github.com:BLCtbc/dehy.git
-		$ python3.7 -m venv venv # create the virtual environment
-		$ source venv/bin/activate # activate the virtual environment
-		$ export PROJECT_NAME=dehy && export APP_FOLDER=apps
-		$ (venv) pip install --upgrade pip
-		$ (venv) pip install 'django-oscar[sorl-thumbnail]' # should also install django and various other requirements
-		$ (venv) pip install pycountry # additional dependency
-		$ (venv) pip install psycopg2-binary # PostgreSQL requirement
-		$ (venv) django-admin startproject $PROJECT_NAME # rename to w/e your project name is
-		$ (venv) mv $PROJECT_NAME temp && mv temp/manage.py manage.py && mv temp/$PROJECT_NAME $PROJECT_NAME && rm -r temp
+		$ touch $PROJECT_NAME/.env
+		```
+
+		contents of `$PROJECT_NAME/.env`:
+		```sh
+		# Development Environment settings
+		DEBUG=on
+		SECRET_KEY='secret-key'
+		ALLOWED_HOSTS=['*']
+		DATABASE_URL=sqlite:///db.sqlite3
+		REDIS_CACHE_URL=redis://use
 		```
 
 	- add oscar-specific settings to `settings.py`
@@ -106,6 +187,8 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			]
 
 			SITE_ID = 1
+			...
+			TIME_ZONE = 'America/Chicago'
 			...
 			```
 
@@ -685,17 +768,40 @@ Note, any changes made to `settings.py` might require restarting the server in o
 <a name="git_commands"></a>
 4. ###### various git commands
 
-	1. authenticating (Sometimes required prior to pushing)
+	<a name="ssh_key_creation"></a>
+	1. [creating an SSH key for github and adding it to your account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
 
 		```sh
-		$ ssh -vT git@github.com
+		$ ssh-keygen -t ed25519 -C "bigleagchew@gmail.com" # creating it
 		```
+
+		open the file:
+		```sh
+		$ cat ~/.ssh/id_ed25519.pub #
+		```
+		copy/paste the output
+
+	<a name="git_authentication"></a>
+	2. authenticating
+
+			```sh
+			$ ssh -vT git@github.com
+			```
+
+		often required if you see this message after trying to `git push` or `git clone` a private repo:
+			```
+			git@github.com: Permission denied (publickey).
+			fatal: Could not read from remote repository.
+
+			Please make sure you have the correct access rights
+			and the repository exists.
+			```
 
 ---
 
 <a name="server_cli"></a>
 5. ###### various CLI commands
-
+	<a name="connecting_to_AWS"></a>
 	1. connecting to AWS instance via [ssh](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html):
 
 		```sh
