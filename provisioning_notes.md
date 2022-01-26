@@ -23,11 +23,10 @@ Note, any changes made to `settings.py` might require restarting the server in o
 
 	- install dependencies + virtual env setup
 		```sh
-		$ export PROJECT_NAME=dehy
-		$ export APP_FOLDER=apps
-		$ mkdir $PROJECT_NAME && cd $PROJECT_NAME
+		$ git clone git@github.com:BLCtbc/dehy.git
 		$ python3.7 -m venv venv # create the virtual environment
 		$ source venv/bin/activate # activate the virtual environment
+		$ export PROJECT_NAME=dehy && export APP_FOLDER=apps
 		$ (venv) pip install --upgrade pip
 		$ (venv) pip install 'django-oscar[sorl-thumbnail]' # should also install django and various other requirements
 		$ (venv) pip install pycountry # additional dependency
