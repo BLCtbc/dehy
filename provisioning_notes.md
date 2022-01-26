@@ -1,6 +1,7 @@
 # Provisioning notes, how-to's, etc. for a custom django-oscar deployment
 
 1. [installation and setup](#installation)
+	- [server side config files](#server_config)
 2. [providing initial data via data migration](#initial_data)
 3. [customizing oscar](#customizing_oscar)
 	- [adding field to existing Product](#edit_product_model)
@@ -23,7 +24,6 @@
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
 
 1. ##### <a name="installation"></a> Creating new django project with [oscar-django](https://django-oscar.readthedocs.io/en/3.1/internals/getting_started.html#install-oscar-and-its-dependencies)
-
 	- aws setup
 		- updating packages:
 			```sh
@@ -34,7 +34,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		- setting key permissions and connecting to your AWS instance (most instructions from [here](https://dev.to/rmiyazaki6499/deploying-a-production-ready-django-app-on-aws-1pk3))
 			```sh
 			$ cd Documents/$REPO_FOLDER
-			$ chmod 400 dehy.cer #
+			$ chmod 400 DEHY.cer # changes permissions on cert file (required)
 			$ ssh -i "DEHY.cer" admin@ec2-3-135-111-34.us-east-2.compute.amazonaws.com
 			```
 
@@ -284,15 +284,66 @@ Note, any changes made to `settings.py` might require restarting the server in o
 				- click 'save'
 				- do the same for any other countries shipping should be available for
 
+	<a name="server_config"></a>
+	- server config files
 
-	- setting up `oscar-django` payment support:
-		- `django-oscar-paypal`:
-			```sh
-			$ pip install django-oscar-paypal
-			$ python manage.py syncdb
+		- gunicorn
+			- socket file:
+
+				```
+				[Unit]
+				Description=gunicorn socket for dehy
+
+				[Socket]
+				ListenStream=/run/gunicorn.sock
+
+				[Install]
+				WantedBy=sockets.target
+				```
+
+			- service file (log file locations might need correcting)
+
+				```
+				[Unit]
+				Description=gunicorn daemon for dehy
+				Requires=gunicorn.socket
+				After=network.target
+
+				[Service]
+				User=admin
+				Group=www-data
+				WorkingDirectory=/home/admin/dehy
+				ExecStart=/home/admin/dehy/venv/bin/gunicorn \
+				--access-logfile access.log \
+        		--error-logfile error.log \
+				--workers 3 \
+				--bind unix:/run/gunicorn.sock \
+				dehy.wsgi:application
+
+				[Install]
+				WantedBy=multi-user.target
+				```
+
+		- nginx
+
+			```
+			server {
+			        listen 80;
+			        server_name dehygarnish.com 3.135.111.34;
+
+			        location = /favicon.ico { access_log off; log_not_found off; }
+			        location /static {
+			                alias /home/admin/dehy/static;
+			        }
+
+			        location / {
+			                include proxy_params;
+			                proxy_pass http://unix:/run/gunicorn.sock;
+			        }
+			}
 			```
 
-		- if `AttributeError: 'SessionStore' object has no attribute '_session_cache'` error is encountered, [try clearing cookies on](https://stackoverflow.com/a/27181817/6158303) `localhost` and `127.0.0.1`
+
 
 
 ---
@@ -757,6 +808,9 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			OSCAR_HOMEPAGE = reverse_lazy('home')
 			...
 			```
+
+		- troubleshooting
+			- if `AttributeError: 'SessionStore' object has no attribute '_session_cache'` error is encountered, [try clearing cookies on](https://stackoverflow.com/a/27181817/6158303) `localhost` and `127.0.0.1`
 
 ---
 <a name="django_oscar_paypal"></a>
