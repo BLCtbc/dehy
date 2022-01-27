@@ -615,34 +615,47 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			- http://127.0.0.1:8000/shop/p/pear - specific **p**roduct
 			- http://127.0.0.1:8000/shop/citrus - category
 
-		http://127.0.0.1:8000/shop/
-		in our case, for namespacing reasons, we couldn't simply put the `apps.py` file in our `$PROJECT_NAME` directory because our `$APP_FOLDER` is named 'apps'
 
 		- create `apps.py` and `__init__.py`
 			```sh
-			$ touch $PROJECT_NAME/$APP_FOLDER/apps.py && touch $PROJECT_NAME/$APP_FOLDER/__init__.py
+			$ touch $PROJECT_NAME/__init__.py
 			```
 
-		- `dehy/apps/apps.py`:
+		- `dehy/__init__.py`:
+			```py
+			default_app_config = 'dehy.apps.ShopConfig'
+			```
+
+		- `dehy/apps.py`:
 
 			```py
-			# dehy/apps/apps.py
 			from oscar import config
 			from django.urls import path
 
 			class ShopConfig(config.Shop):
 				name = 'dehy'
-				namespace = 'dehy'
+				namespace = 'shop'
 
 				# Override get_urls method
 				def get_urls(self):
+					urls_to_remove = []
 					urlpatterns = super().get_urls()
+					for pattern in urlpatterns:
+						if hasattr(pattern, 'name'):
+							name = getattr(pattern, 'name', None)
+							if name == 'home':
+								urls_to_remove.append(pattern)
 
-					catalog_test = lambda x: (hasattr(x, 'namespace') and x.namespace is "catalogue")
-					if any((hasattr(x, 'namespace') and x.namespace=="catalogue") for x in urlpatterns):
-						ix = list(map(catalog_test, urlpatterns)).index(True)
-						if ix:
-							urlpatterns.pop(ix)
+
+						if hasattr(pattern, 'namespace'):
+							namespace = getattr(pattern, 'namespace', None)
+							if namespace == 'catalogue':
+								urls_to_remove.append(pattern)
+
+
+					for pattern in urls_to_remove:
+						urlpatterns.remove(pattern)
+
 
 					urlpatterns += [
 						path('shop/', self.catalogue_app.urls, name='shop'),
@@ -650,15 +663,12 @@ Note, any changes made to `settings.py` might require restarting the server in o
 						# all the remaining URLs, removed for simplicity
 						# ...
 					]
-					print('\nurlpatterns: ', urlpatterns)
-					# return self.post_process_urls(urls)
+
 					return urlpatterns
 			```
 
-		- note the namespacing in `dehy/__init__.py`:
-			```py
-			default_app_config = 'dehy.apps.apps.ShopConfig'
-			```
+		if `$APP_FOLDER` is named 'apps', simply put the `apps.py` file under `$PROJECT_NAME/apps`
+		and change the namespacing in `$PROJECT_NAME/__init__.py` to `'dehy.apps.apps.ShopConfig'`
 
 		- update `urls.py`: replace `path('', include(apps.get_app_config('oscar').urls[0])),` with `path('', include(apps.get_app_config('dehy').urls[0])),`
 

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
 	'django.contrib.staticfiles',
 	'dehy',
 	'dehy.appz.catalogue.apps.CatalogueConfig',
+	'dehy.appz.dashboard.apps.DashboardConfig',
+	'dehy.appz.dashboard.catalogue.apps.CatalogueDashboardConfig',
 	# django apps added by oscar
 	'django.contrib.sites',
 	'django.contrib.flatpages',
@@ -55,7 +57,6 @@ INSTALLED_APPS = [
 	'oscar.apps.checkout.apps.CheckoutConfig',
 	'oscar.apps.address.apps.AddressConfig',
 	'oscar.apps.shipping.apps.ShippingConfig',
-	# 'oscar.apps.catalogue.apps.CatalogueConfig'
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
 	'oscar.apps.partner.apps.PartnerConfig',
@@ -67,11 +68,9 @@ INSTALLED_APPS = [
 	'oscar.apps.search.apps.SearchConfig',
 	'oscar.apps.voucher.apps.VoucherConfig',
 	'oscar.apps.wishlists.apps.WishlistsConfig',
-	'oscar.apps.dashboard.apps.DashboardConfig',
 	'oscar.apps.dashboard.reports.apps.ReportsDashboardConfig',
 	'oscar.apps.dashboard.users.apps.UsersDashboardConfig',
 	'oscar.apps.dashboard.orders.apps.OrdersDashboardConfig',
-	'oscar.apps.dashboard.catalogue.apps.CatalogueDashboardConfig',
 	'oscar.apps.dashboard.offers.apps.OffersDashboardConfig',
 	'oscar.apps.dashboard.partners.apps.PartnersDashboardConfig',
 	'oscar.apps.dashboard.pages.apps.PagesDashboardConfig',
@@ -208,4 +207,19 @@ HAYSTACK_CONNECTIONS = {
 	},
 }
 
+OSCAR_INITIAL_ORDER_STATUS = 'Pending'
+OSCAR_INITIAL_LINE_STATUS = 'Pending'
+OSCAR_ORDER_STATUS_PIPELINE = {
+	'Pending': ('Being processed', 'Cancelled',),
+	'Being processed': ('Processed', 'Cancelled',),
+	'Cancelled': (),
+}
+
+OSCAR_ORDER_STATUS_CASCADE = {
+	'Being processed': 'In progress'
+}
+
 OSCAR_DEFAULT_CURRENCY = 'USD'
+OSCAR_HIDDEN_FEATURES = ["reviews"]
+OSCAR_HOMEPAGE = reverse_lazy('home')
+OSCAR_SHOP_NAME = "DEHY"
