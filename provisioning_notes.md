@@ -87,17 +87,25 @@ Note, any changes made to `settings.py` might require restarting the server in o
 				> see [here](https://stackoverflow.com/questions/13410686/postgres-could-not-connect-to-server) for troubleshooting methods
 
 		* create database/user with [optimal](https://docs.djangoproject.com/en/3.0/ref/databases/#optimizing-postgresql-s-configuration) settings
-			```
+
+			```sql
 			postgres=# CREATE DATABASE dehy;
 			postgres=# CREATE USER dehydevuser WITH PASSWORD 'penileZZ44yN0tT420';
 			postgres=# ALTER ROLE dehydevuser SET client_encoding TO 'utf8';
 			postgres=# ALTER ROLE dehydevuser SET default_transaction_isolation TO 'read committed';
 			postgres=# ALTER ROLE dehydevuser SET timezone TO 'America/Chicago';
 			```
+
 		* grant permissions, then quit
 			```
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy TO dehydevuser;
 			postgres=# \q
+			```
+
+		* or if you have an existing database and want to make a copy:
+			```sql
+			postgres=# CREATE DATABASE dehy_staging WITH TEMPLATE dehy OWNER dehydevuser;
+			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy_staging TO dehydevuser;
 			```
 
 	- create and setup the `.env` file:
