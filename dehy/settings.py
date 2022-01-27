@@ -9,8 +9,12 @@ https://django-oscar.readthedocs.io/en/3.1/ref/settings.html
 from oscar.defaults import *
 import environ
 from pathlib import Path
+from pygit2 import Repository
 
-# smile xd
+ENV_FILE = '.env'
+if Repository('.').head.shorthand is 'main':
+	ENV_FILE = '.env-prod'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,7 +25,7 @@ env = environ.Env(
 environ.Env.read_env()
 
 # env.read_env(env.str(BASE_DIR, '.env'))
-env.read_env(BASE_DIR / '.env')
+env.read_env(BASE_DIR / ENV_FILE)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
