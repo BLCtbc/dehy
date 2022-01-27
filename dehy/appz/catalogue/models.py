@@ -1,8 +1,10 @@
-# dehy/appz/catalogue/models.py
-
+# dehy/apps/catalogue/models.py
 from django.template.defaultfilters import striptags
 from django.db import models
-from oscar.apps.catalogue.abstract_models import AbstractProduct
+from datetime import datetime
+from django.urls import reverse
+from oscar.models.fields.slugfield import SlugField
+from oscar.apps.catalogue.abstract_models import AbstractCategory, AbstractProduct
 from django.utils.translation import gettext_lazy as _
 
 class Product(AbstractProduct):
@@ -35,6 +37,34 @@ class Product(AbstractProduct):
 			elif self.is_child:
 				self.meta_title = self.parent.get_title()
 
+		super().save(*args, **kwargs)
 
+	def get_absolute_url(self):
+		"""
+		Return a product's absolute URL
+		"""
+		return f"{reverse('catalogue:detail', kwargs={'product_slug': self.slug})}"
 
-from oscar.apps.catalogue.models import *  # noqa isort:skip
+class Category(AbstractCategory):
+	slug = SlugField(_('Slug'), max_length=255, db_index=True, unique=True)
+
+	def get_url_cache_key(self):
+		current_locale = get_language()
+		cache_key = 'CATEGORY_URL_%s_%s' % (current_locale, self.slug)
+		return
+
+	def _get_absolute_url(self, parent_slug=None):
+		"""
+		Our URL scheme means we have to look up the category's ancestors. As
+		that is a bit more expensive, we cache the generated URL. That is
+		safe even for a stale cache, as the default implementation of
+		ProductCategoryView does the lookup via primary key anyway. But if
+		you change that logic, you'll have to reconsider the caching
+		approach.
+		"""
+
+		return reverse('catalogue:category', kwargs={
+			'category_slug': self.get_full_slug(parent_slug=parent_slug)
+		})
+
+from oscar.apps.catalogue.models import *
