@@ -13,6 +13,7 @@
 	- [modifying urls by overriding the default oscar app](#modify_urls)
 	- [disabling a built-in oscar feature](#disable_feature)
 	- [changing the oscar homepage](#edit_homepage)
+	- [overriding base templates](#base_layouts_override)
 4. [implementing paypal payment support with django-oscar-payapl](#django_oscar_paypal)
 5. [linux cli commands](#server_cli)
 	- [connecting to AWS](#connecting_to_AWS)
@@ -795,7 +796,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			```html
 			<!-- dehy/templates/home.html -->
 
-			{% extends "oscar/layout.html" %}
+			{% extends "layout.html" %}
 
 			{% load i18n %}
 			{% load product_tags %}
@@ -829,6 +830,35 @@ Note, any changes made to `settings.py` might require restarting the server in o
 
 		- troubleshooting
 			- if `AttributeError: 'SessionStore' object has no attribute '_session_cache'` error is encountered, [try clearing cookies on](https://stackoverflow.com/a/27181817/6158303) `localhost` and `127.0.0.1`
+
+
+	<a name="base_layouts_override"></a>
+	- ###### overriding base templates (theorizing)
+		- follow the directions [here](https://django-oscar.readthedocs.io/en/3.1/howto/how_to_customise_templates.html#method-1-forking)
+
+		- list of apps to fork to override `layout.html`:
+			- checkout: `./manage.py oscar_fork_app checkout dehy/appz`
+			- dashboard (optional): `./manage.py oscar_fork_app dashboard dehy/appz`
+
+		- list of apps to fork to override `layout_2_col.html`:
+			- catalogue: `./manage.py oscar_fork_app catalogue dehy/appz`
+			- search: `./manage.py oscar_fork_app search dehy/appz`
+			- basket: `./manage.py oscar_fork_app basket dehy/appz`
+			- customer: `./manage.py oscar_fork_app customer dehy/appz`
+
+		- after forking all of the above ups, create copies of the aforementioned oscar template directories:
+			- `venv/lib/python3.7/site-packages/oscar/templates/basket` -> `templates/basket` -- repeat for all required apps
+
+		- list of files where an override is needed:
+			- `layout_2_col.html`
+			- `layout_3_col.html`
+			- `basket/basket.html`
+			- `checkout/checkout.html`
+			- `checkout/layout.html`
+			...
+			..way too many to list..
+			suggestion: use a regex pattern something like this: `oscar\/([\w]+\.html)` and just replace all
+			regex for nested: `oscar\/([\w]+\/[\w]+\.html)`
 
 ---
 <a name="django_oscar_paypal"></a>
