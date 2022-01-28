@@ -49,7 +49,7 @@
         <div class="side_categories card card-body bg-light">
             {% for field, data in facet_data.items %}
                 {% if data.results %}
-                    {% include 'oscar/search/partials/facet.html' with name=data.name items=data.results %}
+                    {% include 'search/partials/facet.html' with name=data.name items=data.results %}
                 {% endif %}
             {% endfor %}
         </div>

@@ -1,12 +1,18 @@
 from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
 from oscar.apps.catalogue.views import ProductCategoryView as CoreProductCategoryView
+from oscar.apps.catalogue.views import CatalogueView as CoreCatalogueView
+
 from dehy.appz.catalogue.models import Category, Product
 from django.shortcuts import get_object_or_404, redirect
 
+class CatalogueView(CoreCatalogueView):
+	template_name = 'catalogue/browse.html'
+	
 class ProductCategoryView(CoreProductCategoryView):
 	model = Category
 	slug_field = 'slug'
 	slug_url_kwarg = 'category_slug'
+	template_name = 'catalogue/category.html'
 
 	def get_category(self):
 		return get_object_or_404(Category, slug=self.kwargs['category_slug'])
@@ -14,6 +20,7 @@ class ProductCategoryView(CoreProductCategoryView):
 class ProductDetailView(CoreProductDetailView):
 	model = Product
 	template_name = 'catalogue/partials/product.html'
+	# template_folder = "dehy/templates/catalogue"
 	slug_field = 'slug'
 	slug_url_kwarg = 'product_slug'
 
