@@ -13,7 +13,7 @@ class ProductCategoryView(CoreProductCategoryView):
 
 class ProductDetailView(CoreProductDetailView):
 	model = Product
-	template_name = 'catalogue/partials/detail.html'
+	template_name = 'catalogue/partials/product.html'
 	slug_field = 'slug'
 	slug_url_kwarg = 'product_slug'
 
