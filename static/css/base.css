@@ -1,0 +1,64 @@
+:root {
+    --gold: #bca263;
+	--hunter-green: #224431;
+	--beige: #f4ecdc;
+}
+@font-face {
+    font-family: 'lydiacondensed-bold';
+    src: url('/static/fonts/lydiacondensed-bold.eot');
+    src: url('/static/fonts/lydiacondensed-bold.eot?#iefix') format('embedded-opentype'),
+         url('/static/fonts/lydiacondensed-bold.woff2') format('woff2'),
+         url('/static/fonts/lydiacondensed-bold.woff') format('woff'),
+         url('/static/fonts/lydiacondensed-bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'lydiacondensed-bold';
+    src: url('/static/fonts/lydiacondensed-bold.eot');
+    src: url('/static/fonts/lydiacondensed-bold.eot?#iefix') format('embedded-opentype'),
+         url('/static/fonts/lydiacondensed-bold.woff2') format('woff2'),
+         url('/static/fonts/lydiacondensed-bold.woff') format('woff'),
+         url('/static/fonts/lydiacondensed-bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'freefrm';
+    src: url('/static/fonts/freefrm.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+	font-family: 'itc-avant-garde-gothic-pro';
+	src:url('https://use.typekit.net/af/b89a53/00000000000000007735ba1d/30/l?subset_id=2&fvd=n3&v=3') format("woff2"),
+		url('https://use.typekit.net/af/b89a53/00000000000000007735ba1d/30/d?subset_id=2&fvd=n3&v=3') format("woff"),
+		url('https://use.typekit.net/af/b89a53/00000000000000007735ba1d/30/a?subset_id=2&fvd=n3&v=3') format("opentype");
+	font-weight:300;
+	font-style:normal;
+	font-display:auto;
+}
+
+@font-face {
+	font-family:'itc-avant-garde-gothic-pro';
+	src:url('https://use.typekit.net/af/6161d4/00000000000000007735ba1e/30/l?subset_id=2&fvd=n5&v=3') format("woff2"),
+		url('https://use.typekit.net/af/6161d4/00000000000000007735ba1e/30/d?subset_id=2&fvd=n5&v=3') format("woff"),
+		url('https://use.typekit.net/af/6161d4/00000000000000007735ba1e/30/a?subset_id=2&fvd=n5&v=3') format("opentype");
+	font-weight:500;
+	font-style:normal;
+	font-display:auto;
+}
+
+@font-face {
+	font-family:'itc-avant-garde-gothic-pro';
+	src: url('https://use.typekit.net/af/578a9d/00000000000000007735ba14/30/l?subset_id=2&fvd=n7&v=3') format("woff2"),
+		url('https://use.typekit.net/af/578a9d/00000000000000007735ba14/30/d?subset_id=2&fvd=n7&v=3') format("woff"),
+		url('https://use.typekit.net/af/578a9d/00000000000000007735ba14/30/a?subset_id=2&fvd=n7&v=3') format("opentype");
+	font-weight:700;
+	font-style:normal;
+	font-display:auto;
+}

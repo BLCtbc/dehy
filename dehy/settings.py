@@ -49,27 +49,28 @@ INSTALLED_APPS = [
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 	'dehy',
+	# oscar overrides
 	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
 	'dehy.appz.dashboard.catalogue.apps.CatalogueDashboardConfig',
+	'dehy.appz.basket.apps.BasketConfig',
+	'dehy.appz.search.apps.SearchConfig',
+	'dehy.appz.customer.apps.CustomerConfig',
+	'dehy.appz.checkout.apps.CheckoutConfig',
 	# django apps added by oscar
 	'django.contrib.sites',
 	'django.contrib.flatpages',
 	# oscar apps
 	'oscar.config.Shop',
 	'oscar.apps.analytics.apps.AnalyticsConfig',
-	'oscar.apps.checkout.apps.CheckoutConfig',
 	'oscar.apps.address.apps.AddressConfig',
 	'oscar.apps.shipping.apps.ShippingConfig',
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
 	'oscar.apps.partner.apps.PartnerConfig',
-	'oscar.apps.basket.apps.BasketConfig',
 	'oscar.apps.payment.apps.PaymentConfig',
 	'oscar.apps.offer.apps.OfferConfig',
 	'oscar.apps.order.apps.OrderConfig',
-	'oscar.apps.customer.apps.CustomerConfig',
-	'oscar.apps.search.apps.SearchConfig',
 	'oscar.apps.voucher.apps.VoucherConfig',
 	'oscar.apps.wishlists.apps.WishlistsConfig',
 	'oscar.apps.dashboard.reports.apps.ReportsDashboardConfig',
@@ -150,6 +151,14 @@ DATABASES = {
     #     default='sqlite:////tmp/my-tmp-sqlite.db'
     # )
 }
+if DEBUG:
+
+	CACHES = {
+	    'default': {
+	        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+	   }
+	}
+	MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -188,7 +197,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
-# STATICFILES_DIRS
+# STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
@@ -225,3 +234,4 @@ OSCAR_DEFAULT_CURRENCY = 'USD'
 OSCAR_HIDDEN_FEATURES = ["reviews"]
 OSCAR_HOMEPAGE = reverse_lazy('home')
 OSCAR_SHOP_NAME = "DEHY"
+OSCAR_SHOP_TAGLINE = ""
