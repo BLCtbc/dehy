@@ -12,3 +12,6 @@ class HomeView(TemplateView):
 class ReturnsRefundsView(TemplateView):
     template_name = "dehy/returns.html"
 
+class ContactView(TemplateView):
+    template_name = "dehy/contact.html"
+
