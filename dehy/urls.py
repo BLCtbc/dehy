@@ -9,6 +9,7 @@ urlpatterns = [
 	path('custom/', views.CustomView.as_view(), name='custom'),
 	path('returns/', views.ReturnsRefundsView.as_view(), name='returns'),
 	path('wholesale/', views.WholesaleView.as_view(), name='wholesale'),
+	path('contact/', views.ContactView.as_view(), name='contact'),
 	path('', views.HomeView.as_view(), name='home'),
 	path('', include(apps.get_app_config('dehy').urls[0])),
 ]

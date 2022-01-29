@@ -1,0 +1,3413 @@
+[
+    {
+        "model": "catalogue.product",
+        "pk": 1,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f7524941158a96d1ac2b654",
+            "title": "Lime - Fine Cuts",
+            "slug": "fine-dehydrated-lime-cocktail-garnish",
+            "description": "Fine Cuts are the most consistent cut we offer, with the same thickness from slice to slice. A perfect addition to any cocktail.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.159Z",
+            "date_updated": "2022-01-25T21:49:21.159Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 1,
+        "fields": {
+            "product": 1,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 2,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 8ct",
+            "is_public": true,
+            "parent": 1,
+            "upc": "1da1c05b-365f-483d-b92f-0503a4b3b952",
+            "slug": "fine-dehydrated-lime-cocktail-garnish-pouch-8ct",
+            "length": 6.0,
+            "width": 5.0,
+            "height": 1.0,
+            "weight": 0.001,
+            "date_created": "2022-01-25T21:49:21.159Z",
+            "date_updated": "2022-01-25T21:49:21.159Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 1,
+        "fields": {
+            "product": 2,
+            "partner": 1,
+            "partner_sku": "1da1c05b-365f-483d-b92f-0503a4b3b952",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.159Z",
+            "date_updated": "2022-01-25T21:49:21.159Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 3,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 1,
+            "upc": "2fa0adcc-74a4-4756-bc30-29204cb0160f",
+            "slug": "fine-dehydrated-lime-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.159Z",
+            "date_updated": "2022-01-25T21:49:21.159Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 2,
+        "fields": {
+            "product": 3,
+            "partner": 1,
+            "partner_sku": "2fa0adcc-74a4-4756-bc30-29204cb0160f",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.159Z",
+            "date_updated": "2022-01-25T21:49:21.159Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 4,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 100ct",
+            "is_public": true,
+            "parent": 1,
+            "upc": "c4f5749e-466b-4c0b-8fb9-6d99a941bf98",
+            "slug": "fine-dehydrated-lime-cocktail-garnish-largejar-100ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.159Z",
+            "date_updated": "2022-01-25T21:49:21.159Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 3,
+        "fields": {
+            "product": 4,
+            "partner": 1,
+            "partner_sku": "c4f5749e-466b-4c0b-8fb9-6d99a941bf98",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.159Z",
+            "date_updated": "2022-01-25T21:49:21.159Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 5,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 625ct",
+            "is_public": true,
+            "parent": 1,
+            "upc": "225fde51-6439-4bf4-9508-ef1f08addd9e",
+            "slug": "fine-dehydrated-lime-cocktail-garnish-wholesale-625ct",
+            "length": 12.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 2.5,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 4,
+        "fields": {
+            "product": 5,
+            "partner": 1,
+            "partner_sku": "225fde51-6439-4bf4-9508-ef1f08addd9e",
+            "price_currency": "USD",
+            "price": 65.0,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 6,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f75381e2fbf5a33637c5556",
+            "title": "Lemon - Fine Cuts",
+            "slug": "fine-dehydrated-lemon-cocktail-garnish",
+            "description": "Fine Cuts are the most consistent cut we offer, with the same thickness from slice to slice. A perfect addition to any cocktail.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 2,
+        "fields": {
+            "product": 6,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 7,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 8ct",
+            "is_public": true,
+            "parent": 6,
+            "upc": "9d3f3ada-5582-439f-a78e-17a100075b30",
+            "slug": "fine-dehydrated-lemon-cocktail-garnish-pouch-8ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 5.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 5,
+        "fields": {
+            "product": 7,
+            "partner": 1,
+            "partner_sku": "9d3f3ada-5582-439f-a78e-17a100075b30",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 8,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 50ct",
+            "is_public": true,
+            "parent": 6,
+            "upc": "6fc897d8-3f68-4c4b-92a6-b0549fb4bb35",
+            "slug": "fine-dehydrated-lemon-cocktail-garnish-smalljar-50ct",
+            "length": 12.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 6,
+        "fields": {
+            "product": 8,
+            "partner": 1,
+            "partner_sku": "6fc897d8-3f68-4c4b-92a6-b0549fb4bb35",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 9,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 100ct",
+            "is_public": true,
+            "parent": 6,
+            "upc": "3d8477aa-0e34-4bec-94a0-09cf43233361",
+            "slug": "fine-dehydrated-lemon-cocktail-garnish-largejar-100ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.5,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 7,
+        "fields": {
+            "product": 9,
+            "partner": 1,
+            "partner_sku": "3d8477aa-0e34-4bec-94a0-09cf43233361",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 10,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 625ct",
+            "is_public": true,
+            "parent": 6,
+            "upc": "2973f878-75aa-4c77-9d92-0c067999cd4c",
+            "slug": "fine-dehydrated-lemon-cocktail-garnish-wholesale-625ct",
+            "length": 12.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.95,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 8,
+        "fields": {
+            "product": 10,
+            "partner": 1,
+            "partner_sku": "2973f878-75aa-4c77-9d92-0c067999cd4c",
+            "price_currency": "USD",
+            "price": 65.0,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 11,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f753a86f5a59735fc894ee1",
+            "title": "Orange - Fine Cuts",
+            "slug": "fine-dehydrated-orange-cocktail-garnish",
+            "description": "Fine Cuts are the most consistent cut we offer, with the same thickness from slice to slice. A perfect addition to any cocktail.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 3,
+        "fields": {
+            "product": 11,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 12,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 6ct",
+            "is_public": true,
+            "parent": 11,
+            "upc": "f5a4926b-3075-4125-8650-56b5666ade22",
+            "slug": "fine-dehydrated-orange-cocktail-garnish-pouch-6ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 5.0,
+            "weight": 0.001,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 9,
+        "fields": {
+            "product": 12,
+            "partner": 1,
+            "partner_sku": "f5a4926b-3075-4125-8650-56b5666ade22",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 13,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 11,
+            "upc": "544d4a5d-d5f1-4faf-86f2-8aa49a1a4e33",
+            "slug": "fine-dehydrated-orange-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 10,
+        "fields": {
+            "product": 13,
+            "partner": 1,
+            "partner_sku": "544d4a5d-d5f1-4faf-86f2-8aa49a1a4e33",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 14,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 70ct",
+            "is_public": true,
+            "parent": 11,
+            "upc": "2c3bc9c7-a98d-4f22-ac41-48a836dfa7c0",
+            "slug": "fine-dehydrated-orange-cocktail-garnish-largejar-70ct",
+            "length": 12.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.95,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 11,
+        "fields": {
+            "product": 14,
+            "partner": 1,
+            "partner_sku": "2c3bc9c7-a98d-4f22-ac41-48a836dfa7c0",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.160Z",
+            "date_updated": "2022-01-25T21:49:21.160Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 15,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 400ct",
+            "is_public": true,
+            "parent": 11,
+            "upc": "03bb027f-d53c-4464-bbc3-9c11a0fbec8d",
+            "slug": "fine-dehydrated-orange-cocktail-garnish-wholesale-400ct",
+            "length": 12.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.95,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 12,
+        "fields": {
+            "product": 15,
+            "partner": 1,
+            "partner_sku": "03bb027f-d53c-4464-bbc3-9c11a0fbec8d",
+            "price_currency": "USD",
+            "price": 65.0,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 16,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f753cec2b23623907f1c830",
+            "title": "Blood Orange - Fine Cuts",
+            "slug": "fine-dehydrated-blood-orange-cocktail-garnish",
+            "description": "Fine Cuts are the most consistent cut we offer, with the same thickness from slice to slice.A perfect addition to any cocktail.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 4,
+        "fields": {
+            "product": 16,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 17,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 6ct",
+            "is_public": true,
+            "parent": 16,
+            "upc": "cdf081c0-df5d-493f-b33f-598d4fea990e",
+            "slug": "fine-dehydrated-blood-orange-cocktail-garnish-pouch-6ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 5.0,
+            "weight": 0.001,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 13,
+        "fields": {
+            "product": 17,
+            "partner": 1,
+            "partner_sku": "cdf081c0-df5d-493f-b33f-598d4fea990e",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 18,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 16,
+            "upc": "3d6c7183-0704-4146-8fc6-eabd4a48eaf6",
+            "slug": "fine-dehydrated-blood-orange-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 14,
+        "fields": {
+            "product": 18,
+            "partner": 1,
+            "partner_sku": "3d6c7183-0704-4146-8fc6-eabd4a48eaf6",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 19,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 70ct",
+            "is_public": true,
+            "parent": 16,
+            "upc": "115150e5-c6c4-49cb-9f47-d703cc3d161b",
+            "slug": "fine-dehydrated-blood-orange-cocktail-garnish-largejar-70ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 15,
+        "fields": {
+            "product": 19,
+            "partner": 1,
+            "partner_sku": "115150e5-c6c4-49cb-9f47-d703cc3d161b",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 20,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 400ct",
+            "is_public": true,
+            "parent": 16,
+            "upc": "e5c27b85-e714-4f07-b0c6-e22b9956de27",
+            "slug": "fine-dehydrated-blood-orange-cocktail-garnish-wholesale-400ct",
+            "length": 12.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.95,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 16,
+        "fields": {
+            "product": 20,
+            "partner": 1,
+            "partner_sku": "e5c27b85-e714-4f07-b0c6-e22b9956de27",
+            "price_currency": "USD",
+            "price": 75.0,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 21,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f753ef12fbf5a33637d4f76",
+            "title": "Blood Orange - Rough Cuts",
+            "slug": "rough-dehydrated-blood-orange-cocktail-garnish",
+            "description": "Rough Cuts are thicker and vary in size. Great for drinks that are a bit more \u2018rough around the edges\u2019 and call for a hand-cut, rustic look.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 5,
+        "fields": {
+            "product": 21,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 22,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 4ct",
+            "is_public": true,
+            "parent": 21,
+            "upc": "ab7f4f17-06fb-43de-93c9-814169985dc7",
+            "slug": "rough-dehydrated-blood-orange-cocktail-garnish-pouch-4ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.09,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 17,
+        "fields": {
+            "product": 22,
+            "partner": 1,
+            "partner_sku": "ab7f4f17-06fb-43de-93c9-814169985dc7",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.161Z",
+            "date_updated": "2022-01-25T21:49:21.161Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 23,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 20ct",
+            "is_public": true,
+            "parent": 21,
+            "upc": "bef35630-bebe-4671-8b00-a06a3af0c15d",
+            "slug": "rough-dehydrated-blood-orange-cocktail-garnish-smalljar-20ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 18,
+        "fields": {
+            "product": 23,
+            "partner": 1,
+            "partner_sku": "bef35630-bebe-4671-8b00-a06a3af0c15d",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 24,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 40ct",
+            "is_public": true,
+            "parent": 21,
+            "upc": "aca86b55-338f-4b35-912e-5a6c85be6599",
+            "slug": "rough-dehydrated-blood-orange-cocktail-garnish-largejar-40ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 19,
+        "fields": {
+            "product": 24,
+            "partner": 1,
+            "partner_sku": "aca86b55-338f-4b35-912e-5a6c85be6599",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 25,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f7540170121d07afb8cbc58",
+            "title": "Orange - Rough Cuts",
+            "slug": "rough-dehydrated-orange-cocktail-garnish",
+            "description": "Rough Cuts are thicker and vary in size. Great for drinks that are a bit more \u2018rough around the edges\u2019 and call for a hand-cut, rustic look.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 6,
+        "fields": {
+            "product": 25,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 26,
+        "fields": {
+            "structure": "child",
+            "title": "6ct",
+            "is_public": true,
+            "parent": 25,
+            "upc": "8c43d468-7f06-4c58-b2bf-b298f3474d0a",
+            "slug": "rough-dehydrated-orange-cocktail-garnish-6ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.09,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 20,
+        "fields": {
+            "product": 26,
+            "partner": 1,
+            "partner_sku": "8c43d468-7f06-4c58-b2bf-b298f3474d0a",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 27,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 30ct",
+            "is_public": true,
+            "parent": 25,
+            "upc": "d2f2dd87-999d-4aa3-b83e-1169b9fa62aa",
+            "slug": "rough-dehydrated-orange-cocktail-garnish-smalljar-30ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 21,
+        "fields": {
+            "product": 27,
+            "partner": 1,
+            "partner_sku": "d2f2dd87-999d-4aa3-b83e-1169b9fa62aa",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 28,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 60ct",
+            "is_public": true,
+            "parent": 25,
+            "upc": "6b1a939b-bfd8-49e3-b97c-73e62ebccd31",
+            "slug": "rough-dehydrated-orange-cocktail-garnish-largejar-60ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 22,
+        "fields": {
+            "product": 28,
+            "partner": 1,
+            "partner_sku": "6b1a939b-bfd8-49e3-b97c-73e62ebccd31",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 29,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 100ct",
+            "is_public": true,
+            "parent": 25,
+            "upc": "a39ad68c-8eaa-4a80-a73c-8b0810be6de4",
+            "slug": "rough-dehydrated-orange-cocktail-garnish-wholesale-100ct",
+            "length": 7.0,
+            "width": 2.0,
+            "height": 9.0,
+            "weight": 0.75,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 23,
+        "fields": {
+            "product": 29,
+            "partner": 1,
+            "partner_sku": "a39ad68c-8eaa-4a80-a73c-8b0810be6de4",
+            "price_currency": "USD",
+            "price": 30.0,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 30,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f7541779993bf06c4cc5e3e",
+            "title": "Lime - Rough Cuts",
+            "slug": "rough-dehydrated-lime-cocktail-garnish",
+            "description": "Rough Cuts are thicker and vary in size. Great for drinks that are a bit more \u2018rough around the edges\u2019 and call for a hand-cut, rustic look.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.162Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 7,
+        "fields": {
+            "product": 30,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 31,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 7ct",
+            "is_public": true,
+            "parent": 30,
+            "upc": "1eb97da2-f07a-4176-ba26-f7c614d5f6fe",
+            "slug": "rough-dehydrated-lime-cocktail-garnish-pouch-7ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.2,
+            "date_created": "2022-01-25T21:49:21.162Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 24,
+        "fields": {
+            "product": 31,
+            "partner": 1,
+            "partner_sku": "1eb97da2-f07a-4176-ba26-f7c614d5f6fe",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 32,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 30,
+            "upc": "72284ff4-a25e-414e-8c64-19f01945365d",
+            "slug": "rough-dehydrated-lime-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 25,
+        "fields": {
+            "product": 32,
+            "partner": 1,
+            "partner_sku": "72284ff4-a25e-414e-8c64-19f01945365d",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 33,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 70ct",
+            "is_public": true,
+            "parent": 30,
+            "upc": "38168337-fb58-4406-95d5-14107b7d80d4",
+            "slug": "rough-dehydrated-lime-cocktail-garnish-largejar-70ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 26,
+        "fields": {
+            "product": 33,
+            "partner": 1,
+            "partner_sku": "38168337-fb58-4406-95d5-14107b7d80d4",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 34,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 150ct",
+            "is_public": true,
+            "parent": 30,
+            "upc": "db003e05-e37d-4f35-9d1a-83e3721c8317",
+            "slug": "rough-dehydrated-lime-cocktail-garnish-wholesale-150ct",
+            "length": 7.0,
+            "width": 2.0,
+            "height": 9.0,
+            "weight": 0.75,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 27,
+        "fields": {
+            "product": 34,
+            "partner": 1,
+            "partner_sku": "db003e05-e37d-4f35-9d1a-83e3721c8317",
+            "price_currency": "USD",
+            "price": 30.0,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 35,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f7543610df493541c5772b4",
+            "title": "Lemon - Rough Cuts",
+            "slug": "rough-dehydrated-lemon-cocktail-garnish",
+            "description": "Rough Cuts are thicker and vary in size. Great for drinks that are a bit more \u2018rough around the edges\u2019 and call for a hand-cut, rustic look.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 8,
+        "fields": {
+            "product": 35,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 36,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 7pc",
+            "is_public": true,
+            "parent": 35,
+            "upc": "3bce9f65-89ef-44fa-9454-39a08559f8fd",
+            "slug": "rough-dehydrated-lemon-cocktail-garnish-pouch-7pc",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.09,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 28,
+        "fields": {
+            "product": 36,
+            "partner": 1,
+            "partner_sku": "3bce9f65-89ef-44fa-9454-39a08559f8fd",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 37,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 30ct",
+            "is_public": true,
+            "parent": 35,
+            "upc": "2fb8e4d4-34a9-4a75-9831-5f6e20540205",
+            "slug": "rough-dehydrated-lemon-cocktail-garnish-smalljar-30ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 29,
+        "fields": {
+            "product": 37,
+            "partner": 1,
+            "partner_sku": "2fb8e4d4-34a9-4a75-9831-5f6e20540205",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.163Z",
+            "date_updated": "2022-01-25T21:49:21.163Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 38,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 65ct",
+            "is_public": true,
+            "parent": 35,
+            "upc": "f6809bb3-80a0-42e0-b057-fbbe8aff07a4",
+            "slug": "rough-dehydrated-lemon-cocktail-garnish-largejar-65ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 30,
+        "fields": {
+            "product": 38,
+            "partner": 1,
+            "partner_sku": "f6809bb3-80a0-42e0-b057-fbbe8aff07a4",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 39,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f7544e27a7dba1ef4c542d4",
+            "title": "Orange - Petals",
+            "slug": "dehydrated-orange-petal-cocktail-garnish",
+            "description": "In preparing citrus for slicing, we cut off the ends. In the spirit of letting nothing go to waste, we discovered the perfect sized garnish for smaller cocktail glasses, like the classic Nick & Nora. When dehydrated, these resemble dried flower petals, and make wonderful finishes to an egg white cocktail, punch bowl, or tea cup presentation. While they are small, they still pack in all the aromatics of the citrus. \n",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 9,
+        "fields": {
+            "product": 39,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 40,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 100ct",
+            "is_public": true,
+            "parent": 39,
+            "upc": "92b6751f-8369-488c-9887-cb6b74172146",
+            "slug": "dehydrated-orange-petal-cocktail-garnish-wholesale-100ct",
+            "length": 6.0,
+            "width": 2.0,
+            "height": 9.0,
+            "weight": 1.1,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 31,
+        "fields": {
+            "product": 40,
+            "partner": 1,
+            "partner_sku": "92b6751f-8369-488c-9887-cb6b74172146",
+            "price_currency": "USD",
+            "price": 14.0,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 41,
+        "fields": {
+            "structure": "child",
+            "title": "7ct",
+            "is_public": true,
+            "parent": 39,
+            "upc": "f3ecafe4-10a8-4575-98e4-845ab096cd08",
+            "slug": "dehydrated-orange-petal-cocktail-garnish-7ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.09,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 32,
+        "fields": {
+            "product": 41,
+            "partner": 1,
+            "partner_sku": "f3ecafe4-10a8-4575-98e4-845ab096cd08",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 42,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 39,
+            "upc": "505c17b9-814c-4124-8626-9f0d628203d0",
+            "slug": "dehydrated-orange-petal-cocktail-garnish-smalljar-35ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.2,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 33,
+        "fields": {
+            "product": 42,
+            "partner": 1,
+            "partner_sku": "505c17b9-814c-4124-8626-9f0d628203d0",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 43,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f7548970121d07afb8db8a3",
+            "title": "Blood Orange - Petals",
+            "slug": "dehydrated-blood-orange-petal-cocktail-garnish",
+            "description": "In preparing citrus for slicing, we cut off the ends. In the spirit of letting nothing go to waste, we discovered the perfect sized garnish for smaller cocktail glasses, like the classic Nick & Nora. When dehydrated, these resemble dried flower petals, and make wonderful finishes to an egg white cocktail, punch bowl, or tea cup presentation. While they are small, they still pack in all the aromatics of the citrus. \n",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 10,
+        "fields": {
+            "product": 43,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 44,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 6ct",
+            "is_public": true,
+            "parent": 43,
+            "upc": "f88f31ed-dd5c-4619-a797-933f27c3f1d1",
+            "slug": "dehydrated-blood-orange-petal-cocktail-garnish-pouch-6ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.09,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 34,
+        "fields": {
+            "product": 44,
+            "partner": 1,
+            "partner_sku": "f88f31ed-dd5c-4619-a797-933f27c3f1d1",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 45,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 43,
+            "upc": "1c5b25de-3acd-4da9-a8ce-fb15526e104b",
+            "slug": "dehydrated-blood-orange-petal-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.2,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 35,
+        "fields": {
+            "product": 45,
+            "partner": 1,
+            "partner_sku": "1c5b25de-3acd-4da9-a8ce-fb15526e104b",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.164Z",
+            "date_updated": "2022-01-25T21:49:21.164Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 46,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f754a610df493541c586bef",
+            "title": "Lemon - Petals",
+            "slug": "dehydrated-lemon-petal-cocktail-garnish",
+            "description": "In preparing citrus for slicing, we cut off the ends. In the spirit of letting nothing go to waste, we discovered the perfect sized garnish for smaller cocktail glasses, like the classic Nick & Nora. When dehydrated, these resemble dried flower petals, and make wonderful finishes to an egg white cocktail, punch bowl, or tea cup presentation. While they are small, they still pack in all the aromatics of the citrus. \n",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 11,
+        "fields": {
+            "product": 46,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 47,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 10ct",
+            "is_public": true,
+            "parent": 46,
+            "upc": "3dbd709b-5a06-46d3-8288-9ac2ac58d292",
+            "slug": "dehydrated-lemon-petal-cocktail-garnish-pouch-10ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.09,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 36,
+        "fields": {
+            "product": 47,
+            "partner": 1,
+            "partner_sku": "3dbd709b-5a06-46d3-8288-9ac2ac58d292",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 48,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 100ct",
+            "is_public": true,
+            "parent": 46,
+            "upc": "d0a03c09-a341-4777-8e5e-7444a115f782",
+            "slug": "dehydrated-lemon-petal-cocktail-garnish-smalljar-100ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 3.75,
+            "weight": 1.2,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 37,
+        "fields": {
+            "product": 48,
+            "partner": 1,
+            "partner_sku": "d0a03c09-a341-4777-8e5e-7444a115f782",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 49,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f754b4b0373414277ab927f",
+            "title": "Lime - Petals",
+            "slug": "dehydrated-lime-petal-cocktail-garnish",
+            "description": "In preparing citrus for slicing, we cut off the ends. In the spirit of letting nothing go to waste, we discovered the perfect sized garnish for smaller cocktail glasses, like the classic Nick & Nora. When dehydrated, these resemble dried flower petals, and make wonderful finishes to an egg white cocktail, punch bowl, or tea cup presentation. While they are small, they still pack in all the aromatics of the citrus. \n",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 12,
+        "fields": {
+            "product": 49,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 50,
+        "fields": {
+            "structure": "child",
+            "title": "12ct",
+            "is_public": true,
+            "parent": 49,
+            "upc": "7f58dff9-9e9f-44a9-8625-b11f8d47d902",
+            "slug": "dehydrated-lime-petal-cocktail-garnish-12ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.09,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 38,
+        "fields": {
+            "product": 50,
+            "partner": 1,
+            "partner_sku": "7f58dff9-9e9f-44a9-8625-b11f8d47d902",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 51,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 100ct",
+            "is_public": true,
+            "parent": 49,
+            "upc": "e5db3bfe-6775-41f9-80fb-5c363af7f7e4",
+            "slug": "dehydrated-lime-petal-cocktail-garnish-smalljar-100ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.2,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 39,
+        "fields": {
+            "product": 51,
+            "partner": 1,
+            "partner_sku": "e5db3bfe-6775-41f9-80fb-5c363af7f7e4",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 52,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f754db6883c6055aa0bb109",
+            "title": "Pineapple - Half Moons",
+            "slug": "half-moon-dehydrated-pineapple-cocktail-garnish",
+            "description": "Pineapple is the quintessential tropical flavor. These \u2018half-moon\u2019 slices will bring that touch of tiki to every cocktail.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 13,
+        "fields": {
+            "product": 52,
+            "category": 3
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 53,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 6ct",
+            "is_public": true,
+            "parent": 52,
+            "upc": "3a62922b-ef89-4df7-9bcc-dd11a905ffde",
+            "slug": "half-moon-dehydrated-pineapple-cocktail-garnish-pouch-6ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.165Z",
+            "date_updated": "2022-01-25T21:49:21.165Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 40,
+        "fields": {
+            "product": 53,
+            "partner": 1,
+            "partner_sku": "3a62922b-ef89-4df7-9bcc-dd11a905ffde",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 54,
+        "fields": {
+            "structure": "child",
+            "title": "Glass Jar - 40ct",
+            "is_public": true,
+            "parent": 52,
+            "upc": "6f9af528-c726-4168-be9e-94f03954988b",
+            "slug": "half-moon-dehydrated-pineapple-cocktail-garnish-glassjar-40ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.5,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 41,
+        "fields": {
+            "product": 54,
+            "partner": 1,
+            "partner_sku": "6f9af528-c726-4168-be9e-94f03954988b",
+            "price_currency": "USD",
+            "price": 20.0,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 55,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 275ct",
+            "is_public": true,
+            "parent": 52,
+            "upc": "3af92eba-b9bc-423e-a0a3-cdf2e6085c67",
+            "slug": "half-moon-dehydrated-pineapple-cocktail-garnish-wholesale-275ct",
+            "length": 9.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.75,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 42,
+        "fields": {
+            "product": 55,
+            "partner": 1,
+            "partner_sku": "3af92eba-b9bc-423e-a0a3-cdf2e6085c67",
+            "price_currency": "USD",
+            "price": 45.0,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 56,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5f755020167d56560cdd4066",
+            "title": "Pineapple - Full Cuts",
+            "slug": "full-cut-dehydrated-pineapple-cocktail-garnish",
+            "description": "Pineapple is the quintessential tropical flavor. These full-cut slices will bring that touch of tiki to every cocktail.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 14,
+        "fields": {
+            "product": 56,
+            "category": 3
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 57,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 2ct",
+            "is_public": true,
+            "parent": 56,
+            "upc": "78c3faf9-b60f-43dd-a1ef-f2f037d11f07",
+            "slug": "full-cut-dehydrated-pineapple-cocktail-garnish-pouch-2ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 5.0,
+            "weight": 0.2,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 43,
+        "fields": {
+            "product": 57,
+            "partner": 1,
+            "partner_sku": "78c3faf9-b60f-43dd-a1ef-f2f037d11f07",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 58,
+        "fields": {
+            "structure": "child",
+            "title": "Glass Jar - 20ct",
+            "is_public": true,
+            "parent": 56,
+            "upc": "e6c5126b-0294-4780-8af0-eccb6536ea49",
+            "slug": "full-cut-dehydrated-pineapple-cocktail-garnish-glassjar-20ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.5,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 44,
+        "fields": {
+            "product": 58,
+            "partner": 1,
+            "partner_sku": "e6c5126b-0294-4780-8af0-eccb6536ea49",
+            "price_currency": "USD",
+            "price": 20.0,
+            "date_created": "2022-01-25T21:49:21.166Z",
+            "date_updated": "2022-01-25T21:49:21.166Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 59,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdb8832bc7884852d3b89b",
+            "title": "Apple",
+            "slug": "dehydrated-apple-cocktail-garnish",
+            "description": "Apples, a seasonal favorite",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 15,
+        "fields": {
+            "product": 59,
+            "category": 2
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 60,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 6ct",
+            "is_public": true,
+            "parent": 59,
+            "upc": "48e946ae-d9dc-4499-9030-daf053e9acf2",
+            "slug": "dehydrated-apple-cocktail-garnish-pouch-6ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 45,
+        "fields": {
+            "product": 60,
+            "partner": 1,
+            "partner_sku": "48e946ae-d9dc-4499-9030-daf053e9acf2",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 61,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 59,
+            "upc": "d97c2260-1245-4bee-918c-a8866db64522",
+            "slug": "dehydrated-apple-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 46,
+        "fields": {
+            "product": 61,
+            "partner": 1,
+            "partner_sku": "d97c2260-1245-4bee-918c-a8866db64522",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 62,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 70ct",
+            "is_public": true,
+            "parent": 59,
+            "upc": "ddbc94fa-66d0-4ad6-b7bb-b2593fa401bf",
+            "slug": "dehydrated-apple-cocktail-garnish-largejar-70ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 47,
+        "fields": {
+            "product": 62,
+            "partner": 1,
+            "partner_sku": "ddbc94fa-66d0-4ad6-b7bb-b2593fa401bf",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 63,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 250ct",
+            "is_public": true,
+            "parent": 59,
+            "upc": "15bd6d1b-8dd5-466e-8fe0-c50a100a35e8",
+            "slug": "dehydrated-apple-cocktail-garnish-wholesale-250ct",
+            "length": 9.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.75,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 48,
+        "fields": {
+            "product": 63,
+            "partner": 1,
+            "partner_sku": "15bd6d1b-8dd5-466e-8fe0-c50a100a35e8",
+            "price_currency": "USD",
+            "price": 40.0,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 64,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdb982a87f9f1b19f8564a",
+            "title": "Pear",
+            "slug": "dehydrated-pear-cocktail-garnish",
+            "description": "Dehydrated pear slices perfect to accent a bar or restaurant drink menu with artisanal style and timeless appeal.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 16,
+        "fields": {
+            "product": 64,
+            "category": 2
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 65,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 7ct",
+            "is_public": true,
+            "parent": 64,
+            "upc": "92731f08-3ed1-40e2-a3eb-88c53f985925",
+            "slug": "dehydrated-pear-cocktail-garnish-pouch-7ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.167Z",
+            "date_updated": "2022-01-25T21:49:21.167Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 49,
+        "fields": {
+            "product": 65,
+            "partner": 1,
+            "partner_sku": "92731f08-3ed1-40e2-a3eb-88c53f985925",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 66,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 64,
+            "upc": "cacb00d5-3451-4b5c-b575-9bb402101b2f",
+            "slug": "dehydrated-pear-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 50,
+        "fields": {
+            "product": 66,
+            "partner": 1,
+            "partner_sku": "cacb00d5-3451-4b5c-b575-9bb402101b2f",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 67,
+        "fields": {
+            "structure": "child",
+            "title": "Glass Jar - 70ct",
+            "is_public": true,
+            "parent": 64,
+            "upc": "2702ecd3-d97f-4fa0-8ba7-4cec892b5b9b",
+            "slug": "dehydrated-pear-cocktail-garnish-glassjar-70ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 51,
+        "fields": {
+            "product": 67,
+            "partner": 1,
+            "partner_sku": "2702ecd3-d97f-4fa0-8ba7-4cec892b5b9b",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 68,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 425ct",
+            "is_public": true,
+            "parent": 64,
+            "upc": "efea66ca-aedd-467e-933c-bbc016feb250",
+            "slug": "dehydrated-pear-cocktail-garnish-wholesale-425ct",
+            "length": 12.0,
+            "width": 9.0,
+            "height": 5.0,
+            "weight": 1.8,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 52,
+        "fields": {
+            "product": 68,
+            "partner": 1,
+            "partner_sku": "efea66ca-aedd-467e-933c-bbc016feb250",
+            "price_currency": "USD",
+            "price": 60.0,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 69,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdb9d8662d5e24e0c16bc6",
+            "title": "Figs",
+            "slug": "dehydrated-fig-cocktail-garnish",
+            "description": "Figs, a seasonal favorite",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 17,
+        "fields": {
+            "product": 69,
+            "category": 2
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 70,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 5ct",
+            "is_public": true,
+            "parent": 69,
+            "upc": "4b95dbdf-bce0-4bb5-9b9a-a57b84ab3ca9",
+            "slug": "dehydrated-fig-cocktail-garnish-pouch-5ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 53,
+        "fields": {
+            "product": 70,
+            "partner": 1,
+            "partner_sku": "4b95dbdf-bce0-4bb5-9b9a-a57b84ab3ca9",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.168Z",
+            "date_updated": "2022-01-25T21:49:21.168Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 71,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 30ct",
+            "is_public": true,
+            "parent": 69,
+            "upc": "01ee0add-982e-4be4-85ba-5f8caa08aa1d",
+            "slug": "dehydrated-fig-cocktail-garnish-smalljar-30ct",
+            "length": 8.0,
+            "width": 3.0,
+            "height": 11.0,
+            "weight": 0.5,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 54,
+        "fields": {
+            "product": 71,
+            "partner": 1,
+            "partner_sku": "01ee0add-982e-4be4-85ba-5f8caa08aa1d",
+            "price_currency": "USD",
+            "price": 30.0,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 72,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdbabda87f9f1b19f875b8",
+            "title": "Grapefruit",
+            "slug": "dehydrated-grapefruit-cocktail-garnish",
+            "description": "Dehydrated grapefruit, a timeless classic",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 18,
+        "fields": {
+            "product": 72,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 73,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 4ct",
+            "is_public": true,
+            "parent": 72,
+            "upc": "cc333b8e-c396-45eb-a4a3-94f1c51c6a3c",
+            "slug": "dehydrated-grapefruit-cocktail-garnish-pouch-4ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 55,
+        "fields": {
+            "product": 73,
+            "partner": 1,
+            "partner_sku": "cc333b8e-c396-45eb-a4a3-94f1c51c6a3c",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 74,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 20ct",
+            "is_public": true,
+            "parent": 72,
+            "upc": "7e502002-70a5-4ca7-8172-b320628870fc",
+            "slug": "dehydrated-grapefruit-cocktail-garnish-smalljar-20ct",
+            "length": 4.0,
+            "width": 44.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 56,
+        "fields": {
+            "product": 74,
+            "partner": 1,
+            "partner_sku": "7e502002-70a5-4ca7-8172-b320628870fc",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 75,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 45ct",
+            "is_public": true,
+            "parent": 72,
+            "upc": "3b1c007f-0bc3-4745-9ec9-d2f5ecf872a2",
+            "slug": "dehydrated-grapefruit-cocktail-garnish-largejar-45ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.5,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 57,
+        "fields": {
+            "product": 75,
+            "partner": 1,
+            "partner_sku": "3b1c007f-0bc3-4745-9ec9-d2f5ecf872a2",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 76,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 250ct",
+            "is_public": true,
+            "parent": 72,
+            "upc": "ff613dbb-b04e-412c-8f92-1414819a4ee4",
+            "slug": "dehydrated-grapefruit-cocktail-garnish-wholesale-250ct",
+            "length": 9.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.75,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 58,
+        "fields": {
+            "product": 76,
+            "partner": 1,
+            "partner_sku": "ff613dbb-b04e-412c-8f92-1414819a4ee4",
+            "price_currency": "USD",
+            "price": 65.0,
+            "date_created": "2022-01-25T21:49:21.169Z",
+            "date_updated": "2022-01-25T21:49:21.169Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 77,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdbb98c836a917f92c570a",
+            "title": "Lotus Root",
+            "slug": "dehydrated-lotus-root-cocktail-garnish",
+            "description": "Dehydrated lotus root, for an exotic touch",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 19,
+        "fields": {
+            "product": 77,
+            "category": 3
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 78,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 6ct",
+            "is_public": true,
+            "parent": 77,
+            "upc": "57d52136-9d51-47ba-9a66-24cecc08dc82",
+            "slug": "dehydrated-lotus-root-cocktail-garnish-pouch-6ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 59,
+        "fields": {
+            "product": 78,
+            "partner": 1,
+            "partner_sku": "57d52136-9d51-47ba-9a66-24cecc08dc82",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 79,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 75ct",
+            "is_public": true,
+            "parent": 77,
+            "upc": "2b8a7e6e-f103-4279-b2cc-47b519c2bc9e",
+            "slug": "dehydrated-lotus-root-cocktail-garnish-largejar-75ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.5,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 60,
+        "fields": {
+            "product": 79,
+            "partner": 1,
+            "partner_sku": "2b8a7e6e-f103-4279-b2cc-47b519c2bc9e",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 80,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 77,
+            "upc": "c2ee6797-2e61-4251-a195-5e3f5b5f1beb",
+            "slug": "dehydrated-lotus-root-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 61,
+        "fields": {
+            "product": 80,
+            "partner": 1,
+            "partner_sku": "c2ee6797-2e61-4251-a195-5e3f5b5f1beb",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 81,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 250ct",
+            "is_public": true,
+            "parent": 77,
+            "upc": "28124bcf-7bf3-47ba-8281-d37ba1dd653d",
+            "slug": "dehydrated-lotus-root-cocktail-garnish-wholesale-250ct",
+            "length": 9.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.75,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 62,
+        "fields": {
+            "product": 81,
+            "partner": 1,
+            "partner_sku": "28124bcf-7bf3-47ba-8281-d37ba1dd653d",
+            "price_currency": "USD",
+            "price": 60.0,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 82,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdbbf10ab5d62feb11d8eb",
+            "title": "Persimmon",
+            "slug": "dehydrated-persimmon-cocktail-garnish",
+            "description": "Dehydrated persimmon, a seasonal favorite",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.170Z",
+            "date_updated": "2022-01-25T21:49:21.170Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 20,
+        "fields": {
+            "product": 82,
+            "category": 2
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 83,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 4ct",
+            "is_public": true,
+            "parent": 82,
+            "upc": "5cdbf8cc-11c2-4f50-ae53-ed71ee22ee6a",
+            "slug": "dehydrated-persimmon-cocktail-garnish-pouch-4ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 63,
+        "fields": {
+            "product": 83,
+            "partner": 1,
+            "partner_sku": "5cdbf8cc-11c2-4f50-ae53-ed71ee22ee6a",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 84,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 25ct",
+            "is_public": true,
+            "parent": 82,
+            "upc": "64e01a1b-1311-4809-a412-4c764352a741",
+            "slug": "dehydrated-persimmon-cocktail-garnish-smalljar-25ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 64,
+        "fields": {
+            "product": 84,
+            "partner": 1,
+            "partner_sku": "64e01a1b-1311-4809-a412-4c764352a741",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 85,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 50ct",
+            "is_public": true,
+            "parent": 82,
+            "upc": "d3985238-bcb6-43ce-a4d7-12ed6632ebb9",
+            "slug": "dehydrated-persimmon-cocktail-garnish-largejar-50ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.5,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 65,
+        "fields": {
+            "product": 85,
+            "partner": 1,
+            "partner_sku": "d3985238-bcb6-43ce-a4d7-12ed6632ebb9",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 86,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdbe64fe657040d5b13ee5",
+            "title": "Kiwifruit",
+            "slug": "dehydrated-kiwifruit-cocktail-garnish",
+            "description": "Dehydrated kiwi, an exotic fruit",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 21,
+        "fields": {
+            "product": 86,
+            "category": 3
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 87,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 6ct",
+            "is_public": true,
+            "parent": 86,
+            "upc": "3066bb84-3e1f-49a2-9ce1-87bddf8f6ba5",
+            "slug": "dehydrated-kiwifruit-cocktail-garnish-pouch-6ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 66,
+        "fields": {
+            "product": 87,
+            "partner": 1,
+            "partner_sku": "3066bb84-3e1f-49a2-9ce1-87bddf8f6ba5",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.171Z",
+            "date_updated": "2022-01-25T21:49:21.171Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 88,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 35ct",
+            "is_public": true,
+            "parent": 86,
+            "upc": "afa61969-d243-4d3f-bb2c-cb84b68b5bd2",
+            "slug": "dehydrated-kiwifruit-cocktail-garnish-smalljar-35ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 67,
+        "fields": {
+            "product": 88,
+            "partner": 1,
+            "partner_sku": "afa61969-d243-4d3f-bb2c-cb84b68b5bd2",
+            "price_currency": "USD",
+            "price": 15.0,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 89,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 70ct",
+            "is_public": true,
+            "parent": 86,
+            "upc": "4aa25dbb-f2bf-4208-adb0-0ce6060a2918",
+            "slug": "dehydrated-kiwifruit-cocktail-garnish-largejar-70ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 3.75,
+            "weight": 1.15,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 68,
+        "fields": {
+            "product": 89,
+            "partner": 1,
+            "partner_sku": "4aa25dbb-f2bf-4208-adb0-0ce6060a2918",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 90,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdbf040ab5d62feb1234cc",
+            "title": "Star Fruit",
+            "slug": "dehydrated-star-fruit-cocktail-garnish",
+            "description": "Dehydrated star fruit, for an exotic touch",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 22,
+        "fields": {
+            "product": 90,
+            "category": 3
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 91,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 8ct",
+            "is_public": true,
+            "parent": 90,
+            "upc": "c0bb0649-2926-46f3-a41d-6cc1ffea9712",
+            "slug": "dehydrated-star-fruit-cocktail-garnish-pouch-8ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 69,
+        "fields": {
+            "product": 91,
+            "partner": 1,
+            "partner_sku": "c0bb0649-2926-46f3-a41d-6cc1ffea9712",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 92,
+        "fields": {
+            "structure": "child",
+            "title": "Glass Jar - 75",
+            "is_public": true,
+            "parent": 90,
+            "upc": "30698d91-b8aa-43da-902b-8a2807bd6c8f",
+            "slug": "dehydrated-star-fruit-cocktail-garnish-glassjar-75",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 3.75,
+            "weight": 1.2,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 70,
+        "fields": {
+            "product": 92,
+            "partner": 1,
+            "partner_sku": "30698d91-b8aa-43da-902b-8a2807bd6c8f",
+            "price_currency": "USD",
+            "price": 25.0,
+            "date_created": "2022-01-25T21:49:21.172Z",
+            "date_updated": "2022-01-25T21:49:21.172Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 93,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 150ct",
+            "is_public": true,
+            "parent": 90,
+            "upc": "c85e85c1-d2ab-4294-9d9b-677acde899d6",
+            "slug": "dehydrated-star-fruit-cocktail-garnish-largejar-150ct",
+            "length": 9.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.75,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 71,
+        "fields": {
+            "product": 93,
+            "partner": 1,
+            "partner_sku": "c85e85c1-d2ab-4294-9d9b-677acde899d6",
+            "price_currency": "USD",
+            "price": 35.0,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 94,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdbfb9a87f9f1b19f8da9e",
+            "title": "Dragon Fruit - White",
+            "slug": "dehydrated-white-dragon-fruit-cocktail-garnish",
+            "description": "Dragon Fruit, for an exotic touch",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 23,
+        "fields": {
+            "product": 94,
+            "category": 3
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 95,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 4ct",
+            "is_public": true,
+            "parent": 94,
+            "upc": "6ab30304-1967-4c23-9d97-17bcef5f1212",
+            "slug": "dehydrated-white-dragon-fruit-cocktail-garnish-pouch-4ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 72,
+        "fields": {
+            "product": 95,
+            "partner": 1,
+            "partner_sku": "6ab30304-1967-4c23-9d97-17bcef5f1212",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 96,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 25ct",
+            "is_public": true,
+            "parent": 94,
+            "upc": "17da879d-b3f1-4649-8a7d-31bb6bfe5a69",
+            "slug": "dehydrated-white-dragon-fruit-cocktail-garnish-smalljar-25ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 73,
+        "fields": {
+            "product": 96,
+            "partner": 1,
+            "partner_sku": "17da879d-b3f1-4649-8a7d-31bb6bfe5a69",
+            "price_currency": "USD",
+            "price": 20.0,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 97,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 50ct",
+            "is_public": true,
+            "parent": 94,
+            "upc": "8ec06c9a-6402-4fe8-bd17-7b5f1db178c7",
+            "slug": "dehydrated-white-dragon-fruit-cocktail-garnish-largejar-50ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 74,
+        "fields": {
+            "product": 97,
+            "partner": 1,
+            "partner_sku": "8ec06c9a-6402-4fe8-bd17-7b5f1db178c7",
+            "price_currency": "USD",
+            "price": 30.0,
+            "date_created": "2022-01-25T21:49:21.173Z",
+            "date_updated": "2022-01-25T21:49:21.173Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 98,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "5fcdc027978da30c561d4d51",
+            "title": "Dragon Fruit - Red",
+            "slug": "dehydrated-red-dragon-fruit-cocktail-garnish",
+            "description": "Dragon Fruit, for an exotic touch",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.174Z",
+            "date_updated": "2022-01-25T21:49:21.174Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 24,
+        "fields": {
+            "product": 98,
+            "category": 3
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 99,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 4ct",
+            "is_public": true,
+            "parent": 98,
+            "upc": "b6b1cb04-345d-4d0c-8813-6cb6de07f2ca",
+            "slug": "dehydrated-red-dragon-fruit-cocktail-garnish-pouch-4ct",
+            "length": 6.0,
+            "width": 1.0,
+            "height": 6.0,
+            "weight": 0.05,
+            "date_created": "2022-01-25T21:49:21.174Z",
+            "date_updated": "2022-01-25T21:49:21.174Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 75,
+        "fields": {
+            "product": 99,
+            "partner": 1,
+            "partner_sku": "b6b1cb04-345d-4d0c-8813-6cb6de07f2ca",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.174Z",
+            "date_updated": "2022-01-25T21:49:21.174Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 100,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 25ct",
+            "is_public": true,
+            "parent": 98,
+            "upc": "47446d3b-2e4a-423b-806f-8e1407bbea09",
+            "slug": "dehydrated-red-dragon-fruit-cocktail-garnish-smalljar-25ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.5,
+            "date_created": "2022-01-25T21:49:21.174Z",
+            "date_updated": "2022-01-25T21:49:21.174Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 76,
+        "fields": {
+            "product": 100,
+            "partner": 1,
+            "partner_sku": "47446d3b-2e4a-423b-806f-8e1407bbea09",
+            "price_currency": "USD",
+            "price": 20.0,
+            "date_created": "2022-01-25T21:49:21.174Z",
+            "date_updated": "2022-01-25T21:49:21.174Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 101,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 50ct",
+            "is_public": true,
+            "parent": 98,
+            "upc": "3339eccb-1261-424b-a9ee-6e34b3e97c61",
+            "slug": "dehydrated-red-dragon-fruit-cocktail-garnish-largejar-50ct",
+            "length": 3.75,
+            "width": 3.75,
+            "height": 7.0,
+            "weight": 1.5,
+            "date_created": "2022-01-25T21:49:21.174Z",
+            "date_updated": "2022-01-25T21:49:21.174Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 77,
+        "fields": {
+            "product": 101,
+            "partner": 1,
+            "partner_sku": "3339eccb-1261-424b-a9ee-6e34b3e97c61",
+            "price_currency": "USD",
+            "price": 30.0,
+            "date_created": "2022-01-25T21:49:21.174Z",
+            "date_updated": "2022-01-25T21:49:21.174Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 102,
+        "fields": {
+            "structure": "child",
+            "title": "Wholesale - 200ct",
+            "is_public": true,
+            "parent": 98,
+            "upc": "077f9a80-6528-48b1-93f2-de80eeaabe70",
+            "slug": "dehydrated-red-dragon-fruit-cocktail-garnish-wholesale-200ct",
+            "length": 9.0,
+            "width": 4.0,
+            "height": 13.0,
+            "weight": 1.75,
+            "date_created": "2022-01-25T21:49:21.175Z",
+            "date_updated": "2022-01-25T21:49:21.175Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 78,
+        "fields": {
+            "product": 102,
+            "partner": 1,
+            "partner_sku": "077f9a80-6528-48b1-93f2-de80eeaabe70",
+            "price_currency": "USD",
+            "price": 80.0,
+            "date_created": "2022-01-25T21:49:21.175Z",
+            "date_updated": "2022-01-25T21:49:21.175Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 103,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "6004b3f5dea472688fb98468",
+            "title": "Citrus Jar Set",
+            "slug": "large-dehydrated-citrus-cocktail-garnish-set",
+            "description": "Dehydrated lemon, lime, orange, and blood orange garnishes, cut consistently to deliver a refined presentation for any cocktail. The perfect gift for the professional mixologist or cocktail enthusiast. This set will make a stunning addition to any bar setup. Large sets are in 32oz thick-walled glass jars.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.175Z",
+            "date_updated": "2022-01-25T21:49:21.175Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 25,
+        "fields": {
+            "product": 103,
+            "category": 4
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 104,
+        "fields": {
+            "structure": "child",
+            "title": "Small 16oz Glass Jar Set",
+            "is_public": true,
+            "parent": 103,
+            "upc": "f7b8237a-16cf-4c22-9c34-e7c9606d426d",
+            "slug": "large-dehydrated-citrus-cocktail-garnish-set-small16ozglassjarset",
+            "length": 10.0,
+            "width": 10.0,
+            "height": 5.0,
+            "weight": 4.0,
+            "date_created": "2022-01-25T21:49:21.175Z",
+            "date_updated": "2022-01-25T21:49:21.175Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 79,
+        "fields": {
+            "product": 104,
+            "partner": 1,
+            "partner_sku": "f7b8237a-16cf-4c22-9c34-e7c9606d426d",
+            "price_currency": "USD",
+            "price": 50.0,
+            "date_created": "2022-01-25T21:49:21.175Z",
+            "date_updated": "2022-01-25T21:49:21.175Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 105,
+        "fields": {
+            "structure": "child",
+            "title": "Large 32oz Glass Jar Set",
+            "is_public": true,
+            "parent": 103,
+            "upc": "1ee21a6c-2f3b-4c78-a778-4b0b8192e15e",
+            "slug": "large-dehydrated-citrus-cocktail-garnish-set-large32ozglassjarset",
+            "length": 9.0,
+            "width": 9.0,
+            "height": 8.0,
+            "weight": 5.0,
+            "date_created": "2022-01-25T21:49:21.175Z",
+            "date_updated": "2022-01-25T21:49:21.175Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 80,
+        "fields": {
+            "product": 105,
+            "partner": 1,
+            "partner_sku": "1ee21a6c-2f3b-4c78-a778-4b0b8192e15e",
+            "price_currency": "USD",
+            "price": 75.0,
+            "date_created": "2022-01-25T21:49:21.175Z",
+            "date_updated": "2022-01-25T21:49:21.175Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 106,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "600b8ce3d7b0ac5d7089a8e2",
+            "title": "Hand Cut Roses",
+            "slug": "dehydrated-hand-cut-roses-garnish",
+            "description": "Hand cut and slowly dried spray roses. *These are not considered edible flowers",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.175Z",
+            "date_updated": "2022-01-25T21:49:21.175Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 26,
+        "fields": {
+            "product": 106,
+            "category": 1
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 107,
+        "fields": {
+            "structure": "child",
+            "title": "6ct",
+            "is_public": true,
+            "parent": 106,
+            "upc": "cb0d5bcc-f368-4891-9c9c-185ae5f3082c",
+            "slug": "dehydrated-hand-cut-roses-garnish-6ct",
+            "length": 5.0,
+            "width": 5.5,
+            "height": 1.0,
+            "weight": 0.1,
+            "date_created": "2022-01-25T21:49:21.176Z",
+            "date_updated": "2022-01-25T21:49:21.176Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 81,
+        "fields": {
+            "product": 107,
+            "partner": 1,
+            "partner_sku": "cb0d5bcc-f368-4891-9c9c-185ae5f3082c",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.176Z",
+            "date_updated": "2022-01-25T21:49:21.176Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 108,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 60ct",
+            "is_public": true,
+            "parent": 106,
+            "upc": "a43001e6-06c3-45fd-b52c-a1774c8cb766",
+            "slug": "dehydrated-hand-cut-roses-garnish-largejar-60ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.176Z",
+            "date_updated": "2022-01-25T21:49:21.176Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 82,
+        "fields": {
+            "product": 108,
+            "partner": 1,
+            "partner_sku": "a43001e6-06c3-45fd-b52c-a1774c8cb766",
+            "price_currency": "USD",
+            "price": 35.0,
+            "date_created": "2022-01-25T21:49:21.176Z",
+            "date_updated": "2022-01-25T21:49:21.176Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 109,
+        "fields": {
+            "structure": "child",
+            "title": "100ct",
+            "is_public": true,
+            "parent": 106,
+            "upc": "92bf8120-b500-44a7-87d1-e583bca7f8ee",
+            "slug": "dehydrated-hand-cut-roses-garnish-100ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 8.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.176Z",
+            "date_updated": "2022-01-25T21:49:21.176Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 83,
+        "fields": {
+            "product": 109,
+            "partner": 1,
+            "partner_sku": "92bf8120-b500-44a7-87d1-e583bca7f8ee",
+            "price_currency": "USD",
+            "price": 55.0,
+            "date_created": "2022-01-25T21:49:21.176Z",
+            "date_updated": "2022-01-25T21:49:21.176Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 110,
+        "fields": {
+            "structure": "standalone",
+            "is_public": true,
+            "upc": "600b8e727dafa963897601fd",
+            "title": "Mini Clothespins",
+            "slug": "pins",
+            "description": "One inch mini clothespins to help keep things where you want them.",
+            "product_class": 2,
+            "date_created": "2022-01-25T21:49:21.176Z",
+            "date_updated": "2022-01-25T21:49:21.176Z",
+            "length": 5.5,
+            "width": 5.5,
+            "height": 1.0,
+            "weight": 0.01
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 27,
+        "fields": {
+            "product": 110,
+            "category": 6
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 84,
+        "fields": {
+            "product": 110,
+            "partner": 1,
+            "partner_sku": "458c1ecf-d2d8-470c-9556-2fe1bd8527e1",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.176Z",
+            "date_updated": "2022-01-25T21:49:21.176Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 111,
+        "fields": {
+            "structure": "parent",
+            "is_public": true,
+            "upc": "600b8fb1872c446e5a088c31",
+            "title": "Dried Lavender",
+            "slug": "dried-lavender-cocktail-garnish",
+            "description": "Incredibly fragrant Blue English Lavender, about 3-4 inches long.",
+            "product_class": 1,
+            "date_created": "2022-01-25T21:49:21.177Z",
+            "date_updated": "2022-01-25T21:49:21.177Z"
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 28,
+        "fields": {
+            "product": 111,
+            "category": 1
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 112,
+        "fields": {
+            "structure": "child",
+            "title": "Pouch - 6ct",
+            "is_public": true,
+            "parent": 111,
+            "upc": "76467c27-a7ca-480f-beb1-476183dd388a",
+            "slug": "dried-lavender-cocktail-garnish-pouch-6ct",
+            "length": 5.5,
+            "width": 5.5,
+            "height": 1.0,
+            "weight": 0.01,
+            "date_created": "2022-01-25T21:49:21.177Z",
+            "date_updated": "2022-01-25T21:49:21.177Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 85,
+        "fields": {
+            "product": 112,
+            "partner": 1,
+            "partner_sku": "76467c27-a7ca-480f-beb1-476183dd388a",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.177Z",
+            "date_updated": "2022-01-25T21:49:21.177Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 113,
+        "fields": {
+            "structure": "child",
+            "title": "Small Jar - 60ct",
+            "is_public": true,
+            "parent": 111,
+            "upc": "78fcddfc-4532-4392-815a-db4c840b45c9",
+            "slug": "dried-lavender-cocktail-garnish-smalljar-60ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 4.0,
+            "weight": 1.1,
+            "date_created": "2022-01-25T21:49:21.177Z",
+            "date_updated": "2022-01-25T21:49:21.177Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 86,
+        "fields": {
+            "product": 113,
+            "partner": 1,
+            "partner_sku": "78fcddfc-4532-4392-815a-db4c840b45c9",
+            "price_currency": "USD",
+            "price": 20.0,
+            "date_created": "2022-01-25T21:49:21.177Z",
+            "date_updated": "2022-01-25T21:49:21.177Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 114,
+        "fields": {
+            "structure": "child",
+            "title": "Large Jar - 120ct",
+            "is_public": true,
+            "parent": 111,
+            "upc": "68414f03-b3e3-421c-9029-7025f7466270",
+            "slug": "dried-lavender-cocktail-garnish-largejar-120ct",
+            "length": 4.0,
+            "width": 4.0,
+            "height": 8.0,
+            "weight": 1.4,
+            "date_created": "2022-01-25T21:49:21.177Z",
+            "date_updated": "2022-01-25T21:49:21.177Z"
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 87,
+        "fields": {
+            "product": 114,
+            "partner": 1,
+            "partner_sku": "68414f03-b3e3-421c-9029-7025f7466270",
+            "price_currency": "USD",
+            "price": 40.0,
+            "date_created": "2022-01-25T21:49:21.177Z",
+            "date_updated": "2022-01-25T21:49:21.177Z"
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 115,
+        "fields": {
+            "structure": "standalone",
+            "is_public": true,
+            "upc": "602863a12487873a721ca8a3",
+            "title": "Sphinx Hat",
+            "slug": "sphinx-hat",
+            "description": "Six panel, unstructured gold corduroy hat featuring the DEHY Sphinx logo. Lower profile with an adjustable metal hoop. One size fits all.",
+            "product_class": 2,
+            "date_created": "2022-01-25T21:49:21.177Z",
+            "date_updated": "2022-01-25T21:49:21.177Z",
+            "length": 7.0,
+            "width": 5.0,
+            "height": 3.0,
+            "weight": 1.4
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 29,
+        "fields": {
+            "product": 115,
+            "category": 6
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 88,
+        "fields": {
+            "product": 115,
+            "partner": 1,
+            "partner_sku": "c66d67e4-2a99-4b55-96cb-c03e2eebdbb9",
+            "price_currency": "USD",
+            "price": 30.0,
+            "date_created": "2022-01-25T21:49:21.178Z",
+            "date_updated": "2022-01-25T21:49:21.178Z",
+            "num_in_stock": 0,
+            "low_stock_threshold": 5
+        }
+    },
+    {
+        "model": "catalogue.product",
+        "pk": 116,
+        "fields": {
+            "structure": "standalone",
+            "is_public": true,
+            "upc": "602865e3f31dc02ae33325e1",
+            "title": "Lapel Pin",
+            "slug": "lapel-pin",
+            "description": "Die-cast shiny gold lapel pin, featuring the DEHY Sphinx logo. Measures 1.2\u201d across.",
+            "product_class": 2,
+            "date_created": "2022-01-25T21:49:21.178Z",
+            "date_updated": "2022-01-25T21:49:21.178Z",
+            "length": 1.2,
+            "width": 1.2,
+            "height": 0.1,
+            "weight": 0.01
+        }
+    },
+    {
+        "model": "catalogue.productcategory",
+        "pk": 30,
+        "fields": {
+            "product": 116,
+            "category": 6
+        }
+    },
+    {
+        "model": "partner.stockrecord",
+        "pk": 89,
+        "fields": {
+            "product": 116,
+            "partner": 1,
+            "partner_sku": "83b82ef8-6712-4e6f-840c-b944f432b408",
+            "price_currency": "USD",
+            "price": 5.0,
+            "date_created": "2022-01-25T21:49:21.178Z",
+            "date_updated": "2022-01-25T21:49:21.178Z",
+            "num_in_stock": 73,
+            "low_stock_threshold": 5
+        }
+    }
+]

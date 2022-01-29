@@ -1,0 +1,35 @@
+{% block footer %}
+<div class="row">
+	<div class="contact"></div>
+
+	<div class="socials-footer"></div>
+</div>
+<footer class="container-fluid">
+	<div class="row justify-content-center">
+		<div class="contact col-4">
+			<a class="contact-link" href="{% url "contact" %}"><h3>Contact Us</h3></a>
+			<p><i style="font-size: 1.2rem;" class="fas fa-phone-alt"></i> 904-796-0812</p>
+			<p style="text-decoration: underline;"><a href="mailto:info@dehygarnish.com" target="_blank">info@dehygarnish.com</a></p>
+			<p>512 Rio Grande St. Austin, Texas 78701</p>
+			<div class="policies">
+				<a class="privacy-policy" href=""><span>Refunds & Returns Policy</span></a>
+			</div>
+		</div>
+		<div class="mailing-list col-3">
+			<p>Sign up for our mailing list to receive updates on new products and promotions!</p>
+			<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
+				<input type="hidden" name="csrfmiddlewaretoken" value="">
+				<label class="sr-only" for="mailing_list_submit">Sign Up</label>
+				<input name="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
+				<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button>
+			</form>
+		</div>
+		<div class="socials col-4">
+			<h3>Follow</h3>
+			<p><a href="https://www.facebook.com/dehygarnish" target="_blank">Facebook</a></p>
+			<p><a href="https://www.instagram.com/dehygarnish/">Instagram</a></p>
+		</div>
+	</div>
+
+</footer>
+{% endblock footer %}

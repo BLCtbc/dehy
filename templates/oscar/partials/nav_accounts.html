@@ -1,0 +1,197 @@
+{% load i18n %}
+{% load currency_filters %}
+{% load static %}
+<nav id="navbar" class="navbar navbar-expand-lg fixed-top scroll-hide category_view scrolled-up scrolled-top">
+	{% comment %}
+	{# old brand element #}
+	<div class="col-sm-6 h1">
+		<a href="{{ homepage_url }}">{% block brand_title %}{{ shop_name }}{% endblock %}</a>
+		<small> {{ shop_tagline }}</small>
+	</div>
+	{% endcomment %}
+
+	<div class="header-container-left container-fluid">
+		<div class="brand-container">
+			<a class="navbar-brand" href="{{ homepage_url }}" title="dehygarnish.com"><small> {{ shop_tagline }}</small>
+				<img src="{% static 'img/brand.png' %}" alt="Dehy logo">
+			</a>
+		</div>
+
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".site-nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	        <span class="navbar-toggler-icon"></span>
+	    </button>
+
+		<div class="site-navigation-container site-nav" style="display:flex; width:100%; justify-content: flex-end">
+		    <ul class="navbar">
+		        <li class="nav-item">
+		            <a class="nav-link" href="/">Shop</a>
+		        </li>
+		        <li class="nav-item">
+		            <a class="nav-link" href="/custom">Custom</a>
+		        </li>
+		        <li class="nav-item">
+		            <a class="nav-link" href="/contact">Contact</a>
+		        </li>
+		    </ul>
+		</div>
+	</div>
+
+	<div class="buttons-container container-fluid">
+		<div class="socials-container">
+			<ul class="navbar">
+				<li class="nav-item socials circles icon">
+					<a class="fa fa-facebook" href="https:/www.facebook.com/dehygarnish" aria-hidden="true"></a>
+				</li>
+				<li class="nav-item socials circles icon">
+					<a class="fa fa-instagram" href="https:/www.instagram.com/dehygarnish" aria-hidden="true"></a>
+				</li>
+			</ul>
+		</div>
+		<div class="cart-container" data-controller="Cart">
+	        <a aria-label="2 items in cart" data-test="continue-to-cart" class="icon icon-cart" href="/cart">
+	          <span>
+	            <svg viewBox="0 0 31 24" class="icon icon-cart">
+				  <g class="svg-icon cart-icon">
+				    <circle stroke-miterlimit="10" cx="22.5" cy="21.5" r="1"></circle>
+				    <circle stroke-miterlimit="10" cx="9.5" cy="21.5" r="1"></circle>
+				    <path fill="none" stroke-miterlimit="10" d="M0,1.5h5c0.6,0,1.1,0.4,1.1,1l1.7,13
+				      c0.1,0.5,0.6,1,1.1,1h15c0.5,0,1.2-0.4,1.4-0.9l3.3-8.1c0.2-0.5-0.1-0.9-0.6-0.9H12"></path>
+				  </g>
+			  	</svg>
+	            <div class="cart-quantity-container">
+	              <span class="cart-quantity">2</span>
+	            </div>
+	          </span>
+	        </a>
+    	</div>
+	</div>
+</nav>
+
+{% comment %}
+old navbar
+<nav id="top_page" class="navbar navbar-expand-lg navbar-light bg-light accounts">
+
+	{# old_brand_element #}
+	<div class="col-sm-6 h1">
+		<a href="{{ homepage_url }}">{% block brand_title %}{{ shop_name }}{% endblock %}</a>
+		<small> {{ shop_tagline }}</small>
+	</div>
+	{# end old_brand_element #}
+
+	<div class="brand-container">
+		<a class="navbar-brand" href="{{ homepage_url }}" title="dehygarnish.com"><small> {{ shop_tagline }}</small>
+			<img src="{% static 'img/brand.png' %}" alt="Dehy logo">
+		</a>
+	</div>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".account-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="container">
+
+        <div class="navbar-collapse account-collapse collapse">
+            {% block nav_account_languages %}
+            {% if LANGUAGES|length > 1 %}
+                <form id="language_selector" class="form-inline mb-0 mt-2 mt-lg-0" action="{% url 'set_language' %}" method="post">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ language_neutral_url_path }}" />
+                    <div class="form-group mb-0">
+                        <select name="language" class="form-control">
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                                <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE%} selected="selected"{% endif %}>
+                                    {{ language.name_local }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-outline-secondary ml-2" type="submit" data-loading-text="{% trans 'Submitting...' %}">{% trans "Go" %}</button>
+                </form>
+                {% endif %}
+            {% endblock %}
+
+			{# account login or register elements #}
+            <ul class="navbar-nav ml-md-auto d-md-flex">
+
+	                {% if user.is_authenticated %}
+	                {% block nav_account_navbar_authenticated %}
+	                    <li class="nav-item mr-2">
+	                        {% if num_unread_notifications > 0 %}
+	                            {# If user has new notifications - we change account link to go to inbox #}
+	                            <a href="{% url 'customer:notifications-inbox' %}" class="nav-link mt-2 mt-lg-0">
+	                                <i class="far fa-user mr-2"></i>
+	                                {% trans "Account" %}
+	                                <span class="badge badge-warning">{{ num_unread_notifications }}</span>
+	                            </a>
+	                        {% else %}
+	                            <a href="{% url 'customer:summary' %}" class="nav-link mt-2 mt-lg-0">
+	                                <i class="far fa-user mr-2"></i>
+	                                {% trans "Account" %}
+	                            </a>
+	                        {% endif %}
+	                    </li>
+	                    {% if user.is_staff or perms.partner.dashboard_access %}
+	                        <li class="nav-item mr-2">
+	                            <a href="{% url 'dashboard:index' %}" class="nav-link">
+	                                <i class="fas fa-list-ul mr-2"></i>
+	                                {% trans "Dashboard" %}
+	                            </a>
+	                        </li>
+	                    {% endif %}
+	                    <li class="nav-item mr-2">
+	                        <a id="logout_link" href="{% url 'customer:logout' %}" class="nav-link">
+	                            <i class="fas fa-sign-out-alt mr-2"></i>
+	                            {% trans "Logout" %}
+	                        </a>
+	                    </li>
+	                {% endblock %}
+	                {% else %}
+	                    <li class="nav-item mr-2">
+	                        <a id="login_link" href="{% url 'customer:login' %}" class="nav-link">
+	                            <i class="fas fa-sign-in-alt mr-2"></i>
+	                            {% trans "Login or register" %}
+	                        </a>
+	                    </li>
+	                {% endif %}
+            </ul>
+			
+			{# mini_basket.html #}
+			<div class="basket-mini col-sm-5 text-right d-none d-md-block">
+				<strong>{% trans "Basket total:" %}</strong>
+				{% if request.basket.is_tax_known %}
+					{{ request.basket.total_incl_tax|currency:request.basket.currency }}
+				{% else %}
+					{{ request.basket.total_excl_tax|currency:request.basket.currency }}
+				{% endif %}
+
+				<div class="btn-group">
+				  <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{% url 'basket:summary' %}';">{% trans "View basket" %}</button>
+				  <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="sr-only">Toggle Dropdown</span>
+				  </button>
+				  <div class="dropdown-menu dropdown-menu-right">
+					{% include "oscar/basket/partials/basket_quick.html" %}
+				  </div>
+				</div>
+				<div class="cart-container" data-controller="Cart">
+			        <a href="/cart" class="icon icon-cart" data-test="continue-to-cart" aria-label="2 items in cart">
+			          <span>
+			            <svg class="icon icon-cart" viewBox="0 0 31 24">
+						  <g class="svg-icon cart-icon">
+						    <circle stroke-miterlimit="10" cx="22.5" cy="21.5" r="1"></circle>
+						    <circle stroke-miterlimit="10" cx="9.5" cy="21.5" r="1"></circle>
+						    <path fill="none" stroke-miterlimit="10" d="M0,1.5h5c0.6,0,1.1,0.4,1.1,1l1.7,13
+						      c0.1,0.5,0.6,1,1.1,1h15c0.5,0,1.2-0.4,1.4-0.9l3.3-8.1c0.2-0.5-0.1-0.9-0.6-0.9H12"></path>
+						  </g>
+					  	</svg>
+			            <div class="cart-quantity-container">
+			              <span class="cart-quantity">2</span>
+			            </div>
+			          </span>
+			        </a>
+		    	</div>
+			</div>
+        </div>
+    </div>
+</nav>
+{% endcomment %}
