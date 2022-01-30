@@ -28,7 +28,7 @@
 
 
     {# Site logo/title, mini-basket, browse dropdown and searchbox #}
-    <header class="header container">
+    <header class="header container-fluid">
         <div class="page_inner">
 			{% comment %}
             <div class="row justify-content-between">
@@ -45,7 +45,7 @@
 
     {# Main content of page - other layout templates may override this block #}
     {% block content_wrapper %}
-        <div class="container page">
+        <div class="container-fluid page">
             <div class="page_inner">
                 {% block breadcrumbs %}{% endblock %}
                 {% block header %}

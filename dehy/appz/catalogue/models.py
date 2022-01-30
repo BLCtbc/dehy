@@ -20,6 +20,14 @@ class Product(AbstractProduct):
 	meta_title = models.CharField(_('Meta title'), help_text='Leave blank to copy product title',
 		max_length=255, blank=True, null=True
 	)
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		# print(dir(self))
+		# if self.parent:
+		# 	print(f'self.parent: {self.parent}')
+		# 	self.Meta.order_with_respect_to = 'parent'
+
+		# print(self.Meta.ordering)
 
 	def save(self, *args, **kwargs):
 		# attempt to create
@@ -39,11 +47,29 @@ class Product(AbstractProduct):
 
 		super().save(*args, **kwargs)
 
+	def get_lowest_variant(self):
+		if self.structure=='child':
+			# self.children.objects.all().aggregate(Max('price'))
+			# self.children.aggregate(Min('stockrecords__price'))
+			lowest = parent.children.aggregate(lowest=models.Min('stockrecords__price'))['lowest']
+			print(f'lowest price: {lowest}')
+			return parent.children.aggregate(lowest=models.Min('stockrecords__price'))['lowest']
+
+	@property
+	def lowest(self):
+		return self.get_lowest_variant()
+
 	def get_absolute_url(self):
 		"""
 		Return a product's absolute URL
 		"""
 		return f"{reverse('catalogue:detail', kwargs={'product_slug': self.slug})}"
+
+	class Meta:
+		order_with_respect_to = 'parent'
+		# ordering = [models.F('parent').asc(nulls_last=True)]
+
+
 
 class Category(AbstractCategory):
 	slug = SlugField(_('Slug'), max_length=255, db_index=True, unique=True)
