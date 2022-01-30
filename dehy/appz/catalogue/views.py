@@ -17,6 +17,18 @@ class ProductCategoryView(CoreProductCategoryView):
 	def get_category(self):
 		return get_object_or_404(Category, slug=self.kwargs['category_slug'])
 
+	def get(self, request, *args, **kwargs):
+		print(f'request: {dir(request)}')
+		print(f'resolver_match: {request.path}')
+		cart = request.basket
+		print(f'cart: {cart}\n')
+		print(dir(cart))
+
+		print(f'cart.num_items: {cart.num_items}\n')
+
+		response = super().get(request, *args, **kwargs)
+		return response
+
 class ProductDetailView(CoreProductDetailView):
 	model = Product
 	# template_name = 'catalogue/partials/product.html'

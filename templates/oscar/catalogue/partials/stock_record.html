@@ -4,19 +4,19 @@
 
 {% purchase_info_for_product request product as session %}
 
+<span class="not_price_color">From </span><span class="price_color">
 {% if session.price.exists %}
-<p class="price_color">From
     {% if session.price.excl_tax == 0 %}
-    {% trans "Free" %}
+    	{% trans "Free" %}
     {% elif session.price.is_tax_known %}
-	{{ session.price.incl_tax|currency:session.price.currency }}
+		{{ session.price.incl_tax|currency:session.price.currency }}
     {% else %}
-	{{ session.price.excl_tax|currency:session.price.currency }}
+		{{ session.price.excl_tax|currency:session.price.currency }}
     {% endif %}
 {% else %}
-    &nbsp;
-</p>
+	&nbsp;
 {% endif %}
+</span>
 
 <p class="{{ session.availability.code }} availability">
     {% if session.availability.is_available_to_buy %}
