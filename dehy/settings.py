@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 	'dehy.appz.search.apps.SearchConfig',
 	'dehy.appz.customer.apps.CustomerConfig',
 	'dehy.appz.checkout.apps.CheckoutConfig',
+	'dehy.appz.partner.apps.PartnerConfig',
 	# django apps added by oscar
 	'django.contrib.sites',
 	'django.contrib.flatpages',
@@ -67,7 +68,6 @@ INSTALLED_APPS = [
 	'oscar.apps.shipping.apps.ShippingConfig',
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
-	'oscar.apps.partner.apps.PartnerConfig',
 	'oscar.apps.payment.apps.PaymentConfig',
 	'oscar.apps.offer.apps.OfferConfig',
 	'oscar.apps.order.apps.OrderConfig',
@@ -197,7 +197,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
-STATICFILES_DIRS = [BASE_DIR / 'assets']
+# STATICFILES_DIRS = [BASE_DIR / 'assets']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
