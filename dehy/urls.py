@@ -11,7 +11,7 @@ urlpatterns = [
 	path('wholesale/', views.WholesaleView.as_view(), name='wholesale'),
 	path('contact/', views.ContactView.as_view(), name='contact'),
 	path('', views.HomeView.as_view(), name='home'),
-	path('', include(apps.get_app_config('dehy').urls[0])),
+	path('', include(apps.get_app_config('dehy').urls[0]), name='shop'),
 ]
 
 from django.conf import settings

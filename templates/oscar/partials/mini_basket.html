@@ -3,6 +3,7 @@
 
 <div class="basket-mini col-sm-5 text-right d-none d-md-block">
     <strong>{% trans "Basket total:" %}</strong>
+	{{ request.basket }}
     {% if request.basket.is_tax_known %}
         {{ request.basket.total_incl_tax|currency:request.basket.currency }}
     {% else %}

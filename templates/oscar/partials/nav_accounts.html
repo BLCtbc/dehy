@@ -22,9 +22,9 @@
 	    </button>
 
 		<div class="site-navigation-container site-nav" style="display:flex; width:100%; justify-content: flex-end">
-		    <ul class="navbar">
+		    <!-- <ul class="navbar">
 		        <li class="nav-item">
-		            <a class="nav-link" href="/">Shop</a>
+		            <a class="nav-link" href="/shop">Shop</a>
 		        </li>
 		        <li class="nav-item">
 		            <a class="nav-link" href="/custom">Custom</a>
@@ -32,7 +32,18 @@
 		        <li class="nav-item">
 		            <a class="nav-link" href="/contact">Contact</a>
 		        </li>
-		    </ul>
+		    </ul> -->
+			<ul class="navbar">
+				<li class="nav-item">
+					<a class="nav-link{% if request.resolver_match.url_name == 'shop' %} active{% endif %}"  href="/shop">Shop</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link{% if request.resolver_match.url_name == 'custom' %} active{% endif %}" href="{% url 'custom' %}">Custom</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link{% if request.resolver_match.url_name == 'contact' %} active{% endif %}" href="{% url 'contact' %}">Contact</a>
+				</li>
+			</ul>
 		</div>
 	</div>
 
@@ -154,7 +165,7 @@ old navbar
 	                    </li>
 	                {% endif %}
             </ul>
-			
+
 			{# mini_basket.html #}
 			<div class="basket-mini col-sm-5 text-right d-none d-md-block">
 				<strong>{% trans "Basket total:" %}</strong>
