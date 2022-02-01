@@ -152,13 +152,13 @@ DATABASES = {
     # )
 }
 if DEBUG:
-
-	CACHES = {
-	    'default': {
-	        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-	   }
-	}
-	MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
+	pass
+	# CACHES = {
+	#     'default': {
+	#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+	#    }
+	# }
+	# MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -231,7 +231,11 @@ OSCAR_ORDER_STATUS_CASCADE = {
 }
 
 OSCAR_DEFAULT_CURRENCY = 'USD'
-OSCAR_HIDDEN_FEATURES = ["reviews"]
-OSCAR_HOMEPAGE = reverse_lazy('home')
+OSCAR_HIDDEN_FEATURES = ["reviews", "wishlists"]
+OSCAR_HOMEPAGE = reverse_lazy('catalogue:index')
 OSCAR_SHOP_NAME = "DEHY"
 OSCAR_SHOP_TAGLINE = ""
+
+OSCAR_PRODUCTS_PER_PAGE = 10
+
+THUMBNAIL_DEBUG = True

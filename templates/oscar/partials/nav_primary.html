@@ -2,7 +2,7 @@
 {% load category_tags %}
 {% load i18n %}
 
-<nav class="{% block nav_classes %}navbar container-fluid navbar-expand-lg navbar-dark bg-dark{% endblock %}">
+<nav id="nav_primary" class="{% block nav_classes %}navbar container navbar-expand-lg{% endblock %}">
     {% block navbar_toggler %}
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -32,7 +32,7 @@
             {% block nav %}
                 <ul class="navbar-nav mr-auto">
                     {% block nav_items %}
-                        <li class="nav-item dropdown">
+                        <li id="shop_dropdown" class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {% block browse_store_text %}{% trans "Browse store" %}{% endblock %}
                             </a>
