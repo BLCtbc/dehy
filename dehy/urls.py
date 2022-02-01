@@ -8,10 +8,12 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('custom/', views.CustomView.as_view(), name='custom'),
 	path('returns/', views.ReturnsRefundsView.as_view(), name='returns'),
+	path('recipes/', views.RecipesView.as_view(), name='recipes'),
 	path('wholesale/', views.WholesaleView.as_view(), name='wholesale'),
 	path('contact/', views.ContactView.as_view(), name='contact'),
 	path('', views.HomeView.as_view(), name='home'),
-	path('', include(apps.get_app_config('dehy').urls[0]), name='shop'),
+	path('', include(apps.get_app_config('dehy').urls[0])),
+	path('ajax/get_cart_quantity/', views.get_cart_quantity, name='get_cart_quantity'),
 ]
 
 from django.conf import settings

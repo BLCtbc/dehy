@@ -14,7 +14,7 @@
 {% block breadcrumbs %}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Shop" %}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ summary }}</li>
         </ol>
     </nav>
@@ -58,10 +58,10 @@
 
 {% block content %}
 
-    <form method="get">
+    <form id="product_pagination_results" method="get">
         {# Render other search params as hidden inputs #}
         {% for value in selected_facets %}
-            <input type="hidden" name="selected_facets" value="{{ value }}" />
+            <input type="hidden" name="selected_facets" value="{{ value }}"/>
         {% endfor %}
         <input type="hidden" name="q" value="{{ search_form.q.value|default_if_none:"" }}" />
 
@@ -92,16 +92,24 @@
     </form>
 
     {% if products %}
-        <section>
-            <div>
-                <ol class="row list-unstyled ml-0 pl-0">
-                    {% for product in products %}
-                        <li class="col-sm-6 col-md-4 col-lg-3">{% render_product product %}</li>
-                    {% endfor %}
-                </ol>
-                {% include "oscar/partials/pagination.html" %}
-            </div>
-        </section>
+		{% comment old product list %}
+		<section id="product_list">
+			<ol class="row list-unstyled ml-0 pl-0">
+				{% for product in products %}
+					<li class="col-sm-6 col-md-4 col-lg-3">{% render_product product %}</li>
+				{% endfor %}
+			</ol>
+			{% include "oscar/partials/pagination.html" %}
+		</section>
+		{% endcomment %}
+
+        <div class='product-list' id="product_list">
+
+            {% for product in products %}
+                <div class="product">{% render_product product %}</div>
+            {% endfor %}
+        </div>
+		{% include "oscar/partials/pagination.html" %}
     {% else %}
         <p class="nonefound">{% trans "No products found." %}</p>
     {% endif %}

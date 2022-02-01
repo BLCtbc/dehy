@@ -5,17 +5,17 @@ Keep the same header and footer as the standard layout template but override the
 main content area to split it into a sidebar and a content block
 {% endcomment %}
 {% block content_wrapper %}
-<div class="{% block content_wrapper_classes %}container-fluid page{% endblock %}">
+<div class="{% block content_wrapper_classes %}container page{% endblock %}">
     <div class="page_inner">
         {% block breadcrumbs %}{% endblock breadcrumbs %}
         <div class="row">
 
-            <aside class="sidebar col-sm-4 col-md-3">
+            <aside class="sidebar col-sm-3 col-md-2">
                 {% block column_left %}{% endblock %}
                 {% block column_left_extra %}{% endblock %}
             </aside>
 
-            <div class="col-sm-8 col-md-9">
+            <div class="col-sm-9 col-md-10">
                 {% block header %}
                 <div class="page-header">
                     <h1>{% block headertext %}{% endblock %}</h1>

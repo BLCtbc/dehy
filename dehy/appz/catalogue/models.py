@@ -52,12 +52,17 @@ class Product(AbstractProduct):
 			# self.children.objects.all().aggregate(Max('price'))
 			# self.children.aggregate(Min('stockrecords__price'))
 			lowest = parent.children.aggregate(lowest=models.Min('stockrecords__price'))['lowest']
-			print(f'lowest price: {lowest}')
 			return parent.children.aggregate(lowest=models.Min('stockrecords__price'))['lowest']
 
 	@property
 	def lowest(self):
 		return self.get_lowest_variant()
+
+	def secondary_image(self):
+		if self.images.count() > 1:
+			print('returning image: ', self.images.all()[1])
+
+			return self.images.all()[1]
 
 	def get_absolute_url(self):
 		"""

@@ -12,7 +12,7 @@
 
 	<div class="header-container-left container-fluid">
 		<div class="brand-container">
-			<a class="navbar-brand" href="{{ homepage_url }}" title="dehygarnish.com"><small> {{ shop_tagline }}</small>
+			<a class="navbar-brand" href="{% url 'home' %}" title="dehygarnish.com"><small> {{ shop_tagline }}</small>
 				<img src="{% static 'img/brand.png' %}" alt="Dehy logo">
 			</a>
 		</div>
@@ -33,17 +33,27 @@
 		            <a class="nav-link" href="/contact">Contact</a>
 		        </li>
 		    </ul> -->
+			{% with url_name=request.resolver_match.url_name %}
+
 			<ul class="navbar">
+
 				<li class="nav-item">
-					<a class="nav-link{% if request.resolver_match.url_name == 'shop' %} active{% endif %}"  href="/shop">Shop</a>
+					{% comment %}
+					{% endcomment %}
+					<a class="nav-link{% if url_name == 'index' or url_name == 'detail' or url_name == 'category' %} active{% endif %}"  href="{% url 'catalogue:index' %}">Shop</a>
+
+					<!-- <a class="nav-link{% if request.resolver_match.url_name == 'shop' %} active{% endif %}"  href="/shop">Shop</a> -->
+
 				</li>
 				<li class="nav-item">
-					<a class="nav-link{% if request.resolver_match.url_name == 'custom' %} active{% endif %}" href="{% url 'custom' %}">Custom</a>
+					<a class="nav-link{% if url_name == 'custom' %} active{% endif %}" href="{% url 'custom' %}">Custom</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link{% if request.resolver_match.url_name == 'contact' %} active{% endif %}" href="{% url 'contact' %}">Contact</a>
+					<a class="nav-link{% if url_name == 'contact' %} active{% endif %}" href="{% url 'contact' %}">Contact</a>
 				</li>
+
 			</ul>
+			{% endwith %}
 		</div>
 	</div>
 
@@ -59,7 +69,7 @@
 			</ul>
 		</div>
 		<div class="cart-container" data-controller="Cart">
-	        <a aria-label="2 items in cart" data-test="continue-to-cart" class="icon icon-cart" href="/cart">
+	        <a aria-label="{{request.basket.num_items}} items in cart" data-test="continue-to-cart" class="icon icon-cart" href="/basket">
 	          <span>
 	            <svg viewBox="0 0 31 24" class="icon icon-cart">
 				  <g class="svg-icon cart-icon">
@@ -70,7 +80,7 @@
 				  </g>
 			  	</svg>
 	            <div class="cart-quantity-container">
-	              <span class="cart-quantity">2</span>
+	              <span id="cart-quantity" class="cart-quantity">{{request.basket.num_items}}</span>
 	            </div>
 	          </span>
 	        </a>
@@ -82,15 +92,8 @@
 old navbar
 <nav id="top_page" class="navbar navbar-expand-lg navbar-light bg-light accounts">
 
-	{# old_brand_element #}
-	<div class="col-sm-6 h1">
-		<a href="{{ homepage_url }}">{% block brand_title %}{{ shop_name }}{% endblock %}</a>
-		<small> {{ shop_tagline }}</small>
-	</div>
-	{# end old_brand_element #}
-
 	<div class="brand-container">
-		<a class="navbar-brand" href="{{ homepage_url }}" title="dehygarnish.com"><small> {{ shop_tagline }}</small>
+		<a class="navbar-brand" href="{{ homepage_url }}" title="dehygarnish.com"><small>{{ shop_tagline }}</small>
 			<img src="{% static 'img/brand.png' %}" alt="Dehy logo">
 		</a>
 	</div>
