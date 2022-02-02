@@ -89,6 +89,10 @@ a:hover{
 	color: var(--beige);
 }
 
+a.navbar-brand {
+	position: relative;
+}
+
 .product-category-list a::after,
 .navbar-brand::after
  {
@@ -436,9 +440,13 @@ span.variant_price {
 }
 
 header.header {
-	/* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
-	/* padding-right: 0; */
-	/* padding-left: 0 */
+	padding-top: 4vw;
+}
+
+header:after {
+    display: block;
+    clear: both;
+    content: "";
 }
 
 .product_pod .product_price {
