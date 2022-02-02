@@ -1,23 +1,25 @@
-from django.views.generic import TemplateView
+from django.views.generic import ListView, TemplateView
 from django.http import JsonResponse
+from .models import QandA
 
 class CustomView(TemplateView):
-    template_name = "dehy/custom.html"
+	template_name = "dehy/custom.html"
 
 class WholesaleView(TemplateView):
-    template_name = "dehy/wholesale.html"
+	template_name = "dehy/wholesale.html"
 
 class HomeView(TemplateView):
-    template_name = "dehy/home.html"
+	template_name = "dehy/home.html"
 
 class ReturnsRefundsView(TemplateView):
-    template_name = "dehy/returns.html"
+	template_name = "dehy/returns.html"
 
 class ContactView(TemplateView):
-    template_name = "dehy/contact.html"
+	template_name = "dehy/contact.html"
 
-class RecipesView(TemplateView):
-    template_name = "dehy/recipes.html"
+class FAQView(ListView):
+	model = QandA
+	template_name = "dehy/faq.html"
 
 
 def get_cart_quantity(request):
