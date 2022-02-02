@@ -14,6 +14,7 @@
 	- [disabling a built-in oscar feature](#disable_feature)
 	- [changing the oscar homepage](#edit_homepage)
 	- [overriding base templates](#base_layouts_override)
+4. [overriding oscar dashboard and adding custom menu item](#oscar_nav_override)
 4. [implementing paypal payment support with django-oscar-payapl](#django_oscar_paypal)
 5. [linux cli commands](#server_cli)
 	- [connecting to AWS](#connecting_to_AWS)
@@ -859,6 +860,245 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			..way too many to list..
 			suggestion: use a regex pattern something like this: `oscar\/([\w]+\.html)` and just replace all
 			regex for nested: `oscar\/([\w]+\/[\w]+\.html)`
+
+---
+<a name="oscar_nav_override"></a>
+1. ##### adding a custom model item to oscar's builtin dashboard
+	initially started attempting to implement this from the [official documentation](https://django-oscar.readthedocs.io/en/3.1/howto/how_to_configure_the_dashboard_navigation.html), wound up using [this how-to article](https://levelup.gitconnected.com/creating-an-oscar-app-with-dashboard-part-2-6283dd24304) as a guide
+
+	- create the custom apps:
+		```sh
+		$ mkdir dehy/appz/recipes
+		$ mkdir dehy/appz/dashboard/recipes
+		$ ./manage.py startapp recipes dehy/appz/recipes
+		$ ./manage.py startapp recipes dehy/appz/dashboard/recipes
+		```
+
+	- create model and views, hookup the apps and the urls
+
+		```py
+		##############################
+		# dehy/appz/recipes/apps.py
+
+		from django.apps import AppConfig
+
+		class RecipesConfig(AppConfig):
+			default_auto_field = 'django.db.models.BigAutoField'
+			name = 'dehy.appz.recipes'
+			namespace = 'recipes'
+			label = 'recipes'
+
+		##############################
+		# dehy/appz/recipes/models.py
+		from django.db import models
+		from django.contrib.postgres.fields import ArrayField
+		from oscar.models.fields import AutoSlugField
+
+		class Recipe(models.Model):
+			name = models.CharField(max_length=100, default="", help_text='Name of the recipe')
+			description = models.TextField(help_text='A short introduction about the recipe, origin, summary, etc.')
+			ingredients = ArrayField(models.CharField(max_length=50))
+			slug = AutoSlugField(max_length=50, unique=True, populate_from=name, editable=True)
+			date_created = models.DateField(auto_now_add=True, editable=False)
+			last_modified = models.DateField(auto_now=True, editable=False)
+
+		##############################
+		# dehy/settings.py
+		INSTALLED_APPS = [
+			...
+			'dehy.appz.recipes.apps.RecipesConfig',
+			'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
+			...
+		]
+
+		##############################
+		# dehy/appz/recipes/views.py
+		from django.shortcuts import render
+		from django.views.generic import ListView, DetailView, TemplateView
+		from .models import Recipe
+
+		class RecipesView(TemplateView):
+			template_name = "dehy/recipes.html"
+
+		class RecipeListView(ListView):
+			model = Recipe
+			context_object_name = "recipes"
+			# template_name = "dehy/recipes.html"
+
+		class RecipeDetailView(DetailView):
+		    model = Recipe
+		    template_name = "dehy/recipes.html"
+		    context_object_name = "recipe"
+		    slug_field = 'slug'
+		    slug_url_kwarg = 'slug'
+
+		##############################
+		# dehy/appz/recipes/urls.py
+		from django.urls import path
+		from . import views
+
+		urlpatterns = [
+			path('recipes/', views.RecipesView.as_view(), name='recipes'),
+			path('recipes/<slug:recipe_slug>', views.RecipeDetailView.as_view(), name='recipe_details'),
+		]
+
+		##############################
+		# dehy/urls.py
+		from django.apps import apps
+		from django.urls import include, path
+		from django.contrib import admin
+
+		urlpatterns = [
+			path('admin/', admin.site.urls),
+			path('', include('dehy.appz.recipes.urls'), name='recipes'),
+			path('', include(apps.get_app_config('dehy').urls[0])),
+		]
+		```
+
+	- dashboard specific changes:
+		```py
+		# dehy/appz/dashboard/apps.py
+
+		from django.apps import apps
+		from django.urls import include, path
+		from django.utils.translation import gettext_lazy as _
+		from oscar.core.loading import get_class
+		import oscar.apps.dashboard.apps as oscar_apps
+
+		class DashboardConfig(oscar_apps.DashboardConfig):
+			name = 'dehy.appz.dashboard'
+			label = 'dashboard'
+			verbose_name = _('Dashboard')
+			namespace = 'dashboard'
+			permissions_map = {
+				'index': (['is_staff'], ['partner.dashboard_access']),
+			}
+
+			def ready(self):
+				super().ready()
+				self.recipes_app = apps.get_app_config('recipes_dashboard')
+
+			def get_urls(self):
+				urls = super().get_urls()
+				urls += [
+					path('recipes/', include(self.recipes_app.urls[0]))
+				]
+				return self.post_process_urls(urls)
+
+		# dehy/appz/dashboard/recipes/apps.py
+		from oscar.core.application import OscarDashboardConfig
+		from django.urls import path
+		from oscar.core.loading import get_class
+		import oscar.apps.catalogue.apps as apps
+		from django.utils.translation import gettext_lazy as _
+
+		class RecipesDashboardConfig(OscarDashboardConfig):
+			default_auto_field = 'django.db.models.BigAutoField'
+			name = 'dehy.appz.dashboard.recipes'
+			label = 'recipes_dashboard'
+			verbose_name = _('Recipes')
+			namespace = 'recipes'
+			default_permissions = ['is_staff']
+			permissions_map = _map = {
+		        'recipe-create': (['is_staff'],
+		                                     ['partner.dashboard_access']),
+		        'recipe-list': (['is_staff'], ['partner.dashboard_access']),
+		        'recipe-delete': (['is_staff'],
+		                                     ['partner.dashboard_access']),
+		        'recipe-update': (['is_staff'],
+		                                     ['partner.dashboard_access']),
+		    }
+
+
+			def ready(self):
+				super().ready()
+				self.recipes_list_view = get_class('dashboard.recipes.views', 'RecipeListView')
+				self.recipes_create_view = get_class('dashboard.recipes.views', 'RecipeCreateView')
+				self.recipes_update_view = get_class('dashboard.recipes.views', 'RecipeUpdateView')
+				self.recipes_delete_view = get_class('dashboard.recipes.views', 'RecipeDeleteView')
+
+			def get_urls(self):
+				urls = super().get_urls()
+				urls += [
+					path('', self.recipes_list_view.as_view(), name='recipe-list'),
+					path('create/', self.recipes_create_view.as_view(), name='recipe-create'),
+					path('update/<int:pk>/', self.recipes_update_view.as_view(), name='recipe-update'),
+					path('delete/<int:pk>/', self.recipes_delete_view.as_view(), name='recipe-delete'),
+				]
+				return self.post_process_urls(urls)
+
+		# dehy/appz/dashboard/recipes/views.py
+		from django.apps import apps
+		from django.urls import include, path
+		from django.utils.translation import gettext_lazy as _
+		from oscar.core.loading import get_class
+		import oscar.apps.dashboard.apps as oscar_apps
+
+		class DashboardConfig(oscar_apps.DashboardConfig):
+			name = 'dehy.appz.dashboard'
+			label = 'dashboard'
+			verbose_name = _('Dashboard')
+			namespace = 'dashboard'
+			permissions_map = {
+				'index': (['is_staff'], ['partner.dashboard_access']),
+			}
+
+			def ready(self):
+				super().ready()
+				self.recipes_app = apps.get_app_config('recipes_dashboard')
+
+			def get_urls(self):
+				urls = super().get_urls()
+				urls += [
+					path('recipes/', include(self.recipes_app.urls[0]))
+				]
+				return self.post_process_urls(urls)
+
+		# dehy/appz/dashboard/recipes/forms.py
+		from django import forms
+		from django.db.models import Q
+		from django.utils.translation import gettext_lazy as _
+		from oscar.core.loading import get_model
+
+		Recipe = get_model('recipes', 'Recipe')
+
+		class RecipeSearchForm(forms.Form):
+
+			name = forms.CharField(label=_('Recipe name'), required=False)
+			ingredients = forms.CharField(label=_('Ingredients list'), required=False)
+			slug = forms.SlugField(label=('Slug'), required=False)
+
+			def is_empty(self):
+				d = getattr(self, 'cleaned_data', {})
+				def empty(key): return not d.get(key, None)
+				return empty('name') and empty('ingredients')
+
+			def apply_ingredient_filter(self, qs, value):
+				words = value.replace(',', ' ').split()
+				q = [Q(city__icontains=word) for word in words]
+				return qs.filter(*q)
+
+			def apply_name_filter(self, qs, value):
+				return qs.filter(name__icontains=value)
+
+			def apply_filters(self, qs):
+				for key, value in self.cleaned_data.items():
+					if value:
+						qs = getattr(self, 'apply_%s_filter' % key)(qs, value)
+				return qs
+
+		class RecipeCreateUpdateForm(forms.ModelForm):
+			class Meta:
+				model = Recipe
+				fields = ('name', 'slug', 'ingredients')
+		```
+
+	- copy the oscar template files:
+		```
+		$ mkdir dehy/templates/oscar/dashboard && cp venv/lib/python3.7/oscar/templates/dashboard dehy/templates/oscar/dashboard
+		```
+
+---
 
 ---
 <a name="django_oscar_paypal"></a>
