@@ -10,6 +10,7 @@ from oscar.defaults import *
 import environ
 from pathlib import Path
 from pygit2 import Repository
+from django.utils.translation import gettext_lazy as _
 
 ENV_FILE = '.env'
 if Repository('.').head.shorthand is 'main':
@@ -49,6 +50,10 @@ INSTALLED_APPS = [
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 	'dehy',
+	'dehy.appz.generic.apps.GenericConfig',
+	'dehy.appz.recipes.apps.RecipesConfig',
+	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
+
 	# oscar overrides
 	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
@@ -139,17 +144,17 @@ WSGI_APPLICATION = 'dehy.wsgi.application'
 # like psql://user:pass@127.0.0.1:8458/db
 DATABASES = {
 	'default': env.db('DATABASE_URL')
-    # read os.environ['DATABASE_URL'] and raises
-    # ImproperlyConfigured exception if not found
-    #
-    # The db() method is an alias for db_url().
-    # 'default': env.db(),
+	# read os.environ['DATABASE_URL'] and raises
+	# ImproperlyConfigured exception if not found
 	#
-    # read os.environ['SQLITE_URL']
-    # 'extra': env.db_url(
-    #     'SQLITE_URL',
-    #     default='sqlite:////tmp/my-tmp-sqlite.db'
-    # )
+	# The db() method is an alias for db_url().
+	# 'default': env.db(),
+	#
+	# read os.environ['SQLITE_URL']
+	# 'extra': env.db_url(
+	#     'SQLITE_URL',
+	#     default='sqlite:////tmp/my-tmp-sqlite.db'
+	# )
 }
 if DEBUG:
 	pass
@@ -239,3 +244,16 @@ OSCAR_SHOP_TAGLINE = ""
 OSCAR_PRODUCTS_PER_PAGE = 10
 
 THUMBNAIL_DEBUG = True
+
+OSCAR_DASHBOARD_NAVIGATION += [
+	{
+		'label': _('Recipe'),
+		'icon': 'fas fa-bullhorn',
+		'children': [
+			{
+				'label': _('Recipes'),
+				'url_name': 'dashboard:recipe-list',
+			},
+		 ]
+	},
+]
