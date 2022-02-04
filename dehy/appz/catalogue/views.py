@@ -8,8 +8,7 @@ from django.core.paginator import InvalidPage
 from oscar.core.loading import get_class
 from django.utils.translation import gettext_lazy as _
 
-get_product_search_handler_class = get_class(
-    'catalogue.search_handlers', 'get_product_search_handler_class')
+get_product_search_handler_class = get_class('catalogue.search_handlers', 'get_product_search_handler_class')
 
 
 # class CatalogueView(CoreCatalogueView):

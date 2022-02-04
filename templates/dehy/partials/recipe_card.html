@@ -1,0 +1,15 @@
+<article class="product_page"><!-- Start of product page -->
+<div class="card card-body col-4">
+	<a href="{% url 'recipe_details' recipe.slug %}"><h1>{{recipe.name}}</h1></a>
+	<p>{{recipe.description}}</p>
+	<h3>ingredients</h3>
+	{% for ingredient in recipe.ingredients %}
+	<p>{{ingredient}}</p>
+	{% endfor %}
+	Directions:
+	{% for step in recipe.steps %}
+	<p>{{forloop.counter}}. {{step}}
+	{% endfor %}
+
+</div>
+</article>

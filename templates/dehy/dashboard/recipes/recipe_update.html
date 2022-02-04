@@ -1,0 +1,72 @@
+{% extends 'oscar/dashboard/layout.html' %}
+{% load i18n static %}
+
+{% block title %}
+{{ title }} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'dashboard:recipe-list' %}">{% trans "Recipes" %}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block headertext %}{{ title }}{% endblock %}
+
+{% block dashboard_content %}
+
+{% if form.errors %}
+<div class="alert alert-danger">
+  {% trans "Your submitted data did not validate - please correct the below errors and resubmit." %}
+</div>
+{% endif %}
+
+<form method="post" class="form-vertical wysiwyg">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+  {% for error in form.non_field_errors %}
+  <div class="alert alert-danger">
+    <span class="help-inline"><i class="fas fa-exclamation"></i> {{ error }}</span>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <div class="table-header">
+    <h3>{% trans "Recipe details" %}</h3>
+  </div>
+  <div class="card card-body">
+
+
+	{% if form.is_bound and not form.is_valid %}
+	    <div class="alert alert-danger">
+	        <strong>{% trans "Oops! We found some errors" %}</strong> - {% trans "please check the error messages below and try again" %}
+	    </div>
+	{% endif %}
+
+	{% if form.non_field_errors %}
+	    {% for error in form.non_field_errors %}
+	        <div class="alert alert-danger form-group">
+	            <span class="help-inline"><i class="fas fa-exclamation"></i> {{ error }}</span>
+	        </div>
+	    {% endfor %}
+	{% endif %}
+
+	{% for field in form %}
+
+	    {% include 'dehy/dashboard/partials/form_field.html' with field=field style=style %}
+	{% endfor %}
+  </div>
+
+  <div class="card card-body">
+    <div class="form-actions">
+      <button class="btn btn-primary btn-lg" type="submit">{% trans "Save" %}</button>
+      {% trans "or" %}
+      <a href="{% url 'dashboard:recipe-list' %}">{% trans "cancel" %}</a>
+    </div>
+  </div>
+</form>
+{% endblock dashboard_content %}

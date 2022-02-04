@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'django.contrib.postgres',
 	'dehy',
 	'dehy.appz.generic.apps.GenericConfig',
 	'dehy.appz.recipes.apps.RecipesConfig',
