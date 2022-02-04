@@ -15,4 +15,4 @@ class RecipeDetailView(DetailView):
     template_name = "dehy/recipes.html"
     context_object_name = "recipe"
     slug_field = 'slug'
-    slug_url_kwarg = 'slug'
+    slug_url_kwarg = 'recipe_slug'

@@ -1,6 +1,9 @@
 from django.views.generic import ListView, TemplateView
 from django.http import JsonResponse
 from .models import QandA
+from oscar.core.loading import get_class, get_model
+
+Recipe = get_model('recipes', 'Recipe')
 
 class CustomView(TemplateView):
 	template_name = "dehy/custom.html"
@@ -10,6 +13,12 @@ class WholesaleView(TemplateView):
 
 class HomeView(TemplateView):
 	template_name = "dehy/home.html"
+
+	def get_context_data(self, *args, **kwargs):
+		data = super().get_context_data(*args, **kwargs)
+		recipes = Recipe.objects.all()
+		data.update({'recipes':recipes})
+		return data
 
 class ReturnsRefundsView(TemplateView):
 	template_name = "dehy/returns.html"

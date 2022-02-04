@@ -19,7 +19,7 @@ class RecipeListView(generic.ListView):
 	"""
 
 	model = Recipe
-	template_name = 'oscar/dashboard/recipes/recipe_list.html'
+	template_name = 'dehy/dashboard/recipes/recipe_list.html'
 	context_object_name = "recipe_list"
 	context_table_name = 'recipes'
 	paginate_by = 20
@@ -55,9 +55,14 @@ class RecipeListView(generic.ListView):
 
 class RecipeCreateView(generic.CreateView):
 	model = Recipe
-	template_name = 'oscar/dashboard/recipes/recipe_update.html'
+	template_name = 'dehy/dashboard/recipes/recipe_update.html'
 	form_class = RecipeCreateUpdateForm
 	success_url = reverse_lazy('dashboard:recipe-list')
+
+	def post(self, *args, **kwargs):
+		response = super().post(*args, **kwargs)
+		print('\n\nPOST object: ', dir(response), '\n\n')
+		return response
 
 	def get_context_data(self, **kwargs):
 		ctx = super().get_context_data(**kwargs)
@@ -70,15 +75,17 @@ class RecipeCreateView(generic.CreateView):
 
 	def forms_valid(self, form, inlines):
 		response = super().forms_valid(form, inlines)
-		msg = render_to_string('oscar/dashboard/recipes/messages/recipe_saved.html',{'recipe': self.object})
+		msg = render_to_string('oscar/dashboard/recipes/messages/recipe_saved.html', {'recipe': self.object})
 		messages.success(self.request, msg, extra_tags='safe')
 		return response
 
 class RecipeUpdateView(generic.UpdateView):
 	model = Recipe
-	template_name = "oscar/dashboard/recipes/recipe_update.html"
+	template_name = "dehy/dashboard/recipes/recipe_update.html"
 	form_class = RecipeCreateUpdateForm
 	success_url = reverse_lazy('dashboard:recipe-list')
+
+
 	def get_context_data(self, **kwargs):
 		ctx = super().get_context_data(**kwargs)
 		ctx['title'] = self.object.name
@@ -89,13 +96,14 @@ class RecipeUpdateView(generic.UpdateView):
 			self.request,
 			"Your submitted data was not valid - please correct the below errors")
 		return super().forms_invalid(form, inlines)
+
 	def forms_valid(self, form, inlines):
-		msg = render_to_string('oscar/dashboard/recipes/messages/recipe_saved.html',
+		msg = render_to_string('dehy/dashboard/recipes/messages/recipe_saved.html',
 							   {'recipe': self.object})
 		messages.success(self.request, msg, extrforms_valida_tags='safe')
 		return super().forms_valid(form, inlines)
 
 class RecipeDeleteView(generic.DeleteView):
 	model = Recipe
-	template_name = "oscar/dashboard/recipes/recipe_delete.html"
+	template_name = "dehy/dashboard/recipes/recipe_delete.html"
 	success_url = reverse_lazy('dashboard:recipe-list')

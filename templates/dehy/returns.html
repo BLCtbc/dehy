@@ -1,0 +1,17 @@
+{% extends "dehy/layout.html" %}
+
+{% load i18n %}
+{% load product_tags %}
+
+{% block title %}
+{{ block.super }} | {% trans "Returns" %}
+{% endblock title %}
+
+{% block layout %}
+{{block.super}}
+<h1>returns and refuns policy</h1>
+
+	{% block content %}
+	{% endblock content %}
+{% endblock layout %}
+

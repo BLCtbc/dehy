@@ -5,7 +5,7 @@ class CatalogueConfig(apps.CatalogueConfig):
 	name = 'dehy.appz.catalogue'
 	# name = 'shop'
 	# label = 'shop'
-	# namespace = 'shop'
+	namespace = 'shop'
 
 	def get_urls(self):
 		urls = super().get_urls()

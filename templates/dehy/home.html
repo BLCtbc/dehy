@@ -1,5 +1,5 @@
-{% extends "oscar/layout.html" %}
-
+{% extends "dehy/layout.html" %}
+{% load static %}
 {% load i18n %}
 {% load product_tags %}
 
@@ -7,11 +7,106 @@
 {{ block.super }} | {% trans "Home" %}
 {% endblock title %}
 
-{% block layout %}
-{{block.super}}
-<h1>test 123</h1>
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}"/>
+{% endblock extrastyles %}
 
-	{% block content %}
-	{% endblock content %}
-{% endblock layout %}
+
+{% block header %}
+<header class='content-section' id='header_image'>
+	<div class='col-7 img-split shop-header-image' style='background-image: url({% static "img/custom/dehy_jars2_filter.jpeg"%}); background-size:cover;'>
+		<div class='shop-leadin'>
+			<div class='punchline'>
+				<h1>CATCHY PUNCHLINE</h1>
+				<h1>NOW YOU WANNA BUY SHIT</h1>
+			</div>
+			<div class='shop-link-container'>
+				<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">SHOP NOW</a>
+			</div>
+		</div>
+	</div>
+		<div class='col-5 fun-gif img-split'>
+			<figure>
+				<img style="filter: grayscale(30%) opacity(0.5);" class="image-container" src='{% static 'img/custom/dehy_flag_filter.gif' %}'>
+			</figure>
+		</div>
+</header>
+{% endblock header %}
+
+{% block content_wrapper %}
+	<section class='content-section' id='header_image'>
+		<header>
+			<img class="image-container" src='{% static 'img/custom/dehy_hero.jpeg' %}'>
+		</header>
+	</section>
+
+	<section class='about content-section' id='about'>
+		<div class='container'>
+			<h2>Virtue & Craft</h2>
+			<p>Dehy makes high quality dehydrated garnishes for an elevated cocktail experience, handmade in Austin Texas. Created for cocktail professionals and enthusiasts alike, Dehy makes it easy to put a unique finishing touch on any drink with speed.</p>
+		</div>
+	</section>
+
+	<section class='content-section'>
+		<img class="image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
+	</section>
+
+	<section class='content-section'>
+		<div class="content-split">
+			<div class='col-7 about'>
+				<h2>Virtue & Craft</h2>
+				<p>Dehy makes high quality dehydrated garnishes for an elevated cocktail experience, handmade in Austin Texas. Created for cocktail professionals and enthusiasts alike, Dehy makes it easy to put a unique finishing touch on any drink with speed.</p>
+			</div>
+			<div class='col-5 img-split'>
+				<img class="image-container" src='{% static 'img/custom/dehy_graphic1.jpeg' %}'>
+			</div>
+		</div>
+	</section>
+
+	<section class='content-section mailing-list-container'>
+		<div class="container row justify-content-center">
+			<div class="mailing-list col-8">
+				<p class='subhead'>STAY IN DA MIX LMAOOOO</p>
+				<h2>SUBSCRIBE FOR INSIDE ACCESS</h2>
+				<p class='monospace'>Get emails about special events, offers, and upcoming promotions. Unsubscribe whenever you want.</p>
+				<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
+					<input type="hidden" name="csrfmiddlewaretoken" value="">
+					<label class="sr-only" for="mailing_list_submit">Sign Up</label>
+					<input type="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
+			   	 	<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit"><i class="fas fa-paper-plane"></i></button>
+
+					<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
+				</form>
+			</div>
+		</div>
+	</section>
+
+	<section class='content-section'>
+		<div class="content-split">
+			<div class="mailing-list col-5">
+				<p class='subhead'>STAY IN DA MIX LMAOOOO</p>
+				<h2>SUBSCRIBE FOR INSIDE ACCESS</h2>
+				<p class='monospace'>Get emails about special events, offers, and upcoming promotions. Unsubscribe whenever you want.</p>
+				<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
+					<input type="hidden" name="csrfmiddlewaretoken" value="">
+					<label class="sr-only" for="mailing_list_submit">Sign Up</label>
+					<input name="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
+					<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button>
+				</form>
+			</div>
+			<div class='img-split col-7'>
+				<img class="image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
+			</div>
+		</div>
+	</section>
+
+	{% block recipe_list %}
+	<section class='content-section' id='recipe_list'>
+		{% for recipe in recipes %}
+		{% include "dehy/partials/recipe_card.html" with recipe=recipe %}
+		{% endfor %}
+	</section>
+	{% endblock recipe_list %}
+
+{% endblock content_wrapper %}
 
