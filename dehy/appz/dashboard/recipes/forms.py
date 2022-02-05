@@ -1,4 +1,5 @@
 from django import forms
+import math
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from oscar.core.loading import get_model
@@ -50,41 +51,54 @@ class IngredientWidget(forms.MultiWidget):
 
 	def __init__(self, attrs=None, *args, **kwargs):
 		attrs={'class': 'special'}
-		# widgets = [
-		# 	forms.TextInput(),
-		# 	forms.TextInput(),
-		# 	forms.TextInput()
-		# ]
 
-		# old
 		widgets = [
-			forms.TextInput(attrs={'step':'any', 'min':0}),
+			forms.NumberInput(attrs={'step':'any', 'min':0}),
 			forms.Select(choices=self.UNITS_OF_MEASUREMENT_CHOICES),
 			forms.TextInput()
 		]
 		super().__init__(widgets, attrs, *args, **kwargs)
 
+	# only called on update, not create
 	def decompress(self, value):
 		print(f'\n *** decompressing: {value}')
-
 		if value:
 			return value.split(',')
 		return ['', '', '']
 
-	# def value_from_datadict(self, data, files, name):
-	# 	# print(f'\n dir(MultiWidget): {dir(self)}')
-	# 	# print(f'\n self.widgets: {self.widgets}')
-	#
-	#
-	# 	vals = super().value_from_datadict(data, files, name)
-	# 	print(f'** value_from_datadict: {vals} **')
-	#
-	# 	# DateField expects a single string that it can parse into a date.
-	# 	# print(f'\n a: {a}')
-	# 	# print(f'\n b: {b}')
-	# 	# print(f'\n c: {c}')
-	#
-	# 	return vals
+	def value_from_datadict(self, data, files, name, *args, **kwargs):
+		print('\n *** value_from_datadict')
+		print(f'\n name {name}')
+		print(f'\n pre super*** data {data}')
+		print(f'\n dir(self) multiwidget {dir(self)}')
+		step = len(self.widgets)
+
+		vals = []
+
+		ingredients = get_ingredients(data, name, step)
+		if ingredients:
+			vals = ingredients
+		else:
+			vals = super().value_from_datadict(data, files, name, *args, **kwargs)
+
+
+		print(f'\n vals: {vals}')
+		print('\n end value_from_datadict ***')
+
+		return vals
+
+
+	# only called on update, not create
+	def get_context(self, name, value, attrs):
+		value = value or ['']
+		print(f'\n ** FORMS get_context value {value}')
+		print(f'\n ** FORMS get_context name {name}')
+
+		context = super().get_context(name, value, attrs)
+
+		# print(f'\n ** FORMS get_context {context}')
+		return context
+
 
 class IngredientField(forms.MultiValueField):
 	widget = IngredientWidget()
@@ -102,31 +116,16 @@ class IngredientField(forms.MultiValueField):
 		('L', 'liters'),
 		('kg', 'kilograms'),
 	)
-	#
-	# def clean(self, *args, **kwargs):
-	# 	print('\n cleaning multivaluefield \n')
-	# 	print(f'\n dir(self) multivaluefield {dir(self)} \n')
-	# 	print(f'errors: {self.error_messages}')
-	#
-	# 	# cleaned_data = super().clean(*args, **kwargs)
-	# 	cleaned_data = self.compress(*args, **kwargs)
-	#
-	# 	print('\nMultiValueField cleaned_data: ', cleaned_data)
-	# 	return cleaned_data
-	#
-	# def to_python(self, *args, **kwargs):
-	# 	print(f'\n** to_python {val} \n')
-	# 	val = super().to_python(*args, **kwargs)
-	# 	return val
-	#
-	#
-	# def validate(self, *args, **kwargs):
-	# 	print('\n** validate() \n')
-	# 	pass
-	#
-	# def run_validators(self, *args, **kwargs):
-	# 	print('\n** run_validators() \n')
-	# 	# super().run_validators(*args, **kwargs)
+
+	def clean(self, value, *args, **kwargs):
+		print('\n *** cleaning multivaluefield')
+		print(f'\n dir(self) multivaluefield {dir(self)} \n')
+		print(f'\n uncleaned value multivaluefield: {value}')
+		cleaned_data = super().clean(value, *args, **kwargs)
+		print(f'\n cleaned data multivaluefield: {value}')
+
+		cleaned_data['ingredients'] = value
+		return cleaned_data
 
 	def compress(self, data_list):
 		print(f'\n** compressing ** {data_list}')
@@ -139,18 +138,6 @@ class IngredientField(forms.MultiValueField):
 		error_messages = {
 			'incomplete': 'Enter ingredient information: quantity, measurement, and name',
 		}
-		# Or define a different message for each field.
-		# fields = (
-		# 	forms.CharField(
-		# 		label=_('amount'), help_text='quantity',
-		# 	),
-		# 	forms.CharField(
-		# 		label=_('Unit of measurement'), help_text='Unit of measurement, eg. mL, oz',
-		# 	),
-		# 	forms.CharField(
-		# 		help_text='ingredient name',
-		# 	),
-		# )
 
 		fields = (
 			forms.DecimalField(
@@ -186,13 +173,22 @@ class RecipeCreateUpdateForm(forms.ModelForm):
 
 	def clean(self):
 
-		cleaned_data = super().clean()
-		if 'ingredients' in cleaned_data.keys():
-			cleaned_data['ingredients'] = [cleaned_data['ingredients'].split(',')]
+		print(f'\n dir(self) form {dir(self)}')
+		print(f'\n non_field_errors form {self.non_field_errors}')
+		print(f'\n pre(cleaned_data) {self.cleaned_data}')
+		print(f'\n uncleaned data FORM: {self.data}')
 
+		cleaned_data = super().clean()
+
+		if 'ingredients' not in cleaned_data.keys():
+			cleaned_data['ingredients'] = get_ingredients(self.data, 'ingredients', 3)
+
+		# if 'ingredients' in cleaned_data.keys():
+		# 	cleaned_data['ingredients'] = [cleaned_data['ingredients'].split(',')]
+
+		print('\n cleaned_data FORM: ', cleaned_data)
 		return cleaned_data
 
-	# def full_clean(self):
 
 	class Meta:
 		model = Recipe
@@ -202,16 +198,23 @@ class RecipeCreateUpdateForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
-		print(f"\n form.is_valid() {self.is_valid()}")
-		print(f"\n form.errors {self.errors}")
-		print(f"\n form.non_field_errors {self.non_field_errors()}")
-
-
-		# print(f'\n ** form dir(self) {dir(self)}\n')
-
 		self.fields['ingredients'].widget.attrs.update({'class': 'special'})
-		
-		print(f'\n form {self.fields["ingredients"]}')
-		print(f'\n dir ingredients {dir(self.fields["ingredients"])}')
-		print(f'\n widget {self.fields["ingredients"].widget}')
-		print(f'\n type(fields) {type(self.fields["ingredients"].fields)}')
+
+
+def get_ingredients(data, name, step):
+	qd = list(data.items())
+	vals = []
+	for item in qd:
+		if name in item[0]:
+			vals.append(item[1])
+
+	vals_2d = []
+	if len(vals)%step==0:
+		num_lists = len(vals)/step
+		for i in range(int(num_lists)):
+			n = max(min(i * step, math.inf), 0)
+			m = ((i+1)*step)
+			vals_2d.append(vals[n:m])
+		vals = vals_2d
+
+	return vals
