@@ -59,11 +59,12 @@ class RecipeCreateView(generic.CreateView):
 	form_class = RecipeCreateUpdateForm
 	success_url = reverse_lazy('dashboard:recipe-list')
 
-	# def get(self, *args, **kwargs):
-	# 	form = self.form_class(self.request.GET)
+	# def post(self, *args, **kwargs):
+	# 	form = self.form_class(self.request.POST)
 	# 	print(f'form.is_valid: {form.is_valid()}')
+	#
 	# 	# response = super().post(*args, **kwargs)
-	# 	print(f'\n *** GET ')
+	# 	print(f'\n *** POST ')
 	#
 	# 	response = render(self.request, self.template_name, context=self.get_context_data())
 	# 	return response
@@ -71,14 +72,8 @@ class RecipeCreateView(generic.CreateView):
 	def get_context_data(self, **kwargs):
 		context_data = super().get_context_data(**kwargs)
 		context_data['title'] = _('Create new recipe')
-		print(f'\n context_data: {context_data}')
 		form = context_data['form']
-		print(f'\n form {dir(form)}')
-		print(f'\n form {form.fields}')
-		print(f'\n form {form.fields["ingredients"]}')
-		print(f'\n dir ingredients {dir(form.fields["ingredients"])}')
-		print(f'\n widget {form.fields["ingredients"].widget}')
-		print(f'\n type(fields) {type(form.fields["ingredients"].fields)}')
+		print(f'\n** VIEWS get_context_data: {context_data}')
 
 		return context_data
 
@@ -102,9 +97,11 @@ class RecipeUpdateView(generic.UpdateView):
 
 
 	def get_context_data(self, **kwargs):
-		ctx = super().get_context_data(**kwargs)
-		ctx['title'] = self.object.name
-		return ctx
+		context_data = super().get_context_data(**kwargs)
+		context_data['title'] = self.object.name
+		print(f'\n** VIEWS get_context_data: {context_data}')
+
+		return context_data
 
 	def forms_invalid(self, form, inlines):
 		messages.error(

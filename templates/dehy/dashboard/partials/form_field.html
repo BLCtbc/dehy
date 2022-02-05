@@ -9,24 +9,11 @@
         checkbox and radio inputs differently to other widgets.
     {% endcomment %}
 
-
-	{% if field.label == 'Ingredients' %}
-	length={{field|length}}
-	required={{field.required}}
-	has_changed={{field.has_changed}}
-	get_bound_field={{field.get_bound_field}}
-	label={{field.label}}
-
-	bound_data={{field.bound_data}}
-	length={{field.widget.fields|length}}
-
-	{% else %}
     {% annotate_form_field field %}
-	{% endif %}
 
     {% block control_group %}
 
-		<div class="form-group {% if field.label == 'Ingredients' %}form-inline {% endif %}{% if style == 'horizontal' %} row{% endif %}{% if field.errors %} error{% endif %}">
+		<div class="form-group {% if style == 'horizontal' %} row{% endif %}{% if field.errors %} error{% endif %}">
             {% block label %}
                 {% if not nolabel and field.widget_type != 'checkbox' %}
                     <label for="{{ field.auto_id }}" class="{% if style|default:"stacked" != 'stacked' %}col-sm-4{% endif %} col-form-label{% if field.field.required %} required{% endif %}">
