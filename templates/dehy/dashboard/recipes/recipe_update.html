@@ -56,8 +56,7 @@
 	{% endif %}
 
 	{% for field in form %}
-
-	    {% include 'dehy/dashboard/partials/form_field.html' with field=field style=style %}
+	    {% include 'dehy/dashboard/partials/form_field.html' with field=field style=style widget=widget fields=fields %}
 	{% endfor %}
   </div>
 

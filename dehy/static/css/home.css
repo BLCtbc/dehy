@@ -1,0 +1,156 @@
+.header {
+	background-image: url('/static/img/custom/dehy_hero.jpeg');
+	padding: 0;
+}
+
+.image-container {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+
+.about {
+	font-size: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 2rem;
+}
+
+.content-section {
+	min-height: 350px;
+	justify-content: center;
+	border-bottom: 12px solid var(--beige);
+	display: flex;
+}
+
+.content-split {
+	display: flex;
+}
+
+h2 {
+	font-family: 'freefrm';
+	font-size: 6rem;
+}
+
+.img-split {
+	padding: 0;
+}
+
+.mailing-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.shop-leadin {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+	padding: 10rem;
+	backdrop-filter: grayscale(30%) sepia(0.5);
+	-webkit-backdrop-filter: grayscale(30%) sepia(0.5);
+}
+
+.subhead {
+	margin-bottom: 1rem;
+	font-family: Futura,serif;
+	font-size: 20px;
+}
+.monospace {
+	font-family: monospace;
+	font-size: 16px;
+}
+
+.shop-link-container {
+	padding-top: 3rem;
+}
+
+.shop-link, .btn {
+	border: 2px solid var(--beige);
+	color: var(--beige);
+	padding: 0 3rem;
+	line-height: 3rem;
+	font-weight: 800;
+}
+
+.btn:hover {
+	background-color: var(--beige);
+	color: var(--hunter-green);
+}
+
+.punchline {
+	color: var(--beige);
+    letter-spacing: 0.1rem;
+}
+
+figure {
+	margin-bottom: 0;
+}
+
+.shop-header-image:before {
+	content: '';
+	display: block;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(127, 127, 127, 0.5);
+	background-image: radial-gradient(black 33%, transparent 33%);
+	background-size: 2px 2px;
+}
+
+.mailing-list-container {
+	padding: 0.5rem 0 4rem;
+	background-color: white;
+	text-align: center;
+}
+
+
+.mailing-list-container #mailing_list_email,
+.mailing-list-container #mailing_list_submit {
+	font-family: monospace;
+	-webkit-box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
+	box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
+	font-size: 1rem;
+	border: 2px solid white;
+}
+
+.mailing-list-container #mailing_list_email {
+	width: 70%;
+	padding: 2rem;
+}
+
+.mailing-list-container #mailing_list_submit {
+	line-height: 4rem;
+	color: black;
+}
+
+
+.mailing-list-container .btn {
+	/* color: wheat; */
+	border-radius: 4px;
+
+	background-color: transparent;
+	border-color: wheat;
+	color: gray;
+}
+.card-body {
+	max-height: 500px;
+	overflow-y: scroll;
+}
+
+.card-img {
+	margin-bottom: 1rem;
+}
+
+.recipe-info {
+	font-size: 0.75rem;
+	color: var(--dark-gray);
+	font-family: monospace;
+}
+
+.card-title {
+	font-size: 2rem;
+}

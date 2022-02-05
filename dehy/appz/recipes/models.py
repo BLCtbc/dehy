@@ -6,7 +6,10 @@ from oscar.models.fields import AutoSlugField
 class Recipe(models.Model):
 	name = models.CharField(max_length=100, default="", help_text='Name of the recipe')
 	description = models.TextField(help_text='A short introduction about the recipe, origin, summary, etc.', default="", blank=True, null=True)
-	ingredients = ArrayField(models.CharField(max_length=50), size=3)
+	ingredients = ArrayField(
+		ArrayField(base_field=models.CharField(max_length=50), size=3)
+	)
+
 	steps = ArrayField(models.CharField(max_length=300), default=list)
 	slug = models.SlugField(max_length=50, unique=True, editable=True)
 	date_created = models.DateField(auto_now_add=True, editable=False)

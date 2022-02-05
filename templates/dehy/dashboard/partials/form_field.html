@@ -10,7 +10,19 @@
     {% endcomment %}
 
 
+	{% if field.label == 'Ingredients' %}
+	length={{field|length}}
+	required={{field.required}}
+	has_changed={{field.has_changed}}
+	get_bound_field={{field.get_bound_field}}
+	label={{field.label}}
+
+	bound_data={{field.bound_data}}
+	length={{field.widget.fields|length}}
+
+	{% else %}
     {% annotate_form_field field %}
+	{% endif %}
 
     {% block control_group %}
 
@@ -25,31 +37,8 @@
 
             {% block controls %}
 			{% if field.label == 'Ingredients' %}
-				{% for sub_field in field %}
-				<div class="col-6 {% if style|default:"stacked" != 'stacked' %}col-sm-8{% endif %}{% if field.widget_type == 'checkbox' or field.widget_type == 'radioselect' %} form-check{% endif %}">
-					{% if sub_field.widget_type == 'checkbox' %}
-						{% render_field sub_field class+="form-check-input" %}
-						<label for="{{ field.auto_id }}" class="form-check-label mt-2{% if sub_field.field.required %} required{% endif %}">
-							{{ sub_field.label|safe }}
-						</label>
-					{% elif sub_field.widget_type == 'radioselect' %}
-						{% render_field sub_field class+="form-check-input position-static controls mt-2" %}
-					{% else %}
-						{% render_field field class+="form-control" %}
-
-					{% endif %}
-					{% for error in sub_field.errors %}
-						<span class="error-block"><i class="fas fa-exclamation"></i> {{ error }}</span>
-					{% endfor %}
-					{% if sub_field.help_text %}
-						<small class="form-text text-muted">
-							{# We allow HTML within form help fields #}
-							{{ sub_field.help_text|safe }}
-						</small>
-					{% endif %}
-					</div>
-					{% endfor %}
-				{% else %}
+				{% include "dehy/dashboard/partials/multivalue_widget.html" with field=field %}
+			{% else %}
                 <div class="{% if style|default:"stacked" != 'stacked' %}col-sm-8{% endif %}{% if field.widget_type == 'checkbox' or field.widget_type == 'radioselect' %} form-check{% endif %}">
                     {% block widget %}
                         {% if field.widget_type == 'checkbox' %}
