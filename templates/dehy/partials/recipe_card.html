@@ -1,15 +1,21 @@
-<article class="product_page"><!-- Start of product page -->
-<div class="card card-body col-4">
-	<a href="{% url 'recipe_details' recipe.slug %}"><h1>{{recipe.name}}</h1></a>
-	<p>{{recipe.description}}</p>
-	<h3>ingredients</h3>
-	{% for ingredient in recipe.ingredients %}
-	<p>{{ingredient}}</p>
-	{% endfor %}
-	Directions:
-	{% for step in recipe.steps %}
-	<p>{{forloop.counter}}. {{step}}
-	{% endfor %}
+{% load static %}
+<article class="recipe col-4">
+	<div class="card card-body recipe-card">
 
-</div>
+		<a href="{% url 'recipe_details' recipe.slug %}"><h4 class="card-title">{{recipe.name}}</h4></a>
+		<div class='recipe-info row'>
+			<div class="col-6"><span>By: Fake McFakerson</span></div>
+			<div class="col-6"><span>Udpated: {{recipe.last_modified}}</span></div>
+		</div>
+		<img class='card-img' src="{% static 'img/custom/dehy_glass2_filter.jpeg' %}">
+		<p>{{recipe.description}}</p>
+		<h3>ingredients</h3>
+		{% for ingredient in recipe.ingredients %}
+		<p>{{ingredient}}</p>
+		{% endfor %}
+		Directions:
+		{% for step in recipe.steps %}
+		<p>{{forloop.counter}}. {{step}}
+		{% endfor %}
+	</div>
 </article>

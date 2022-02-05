@@ -59,21 +59,36 @@ class RecipeCreateView(generic.CreateView):
 	form_class = RecipeCreateUpdateForm
 	success_url = reverse_lazy('dashboard:recipe-list')
 
-	def post(self, *args, **kwargs):
-		response = super().post(*args, **kwargs)
-		print('\n\nPOST object: ', dir(response), '\n\n')
-		return response
+	# def get(self, *args, **kwargs):
+	# 	form = self.form_class(self.request.GET)
+	# 	print(f'form.is_valid: {form.is_valid()}')
+	# 	# response = super().post(*args, **kwargs)
+	# 	print(f'\n *** GET ')
+	#
+	# 	response = render(self.request, self.template_name, context=self.get_context_data())
+	# 	return response
 
 	def get_context_data(self, **kwargs):
-		ctx = super().get_context_data(**kwargs)
-		ctx['title'] = _('Create new recipe')
-		return ctx
+		context_data = super().get_context_data(**kwargs)
+		context_data['title'] = _('Create new recipe')
+		print(f'\n context_data: {context_data}')
+		form = context_data['form']
+		print(f'\n form {dir(form)}')
+		print(f'\n form {form.fields}')
+		print(f'\n form {form.fields["ingredients"]}')
+		print(f'\n dir ingredients {dir(form.fields["ingredients"])}')
+		print(f'\n widget {form.fields["ingredients"].widget}')
+		print(f'\n type(fields) {type(form.fields["ingredients"].fields)}')
+
+		return context_data
 
 	def forms_invalid(self, form, inlines):
+		print(f'\n *** forms_invalid ')
 		messages.error(self.request, "Your submitted data was not valid - please correct the below errors")
 		return super().forms_invalid(form, inlines)
 
 	def forms_valid(self, form, inlines):
+		print(f'\n *** forms_valid ')
 		response = super().forms_valid(form, inlines)
 		msg = render_to_string('oscar/dashboard/recipes/messages/recipe_saved.html', {'recipe': self.object})
 		messages.success(self.request, msg, extra_tags='safe')

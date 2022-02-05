@@ -1,0 +1,27 @@
+{% load form_tags %}
+{% load widget_tweaks %}
+
+{% for widget in field.widgets %}
+	{{forloop.counter}}
+{% endfor %}
+
+field.fields: {{field.fields}}
+
+	{% for sub_field in field %}
+	<div class="col-6 {% if style|default:"stacked" != 'stacked' %}col-sm-8{% endif %}{% if field.widget_type == 'checkbox' or field.widget_type == 'radioselect' %} form-check{% endif %}">
+
+		{{field}}
+
+		{% for error in field.errors %}
+			<span class="error-block"><i class="fas fa-exclamation"></i> {{ error }}</span>
+		{% endfor %}
+
+		{% if field.help_text %}
+			<small class="form-text text-muted">
+				{# We allow HTML within form help fields #}
+				{{ sub_field.help_text|safe }}
+			</small>
+		{% endif %}
+
+	</div>
+	{% endfor %}
