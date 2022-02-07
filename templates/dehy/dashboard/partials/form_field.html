@@ -23,9 +23,6 @@
             {% endblock label %}
 
             {% block controls %}
-			{% if field.label == 'Ingredients' %}
-				{% include "dehy/dashboard/partials/multivalue_widget.html" with field=field %}
-			{% else %}
                 <div class="{% if style|default:"stacked" != 'stacked' %}col-sm-8{% endif %}{% if field.widget_type == 'checkbox' or field.widget_type == 'radioselect' %} form-check{% endif %}">
                     {% block widget %}
                         {% if field.widget_type == 'checkbox' %}
@@ -55,7 +52,6 @@
                         {% endif %}
                     {% endblock %}
                 </div>
-			{% endif %}
             {% endblock controls %}
         </div>
     {% endblock %}

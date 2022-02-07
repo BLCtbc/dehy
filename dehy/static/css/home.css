@@ -7,6 +7,7 @@
 	display: flex;
 	justify-content: center;
 	width: 100%;
+	height: auto;
 }
 
 .about {
@@ -20,8 +21,11 @@
 .content-section {
 	min-height: 350px;
 	justify-content: center;
-	border-bottom: 12px solid var(--beige);
 	display: flex;
+}
+
+.content-section:not(:first-child) {
+	border-top: 12px solid var(--beige);
 }
 
 .content-split {
@@ -30,26 +34,20 @@
 
 h2 {
 	font-family: 'freefrm';
-	font-size: 6rem;
+	font-size: 5rem;
 }
 
 .img-split {
 	padding: 0;
 }
 
-.mailing-list {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
 .shop-leadin {
     display: flex;
     flex-direction: column;
     justify-content: center;
-	padding: 10rem;
-	backdrop-filter: grayscale(30%) sepia(0.5);
-	-webkit-backdrop-filter: grayscale(30%) sepia(0.5);
+	padding: 10rem 10rem 0;
+	backdrop-filter: grayscale(30%) sepia(0.1);
+	-webkit-backdrop-filter: grayscale(30%) sepia(0.1);
 }
 
 .subhead {
@@ -105,11 +103,13 @@ figure {
 	padding: 0.5rem 0 4rem;
 	background-color: white;
 	text-align: center;
+	position: relative;
+	background-image: linear-gradient(to right, rgba(221, 210, 193, 1), rgba(243, 237, 229, 1));
 }
 
 
-.mailing-list-container #mailing_list_email,
-.mailing-list-container #mailing_list_submit {
+#mailing_list_email,
+#mailing_list_submit {
 	font-family: monospace;
 	-webkit-box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
 	box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
@@ -117,16 +117,23 @@ figure {
 	border: 2px solid white;
 }
 
-.mailing-list-container #mailing_list_email {
+#mailing_list_email {
 	width: 70%;
 	padding: 2rem;
 }
 
-.mailing-list-container #mailing_list_submit {
+#mailing_list_submit {
 	line-height: 4rem;
 	color: black;
 }
 
+.mailing-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+	padding-bottom: 1rem;
+	background-image: none;
+}
 
 .mailing-list-container .btn {
 	/* color: wheat; */
@@ -145,6 +152,10 @@ figure {
 	margin-bottom: 1rem;
 }
 
+.recipe-card {
+	padding: 0.5rem 0.75rem;
+}
+
 .recipe-info {
 	font-size: 0.75rem;
 	color: var(--dark-gray);
@@ -153,4 +164,50 @@ figure {
 
 .card-title {
 	font-size: 2rem;
+	font-family: cursive;
+	font-weight: 600;
+}
+
+.directions-list p, .ingredients-list p{
+	font-family: Lusitana,Georgia,serif;
+	font-size: 1.25rem
+}
+
+.ingredients-list li {
+	list-style:square;
+}
+
+.directions-list li {
+	list-style: decimal;
+}
+
+#recipe_list {
+	background: url(/static/img/textures/bg_subtle_dots.png) repeat scroll 0 0;
+	border-color: white;
+}
+
+.recipe-description {
+	font-family: serif;
+	line-height: 1.2rem;
+	font-size: 1.2rem;
+}
+
+.image-background-overlay {
+	position: absolute;
+	background-repeat: no-repeat;
+	background-size: contain;
+	width: 100%;
+	height: 100%;
+	top: 0;
+}
+
+.mailing-list-split {
+	border-color: #f4ecdc61 !important;
+	background-color: white;
+}
+
+.mini-shop {
+	background: #fffbf4 url(/static/img/textures/diamond_pattern-3.svg) repeat;
+	background-attachment: scroll;
+	z-index: 1;
 }

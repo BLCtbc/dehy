@@ -1,0 +1,15 @@
+{% extends "dehy/layout.html" %}
+
+{% load i18n %}
+{% load product_tags %}
+
+{% block title %}
+{{ block.super }} | {% trans "Terms of Service" %}
+{% endblock title %}
+
+{% block layout %}
+{{block.super}}
+	{% block content %}
+	{% endblock content %}
+{% endblock layout %}
+
