@@ -13,12 +13,12 @@
 
 
 {% block header %}
-<header class='content-section' id='header_image'>
+<header class='content-section' id="header">
 	<div class='col-7 img-split shop-header-image' style='background-image: url({% static "img/custom/dehy_jars2_filter.jpeg"%}); background-size:cover;'>
 		<div class='shop-leadin'>
 			<div class='punchline'>
 				<h1>CATCHY PUNCHLINE</h1>
-				<h1>NOW YOU WANNA BUY SHIT</h1>
+				<h1>NOW YOU FINNA BUY SHIT</h1>
 			</div>
 			<div class='shop-link-container'>
 				<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">SHOP NOW</a>
@@ -34,11 +34,7 @@
 {% endblock header %}
 
 {% block content_wrapper %}
-	<section class='content-section' id='header_image'>
-		<header>
-			<img class="image-container" src='{% static 'img/custom/dehy_hero.jpeg' %}'>
-		</header>
-	</section>
+
 
 	<section class='about content-section' id='about'>
 		<div class='container'>
@@ -47,24 +43,21 @@
 		</div>
 	</section>
 
-	<section class='content-section'>
-		<img class="image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
-	</section>
 
-	<section class='content-section'>
-		<div class="content-split">
-			<div class='col-7 about'>
-				<h2>Virtue & Craft</h2>
-				<p>Dehy makes high quality dehydrated garnishes for an elevated cocktail experience, handmade in Austin Texas. Created for cocktail professionals and enthusiasts alike, Dehy makes it easy to put a unique finishing touch on any drink with speed.</p>
-			</div>
-			<div class='col-5 img-split'>
-				<img class="image-container" src='{% static 'img/custom/dehy_graphic1.jpeg' %}'>
-			</div>
-		</div>
-	</section>
 
 	<section class='content-section mailing-list-container'>
+		<div class='image-background-overlay'
+			style="background-image: url({% static 'img/product/blood_orange_rough_cuts/blood_orange_rough_cut_jar.jpg' %}); left:0; background-position: center left -20%;">
+		</div>
+		<div class='image-background-overlay'
+			style="background-image: url({% static 'img/product/grapefruit/grapefruit_jar.jpg' %}); right:0; background-position: center right -20%;">
+		</div>
+
 		<div class="container row justify-content-center">
+
+			<!-- <div class="col-2">
+				<img class="image-container" src="{% static 'img/product/blood_orange_rough_cuts/blood_orange_rough_cut_jar.jpg' %}">
+			</div> -->
 			<div class="mailing-list col-8">
 				<p class='subhead'>STAY IN DA MIX LMAOOOO</p>
 				<h2>SUBSCRIBE FOR INSIDE ACCESS</h2>
@@ -78,26 +71,26 @@
 					<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
 				</form>
 			</div>
+			<!-- <div class="col-2">
+				<img class="image-container" src="{% static 'img/product/grapefruit/grapefruit_jar.jpg' %}">
+			</div> -->
+		</div>
+	</section>
+	<section class='content-section'>
+		<div class="content-split">
+			<div class='col-7 about' style="background-image: url({% static  'img/custom/dehy_hero.jpeg' %}); background-position: bottom left 100px;">
+				<h2>Virtue & Craft</h2>
+				<p>Dehy makes high quality dehydrated garnishes for an elevated cocktail experience, handmade in Austin Texas. Created for cocktail professionals and enthusiasts alike, Dehy makes it easy to put a unique finishing touch on any drink with speed.</p>
+			</div>
+			<div class='col-5 img-split'>
+				<img class="image-container" src='{% static 'img/custom/dehy_glass_filter.jpeg' %}'>
+			</div>
 		</div>
 	</section>
 
+
 	<section class='content-section'>
-		<div class="content-split">
-			<div class="mailing-list col-5">
-				<p class='subhead'>STAY IN DA MIX LMAOOOO</p>
-				<h2>SUBSCRIBE FOR INSIDE ACCESS</h2>
-				<p class='monospace'>Get emails about special events, offers, and upcoming promotions. Unsubscribe whenever you want.</p>
-				<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
-					<input type="hidden" name="csrfmiddlewaretoken" value="">
-					<label class="sr-only" for="mailing_list_submit">Sign Up</label>
-					<input name="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
-					<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button>
-				</form>
-			</div>
-			<div class='img-split col-7'>
-				<img class="image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
-			</div>
-		</div>
+		<img class="image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
 	</section>
 
 	{% block recipe_list %}
@@ -107,6 +100,42 @@
 		{% endfor %}
 	</section>
 	{% endblock recipe_list %}
+
+	<section class='content-section mailing-list-split'>
+		<div class="content-split">
+			<div class='img-split col-5'>
+				<img class="image-container" src='{% static 'img/custom/dehy_ice2_filter.jpeg' %}'>
+			</div>
+			<div class="mailing-list mailing-list-container col-7">
+				<div class="col-10">
+					<p class='subhead'>STAY IN DA L00pZ</p>
+					<h2>SUBSCRIBE FOR INSIDE ACCESS</h2>
+					<p class='monospace'>Get emails about special events, offers, and upcoming promotions. Unsubscribe whenever you want.</p>
+					<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
+						<input type="hidden" name="csrfmiddlewaretoken" value="">
+						<label class="sr-only" for="mailing_list_submit">Sign Up</label>
+						<input type="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
+				   	 	<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit"><i class="fas fa-paper-plane"></i></button>
+
+						<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
+					</form>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+	<section class='content-section mini-shop'>
+		{% for product in products %}
+
+		<article class="recipe-card col-4">
+			<div class="card card-body">
+				<a href="{% url 'shop:detail' recipe.slug %}"><h4 class="card-title">{{product.name}}</h4></a>
+			</div>
+		</article>
+		{% endfor %}
+	</section>
+
 
 {% endblock content_wrapper %}
 

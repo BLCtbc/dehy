@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 from .models import Recipe
 
 class RecipesView(TemplateView):
-	template_name = "dehy/recipes.html"
+	template_name = "dehy/recipes/recipes.html"
 
 class RecipeListView(ListView):
 	model = Recipe
@@ -12,7 +12,7 @@ class RecipeListView(ListView):
 
 class RecipeDetailView(DetailView):
     model = Recipe
-    template_name = "dehy/recipes.html"
+    template_name = "dehy/recipes/recipes.html"
     context_object_name = "recipe"
     slug_field = 'slug'
     slug_url_kwarg = 'recipe_slug'

@@ -88,6 +88,7 @@ a {
 
 a:hover{
 	color: var(--beige);
+	text-decoration: none;
 }
 
 a.navbar-brand {
@@ -154,6 +155,10 @@ h1 {
 
 h1.splash-header {
 	font-size: calc(3.3 * 1rem) !important;
+}
+
+h3 {
+	font-size: 2rem;
 }
 
 li {
@@ -323,13 +328,13 @@ nav a.nav-link.active {
 }
 
 footer {
-    width: 90% !important;
-    margin: 20vh auto 0 auto;
-    padding: 10vh 0 !important;
-    border-top: 1px solid var(--beige);
+    /* width: 90% !important; */
+    margin: 2rem auto 0 auto;
+    /* padding: 10vh 0 !important; */
+    /* border-top: 1px solid var(--beige); */
     text-align: center;
-    display: block !important;
-    color: var(--metal-gold);
+    /* display: block !important; */
+    color: var(--gold);
 }
 
 .policies {
@@ -642,4 +647,68 @@ li.breadcrumb-item {
 .pagination-container {
 	margin-top: 1rem;
     padding-top: 1rem;
+}
+
+.contact-footer {
+	font-size: 2rem;
+	padding-bottom: 2rem;
+	margin-top: -1rem;
+}
+
+.contact-footer li {
+	margin: 1rem;
+}
+
+.contact-footer .navbar {
+	justify-content: center;
+}
+
+footer .site-directory {
+	padding: 0;
+	font-family: Futura,serif;
+	font-weight: 400;
+	font-size: 1.2rem;
+	line-height: 1.75;
+	letter-spacing: .01em;
+	text-align: left;
+	padding-top: 2rem;
+}
+
+footer .site-directory h3 {
+    letter-spacing: 0.1em;
+    font-size: 2.25rem;
+    color: var(--beige);
+}
+
+.about-us, footer .about-us ul, .contact-us, .contact-us ul{
+	padding: 0;
+}
+
+.contact-us p {
+	line-height: 1.5;
+	margin-bottom:0;
+}
+
+.contact-us a {
+	margin-bottom: 0.5rem;
+}
+
+.bg-beige {
+	background-color: var(--beige);
+}
+
+.text-dark-hg {
+	color: var(--dark-hg);
+}
+
+.bg-beige a:hover {
+	color: var(--hunter-green);
+}
+
+.font-lydia {
+	font-family: 'lydiacondensed-bold';
+}
+
+.font-serif {
+	font-family: Futura,serif;
 }

@@ -4,6 +4,7 @@ from .models import QandA
 from oscar.core.loading import get_class, get_model
 
 Recipe = get_model('recipes', 'Recipe')
+Product = get_model('catalogue', 'Product')
 
 class CustomView(TemplateView):
 	template_name = "dehy/custom.html"
@@ -11,13 +12,22 @@ class CustomView(TemplateView):
 class WholesaleView(TemplateView):
 	template_name = "dehy/wholesale.html"
 
+
+class PrivacyPolicyView(TemplateView):
+	template_name = "dehy/privacy_policy.html"
+
+class TermsOfServiceView(TemplateView):
+	template_name = "dehy/terms_of_service.html"
+
 class HomeView(TemplateView):
 	template_name = "dehy/home.html"
 
 	def get_context_data(self, *args, **kwargs):
 		data = super().get_context_data(*args, **kwargs)
-		recipes = Recipe.objects.all()
-		data.update({'recipes':recipes})
+		recipes = Recipe.objects.filter(featured=True)
+		products = Product.objects.exclude(product_class__name='Merch')
+
+		data.update({'recipes':recipes, 'products':products})
 		return data
 
 class ReturnsRefundsView(TemplateView):

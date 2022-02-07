@@ -1,35 +1,64 @@
 {% block footer %}
-<div class="row">
-	<div class="contact"></div>
+{% load static %}
 
-	<div class="socials-footer"></div>
-</div>
-<footer class="container-fluid">
-	<div class="row justify-content-center">
-		<div class="contact col-4">
-			<a class="contact-link" href="{% url "contact" %}"><h3>Contact Us</h3></a>
-			<p><i style="font-size: 1.2rem;" class="fas fa-phone-alt"></i> 904-796-0812</p>
-			<p style="text-decoration: underline;"><a href="mailto:info@dehygarnish.com" target="_blank">info@dehygarnish.com</a></p>
-			<p>512 Rio Grande St. Austin, Texas 78701</p>
-			<div class="policies">
-				<a class="privacy-policy" href=""><span>Refunds & Returns Policy</span></a>
+<footer class="container-fluid footer-container">
+	<div class="justify-content-center row">
+
+		<div class="brand-logo-big col-4">
+			<div class="brand-logo image-container col-12">
+				<a href="{% url 'home' %}"><img style="width: 80%" src="{% static 'img/custom/dehy_logo1_clipped2.png' %}" alt='Dehy Logo 1'></a>
+			</div>
+
+			<div class="col-12 contact-footer socials-container">
+				<ul class="navbar">
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-phone-alt" href="tel:904-796-0812" target="_blank" aria-label="call 904-796-0812" alt=""></a>
+					</li>
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-facebook" href="https:/www.facebook.com/dehygarnish" target="_blank" aria-hidden="true"></a>
+					</li>
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-instagram" href="https:/www.instagram.com/dehygarnish" target="_blank" aria-hidden="true"></a>
+					</li>
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-envelope" href="mailto:info@dehygarnish.com" target="_blank"></a>
+					</li>
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-twitter" href="https:/www.twitter.com/dehygarnish" rel="Me" target="_blank" aria-hidden="true"></a>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+		<div class="col-8 site-directory row">
+			<div class="col-1"></div>
+
+			<div class="about-us col-4">
+				<h3>About Us</h3>
+				<ul>
+					<li><a href="{% url 'recipes' %}">Recipes</a></li>
+					<li><a href="{% url 'returns' %}">Returns &amp; Refund Policy</a></li>
+					<li><a href="{% url 'returns' %}">Terms of Service</a></li>
+					<li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+
+				</ul>
+			</div>
+
+			<div class="contact-us col-4">
+				<h3>Contact Us</h3>
+				<p>Email us:</p>
+				<p><a href="mailto:info@dehygarnish.com" target="_blank">info@dehygarnish.com</a></p>
+				<p>Call us:</p>
+				<p>
+					<a class="fa fa-phone-alt" href="tel:904-796-0812" target="_blank" aria-label="call 904-796-0812" alt="call 904-796-0812">904-796-0812</a>
+				</p>
+				<p>Pull up:</p>
+				<p>512 Rio Grande St. Austin, Texas 78701</p>
+
 			</div>
 		</div>
-		<div class="mailing-list col-3">
-			<p>Sign up for our mailing list to receive updates on new products and promotions!</p>
-			<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
-				<input type="hidden" name="csrfmiddlewaretoken" value="">
-				<label class="sr-only" for="mailing_list_submit">Sign Up</label>
-				<input name="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
-				<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button>
-			</form>
-		</div>
-		<div class="socials col-4">
-			<h3>Follow</h3>
-			<br>
-			<p><a class="fb-link" href="https://www.facebook.com/dehygarnish" target="_blank">
-				<span class="fa fa-facebook fb" aria-hidden="true"></span>acebook</a></p>
-			<p><a class="ig-link" href="https://www.instagram.com/dehygarnish/" target="_blank">Inst<span class="fa fa-instagram ig"></span>gram</a></p>
+		<div class="bg-beige text-dark-hg row font-lydia">
+			<div class="col-12"><small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small></div>
 		</div>
 	</div>
 

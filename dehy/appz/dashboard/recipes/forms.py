@@ -5,6 +5,10 @@ from django.utils.translation import gettext_lazy as _
 from oscar.core.loading import get_model
 from django.core.validators import RegexValidator
 from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
+from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
+from django_better_admin_arrayfield.forms.widgets import DynamicArrayTextareaWidget
+from django_better_admin_arrayfield.forms.fields import DynamicArrayField
+
 
 Recipe = get_model('recipes', 'Recipe')
 
@@ -80,7 +84,6 @@ class IngredientWidget(forms.MultiWidget):
 			vals = ingredients
 		else:
 			vals = super().value_from_datadict(data, files, name, *args, **kwargs)
-
 
 		print(f'\n vals: {vals}')
 		print('\n end value_from_datadict ***')
@@ -161,38 +164,24 @@ class IngredientField(forms.MultiValueField):
 	def coerce(self, x):
 		return str(x)
 
-class RecipeCreateUpdateForm(forms.ModelForm):
+class RecipeCreateUpdateForm(forms.ModelForm, DynamicArrayMixin):
 	name = forms.CharField(label=_('Recipe name'), max_length=50)
 	description = forms.CharField(required=False, label=_('Description'), widget=forms.Textarea(attrs={'cols': 40, 'rows': 10}))
-	ingredients = IngredientField()
+	image = forms.ImageField()
+	
+	# ingredients = IngredientField()
+	# ingredients = SimpleArrayField(SimpleArrayField(forms.CharField(help_text='ingredient name')),delimiter='|')
+	ingredients = DynamicArrayField(forms.CharField())
+
 	# ingredients = SplitArrayField(forms.CharField(help_text='ingredient name'), size=3)
 	slug = forms.SlugField(label=('Slug'), required=False)
-	steps = SimpleArrayField(forms.CharField(help_text='directions'), delimiter='|')
-
+	steps = DynamicArrayField(forms.CharField())
 	prepopulated_fields = {"slug": ("name",)}
-
-	def clean(self):
-
-		print(f'\n dir(self) form {dir(self)}')
-		print(f'\n non_field_errors form {self.non_field_errors}')
-		print(f'\n pre(cleaned_data) {self.cleaned_data}')
-		print(f'\n uncleaned data FORM: {self.data}')
-
-		cleaned_data = super().clean()
-
-		if 'ingredients' not in cleaned_data.keys():
-			cleaned_data['ingredients'] = get_ingredients(self.data, 'ingredients', 3)
-
-		# if 'ingredients' in cleaned_data.keys():
-		# 	cleaned_data['ingredients'] = [cleaned_data['ingredients'].split(',')]
-
-		print('\n cleaned_data FORM: ', cleaned_data)
-		return cleaned_data
 
 
 	class Meta:
 		model = Recipe
-		fields = ['name', 'slug', 'description', 'ingredients', 'steps']
+		fields = ['name', 'slug', 'image', 'description', 'ingredients', 'steps', 'featured']
 
 
 	def __init__(self, *args, **kwargs):
