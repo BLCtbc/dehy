@@ -21,3 +21,4 @@ class VisionStatement(models.Model):
 
 	def __str__(self):
 		return f"{self.title}, created: {self.date_created}, modified: {self.last_modified}"
+

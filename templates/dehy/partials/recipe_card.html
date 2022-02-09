@@ -3,7 +3,7 @@
 <article class="recipe-card col-4">
 	<div class="card card-body">
 
-		<a href="{% url 'recipe_details' recipe.slug %}"><h4 class="card-title">{{recipe.name}}</h4></a>
+		<a href="{% url 'recipe_details' recipe_slug=recipe.slug %}"><h4 class="card-title">{{recipe.name}}</h4></a>
 		<div class='recipe-info row'>
 			<div class="col-6"><span>By: Fake McFakerson</span></div>
 			<div class="col-6"><span>Udpated: {{recipe.last_modified}}</span></div>

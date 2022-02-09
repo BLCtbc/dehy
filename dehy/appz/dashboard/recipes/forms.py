@@ -168,15 +168,14 @@ class RecipeCreateUpdateForm(forms.ModelForm, DynamicArrayMixin):
 	name = forms.CharField(label=_('Recipe name'), max_length=50)
 	description = forms.CharField(required=False, label=_('Description'), widget=forms.Textarea(attrs={'cols': 40, 'rows': 10}))
 	image = forms.ImageField()
-	
+
 	# ingredients = IngredientField()
 	# ingredients = SimpleArrayField(SimpleArrayField(forms.CharField(help_text='ingredient name')),delimiter='|')
 	ingredients = DynamicArrayField(forms.CharField())
 
 	# ingredients = SplitArrayField(forms.CharField(help_text='ingredient name'), size=3)
-	slug = forms.SlugField(label=('Slug'), required=False)
+	slug = forms.SlugField(label=('Slug'), required=True)
 	steps = DynamicArrayField(forms.CharField())
-	prepopulated_fields = {"slug": ("name",)}
 
 
 	class Meta:

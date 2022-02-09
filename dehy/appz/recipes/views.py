@@ -8,11 +8,11 @@ class RecipesView(TemplateView):
 class RecipeListView(ListView):
 	model = Recipe
 	context_object_name = "recipes"
-	# template_name = "dehy/recipes.html"
+	template_name = "dehy/recipes/recipes.html"
 
 class RecipeDetailView(DetailView):
     model = Recipe
-    template_name = "dehy/recipes/recipes.html"
+    template_name = "dehy/recipes/detail.html"
     context_object_name = "recipe"
     slug_field = 'slug'
     slug_url_kwarg = 'recipe_slug'

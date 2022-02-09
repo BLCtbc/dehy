@@ -210,4 +210,5 @@ figure {
 	background: #fffbf4 url(/static/img/textures/diamond_pattern-3.svg) repeat;
 	background-attachment: scroll;
 	z-index: 1;
+	overflow-x: scroll;
 }

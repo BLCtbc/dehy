@@ -95,6 +95,7 @@
 
 	{% block recipe_list %}
 	<section class='content-section' id='recipe_list'>
+
 		{% for recipe in recipes %}
 		{% include "dehy/partials/recipe_card.html" with recipe=recipe %}
 		{% endfor %}
@@ -128,11 +129,12 @@
 	<section class='content-section mini-shop'>
 		{% for product in products %}
 
-		<article class="recipe-card col-4">
-			<div class="card card-body">
-				<a href="{% url 'shop:detail' recipe.slug %}"><h4 class="card-title">{{product.name}}</h4></a>
-			</div>
-		</article>
+			{# temporary #}
+			{% render_product product %}
+			
+			{% comment tbd %}
+			{% include "dehy/partials/product_card.html" with product=product %}
+			{% endcomment %}
 		{% endfor %}
 	</section>
 

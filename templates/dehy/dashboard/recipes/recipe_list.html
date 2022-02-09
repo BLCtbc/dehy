@@ -74,11 +74,10 @@
 	  <td>{{ recipe.description }}</td>
 	  <td>{{ recipe.date_created }}</td>
 	  <td>{{ recipe.last_modified }}</td>
-
 	  <td>
 		<div class="btn-group">
-		  <a class="btn btn-primary fas fa-globe" href="{% url 'recipe_details' recipe.slug %}"></a>
 		  <a class="btn btn-info fas fa-pen" href="{% url 'dashboard:recipe-update' recipe.id %}"></a>
+		  <a class="btn btn-primary fas fa-globe" href="{% url 'recipe_details' recipe.slug %}"></a>
 		  <a class="btn btn-danger fas fa-times" href="{% url 'dashboard:recipe-delete' recipe.id %}"></a>
 		</div>
 	  </td>
