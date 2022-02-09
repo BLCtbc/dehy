@@ -9,7 +9,7 @@ class RecipesDashboardConfig(OscarDashboardConfig):
 	name = 'dehy.appz.dashboard.recipes'
 	label = 'recipes_dashboard'
 	verbose_name = _('Recipes')
-	namespace = 'recipes'
+	# namespace = 'recipes'
 	default_permissions = ['is_staff']
 	permissions_map = _map = {
         'recipe-create': (['is_staff'],
