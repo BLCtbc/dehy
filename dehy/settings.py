@@ -55,8 +55,6 @@ INSTALLED_APPS = [
 	'dehy.appz.recipes.apps.RecipesConfig',
 	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
 	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
-
-
 	# oscar overrides
 	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
@@ -66,6 +64,7 @@ INSTALLED_APPS = [
 	'dehy.appz.customer.apps.CustomerConfig',
 	'dehy.appz.checkout.apps.CheckoutConfig',
 	'dehy.appz.partner.apps.PartnerConfig',
+	'dehy.appz.payment.apps.PaymentConfig',
 	# django apps added by oscar
 	'django.contrib.sites',
 	'django.contrib.flatpages',
@@ -76,7 +75,6 @@ INSTALLED_APPS = [
 	'oscar.apps.shipping.apps.ShippingConfig',
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
-	'oscar.apps.payment.apps.PaymentConfig',
 	'oscar.apps.offer.apps.OfferConfig',
 	'oscar.apps.order.apps.OrderConfig',
 	'oscar.apps.voucher.apps.VoucherConfig',
