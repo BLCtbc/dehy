@@ -24,15 +24,15 @@
     {% category_tree as tree_categories %}
     {% if tree_categories %}
         <h4>{% trans "Show results for" %}</h4>
-        <div class="side_categories card card-body">
+        <div class="side_categories card">
             <ul class="product-category-list">
                 {% for tree_category in tree_categories %}
                     <li class="mt-2 category-item">
-                        <a href="{{ tree_category.url }}" class="product-category-list">
+                        <a href="{{ tree_category.url }}" class="product-category-link">
                             {% if tree_category.pk == category.pk %}
                                 <strong>{{ tree_category.name }}</strong>
                             {% else %}
-                                {{ tree_category.name }}
+                                <span>{{ tree_category.name }}</span>
                             {% endif %}
                         </a>
 

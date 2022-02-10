@@ -20,6 +20,8 @@
 	- [connecting to AWS](#connecting_to_AWS)
 6. [git commands](#git_commands)
 	- [authenticating github][#git_authentication]
+7. [troubleshooting](#troubleshooting)
+	- [postgres issues](#postgresql)
 
 ---
 
@@ -99,7 +101,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			```
 
 		* grant permissions, then quit
-			```
+			```sql
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy TO dehydevuser;
 			postgres=# \q
 			```
@@ -1151,3 +1153,32 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		$ ssh -i /path/my-key-pair.pem my-instance-user-name@my-instance-public-dns-name
 		```
 
+<a name="troubleshooting"></a>
+6. ###### troubleshooting
+
+	<a name="postgresql"></a>
+	- To check what is running on port 5432, issue the following command on your terminal.
+		`$ sudo lsof -i :5432`
+	- finding all postgres processes
+		`$ ps -ef | grep postgres`
+
+		output might look something like:
+
+		```
+		504   511   147   0  1:23PM ??         0:00.00 postgres: logger
+		504   535   147   0  1:23PM ??         0:00.01 postgres: checkpointer
+		504   539   147   0  1:23PM ??         0:00.01 postgres: stats collector
+		504  2796   147   0  1:29PM ??         0:00.03 postgres: background writer
+		504  3032   147   0  1:30PM ??         0:00.01 postgres: walwriter
+		504  3033   147   0  1:30PM ??         0:00.01 postgres: autovacuum launcher
+		504  3034   147   0  1:30PM ??         0:00.00 postgres: logical replication launcher
+		501  3971   853   0  1:36PM ttys001    0:00.00 grep postgres
+		```
+
+	- stop all postgres processes (requires having postgres installed)
+		`$ pg_ctl -D $(psql -Xtc 'show data_directory') stop`
+
+	- kill all postgres processes
+		`$ sudo pkill -u postgres` That kills all processes running as user `postgres`
+			or
+		`$ pkill postgres` That kills all processes named 'postgres'

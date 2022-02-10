@@ -16,10 +16,12 @@ class DashboardConfig(oscar_apps.DashboardConfig):
 	def ready(self):
 		super().ready()
 		self.recipes_app = apps.get_app_config('recipes_dashboard')
+		self.faq_app = apps.get_app_config('faq_dashboard')
 
 	def get_urls(self):
 		urls = super().get_urls()
 		urls += [
-			path('recipes/', include(self.recipes_app.urls[0]))
+			path('recipes/', include(self.recipes_app.urls[0])),
+			path('faq/', include(self.faq_app.urls[0]))
 		]
 		return self.post_process_urls(urls)

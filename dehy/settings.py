@@ -49,10 +49,13 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'django.contrib.postgres',
 	'dehy',
 	'dehy.appz.generic.apps.GenericConfig',
 	'dehy.appz.recipes.apps.RecipesConfig',
 	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
+	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
+
 
 	# oscar overrides
 	'dehy.appz.catalogue.apps.CatalogueConfig',
@@ -89,13 +92,14 @@ INSTALLED_APPS = [
 	'oscar.apps.dashboard.vouchers.apps.VouchersDashboardConfig',
 	'oscar.apps.dashboard.communications.apps.CommunicationsDashboardConfig',
 	'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
-
 	# 3rd-party apps that oscar depends on
 	'widget_tweaks',
 	'haystack',
 	'treebeard',
 	'sorl.thumbnail',   # Default thumbnail backend, can be replaced
 	'django_tables2',
+	# other 3rd-party apps
+	'django_better_admin_arrayfield',
 ]
 
 SITE_ID = 1
@@ -253,6 +257,16 @@ OSCAR_DASHBOARD_NAVIGATION += [
 			{
 				'label': _('Recipes'),
 				'url_name': 'dashboard:recipe-list',
+			},
+		 ]
+	},
+	{
+		'label': _('FAQ'),
+		'icon': 'fas fa-bullhorn',
+		'children': [
+			{
+				'label': _('FAQs'),
+				'url_name': 'dashboard:faq-list',
 			},
 		 ]
 	},
