@@ -20,6 +20,7 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: us-east-1
             instance-ids: ${{ secrets.INSTANCE_ID }}
+
             comment: Deploy the staging branch
             working-directory: /home/admin/dehy
             command: /bin/sh ./deploy.sh
