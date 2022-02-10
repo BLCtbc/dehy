@@ -20,7 +20,7 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
-        instance-id: i-029d22a511f603dbd
+        instance-ids: i-029d22a511f603dbd
         # comment: Deploy the staging branch
         working-directory: /home/admin/dehy
         command: /bin/sh ./deploy.sh
