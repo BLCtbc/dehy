@@ -3,19 +3,18 @@ name: dehy
 on:
   push:
     branches: [staging]
-  pull_request:
-    branches: [staging]
+  # pull_request:
+  #   branches: [staging]
 
 jobs:
   start:
     runs-on: self-hosted
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: AWS SSM Send-Command
-      uses: peterkimzz/aws-ssm-send-command@1.0.1
+      uses: peterkimzz/aws-ssm-send-command@master
       id: ssm
       with:
         aws-access-key-id: AKIATWP3CLBXHB3BA7JO
