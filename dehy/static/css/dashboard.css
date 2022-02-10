@@ -1,0 +1,11 @@
+.add_more {
+	cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1rem;
+	position: relative;
+}
+
+.add_more > i {
+	top: 0.5rem;
+	left: 0.5rem;
+}

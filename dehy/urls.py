@@ -1,15 +1,11 @@
-
 from django.apps import apps
 from django.urls import include, path
 from django.contrib import admin
-from . import views
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
-	path('custom/', views.CustomView.as_view(), name='custom'),
-	path('returns/', views.ReturnsRefundsView.as_view(), name='returns'),
-	path('wholesale/', views.WholesaleView.as_view(), name='wholesale'),
-	path('', views.HomeView.as_view(), name='home'),
+	path('', include('dehy.appz.generic.urls'), name='generic'),
+	path('recipes/', include('dehy.appz.recipes.urls'), name='recipes'),
 	path('', include(apps.get_app_config('dehy').urls[0])),
 ]
 

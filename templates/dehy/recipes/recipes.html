@@ -1,0 +1,30 @@
+{% extends "dehy/layout.html" %}
+{% load static %}
+{% load i18n %}
+{% load product_tags %}
+
+{% block title %}
+{{ block.super }} | {% trans "Recipes" %}
+{% endblock title %}
+
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/recipes.css' %}"/>
+{% endblock extrastyles %}
+
+
+{% block header %}
+{{block.super}}
+{% endblock header %}
+
+{% block content_wrapper %}
+<section class="row">
+
+	{% for recipe in recipes %}
+		<article class="recipe-card col-4">
+			{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
+		</article>
+	{% endfor %}
+</section>
+
+{% endblock content_wrapper %}
+

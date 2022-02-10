@@ -1,0 +1,66 @@
+{% block footer %}
+{% load static %}
+
+<footer class="justify-content-center footer-container">
+	<!-- <div class="justify-content-center row"> -->
+
+		<div class="brand-logo-big col-4">
+			<div class="brand-logo image-container col-12">
+				<a href="{% url 'home' %}"><img style="width: 80%" src="{% static 'img/custom/dehy_logo1_clipped2.png' %}" alt='Dehy Logo 1'></a>
+			</div>
+
+			<div class="col-12 contact-footer socials-container">
+				<ul class="navbar">
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-phone-alt" href="tel:904-796-0812" target="_blank" aria-label="call 904-796-0812" alt=""></a>
+					</li>
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-facebook" href="https:/www.facebook.com/dehygarnish" target="_blank" aria-hidden="true"></a>
+					</li>
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-instagram" href="https:/www.instagram.com/dehygarnish" target="_blank" aria-hidden="true"></a>
+					</li>
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-envelope" href="mailto:info@dehygarnish.com" target="_blank"></a>
+					</li>
+					<li class="nav-items socials circles icon">
+						<a class="fa fa-twitter" href="https:/www.twitter.com/dehygarnish" rel="Me" target="_blank" aria-hidden="true"></a>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+		<div class="col-8 site-directory row">
+			<div class="col-1"></div>
+
+			<div class="about-us col-4">
+				<h3>About Us</h3>
+				<ul>
+					<li><a href="{% url 'recipes' %}">Recipes</a></li>
+					<li><a href="{% url 'returns' %}">Returns &amp; Refund Policy</a></li>
+					<li><a href="{% url 'returns' %}">Terms of Service</a></li>
+					<li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+
+				</ul>
+			</div>
+
+			<div class="contact-us col-4">
+				<h3>Contact Us</h3>
+				<p>Email us:</p>
+				<p><a href="mailto:info@dehygarnish.com" target="_blank">info@dehygarnish.com</a></p>
+				<p>Call us:</p>
+				<p>
+					<a class="fa fa-phone-alt" href="tel:904-796-0812" target="_blank" aria-label="call 904-796-0812" alt="call 904-796-0812">904-796-0812</a>
+				</p>
+				<p>Pull up:</p>
+				<p>512 Rio Grande St. Austin, Texas 78701</p>
+
+			</div>
+		</div>
+		<div class="bg-beige text-dark-hg row col-12 font-lydia">
+			<small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small>
+		</div>
+	<!-- </div> -->
+
+</footer>
+{% endblock footer %}
