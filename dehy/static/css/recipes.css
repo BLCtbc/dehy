@@ -43,9 +43,9 @@ header {
 	font-size: 1.2rem;
 }
 
-.recipe-card .recipe-preview {
-	max-height: 500px;
-	overflow-y: scroll;
+.recipe-card.recipe-preview {
+	max-height: 400px;
+	/* overflow-y: scroll; */
 }
 
 .recipe-card .card-img {

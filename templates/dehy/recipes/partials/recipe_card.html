@@ -10,10 +10,14 @@
 		</div>
 		{% endif %}
 
-		{% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' image=recipe.image %}
-		{% oscar_thumbnail image|default:default_image "500x" as thumb %}
-		<img class='card-img' src="{{thumb.url}}" alt="{{ recipe.name }}">
-		{% endwith %}
+		<a href="{% url 'recipe_details' recipe.slug %}">
+		<div class="image-container">
+			{% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' image=recipe.image %}
+			{% oscar_thumbnail image|default:default_image "500x" as thumb %}
+			<img class='card-img' src="{{thumb.url}}" alt="{{ recipe.name }}">
+			{% endwith %}
+		</div>
+		</a>
 		{% if not preview %}
 		<p class='recipe-description'>{{recipe.description}}</p>
 		<h3>Ingredients</h3>

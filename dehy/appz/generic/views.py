@@ -4,6 +4,7 @@ from oscar.core.loading import get_class, get_model
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
+Recipe = get_model('recipes', 'Recipe')
 
 class CustomView(TemplateView):
 	template_name = "dehy/custom.html"
