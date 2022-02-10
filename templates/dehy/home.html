@@ -99,7 +99,7 @@
 	<section class='content-section' id='recipe_list'>
 
 		{% for recipe in recipes %}
-		<article class="recipe-card col-4">
+		<article class="recipe-card col-3">
 		{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
 		</article>
 		{% endfor %}
