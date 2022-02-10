@@ -1,0 +1,95 @@
+{% extends 'oscar/dashboard/layout.html' %}
+{% load i18n %}
+{% load image_tags %}
+{% block body_class %}recipe{% endblock %}
+
+{% block title %}
+{% trans "Recipe management" %} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+	<li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a></li>
+	<li class="breadcrumb-item active">
+	  <a href="{% url 'dashboard:recipe-list' %}">{% trans "Recipes" %}</a>
+	</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block header %}
+<div class="page-header">
+  <a href="{% url 'dashboard:recipe-create' %}" class="btn btn-primary float-right"><i class="fas fa-plus"></i> {% trans "Create new recipe" %}</a>
+  <h1>{% trans "Recipe Management" %}</h1>
+</div>
+{% endblock header %}
+
+
+{% block dashboard_content %}
+<div class="table-header">
+  <h3><i class="fas fa-search"></i>{% trans "Search Recipes" %}</h3>
+</div>
+<div class="card card-body">
+  <form method="get" class="form-inline">
+	{% include "oscar/dashboard/partials/form_fields_inline.html" with form=filterform %}
+	<button type="submit" class="btn btn-primary">{% trans "Search" %}</button>
+	{% if not filterform.is_empty %}
+	<a href="?" class="btn">{% trans "Reset" %}</a>
+	{% endif %}
+  </form>
+</div>
+{% if recipe_list.count %}
+<form method="post" class="order_table">
+  {% csrf_token %}
+  <table class="table table-striped table-bordered">
+	<tr>
+	  <th>{% trans "Name" %}</th>
+	  <th>{% trans "Image" %}</th>
+	  <th>{% trans "Description" %}</th>
+	  <th>{% trans "Created" %}</th>
+	  <th>{% trans "Last Modified" %}</th>
+
+	  <th>{% trans "Actions" %}</th>
+	</tr>
+	{% for recipe in recipe_list %}
+	<tr>
+	  <th><a href="{% url 'dashboard:recipe-update' recipe.id %}">{{ recipe.name }}</a></th>
+	  {% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' image=recipe.image %}
+	  {% oscar_thumbnail image|default:default_image "200x" as thumb %}
+	  <td><img src="{{thumb.url}}" alt="{{ recipe.name }}"></td>
+	  {% endwith %}
+
+	  {% comment %}
+	  {% if recipe.image %}
+		  {% with image=recipe.image %}
+		  {% oscar_thumbnail image "200x" as thumb %}
+		  <td><img src="{{thumb.url}}" alt="{{ recipe.name }}"></td>
+		  {% endwith %}
+	  {% else %}
+		  <td><img src="{{MEDIA_URL}}/media/image_not_found.jpg"></td>
+	  {% endif %}
+	  {% endcomment %}
+
+	  <td>{{ recipe.description }}</td>
+	  <td>{{ recipe.date_created }}</td>
+	  <td>{{ recipe.last_modified }}</td>
+	  <td>
+		<div class="btn-group">
+		  <a class="btn btn-info fas fa-pen" href="{% url 'dashboard:recipe-update' recipe.id %}"></a>
+		  <a class="btn btn-primary fas fa-globe" href="{% url 'recipe_details' recipe.slug %}"></a>
+		  <a class="btn btn-danger fas fa-times" href="{% url 'dashboard:recipe-delete' recipe.id %}"></a>
+		</div>
+	  </td>
+	</tr>
+	{% endfor %}
+  </table>
+
+  {% include "oscar/dashboard/partials/pagination.html" %}
+</form>
+
+{% else %}
+<p>{% trans "No recipes found." %}</p>
+{% endif %}
+
+{% endblock dashboard_content %}

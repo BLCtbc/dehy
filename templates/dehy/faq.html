@@ -1,0 +1,29 @@
+{% extends "dehy/layout_2_col.html" %}
+
+{% load i18n %}
+{% load product_tags %}
+
+{% block title %}
+{{ block.super }} | {% trans "FAQ" %}
+{% endblock title %}
+
+{% block header_title %}
+FAQ
+<p style='font-size: 1.5rem; letter-spacing: 0.2em'>Frequently Asked Questions</p>
+{% endblock header_title %}
+
+{% block content_wrapper %}
+<section class="container">
+
+	{% for faq in faq_list %}
+		<section class="row">
+			<article class="col-10">
+				Question: <p>{{faq.question}}</p>
+				Answer: <p>{{faq.answer}}</p>
+			</article>
+		</section>
+
+	{% endfor %}
+</section>
+
+{% endblock content_wrapper %}

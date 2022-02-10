@@ -14,11 +14,14 @@
 	- [disabling a built-in oscar feature](#disable_feature)
 	- [changing the oscar homepage](#edit_homepage)
 	- [overriding base templates](#base_layouts_override)
+4. [overriding oscar dashboard and adding custom menu item](#oscar_nav_override)
 4. [implementing paypal payment support with django-oscar-payapl](#django_oscar_paypal)
 5. [linux cli commands](#server_cli)
 	- [connecting to AWS](#connecting_to_AWS)
 6. [git commands](#git_commands)
 	- [authenticating github][#git_authentication]
+7. [troubleshooting](#troubleshooting)
+	- [postgres issues](#postgresql)
 
 ---
 
@@ -98,7 +101,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			```
 
 		* grant permissions, then quit
-			```
+			```sql
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy TO dehydevuser;
 			postgres=# \q
 			```
@@ -284,14 +287,14 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			$ python manage.py oscar_populate_countries --no-shipping
 			```
 
-			- to add countries as shipping options:
+			- use the 'no-shipping' option so that all countries aren't available to be shipped to. Then, to add countries as shipping options:
 				- open the admin page: http://127.0.0.1:8000/admin/address/country/
 				- in the search bar, type "united states"
 				- click "United States"
 				- make sure "Is Shipping Country" is checked
 				- set the Display order (optional)
 				- click 'save'
-				- do the same for any other countries shipping should be available for
+				- do the same for any other countries shipping should be available for (Canada for example)
 
 	<a name="server_config"></a>
 	- server config files
@@ -861,6 +864,245 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			regex for nested: `oscar\/([\w]+\/[\w]+\.html)`
 
 ---
+<a name="oscar_nav_override"></a>
+1. ##### adding a custom model item to oscar's builtin dashboard
+	initially started attempting to implement this from the [official documentation](https://django-oscar.readthedocs.io/en/3.1/howto/how_to_configure_the_dashboard_navigation.html), wound up using [this how-to article](https://levelup.gitconnected.com/creating-an-oscar-app-with-dashboard-part-2-6283dd24304) as a guide
+
+	- create the custom apps:
+		```sh
+		$ mkdir dehy/appz/recipes
+		$ mkdir dehy/appz/dashboard/recipes
+		$ ./manage.py startapp recipes dehy/appz/recipes
+		$ ./manage.py startapp recipes dehy/appz/dashboard/recipes
+		```
+
+	- create model and views, hookup the apps and the urls
+
+		```py
+		##############################
+		# dehy/appz/recipes/apps.py
+
+		from django.apps import AppConfig
+
+		class RecipesConfig(AppConfig):
+			default_auto_field = 'django.db.models.BigAutoField'
+			name = 'dehy.appz.recipes'
+			namespace = 'recipes'
+			label = 'recipes'
+
+		##############################
+		# dehy/appz/recipes/models.py
+		from django.db import models
+		from django.contrib.postgres.fields import ArrayField
+		from oscar.models.fields import AutoSlugField
+
+		class Recipe(models.Model):
+			name = models.CharField(max_length=100, default="", help_text='Name of the recipe')
+			description = models.TextField(help_text='A short introduction about the recipe, origin, summary, etc.')
+			ingredients = ArrayField(models.CharField(max_length=50))
+			slug = AutoSlugField(max_length=50, unique=True, populate_from=name, editable=True)
+			date_created = models.DateField(auto_now_add=True, editable=False)
+			last_modified = models.DateField(auto_now=True, editable=False)
+
+		##############################
+		# dehy/settings.py
+		INSTALLED_APPS = [
+			...
+			'dehy.appz.recipes.apps.RecipesConfig',
+			'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
+			...
+		]
+
+		##############################
+		# dehy/appz/recipes/views.py
+		from django.shortcuts import render
+		from django.views.generic import ListView, DetailView, TemplateView
+		from .models import Recipe
+
+		class RecipesView(TemplateView):
+			template_name = "dehy/recipes.html"
+
+		class RecipeListView(ListView):
+			model = Recipe
+			context_object_name = "recipes"
+			# template_name = "dehy/recipes.html"
+
+		class RecipeDetailView(DetailView):
+		    model = Recipe
+		    template_name = "dehy/recipes.html"
+		    context_object_name = "recipe"
+		    slug_field = 'slug'
+		    slug_url_kwarg = 'slug'
+
+		##############################
+		# dehy/appz/recipes/urls.py
+		from django.urls import path
+		from . import views
+
+		urlpatterns = [
+			path('recipes/', views.RecipesView.as_view(), name='recipes'),
+			path('recipes/<slug:recipe_slug>', views.RecipeDetailView.as_view(), name='recipe_details'),
+		]
+
+		##############################
+		# dehy/urls.py
+		from django.apps import apps
+		from django.urls import include, path
+		from django.contrib import admin
+
+		urlpatterns = [
+			path('admin/', admin.site.urls),
+			path('', include('dehy.appz.recipes.urls'), name='recipes'),
+			path('', include(apps.get_app_config('dehy').urls[0])),
+		]
+		```
+
+	- dashboard specific changes:
+		```py
+		# dehy/appz/dashboard/apps.py
+
+		from django.apps import apps
+		from django.urls import include, path
+		from django.utils.translation import gettext_lazy as _
+		from oscar.core.loading import get_class
+		import oscar.apps.dashboard.apps as oscar_apps
+
+		class DashboardConfig(oscar_apps.DashboardConfig):
+			name = 'dehy.appz.dashboard'
+			label = 'dashboard'
+			verbose_name = _('Dashboard')
+			namespace = 'dashboard'
+			permissions_map = {
+				'index': (['is_staff'], ['partner.dashboard_access']),
+			}
+
+			def ready(self):
+				super().ready()
+				self.recipes_app = apps.get_app_config('recipes_dashboard')
+
+			def get_urls(self):
+				urls = super().get_urls()
+				urls += [
+					path('recipes/', include(self.recipes_app.urls[0]))
+				]
+				return self.post_process_urls(urls)
+
+		# dehy/appz/dashboard/recipes/apps.py
+		from oscar.core.application import OscarDashboardConfig
+		from django.urls import path
+		from oscar.core.loading import get_class
+		import oscar.apps.catalogue.apps as apps
+		from django.utils.translation import gettext_lazy as _
+
+		class RecipesDashboardConfig(OscarDashboardConfig):
+			default_auto_field = 'django.db.models.BigAutoField'
+			name = 'dehy.appz.dashboard.recipes'
+			label = 'recipes_dashboard'
+			verbose_name = _('Recipes')
+			namespace = 'recipes'
+			default_permissions = ['is_staff']
+			permissions_map = _map = {
+		        'recipe-create': (['is_staff'],
+		                                     ['partner.dashboard_access']),
+		        'recipe-list': (['is_staff'], ['partner.dashboard_access']),
+		        'recipe-delete': (['is_staff'],
+		                                     ['partner.dashboard_access']),
+		        'recipe-update': (['is_staff'],
+		                                     ['partner.dashboard_access']),
+		    }
+
+
+			def ready(self):
+				super().ready()
+				self.recipes_list_view = get_class('dashboard.recipes.views', 'RecipeListView')
+				self.recipes_create_view = get_class('dashboard.recipes.views', 'RecipeCreateView')
+				self.recipes_update_view = get_class('dashboard.recipes.views', 'RecipeUpdateView')
+				self.recipes_delete_view = get_class('dashboard.recipes.views', 'RecipeDeleteView')
+
+			def get_urls(self):
+				urls = super().get_urls()
+				urls += [
+					path('', self.recipes_list_view.as_view(), name='recipe-list'),
+					path('create/', self.recipes_create_view.as_view(), name='recipe-create'),
+					path('update/<int:pk>/', self.recipes_update_view.as_view(), name='recipe-update'),
+					path('delete/<int:pk>/', self.recipes_delete_view.as_view(), name='recipe-delete'),
+				]
+				return self.post_process_urls(urls)
+
+		# dehy/appz/dashboard/recipes/views.py
+		from django.apps import apps
+		from django.urls import include, path
+		from django.utils.translation import gettext_lazy as _
+		from oscar.core.loading import get_class
+		import oscar.apps.dashboard.apps as oscar_apps
+
+		class DashboardConfig(oscar_apps.DashboardConfig):
+			name = 'dehy.appz.dashboard'
+			label = 'dashboard'
+			verbose_name = _('Dashboard')
+			namespace = 'dashboard'
+			permissions_map = {
+				'index': (['is_staff'], ['partner.dashboard_access']),
+			}
+
+			def ready(self):
+				super().ready()
+				self.recipes_app = apps.get_app_config('recipes_dashboard')
+
+			def get_urls(self):
+				urls = super().get_urls()
+				urls += [
+					path('recipes/', include(self.recipes_app.urls[0]))
+				]
+				return self.post_process_urls(urls)
+
+		# dehy/appz/dashboard/recipes/forms.py
+		from django import forms
+		from django.db.models import Q
+		from django.utils.translation import gettext_lazy as _
+		from oscar.core.loading import get_model
+
+		Recipe = get_model('recipes', 'Recipe')
+
+		class RecipeSearchForm(forms.Form):
+
+			name = forms.CharField(label=_('Recipe name'), required=False)
+			ingredients = forms.CharField(label=_('Ingredients list'), required=False)
+			slug = forms.SlugField(label=('Slug'), required=False)
+
+			def is_empty(self):
+				d = getattr(self, 'cleaned_data', {})
+				def empty(key): return not d.get(key, None)
+				return empty('name') and empty('ingredients')
+
+			def apply_ingredient_filter(self, qs, value):
+				words = value.replace(',', ' ').split()
+				q = [Q(city__icontains=word) for word in words]
+				return qs.filter(*q)
+
+			def apply_name_filter(self, qs, value):
+				return qs.filter(name__icontains=value)
+
+			def apply_filters(self, qs):
+				for key, value in self.cleaned_data.items():
+					if value:
+						qs = getattr(self, 'apply_%s_filter' % key)(qs, value)
+				return qs
+
+		class RecipeCreateUpdateForm(forms.ModelForm):
+			class Meta:
+				model = Recipe
+				fields = ('name', 'slug', 'ingredients')
+		```
+
+	- copy the oscar template files:
+		```
+		$ mkdir dehy/templates/oscar/dashboard && cp venv/lib/python3.7/oscar/templates/dashboard dehy/templates/oscar/dashboard
+		```
+
+---
+
+---
 <a name="django_oscar_paypal"></a>
 1. ##### implementing paypal payments with [django-oscar-paypal](https://django-oscar-paypal.readthedocs.io/en/latest/express.html)
 
@@ -911,3 +1153,36 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		$ ssh -i /path/my-key-pair.pem my-instance-user-name@my-instance-public-dns-name
 		```
 
+<a name="troubleshooting"></a>
+6. ###### troubleshooting
+
+	<a name="postgresql"></a>
+	- To check what is running on port 5432, issue the following command on your terminal.
+		`$ sudo lsof -i :5432`
+
+	- finding all postgres processes
+		`$ ps -ef | grep postgres`
+
+		output might look something like:
+
+		uid   pid  ppid   C  STIME TTY         TIME    CMD
+		```
+		504   511   147   0  1:23PM ??         0:00.00 postgres: logger
+		504   535   147   0  1:23PM ??         0:00.01 postgres: checkpointer
+		504   539   147   0  1:23PM ??         0:00.01 postgres: stats collector
+		504  2796   147   0  1:29PM ??         0:00.03 postgres: background writer
+		504  3032   147   0  1:30PM ??         0:00.01 postgres: walwriter
+		504  3033   147   0  1:30PM ??         0:00.01 postgres: autovacuum launcher
+		504  3034   147   0  1:30PM ??         0:00.00 postgres: logical replication launcher
+		501  3971   853   0  1:36PM ttys001    0:00.00 grep postgres
+		```
+
+		NOTE: the postmaster PID in this case 147, which is the parent pid of most the processes listed
+
+	- stop all postgres processes (requires having postgres installed)
+		`$ pg_ctl -D $(psql -Xtc 'show data_directory') stop`
+
+	- kill all postgres processes
+		`$ sudo pkill -u postgres` That kills all processes running as user `postgres`
+			or
+		`$ pkill postgres` That kills all processes named 'postgres'

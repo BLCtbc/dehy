@@ -10,6 +10,7 @@ from oscar.defaults import *
 import environ
 from pathlib import Path
 from pygit2 import Repository
+from django.utils.translation import gettext_lazy as _
 
 ENV_FILE = '.env'
 if Repository('.').head.shorthand is 'main':
@@ -48,7 +49,12 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'django.contrib.postgres',
 	'dehy',
+	'dehy.appz.generic.apps.GenericConfig',
+	'dehy.appz.recipes.apps.RecipesConfig',
+	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
+	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
 	# oscar overrides
 	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
@@ -57,6 +63,8 @@ INSTALLED_APPS = [
 	'dehy.appz.search.apps.SearchConfig',
 	'dehy.appz.customer.apps.CustomerConfig',
 	'dehy.appz.checkout.apps.CheckoutConfig',
+	'dehy.appz.partner.apps.PartnerConfig',
+	'dehy.appz.payment.apps.PaymentConfig',
 	# django apps added by oscar
 	'django.contrib.sites',
 	'django.contrib.flatpages',
@@ -67,8 +75,6 @@ INSTALLED_APPS = [
 	'oscar.apps.shipping.apps.ShippingConfig',
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
-	'oscar.apps.partner.apps.PartnerConfig',
-	'oscar.apps.payment.apps.PaymentConfig',
 	'oscar.apps.offer.apps.OfferConfig',
 	'oscar.apps.order.apps.OrderConfig',
 	'oscar.apps.voucher.apps.VoucherConfig',
@@ -84,13 +90,14 @@ INSTALLED_APPS = [
 	'oscar.apps.dashboard.vouchers.apps.VouchersDashboardConfig',
 	'oscar.apps.dashboard.communications.apps.CommunicationsDashboardConfig',
 	'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
-
 	# 3rd-party apps that oscar depends on
 	'widget_tweaks',
 	'haystack',
 	'treebeard',
 	'sorl.thumbnail',   # Default thumbnail backend, can be replaced
 	'django_tables2',
+	# other 3rd-party apps
+	'django_better_admin_arrayfield',
 ]
 
 SITE_ID = 1
@@ -139,26 +146,26 @@ WSGI_APPLICATION = 'dehy.wsgi.application'
 # like psql://user:pass@127.0.0.1:8458/db
 DATABASES = {
 	'default': env.db('DATABASE_URL')
-    # read os.environ['DATABASE_URL'] and raises
-    # ImproperlyConfigured exception if not found
-    #
-    # The db() method is an alias for db_url().
-    # 'default': env.db(),
+	# read os.environ['DATABASE_URL'] and raises
+	# ImproperlyConfigured exception if not found
 	#
-    # read os.environ['SQLITE_URL']
-    # 'extra': env.db_url(
-    #     'SQLITE_URL',
-    #     default='sqlite:////tmp/my-tmp-sqlite.db'
-    # )
+	# The db() method is an alias for db_url().
+	# 'default': env.db(),
+	#
+	# read os.environ['SQLITE_URL']
+	# 'extra': env.db_url(
+	#     'SQLITE_URL',
+	#     default='sqlite:////tmp/my-tmp-sqlite.db'
+	# )
 }
 if DEBUG:
-
-	CACHES = {
-	    'default': {
-	        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-	   }
-	}
-	MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
+	pass
+	# CACHES = {
+	#     'default': {
+	#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+	#    }
+	# }
+	# MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -197,7 +204,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
-# STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATICFILES_DIRS = [BASE_DIR / 'assets']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
@@ -231,7 +238,34 @@ OSCAR_ORDER_STATUS_CASCADE = {
 }
 
 OSCAR_DEFAULT_CURRENCY = 'USD'
-OSCAR_HIDDEN_FEATURES = ["reviews"]
-OSCAR_HOMEPAGE = reverse_lazy('home')
+OSCAR_HIDDEN_FEATURES = ["reviews", "wishlists"]
+OSCAR_HOMEPAGE = reverse_lazy('catalogue:index')
 OSCAR_SHOP_NAME = "DEHY"
 OSCAR_SHOP_TAGLINE = ""
+
+OSCAR_PRODUCTS_PER_PAGE = 10
+
+THUMBNAIL_DEBUG = True
+
+OSCAR_DASHBOARD_NAVIGATION += [
+	{
+		'label': _('Recipe'),
+		'icon': 'fas fa-bullhorn',
+		'children': [
+			{
+				'label': _('Recipes'),
+				'url_name': 'dashboard:recipe-list',
+			},
+		 ]
+	},
+	{
+		'label': _('FAQ'),
+		'icon': 'fas fa-bullhorn',
+		'children': [
+			{
+				'label': _('FAQs'),
+				'url_name': 'dashboard:faq-list',
+			},
+		 ]
+	},
+]

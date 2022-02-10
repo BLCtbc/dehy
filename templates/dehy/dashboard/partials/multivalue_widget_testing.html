@@ -1,0 +1,48 @@
+{% load form_tags %}
+{% load widget_tweaks %}
+
+{% for widget in field.widgets %}
+	{{forloop.counter}}
+{% endfor %}
+
+{{field}}
+
+
+	{% for sub_field in field.field.fields %}
+	<div class="col-6">
+		{{sub_field.label}}
+		{{sub_field.widget.render}}
+
+		{% for error in sub_field.errors %}
+			<span class="error-block"><i class="fas fa-exclamation"></i> {{ error }}</span>
+		{% endfor %}
+
+		{% if sub_field.help_text %}
+			<small class="form-text text-muted">
+				{# We allow HTML within form help fields #}
+				{{ sub_field.help_text|safe }}
+			</small>
+		{% endif %}
+
+	</div>
+	{% endfor %}
+
+
+	{% for subwidget in field.field.widget.widgets %}
+	<div class="col-6">
+
+		{{subwidget}}
+		{{subwidget.render}}
+		{{subwidget.format_value}}
+		{{subwidget.template_name}}
+
+
+		{% if widget.help_text %}
+			<small class="form-text text-muted">
+				{# We allow HTML within form help fields #}
+				{{ sub_field.help_text|safe }}
+			</small>
+		{% endif %}
+
+	</div>
+	{% endfor %}
