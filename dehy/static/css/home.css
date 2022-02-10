@@ -1,0 +1,171 @@
+.header {
+	background-image: url('/static/img/custom/dehy_hero.jpeg');
+	padding: 0;
+}
+
+.image-container {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	height: auto;
+}
+
+.about {
+	font-size: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 2rem;
+}
+
+.content-section {
+	min-height: 350px;
+	justify-content: center;
+	display: flex;
+}
+
+.content-section:not(:first-child) {
+	border-top: 12px solid var(--beige);
+}
+
+.content-split {
+	display: flex;
+}
+
+h2 {
+	font-family: 'freefrm';
+	font-size: 5rem;
+}
+
+.img-split {
+	padding: 0;
+}
+
+.shop-leadin {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+	padding: 10rem 10rem 0;
+	backdrop-filter: grayscale(30%) sepia(0.1);
+	-webkit-backdrop-filter: grayscale(30%) sepia(0.1);
+}
+
+.subhead {
+	margin-bottom: 1rem;
+	font-family: Futura,serif;
+	font-size: 20px;
+}
+.monospace {
+	font-family: monospace;
+	font-size: 16px;
+}
+
+.shop-link-container {
+	padding-top: 3rem;
+}
+
+.shop-link, .btn {
+	border: 2px solid var(--beige);
+	color: var(--beige);
+	padding: 0 3rem;
+	line-height: 3rem;
+	font-weight: 800;
+}
+
+.btn:hover {
+	background-color: var(--beige);
+	color: var(--hunter-green);
+}
+
+.punchline {
+	color: var(--beige);
+    letter-spacing: 0.1rem;
+}
+
+figure {
+	margin-bottom: 0;
+}
+
+.shop-header-image:before {
+	content: '';
+	display: block;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(127, 127, 127, 0.5);
+	background-image: radial-gradient(black 33%, transparent 33%);
+	background-size: 2px 2px;
+}
+
+.mailing-list-container {
+	padding: 0.5rem 0 4rem;
+	background-color: white;
+	text-align: center;
+	position: relative;
+	background-image: linear-gradient(to right, rgba(221, 210, 193, 1), rgba(243, 237, 229, 1));
+}
+
+
+#mailing_list_email,
+#mailing_list_submit {
+	font-family: monospace;
+	-webkit-box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
+	box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
+	font-size: 1rem;
+	border: 2px solid white;
+}
+
+#mailing_list_email {
+	width: 70%;
+	padding: 2rem;
+}
+
+#mailing_list_submit {
+	line-height: 4rem;
+	color: black;
+}
+
+.mailing-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+	padding-bottom: 1rem;
+	background-image: none;
+}
+
+.mailing-list-container .btn {
+	/* color: wheat; */
+	border-radius: 4px;
+
+	background-color: transparent;
+	border-color: wheat;
+	color: gray;
+}
+
+.image-background-overlay {
+	position: absolute;
+	background-repeat: no-repeat;
+	background-size: contain;
+	width: 100%;
+	height: 100%;
+	top: 0;
+}
+
+.mailing-list-split {
+	border-color: #f4ecdc61 !important;
+	background-color: white;
+}
+
+.mini-shop {
+	background: #fffbf4 url(/static/img/textures/diamond_pattern-3.svg) repeat;
+	background-attachment: scroll;
+	z-index: 1;
+	overflow-x: scroll;
+}
+
+header {
+	padding-top: 0;
+}
+

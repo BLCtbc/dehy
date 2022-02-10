@@ -5,7 +5,7 @@ from django.contrib import admin
 urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('', include('dehy.appz.generic.urls'), name='generic'),
-	path('', include('dehy.appz.recipes.urls'), name='recipes'),
+	path('recipes/', include('dehy.appz.recipes.urls'), name='recipes'),
 	path('', include(apps.get_app_config('dehy').urls[0])),
 ]
 
