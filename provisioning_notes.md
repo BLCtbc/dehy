@@ -287,14 +287,14 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			$ python manage.py oscar_populate_countries --no-shipping
 			```
 
-			- to add countries as shipping options:
+			- use the 'no-shipping' option so that all countries aren't available to be shipped to. Then, to add countries as shipping options:
 				- open the admin page: http://127.0.0.1:8000/admin/address/country/
 				- in the search bar, type "united states"
 				- click "United States"
 				- make sure "Is Shipping Country" is checked
 				- set the Display order (optional)
 				- click 'save'
-				- do the same for any other countries shipping should be available for
+				- do the same for any other countries shipping should be available for (Canada for example)
 
 	<a name="server_config"></a>
 	- server config files
@@ -1159,11 +1159,13 @@ Note, any changes made to `settings.py` might require restarting the server in o
 	<a name="postgresql"></a>
 	- To check what is running on port 5432, issue the following command on your terminal.
 		`$ sudo lsof -i :5432`
+
 	- finding all postgres processes
 		`$ ps -ef | grep postgres`
 
 		output might look something like:
 
+		uid   pid  ppid   C  STIME TTY         TIME    CMD
 		```
 		504   511   147   0  1:23PM ??         0:00.00 postgres: logger
 		504   535   147   0  1:23PM ??         0:00.01 postgres: checkpointer
@@ -1174,6 +1176,8 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		504  3034   147   0  1:30PM ??         0:00.00 postgres: logical replication launcher
 		501  3971   853   0  1:36PM ttys001    0:00.00 grep postgres
 		```
+
+		NOTE: the postmaster PID in this case 147, which is the parent pid of most the processes listed
 
 	- stop all postgres processes (requires having postgres installed)
 		`$ pg_ctl -D $(psql -Xtc 'show data_directory') stop`
