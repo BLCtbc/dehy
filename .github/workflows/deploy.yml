@@ -18,11 +18,11 @@ jobs:
       uses: peterkimzz/aws-ssm-send-command@1.0.1
       id: ssm
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: AKIATWP3CLBXHB3BA7JO
+        aws-secret-access-key: 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
         aws-region: us-east-2
         instance-ids:
-          i-029d22a511f603dbd
+          'i-029d22a511f603dbd'
         # comment: Deploy the staging branch
         working-directory: /home/admin/dehy
         command: /bin/sh ./deploy.sh
