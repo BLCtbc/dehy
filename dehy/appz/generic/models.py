@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 
-class QandA(models.Model):
+class FAQ(models.Model):
 	"""
 	A question and an answer to be used in the FAQ page.
 	"""

@@ -1,9 +1,8 @@
 from django.views.generic import ListView, TemplateView
 from django.http import JsonResponse
-from .models import QandA
 from oscar.core.loading import get_class, get_model
 
-Recipe = get_model('recipes', 'Recipe')
+FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 
 class CustomView(TemplateView):
@@ -25,7 +24,7 @@ class HomeView(TemplateView):
 	def get_context_data(self, *args, **kwargs):
 		data = super().get_context_data(*args, **kwargs)
 		recipes = Recipe.objects.filter(featured=True)
-		products = Product.objects.exclude(product_class__name='Merch')
+		products = Product.objects.exclude(product_class__name='Merch', structure='child')
 
 		data.update({'recipes':recipes, 'products':products})
 		return data
@@ -37,7 +36,8 @@ class ContactView(TemplateView):
 	template_name = "dehy/contact.html"
 
 class FAQView(ListView):
-	model = QandA
+	model = FAQ
+	context_object_name = "faq_list"
 	template_name = "dehy/faq.html"
 
 

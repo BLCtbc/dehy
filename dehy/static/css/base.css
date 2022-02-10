@@ -5,6 +5,11 @@
 	--avant-garde: 'itc-avant-garde-gothic-pro';
 	--dark-hg: rgba(28, 54, 39, 1);
 	--dark-gray: rgba(0,0,0,0.8);
+	--global-font-size: calc(1.5 * 1rem);
+	--global-line-height: 1.2em;
+	--main-navbar-padding-top: 2vw;
+	--main-navbar-height: calc(var(--main-navbar-padding-top)*2 + var(--global-font-size) + var(--global-line-height));
+
 }
 
 @font-face {
@@ -60,18 +65,15 @@ html {
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
 	background-color: var(--hunter-green);
-	font-family: 'freefrm';
-	line-height: 1.2em;
-	transition: all 300ms ease;
 }
 
 body {
     background-color: var(--hunter-green);
     font-family: 'freefrm';
-    line-height: 1.2em;
+    line-height: var(--global-line-height);
     -webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-    font-size: calc(1.5 * 1rem);
+    font-size: var(--global-font-size);
     transition: all 300ms ease;
 	color: var(--gold);
 }
@@ -126,9 +128,7 @@ input, select, article {
 	font-weight: 100;
 }
 
-header {
-	font-family: 'itc-avant-garde-gothic-pro';
-}
+
 
 .container-fluid {
 	display: -ms-flexbox;
@@ -321,10 +321,7 @@ nav a.nav-link.active {
     flex-direction: column;
     height: 100%;
     justify-content: center;
-}
-
-.splash-header {
-    color: var(--beige);
+	color: var(--beige);
 }
 
 footer {
@@ -446,8 +443,10 @@ span.variant_price {
 	border-radius: 0;
 }
 
-header.header {
-	padding-top: 4vw;
+header {
+	/* padding-top: 4vw; */
+	padding-top: var(--main-navbar-height);
+	font-family: 'itc-avant-garde-gothic-pro';
 }
 
 header:after {
@@ -485,9 +484,9 @@ span.ig{
 }
 
 #nav_primary {
-	margin-left: var(--bs-gutter-x,1.5rem);
+	/* margin-left: var(--bs-gutter-x,1.5rem); */
 	background-color: var(--dark-hg);
-	padding: 1rem;
+	padding: 2rem 1rem;
 	border-radius: 1px;
 	font-size: 1.3rem;
 	font-weight: 400;
@@ -711,4 +710,13 @@ footer .site-directory h3 {
 
 .font-serif {
 	font-family: Futura,serif;
+}
+
+.footer-container {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+#navbarSupportedContent {
+	justify-content: space-around;
 }

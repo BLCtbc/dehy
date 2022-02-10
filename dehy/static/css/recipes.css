@@ -1,0 +1,53 @@
+header {
+	padding-top: var(--main-navbar-height);
+}
+
+
+.recipe-card {
+	padding: 0.5rem 0.75rem;
+}
+
+.recipe-info {
+	font-size: 0.75rem;
+	color: var(--dark-gray);
+	font-family: monospace;
+}
+
+.recipe-card .card-title {
+	font-size: 2rem;
+	font-family: cursive;
+	font-weight: 600;
+}
+
+.recipe-card .directions-list p, .recipe-card .ingredients-list p{
+	font-family: Lusitana,Georgia,serif;
+	font-size: 1.25rem
+}
+
+.recipe-card .ingredients-list li {
+	list-style:square;
+}
+
+.recipe-card .directions-list li {
+	list-style: decimal;
+}
+
+#recipe_list {
+	background: url(/static/img/textures/bg_subtle_dots.png) repeat scroll 0 0;
+	border-color: white;
+}
+
+.recipe-description {
+	font-family: serif;
+	line-height: 1.2rem;
+	font-size: 1.2rem;
+}
+
+.recipe-card .recipe-preview {
+	max-height: 500px;
+	overflow-y: scroll;
+}
+
+.recipe-card .card-img {
+	margin-bottom: 1rem;
+}

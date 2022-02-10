@@ -1,8 +1,8 @@
 {% block footer %}
 {% load static %}
 
-<footer class="container-fluid footer-container">
-	<div class="justify-content-center row">
+<footer class="justify-content-center footer-container">
+	<!-- <div class="justify-content-center row"> -->
 
 		<div class="brand-logo-big col-4">
 			<div class="brand-logo image-container col-12">
@@ -57,10 +57,10 @@
 
 			</div>
 		</div>
-		<div class="bg-beige text-dark-hg row font-lydia">
-			<div class="col-12"><small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small></div>
+		<div class="bg-beige text-dark-hg row col-12 font-lydia">
+			<small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small>
 		</div>
-	</div>
+	<!-- </div> -->
 
 </footer>
 {% endblock footer %}
