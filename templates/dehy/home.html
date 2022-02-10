@@ -9,6 +9,8 @@
 
 {% block extrastyles %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'css/recipes.css' %}"/>
+
 {% endblock extrastyles %}
 
 
@@ -97,7 +99,9 @@
 	<section class='content-section' id='recipe_list'>
 
 		{% for recipe in recipes %}
-		{% include "dehy/partials/recipe_card.html" with recipe=recipe %}
+		<article class="recipe-card col-4">
+		{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
+		</article>
 		{% endfor %}
 	</section>
 	{% endblock recipe_list %}
@@ -131,9 +135,9 @@
 
 			{# temporary #}
 			{% render_product product %}
-			
+
 			{% comment tbd %}
-			{% include "dehy/partials/product_card.html" with product=product %}
+			{% include "dehy/shop/partials/product_card.html" with product=product %}
 			{% endcomment %}
 		{% endfor %}
 	</section>

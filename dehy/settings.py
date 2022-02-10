@@ -54,6 +54,8 @@ INSTALLED_APPS = [
 	'dehy.appz.generic.apps.GenericConfig',
 	'dehy.appz.recipes.apps.RecipesConfig',
 	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
+	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
+
 
 	# oscar overrides
 	'dehy.appz.catalogue.apps.CatalogueConfig',
@@ -255,6 +257,16 @@ OSCAR_DASHBOARD_NAVIGATION += [
 			{
 				'label': _('Recipes'),
 				'url_name': 'dashboard:recipe-list',
+			},
+		 ]
+	},
+	{
+		'label': _('FAQ'),
+		'icon': 'fas fa-bullhorn',
+		'children': [
+			{
+				'label': _('FAQs'),
+				'url_name': 'dashboard:faq-list',
 			},
 		 ]
 	},

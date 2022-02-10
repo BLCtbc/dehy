@@ -143,54 +143,6 @@ figure {
 	border-color: wheat;
 	color: gray;
 }
-.card-body {
-	max-height: 500px;
-	overflow-y: scroll;
-}
-
-.card-img {
-	margin-bottom: 1rem;
-}
-
-.recipe-card {
-	padding: 0.5rem 0.75rem;
-}
-
-.recipe-info {
-	font-size: 0.75rem;
-	color: var(--dark-gray);
-	font-family: monospace;
-}
-
-.card-title {
-	font-size: 2rem;
-	font-family: cursive;
-	font-weight: 600;
-}
-
-.directions-list p, .ingredients-list p{
-	font-family: Lusitana,Georgia,serif;
-	font-size: 1.25rem
-}
-
-.ingredients-list li {
-	list-style:square;
-}
-
-.directions-list li {
-	list-style: decimal;
-}
-
-#recipe_list {
-	background: url(/static/img/textures/bg_subtle_dots.png) repeat scroll 0 0;
-	border-color: white;
-}
-
-.recipe-description {
-	font-family: serif;
-	line-height: 1.2rem;
-	font-size: 1.2rem;
-}
 
 .image-background-overlay {
 	position: absolute;
@@ -212,3 +164,8 @@ figure {
 	z-index: 1;
 	overflow-x: scroll;
 }
+
+header {
+	padding-top: 0;
+}
+

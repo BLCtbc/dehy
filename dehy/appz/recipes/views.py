@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, TemplateView
 from .models import Recipe
 
-class RecipesView(TemplateView):
-	template_name = "dehy/recipes/recipes.html"
+# class RecipesView(TemplateView):
+# 	template_name = "dehy/recipes/recipes.html"
 
 class RecipeListView(ListView):
 	model = Recipe

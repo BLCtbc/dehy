@@ -1,17 +1,20 @@
 {% load image_tags %}
 
-<article class="recipe-card col-4">
-	<div class="card card-body">
+	<div class="card card-body{% if preview %} recipe-preview{% endif %}">
 
-		<a href="{% url 'recipe_details' recipe_slug=recipe.slug %}"><h4 class="card-title">{{recipe.name}}</h4></a>
+		<a href="{% url 'recipe_details' recipe.slug %}"><h4 class="card-title">{{recipe.name}}</h4></a>
+		{% if not preview %}
 		<div class='recipe-info row'>
 			<div class="col-6"><span>By: Fake McFakerson</span></div>
 			<div class="col-6"><span>Udpated: {{recipe.last_modified}}</span></div>
 		</div>
+		{% endif %}
+
 		{% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' image=recipe.image %}
 		{% oscar_thumbnail image|default:default_image "500x" as thumb %}
 		<img class='card-img' src="{{thumb.url}}" alt="{{ recipe.name }}">
 		{% endwith %}
+		{% if not preview %}
 		<p class='recipe-description'>{{recipe.description}}</p>
 		<h3>Ingredients</h3>
 		<div class='ingredients-list'>
@@ -29,5 +32,5 @@
 			{% endfor %}
 			</ul>
 		</div>
+		{% endif %}
 	</div>
-</article>

@@ -19,7 +19,7 @@ class CatalogueView(BrowseView):
 	Browse all products in the catalogue
 	"""
 	context_object_name = "products"
-	template_name = 'oscar/catalogue/browse.html'
+	template_name = 'dehy/shop/browse.html'
 
 	def get(self, request, *args, **kwargs):
 		try:
