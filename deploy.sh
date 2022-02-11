@@ -1,9 +1,10 @@
 #!/bin/sh
 cd ~/home/admin/dehy/dehy
+python3.7 -m venv venv
 source venv/bin/activate
+pip install -r requirements.txt
 git checkout staging
 git pull
-pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 echo 'hello world'
