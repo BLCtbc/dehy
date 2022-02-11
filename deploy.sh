@@ -1,12 +1,12 @@
 #!/bin/bash
 
 activate() {
+	echo 'bingbong'
 	./venv/bin/activate
 	pip install -r requirements.txt
 	python manage.py collectstatic --noinput
 	python manage.py makemigrations
 	python manage.py migrate
-
 }
 activate
 
