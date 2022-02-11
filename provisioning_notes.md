@@ -1153,6 +1153,9 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		$ ssh -i /path/my-key-pair.pem my-instance-user-name@my-instance-public-dns-name
 		```
 
+		for this project:
+		`$ ssh -i DEHY.cer admin@3.135.111.34`
+
 <a name="troubleshooting"></a>
 6. ###### troubleshooting
 
@@ -1186,3 +1189,6 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		`$ sudo pkill -u postgres` That kills all processes running as user `postgres`
 			or
 		`$ pkill postgres` That kills all processes named 'postgres'
+
+
+[installing ssm agent on debian running](https://docs.aws.amazon.com/systems-manager/latest/userguide/agent-install-deb.html)
