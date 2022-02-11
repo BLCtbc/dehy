@@ -1207,7 +1207,7 @@ implementing a continuous deployment workflow on Debian 10+
 	2. removing existing config (required)
 			```sh
 			$ cd ~/actions-runner
-			$ sudo ./svc.sh stop && sudo ./svc.sh uninstall
+			$ sudo ./svc.sh stop && sudo ./svc.sh uninstall && ./config.sh remove --token AIZIT7ZNXUADID6LVNDRLNDCA2SS6
 			```
 
 
