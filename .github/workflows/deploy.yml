@@ -11,10 +11,11 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: AWS SSM Send-Command
-      uses: ./
+      uses: peterkimzz/aws-ssm-send-command@master
       id: ssm
       with:
         aws-access-key-id: 'AKIATWP3CLBXHB3BA7JO'
