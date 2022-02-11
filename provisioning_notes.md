@@ -1193,6 +1193,11 @@ Note, any changes made to `settings.py` might require restarting the server in o
 
 implementing a continuous deployment workflow on Debian 10+
 [adding a self-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners)
+[configuring the self-hosted runner as a service](https://docs.github.com/en/actions/hosting-your-own-runners/configuring-the-self-hosted-runner-application-as-a-service)
+	```sh
+	$ sudo ./svc.sh install
+	$ sudo ./svc.sh start
+	```
 [installing ssm agent on debian running](https://docs.aws.amazon.com/systems-manager/latest/userguide/agent-install-deb.html)
 
 <a name="runner_config_rest"></a>
