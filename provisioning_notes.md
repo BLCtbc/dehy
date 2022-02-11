@@ -1206,17 +1206,16 @@ implementing a continuous deployment workflow on Debian 10+
 	1. follow the steps given here
 	2. removing existing config (required)
 			```sh
-			$ cd ~/actions-runner
-			$ sudo ./svc.sh stop && sudo ./svc.sh uninstall && ./config.sh remove --token AIZIT7ZNXUADID6LVNDRLNDCA2SS6
+			$ cd ~/actions-runner && sudo ./svc.sh stop && sudo ./svc.sh uninstall && ./config.sh remove --token AIZIT75KYJN7TO6JXMXJCRLCA24FI
 			```
 
 
-	3. follow the steps listed in this [github help center](https://docs.github.com/en/actions/hosting-your-own-runners/removing-self-hosted-runners) article to get the token. Should look something like this `./config.sh remove --token AIZIT7ZNXUADID6LVNDRLNDCA2SS6`
+	3. follow the steps listed in this [github help center](https://docs.github.com/en/actions/hosting-your-own-runners/removing-self-hosted-runners) article to get the token. Should look something like this `./config.sh remove --token AIZIT75KYJN7TO6JXMXJCRLCA24FI`
 
 
 	4. running the config
 			```sh
-			$ ./config.sh --url https://github.com/BLCtbc/dehy --token AIZIT7ZNXUADID6LVNDRLNDCA2SS6
+			$ ./config.sh --url https://github.com/BLCtbc/dehy --token AIZIT75KYJN7TO6JXMXJCRLCA24FI
 			$ sudo ./svc.sh install && sudo ./svc.sh start
 			```
 
