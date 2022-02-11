@@ -1,7 +1,7 @@
-#!/bin/sh     
+#!/bin/sh
 source venv/bin/activate
-sudo git pull origin master
-sudo pip install -r requirements.txt
+sudo git pull origin staging
+pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic
