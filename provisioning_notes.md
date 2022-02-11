@@ -1221,3 +1221,7 @@ implementing a continuous deployment workflow on Debian 10+
 
 	5. removing extra shit left behind:
 		`rm -rf _temp _tool _actions _PipelineMapping`
+
+	- a note about $GITHUB_WORKSPACE, from https://docs.github.com/en/actions/learn-github-actions/environment-variables:
+
+		> The default working directory on the runner for steps, and the default location of your repository when using the checkout action. For example, /home/runner/work/my-repo-name/my-repo-name.

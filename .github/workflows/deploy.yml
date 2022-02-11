@@ -1,8 +1,5 @@
 name: dehy
 
-env:
-  GITHUB_WORKSPACE: /home/admin/dehy
-  
 on:
   push:
     branches: [staging]
