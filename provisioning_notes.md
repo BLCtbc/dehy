@@ -1219,3 +1219,6 @@ implementing a continuous deployment workflow on Debian 10+
 			$ ./config.sh --url https://github.com/BLCtbc/dehy --token AIZIT7ZNXUADID6LVNDRLNDCA2SS6
 			$ sudo ./svc.sh install && sudo ./svc.sh start
 			```
+
+	5. removing extra shit left behind:
+		`rm -rf _temp _tool _actions _PipelineMapping`
