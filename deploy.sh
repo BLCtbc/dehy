@@ -1,8 +1,7 @@
 #!/bin/sh
 
-sudo git pull
-cd ~/home/admin/dehy/dehy
-source venv/bin/activate
+git pull
+cd ~/home/admin/dehy/dehy && source venv/bin/activate
 pip install -r requirements.txt
 python manage.py collectstatic --noinput
 python manage.py makemigrations
