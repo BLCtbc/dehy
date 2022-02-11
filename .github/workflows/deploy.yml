@@ -26,7 +26,7 @@ jobs:
         instance-ids: ${{ secrets.INSTANCE_ID }}
         comment: Deploy the staging branch
         working-directory: /home/admin/dehy/dehy
-        command: git pull && source ./deploy.sh
+        command: git pull && echo 'hello world' && source ./deploy.sh
 
 
         # Catch SSM outputs
