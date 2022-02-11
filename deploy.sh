@@ -1,4 +1,5 @@
 #!/bin/sh
+cd ~/home/admin/dehy
 source venv/bin/activate
 git checkout staging
 git pull
