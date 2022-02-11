@@ -1,0 +1,3 @@
+#!/bin/bash
+
+source /home/admin/dehy/dehy/venv/bin/activate && echo 'bingbong' pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate
