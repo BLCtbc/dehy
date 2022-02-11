@@ -1,6 +1,7 @@
 #!/bin/sh
 source venv/bin/activate
-git pull origin staging
+git checkout staging
+git pull
 pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
