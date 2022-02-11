@@ -1,5 +1,8 @@
 name: dehy
 
+env:
+  GITHUB_WORKSPACE: /home/admin/dehy
+  
 on:
   push:
     branches: [staging]
@@ -12,8 +15,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        path: '/home/admin/dehy'
 
     - name: AWS SSM Send-Command
       uses: peterkimzz/aws-ssm-send-command@1.0.1
