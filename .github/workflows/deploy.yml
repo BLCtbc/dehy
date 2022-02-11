@@ -17,8 +17,8 @@ jobs:
       uses: peterkimzz/aws-ssm-send-command@1.0.1
       id: ssm
       with:
-        aws-access-key-id: AKIATWP3CLBXJSMGQWM5
-        aws-secret-access-key: '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'
+        aws-access-key-id: AKIATWP3CLBXHB3BA7JO
+        aws-secret-access-key: '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'
         aws-region: us-east-2
         instance-ids:
           'i-029d22a511f603dbd'
