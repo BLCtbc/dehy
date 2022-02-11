@@ -11,6 +11,7 @@
 	--main-navbar-height: calc(var(--main-navbar-padding-top)*2 + var(--global-font-size) + var(--global-line-height));
 	--gay: 'hello_world';
 	--real-gay: 420%;
+	--piss: 'pissening';
 }
 
 @font-face {
