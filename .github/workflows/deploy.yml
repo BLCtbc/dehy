@@ -14,10 +14,10 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: AWS SSM Send-Command
-      uses: peterkimzz/aws-ssm-send-command@1.0.1
+      uses: peterkimzz/aws-ssm-send-command@master
       id: ssm
       with:
-        aws-access-key-id: AKIATWP3CLBXHB3BA7JO
+        aws-access-key-id: 'AKIATWP3CLBXHB3BA7JO'
         aws-secret-access-key: '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'
         aws-region: us-east-2
         instance-ids:
