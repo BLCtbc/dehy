@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        path: $GITHUB_WORKSPACE
+        path: '/home/admin/dehy'
 
     - name: AWS SSM Send-Command
       uses: peterkimzz/aws-ssm-send-command@1.0.1
