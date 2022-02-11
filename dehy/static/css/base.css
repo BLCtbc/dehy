@@ -9,7 +9,6 @@
 	--global-line-height: 1.2em;
 	--main-navbar-padding-top: 2vw;
 	--main-navbar-height: calc(var(--main-navbar-padding-top)*2 + var(--global-font-size) + var(--global-line-height));
-	--gay: 'hello_world';
 	--real-gay: 420%;
 }
 
