@@ -1,6 +1,5 @@
 #!/bin/sh
 cd ~/home/admin/dehy/dehy
-# python3.7 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 git checkout staging
