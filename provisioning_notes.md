@@ -1217,4 +1217,6 @@ implementing a continuous deployment workflow on Debian 10+
 	4. running the config
 			```sh
 			$ ./config.sh --url https://github.com/BLCtbc/dehy --token AIZIT7ZNXUADID6LVNDRLNDCA2SS6
+			$ sudo ./svc.sh install
+			$ sudo ./svc.sh start
 			```
