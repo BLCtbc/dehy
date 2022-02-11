@@ -26,7 +26,7 @@ jobs:
         instance-ids: ${{ secrets.INSTANCE_ID }}
 
         working-directory: /home/admin/dehy/dehy
-        command: ls -al #/bin/sh ./deploy.sh
+        command: echo "bingbong" #/bin/sh ./deploy.sh
         comment: Deploy the staging branch
 
 
