@@ -24,7 +24,7 @@ jobs:
         comment: Deploy the staging branch
         working-directory: /home/admin/dehy
         command: /bin/sh ./deploy.sh
-        path: ${{ GITHUB_WORKSPACE }}
+        path: $GITHUB_WORKSPACE
 
         # Catch SSM outputs
     - name: Get the outputs
