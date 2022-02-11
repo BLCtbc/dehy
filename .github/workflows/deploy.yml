@@ -22,8 +22,9 @@ jobs:
         aws-region: us-east-2
         instance-ids: ${{ secrets.INSTANCE_ID }}
         comment: Deploy the staging branch
-        working-directory: ~/home/admin
+        working-directory: /home/admin/dehy
         command: /bin/sh ./deploy.sh
+        path: ${{ GITHUB_WORKSPACE }}
 
         # Catch SSM outputs
     - name: Get the outputs
