@@ -87,6 +87,7 @@
                 {% endblock %}
             {% endwith %}
 
+			{% comment %}
             {% block shipping_totals %}
                 <tr>
                     <th>&nbsp;</th>
@@ -150,7 +151,8 @@
                         </th>
                     </tr>
                 {% endif %}
-            {% endblock %}
+            {% endblock shipping_totals %}
+			{% endcomment %}
 
             {% block surcharges %}
                 {% if surcharges %}
@@ -165,8 +167,8 @@
                         </th>
                     </tr>
                     {% for surcharge in surcharges %}
-                        <tr> 
-                            <th class="total"> 
+                        <tr>
+                            <th class="total">
                                 {{ surcharge.surcharge.name }}
                             </th>
                             <th class="total align-right">
