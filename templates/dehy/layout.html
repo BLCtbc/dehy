@@ -29,16 +29,8 @@
     {# Site logo/title, mini-basket, browse dropdown and searchbox #}
 	{% block header %}
 	<header class="header">
-			{% comment %}
-			<div class="row justify-content-between">
-				{% include "oscar/partials/brand.html" %}
-				{# Mini-basket wrapped in a block so some templates can now display it #}
-				{% block mini_basket %}{% include "oscar/partials/mini_basket.html" %}{% endblock %}
-			</div>
-			{% endcomment %}
-
 		{% block navigation %}
-			{% include "dehy/partials/nav_search.html" %}
+		{% include "dehy/partials/nav_search.html" %}
 		{% endblock %}
 	</header>
 	{% endblock header %}

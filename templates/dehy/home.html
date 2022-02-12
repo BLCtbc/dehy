@@ -132,9 +132,11 @@
 
 	<section class='content-section mini-shop'>
 		{% for product in products %}
-
-			{# temporary #}
-			{% render_product product %}
+			{% if not product.is_child %}
+				{# temporary #}
+				{% render_product product %}
+				
+			{% endif %}
 
 			{% comment tbd %}
 			{% include "dehy/shop/partials/product_card.html" with product=product %}
