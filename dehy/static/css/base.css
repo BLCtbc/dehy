@@ -68,7 +68,7 @@ html {
 
 body {
     background-color: var(--hunter-green);
-    font-family: 'freefrm';
+    font-family: itc-avant-garde-gothic-pro, 'freefrm';
     line-height: var(--global-line-height);
     -webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -128,13 +128,13 @@ input, select, article {
 }
 
 
-
+/* 
 .container-fluid {
 	display: -ms-flexbox;
     display: flex;
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
-}
+} */
 
 h1, h2, h3, h4 {
 	font-family: "proxima-nova","Helvetica Neue",Helvetica,Arial,sans-serif,itc-avant-garde-gothic-pro;
@@ -416,23 +416,6 @@ footer {
 	position:relative;
 }
 
-span.not_price_color {
-	font-family: var(--avant-garde);
-	font-weight: 100;
-}
-
-span.variant_price {
-	font-family: var(--avant-garde);
-	color: var(--beige);
-	display: contents;
-	font-weight: 100;
-}
-
-.product_main span.not_price_color,
-.product_main span.variant_price  {
-	font-size: 1.5rem;
-}
-
 .breadcrumb {
 	background-color: inherit;
 	font-family:'itc-avant-garde-gothic-pro';
@@ -512,63 +495,6 @@ li.breadcrumb-item {
 }
 
 
-.variant-option select {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    font-size: 1rem;
-    color: rgba(0,0,0,0);
-    padding-right: 3.5rem;
-	background: transparent;
-	appearance: none;
-	border: none;
-}
-
-.variant-option select:focus {
-	box-shadow: none;
-	border-color: transparent;
-}
-
-.variant-select-container {
-    position: relative;
-    opacity: 0;
-    transition: opacity .1s ease-out;
-	text-align: left;
-	box-sizing: border-box;
-	padding: 1.5rem;
-	line-height: normal;
-	color: inherit;
-	border: 1px solid grey;
-	font-size: calc(1.1 * 1rem);
-}
-
-.variant-select-container[data-text] {
-    opacity: 1;
-}
-
-.variant-select-container:before {
-    content: attr(data-text);
-    display: inline-block;
-}
-
-.variant-select-container:after {
-	content: '';
-	position: absolute;
-	right: 1rem;
-	transform: rotate(45deg);
-	border-bottom: 1px solid;
-	border-right: 1px solid;
-	height: 1rem;
-	width: 1rem;
-	transform-origin: top;
-	pointer-events: none;
-	font-size: 1rem;
-    border-bottom-color: #bca263;
-    border-right-color: #bca263;
-
-}
 
 .product_pod {
 	font-family: 'lydiacondensed-bold' !important;
@@ -718,4 +644,26 @@ footer .site-directory h3 {
 
 #navbarSupportedContent {
 	justify-content: space-around;
+}
+
+.basket_summary, .basket_summary h3, .basket_summary p {
+	font-family: var(--avant-garde);
+}
+
+.basket_summary h3 {
+	font-size: 1.25rem;
+	font-weight: 400;
+}
+
+.basket-items:nth-child(even) {
+    background: var(--dark-hg);
+}
+
+small {
+	font-weight: 200;
+}
+
+.basket-items .price_color {
+	color: inherit;
+	font-weight: normal;
 }

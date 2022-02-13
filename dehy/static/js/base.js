@@ -25,22 +25,25 @@ var DEHY = {
 		cart: function() {
 			var size_selector = document.getElementById('size_selector');
 			size_selector.addEventListener('change', e=> {
-				var variant_select_container = document.querySelector('.variant-select-container'),
-					not_price_selector = document.querySelector('span.not_price_color'),
-					variant_price = document.querySelector('span.variant_price');
-					console.log(e.target.selectedOptions[0].dataset.price)
-					var option_price = e.target.selectedOptions[0].dataset.price
+
+				var variant_select_container = e.target.closest('.variant-select-container'),
+					not_price_selector = e.target.closest('.product_main').querySelector('span.not_price_color'),
+					variant_price = e.target.closest('.product_main').querySelector('span.variant_price'),
+					option_price = e.target.selectedOptions[0].dataset.price,
+					variant_id = e.target.selectedOptions[0].dataset.id,
+					form = e.target.closest('form');
+
 				if (e.target.selectedOptions[0].dataset.price) {
 					not_price_selector.innerText = "";
 					variant_select_container.dataset.text = e.target.value
 					variant_price.innerText = `$${option_price}`
+					form.action = `/basket/add/${variant_id}/`
+
 				} else {
 					not_price_selector.innerText = 'from ';
-					console.log(e.target)
-					console.log(e.target.options)
-
 					variant_price.innerText = `$${e.target.options[1].dataset.price}`;
 					variant_select_container.dataset.text = e.target.options[0].text;
+					form.action = "/basket/"
 				}
 			});
 		},

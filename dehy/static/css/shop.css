@@ -1,0 +1,103 @@
+
+form {
+	font-family: itc-avant-garde-gothic-pro !important;
+	font-weight: 400;
+	font-size: 1.25rem;
+}
+
+.variant-select-container, .quantity-select-container {
+    position: relative;
+    transition: opacity .1s ease-out;
+    text-align: left;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    line-height: normal;
+    color: inherit;
+    border: 1px solid grey;
+    font-size: calc(1.1 * 1rem);
+}
+
+.variant-select-container {
+	opacity: 0;
+}
+
+span.not_price_color {
+	font-family: var(--avant-garde);
+	font-weight: 100;
+}
+
+span.variant_price {
+	font-family: var(--avant-garde);
+	color: var(--beige);
+	display: contents;
+	font-weight: 100;
+}
+
+.product_main span.not_price_color,
+.product_main span.variant_price  {
+	font-size: 1.5rem;
+}
+
+
+input#id_quantity {
+	color: inherit;
+	width: 80%;
+}
+
+.variant-option select, input#id_quantity {
+
+    height: 100%;
+    font-size: 1rem;
+	background: transparent;
+	-webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+	border: none;
+}
+
+.variant-option select {
+	position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+	padding-right: 3.5rem;
+	color: rgba(0,0,0,0);
+}
+
+.variant-option select:focus {
+	box-shadow: none;
+	border-color: transparent;
+}
+
+.variant-select-container[data-text] {
+    opacity: 1;
+}
+
+.variant-select-container:before {
+    content: attr(data-text);
+    display: inline-block;
+}
+
+.variant-select-container:after {
+	content: '';
+	position: absolute;
+	right: 1rem;
+	transform: rotate(45deg);
+	border-bottom: 1px solid;
+	border-right: 1px solid;
+	height: 1rem;
+	width: 1rem;
+	transform-origin: top;
+	pointer-events: none;
+	font-size: 1rem;
+    border-bottom-color: #bca263;
+    border-right-color: #bca263;
+
+}
+
+.product-list-container {
+	display: flex;
+	display: -ms-flexbox;
+	flex-direction: column;
+	-ms-flex-direction: column;
+}

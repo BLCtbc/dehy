@@ -1,4 +1,4 @@
-{% extends "oscar/layout.html" %}
+{% extends "dehy/layout.html" %}
 
 {% load history_tags %}
 {% load currency_filters %}
@@ -82,8 +82,9 @@
             {% iffeature "reviews" %}
                 {% include "oscar/catalogue/reviews/partials/review_stars.html" %}
             {% endiffeature %}
-
             <hr/>
+
+
 
             {% if not product.is_parent %}
                 {% block product_basket_form %}
@@ -91,28 +92,60 @@
                 {% endblock %}
             {% else %}
                 {% block variants %}
-                    <h2>{% trans 'Size:' %}</h2>
-					<div class="variant-option">
-						<div class="variant-select-container" data-text="Select Size">
-							<select id="size_selector" class="custom-select" aria-label="Select Size" data-variant-option-name="Size">
-						        <option value>Select Size</option>
-								{% for child in product.children.public %}
-								  {% purchase_info_for_product request child as child_session %}
-								  {% if child_session.availability.is_available_to_buy %}
-								<option data-price="{{child.stockrecords.first.price}}" data-id="{{child.id}}" value="{{ child.get_title }}">{{ child.get_title }}</option>
-								  {% endif %}
-								{% endfor %}
-						      </select>
+				<form id="add_to_basket_form" action="{% url 'basket:add' pk=product.pk  %}"
+					method="post" class="add-to-basket col-12 mb-0" style='width:inherit;'>
+			        {% csrf_token %}
+			        {% include "oscar/partials/form_fields.html" with form=basket_form %}
+					<div class="d-flex">
+						<div class="col-8">
+							<label for="size_selector">{% trans 'Size:' %}</label>
+						</div>
+						<div class="col-4">
+							<label for="id_quantity">{% trans 'Quantity:' %}</label>
+						</div>
+					</div>
+					<div class="d-flex justify-content-between">
+						<div class="variant-option col-8">
+							<div class="variant-select-container" data-text="Select Size">
+								<select id="size_selector" class="custom-select" aria-label="Select Size" data-variant-option-name="Size">
+							        <option value>Select Size</option>
+									{% for child in product.children.public %}
+									  {% purchase_info_for_product request child as child_session %}
+									  {% if child_session.availability.is_available_to_buy %}
+									<option data-price="{{child.stockrecords.first.price}}" data-id="{{child.id}}" value="{{ child.get_title }}">{{ child.get_title }}</option>
+									  {% endif %}
+									{% endfor %}
+							      </select>
+							  </div>
+						  </div>
+
+						  <div class="quantity-select-container col-4">
+							  <input type="number" name="quantity" value="1" id="id_quantity">
+	  					  </div>
+					  </div>
+					  <div class="row mt-4">
+						  <div class="col-2">
+						  </div>
+						  <div class="col-8">
+							  <button style="border-radius: 20px;" type="submit" class="btn btn-lg w-100 btn-primary" value="{% trans "Add to basket" %}" data-loading-text="{% trans 'Adding...' %}">{% trans "Add to basket" %}</button>
+						  </div>
+						  <div class="col-2">
 						  </div>
 					  </div>
 
 
+				  </form>
+
+
+					{% comment %}
                     {% for child in product.children.public %}
                         {% purchase_info_for_product request child as child_session %}
                         {% if child_session.availability.is_available_to_buy %}
                             <a href="{{ child.get_absolute_url }}">{{ child.get_title }}</a><br>
                         {% endif %}
                     {% endfor %}
+					{% endcomment %}
+
                 {% endblock %}
             {% endif %}
         </div><!-- /col-sm-6 -->

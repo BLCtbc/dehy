@@ -6,6 +6,7 @@ from oscar.apps.payment import models
 class PaymentDetailsView(views.PaymentDetailsView):
 
     def handle_payment(self, order_number, total, **kwargs):
+		# method = self.checkout_session.payment_method()
         # Talk to payment gateway.  If unsuccessful/error, raise a
         # PaymentError exception which we allow to percolate up to be caught
         # and handled by the core PaymentDetailsView.

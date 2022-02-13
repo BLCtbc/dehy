@@ -54,8 +54,13 @@
                                 {% endwith %}
                             </div>
                             <div class="col-md-4">
-                                <h3><a href="{{ product.get_absolute_url }}">{{ line.description }}</a></h3>
-                                <p class="availability {{ session.availability.code }}">{{ session.availability.message }}</p>
+                                <h3><a href="{{ product.get_absolute_url }}">{{ product.parent.title|default:product.title }}</a></h3>
+								{% if product.is_child %}
+                                <p class="size"><small>Size: {{line.description}}</small></p>
+								{% endif %}
+								{% comment %}
+								<p class="availability {{ session.availability.code }}">{{ session.availability.message }}</p>
+								{% endcomment %}
                             </div>
                             <div class="col-md-3">
                                 <div class="checkout-quantity">
