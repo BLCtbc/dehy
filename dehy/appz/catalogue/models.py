@@ -4,8 +4,28 @@ from django.db import models
 from datetime import datetime
 from django.urls import reverse
 from oscar.models.fields.slugfield import SlugField
-from oscar.apps.catalogue.abstract_models import AbstractCategory, AbstractProduct
+from oscar.apps.catalogue.abstract_models import AbstractCategory, AbstractProduct, AbstractProductImage
 from django.utils.translation import gettext_lazy as _
+import re
+
+def get_image_upload_path(instance, filename):
+	nope = re.compile(r"[\-\+\%]")
+	forbidden = re.compile(r"[\/\:\'\(\)]")
+	repeated = re.compile(r"[\-\+\_\s]{2,}")
+	slug_matcher = re.compile(r'(https\:\/{2}w{3}\.dehygarnish\.com\/shop\/p\/)?(?P<slug>[\w\- ]+)', re.I)
+
+	def sanitize(s):
+		a = forbidden.sub('', s)
+		a = nope.sub(' ', a).strip().replace(' ', '_').lower()
+		a = repeated.sub('_', a)
+		return(a)
+
+	folder_name = sanitize(instance.product.title)
+	return f"images/products/{folder_name}/{filename}"
+
+
+class ProductImage(AbstractProductImage):
+	original = models.ImageField(_("Original"), upload_to=get_image_upload_path, max_length=255)
 
 class Product(AbstractProduct):
 

@@ -22,7 +22,7 @@
 	- [authenticating github][#git_authentication]
 7. [troubleshooting](#troubleshooting)
 	- [postgres issues](#postgresql)
-
+8. [clearing sorl thumbnail media cache](#clear_sorl_image_cache)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1225,3 +1225,10 @@ implementing a continuous deployment workflow on Debian 10+
 	- a note about $GITHUB_WORKSPACE, from https://docs.github.com/en/actions/learn-github-actions/environment-variables:
 
 		> The default working directory on the runner for steps, and the default location of your repository when using the checkout action. For example, /home/runner/work/my-repo-name/my-repo-name.
+
+<a name="clear_sorl_image_cache"></a>
+6. ###### clearing out django oscar's thumbnail/sorl's media cache of thumbnails
+
+	```sh
+	$ python manage.py thumbnail cleanup && python manage.py thumbnail clear
+	```

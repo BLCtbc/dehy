@@ -8,6 +8,7 @@
 	justify-content: center;
 	width: 100%;
 	height: auto;
+	position: relative;
 }
 
 .about {
@@ -167,5 +168,13 @@ figure {
 
 header {
 	padding-top: 0 !important;
+}
+
+.card-body {
+	position: relative;
+}
+.card-body .product-price {
+	position: absolute;
+b	ottom: 1rem;
 }
 
