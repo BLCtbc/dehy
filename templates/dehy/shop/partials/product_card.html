@@ -1,7 +1,27 @@
 {% load image_tags %}
 
-<article class="product-card col-4">
-	<div class="card card-body">
-		
+	<div class="card card-body{% if preview %} recipe-preview{% endif %}">
+
+		<a href="{% url 'catalogue:detail' product.slug %}"><h4 class="card-title">{{product.title}}</h4></a>
+		{% if not preview %}
+
+		{% endif %}
+
+		<a href="{% url 'catalogue:detail' product.slug %}">
+		<div class="image-container">
+			{% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' image=product.primary_image %}
+			{% oscar_thumbnail image.original|default:default_image "1000x" as thumb %}
+			<img class='card-img' src="{{thumb.url}}" alt="{{ recipe.name }}">
+			{% endwith %}
+		</div>
+		</a>
+		{% block product_price %}
+			<div class="product_price">
+
+				{% include "oscar/catalogue/partials/stock_record.html" %}
+				{% if not product.is_parent and not product.has_options %}
+					{% include "oscar/catalogue/partials/add_to_basket_form_compact.html" %}
+				{% endif %}
+			</div>
+		{% endblock product_price %}
 	</div>
-</article>

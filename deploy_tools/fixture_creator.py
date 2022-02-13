@@ -6,9 +6,12 @@ from datetime import datetime as dt
 from oscar.core.loading import get_model
 
 import django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dehy.settings")
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dehy.settings")
+# from django.conf import settings
+# settings.configure()
 django.setup()
+
 # from APP_NAME.models import *
 
 class FixtureCreator(object):
@@ -42,7 +45,7 @@ class FixtureCreator(object):
 		useless = re.compile("(DEHY(DRATED)*|(?<!agon|star)fruit|garnish)+", re.I) ## remove non-descriptive words
 		nope = re.compile(r"[\-\+\%]")
 		forbidden = re.compile(r"[\/\:\'\(\)]")
-		repeated = re.compile(r"[\-\+\_]{2,}")
+		repeated = re.compile(r"[\-\+\_\s]{2,}")
 		slug_matcher = re.compile(r'(https\:\/{2}w{3}\.dehygarnish\.com\/shop\/p\/)?(?P<slug>[\w\- ]+)', re.I)
 
 	class category:
@@ -104,32 +107,29 @@ class FixtureCreator(object):
 		df = pd.read_excel(os.path.abspath(self.file_location))
 		df.price = df.price.apply(self.extract_float)
 
-		df.rename(columns={'link':'url', 'image_link':'default_image'}, inplace=True)
-
+		df.rename(columns={'link':'url'}, inplace=True)
+		df = df.assign(default_image="")
 		# df = df[df['category'].notna()] ## removes variants
 
-		df['additional_image_link'] = df['additional_image_link'].str.strip("[]").str.replace("'","").str.split(',') ## changes additional_image_link column: str -> lists
+		df['all_image_links'] = df['all_image_links'].str.strip("[]").str.replace("'","").str.split(',') ## changes all_image_links column: str -> lists
 
 		df['group_id'] = df.title.apply(self.sanitize) ## create new column 'group_id' out of sanitizing 'name' column
 		df['slug'] = df.url.apply(self.get_slug)
 		# remove duplicate photos from alt images
 		for index, row in df.iterrows():
-			if row['default_image'] in row["additional_image_link"]:
-				additional_image_links = df.at[index, "additional_image_link"]
-				additional_image_links.remove(df.at[index, 'default_image'])
-				df.at[index, "additional_image_link"] = additional_image_links
+			df.at[index, 'default_image'] = self.create_img_name(df.at[index, 'image_link'])
+
+			# if row['default_image'] in row["all_image_links"]:
+			# 	all_image_links = df.at[index, "all_image_links"]
+			# 	all_image_links.remove(df.at[index, 'default_image'])
+			# 	df.at[index, "all_image_links"] = all_image_links
 
 		df = df.assign(alt_image1="", alt_image2="", alt_image3="")
-			## download photos locally
-
 		for index, row in df.iterrows():
-			item_group_id = df.at[index, 'group_id']
-			## download default images
-			df.at[index, 'default_image'] = self.create_img_name(df.at[index, 'default_image'])
-			for img_num, img in enumerate(df.at[index, 'additional_image_link'], start=1):
+			for img_num, img in enumerate(df.at[index, 'all_image_links'], start=1):
 				## add alt image columns
 				df.at[index, f'alt_image{img_num}'] = self.create_img_name(img)
-		# df.drop(axis=1, columns='additional_image_link', inplace=True)
+		# df.drop(axis=1, columns='all_image_links', inplace=True)
 		df.category.fillna(value=0, inplace=True)
 		return df
 

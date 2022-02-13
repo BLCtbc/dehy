@@ -242,10 +242,11 @@ OSCAR_HIDDEN_FEATURES = ["reviews", "wishlists"]
 OSCAR_HOMEPAGE = reverse_lazy('catalogue:index')
 OSCAR_SHOP_NAME = "DEHY"
 OSCAR_SHOP_TAGLINE = ""
+OSCAR_MISSING_IMAGE_URL = MEDIA_ROOT / "image_not_found.jpg"  # relative path from media root
 
 OSCAR_PRODUCTS_PER_PAGE = 10
 
-THUMBNAIL_DEBUG = True
+OSCAR_THUMBNAIL_DEBUG = True
 
 OSCAR_DASHBOARD_NAVIGATION += [
 	{
@@ -269,3 +270,5 @@ OSCAR_DASHBOARD_NAVIGATION += [
 		 ]
 	},
 ]
+
+OSCAR_IMAGE_FOLDER = 'images/products'
