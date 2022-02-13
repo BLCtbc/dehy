@@ -48,6 +48,8 @@ class ProductCategoryView(CoreProductCategoryView):
 	model = Category
 	slug_field = 'slug'
 	slug_url_kwarg = 'category_slug'
+	template_name = 'dehy/shop/category.html'
+
 
 	def get_category(self):
 		return get_object_or_404(Category, slug=self.kwargs['category_slug'])
@@ -57,4 +59,6 @@ class ProductDetailView(CoreProductDetailView):
 	model = Product
 	slug_field = 'slug'
 	slug_url_kwarg = 'product_slug'
+	template_name = 'dehy/shop/detail.html'
+
 

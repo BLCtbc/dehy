@@ -104,13 +104,13 @@ class FixtureCreator(object):
 		df = pd.read_excel(os.path.abspath(self.file_location))
 		df.price = df.price.apply(self.extract_float)
 
-		df.rename(columns={'title':'name', 'link':'url', 'image_link':'default_image'}, inplace=True)
+		df.rename(columns={'link':'url', 'image_link':'default_image'}, inplace=True)
 
 		# df = df[df['category'].notna()] ## removes variants
 
 		df['additional_image_link'] = df['additional_image_link'].str.strip("[]").str.replace("'","").str.split(',') ## changes additional_image_link column: str -> lists
 
-		df['group_id'] = df.name.apply(self.sanitize) ## create new column 'group_id' out of sanitizing 'name' column
+		df['group_id'] = df.title.apply(self.sanitize) ## create new column 'group_id' out of sanitizing 'name' column
 		df['slug'] = df.url.apply(self.get_slug)
 		# remove duplicate photos from alt images
 		for index, row in df.iterrows():
@@ -121,15 +121,15 @@ class FixtureCreator(object):
 
 		df = df.assign(alt_image1="", alt_image2="", alt_image3="")
 			## download photos locally
+
 		for index, row in df.iterrows():
 			item_group_id = df.at[index, 'group_id']
 			## download default images
-			default_image = df.at[index, 'default_image']
-			row['default_image'] = self.create_img_name(default_image)
+			df.at[index, 'default_image'] = self.create_img_name(df.at[index, 'default_image'])
 			for img_num, img in enumerate(df.at[index, 'additional_image_link'], start=1):
 				## add alt image columns
-				row[f'alt_image{img_num}'] = self.create_img_name(img)
-		df.drop(axis=1, columns='additional_image_link', inplace=True)
+				df.at[index, f'alt_image{img_num}'] = self.create_img_name(img)
+		# df.drop(axis=1, columns='additional_image_link', inplace=True)
 		df.category.fillna(value=0, inplace=True)
 		return df
 
@@ -168,7 +168,7 @@ def main():
 				"structure": "parent",
 				"is_public": True,
 				"upc": row["item_group_id"],
-				"title": row['name'],
+				"title": row['title'],
 				"slug": fc.get_slug(row["url"]),
 				"description": row["description"],
 				"product_class": fc.get_product_class_pk(row["category"]),
