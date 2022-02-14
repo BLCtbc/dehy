@@ -47,7 +47,18 @@ window.addEventListener('load', function () {
             widgetElement => initializeWidget(widgetElement)
         );
     });
+	autoslug_handler();
+
   });
+
+function autoslug_handler() {
+	document.querySelectorAll('.autoslug').forEach(function(slug_elem) {
+		var elem = document.getElementById(slug_elem.dataset.autoslug)
+		elem.addEventListener('change', e=>{
+			slug_elem.value = convertToSlug(elem.value)
+		})
+	})
+}
 
 function list_items_handler() {
 	var add_more_btn = document.querySelector('button.add_more');

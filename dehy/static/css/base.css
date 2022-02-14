@@ -128,7 +128,7 @@ input, select, article {
 }
 
 
-/* 
+/*
 .container-fluid {
 	display: -ms-flexbox;
     display: flex;
@@ -425,13 +425,13 @@ footer {
 	border-radius: 0;
 }
 
-header {
+.navbar-padding {
 	/* padding-top: 4vw; */
 	padding-top: var(--main-navbar-height);
 	font-family: 'itc-avant-garde-gothic-pro';
 }
 
-header:after {
+.navbar-padding:after {
     display: block;
     clear: both;
     content: "";

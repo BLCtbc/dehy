@@ -168,9 +168,6 @@ class RecipeCreateUpdateForm(forms.ModelForm, DynamicArrayMixin):
 	name = forms.CharField(label=_('Recipe name'), max_length=50)
 	description = forms.CharField(required=False, label=_('Description'), widget=forms.Textarea(attrs={'cols': 40, 'rows': 10}))
 	image = forms.ImageField()
-
-	# ingredients = IngredientField()
-	# ingredients = SimpleArrayField(SimpleArrayField(forms.CharField(help_text='ingredient name')),delimiter='|')
 	ingredients = DynamicArrayField(forms.CharField())
 
 	# ingredients = SplitArrayField(forms.CharField(help_text='ingredient name'), size=3)
@@ -187,7 +184,7 @@ class RecipeCreateUpdateForm(forms.ModelForm, DynamicArrayMixin):
 		super().__init__(*args, **kwargs)
 
 		self.fields['ingredients'].widget.attrs.update({'class': 'special'})
-
+		self.fields['slug'].widget.attrs.update({'class': 'autoslug', 'data-autoslug': 'id_name'})
 
 def get_ingredients(data, name, step):
 	qd = list(data.items())
