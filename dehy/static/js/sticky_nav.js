@@ -2,9 +2,9 @@
 document.addEventListener("DOMContentLoaded", function(){
 
   var scroll_hide = document.querySelector('.scroll-hide');
-  var navbar_height = document.querySelector('#navbar').offsetHeight;
 
 	if(scroll_hide) {
+		var navbar_height = document.querySelector('#navbar').offsetHeight;
 		var last_scroll_top = 0;
 		window.addEventListener('scroll', function() {
 		    let scroll_top = window.scrollY;
