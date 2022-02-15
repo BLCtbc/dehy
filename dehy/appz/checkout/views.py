@@ -3,12 +3,21 @@ from oscar.apps.payment import models
 from oscar.core.loading import get_class, get_classes, get_model
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
+from .facade import Facade
+from django.conf import settings
+from django.utils.decorators import method_decorator
 
-ShippingAddressForm, ShippingMethodForm, GatewayForm \
-	= get_classes('checkout.forms', ['ShippingAddressForm', 'ShippingMethodForm', 'GatewayForm'])
+from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
+StripeTokenForm, ShippingAddressForm, ShippingMethodForm, GatewayForm \
+	= get_classes('checkout.forms', ['StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'GatewayForm'])
 
 BankcardForm, BillingAddressForm \
 	= get_classes('payment.forms', ['BankcardForm', 'BillingAddressForm'])
+
+
+SourceType = get_model('payment', 'SourceType')
+Source = get_model('payment', 'Source')
 
 class IndexView(views.IndexView):
 	"""
@@ -64,6 +73,10 @@ class PaymentDetailsView(views.PaymentDetailsView):
 	# details ready for submission.
 	preview = False
 
+	@method_decorator(csrf_exempt)
+	def dispatch(self, request, *args, **kwargs):
+		return super().dispatch(request, *args, **kwargs)
+
 	def get_context_data(self, *args, **kwargs):
 
 		context_data = super().get_context_data(*args, **kwargs)
@@ -71,8 +84,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
 		context_data['billing_address_form'] = kwargs.get('billing_address_form', BillingAddressForm())
 		shipping_addr = context_data.get('shipping_address', None)
 		if shipping_addr:
-			print(dir(shipping_addr))
-			print(f'\n active address fields: {shipping_addr.active_address_fields()}')
+			# print(f'\n shipping_addr: {dir(shipping_addr)}')
 
 			context_data['billing_address_form'].initial = {
 				'first_name':shipping_addr.first_name, 'last_name':shipping_addr.last_name,
@@ -81,32 +93,99 @@ class PaymentDetailsView(views.PaymentDetailsView):
 				'country':shipping_addr.country, 'phone_number':shipping_addr.phone_number
 			}
 
+		if self.preview:
+			context_data['stripe_token_form'] = StripeTokenForm(self.request.POST)
+			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
+		else:
+			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
+			context_data['stripe_publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
+
 		print(context_data)
 
 		return context_data
 
-	def handle_payment(self, order_number, total, **kwargs):
-		print('\n *** handling payment *** \n')
-		# method = self.checkout_session.payment_method()
-		# Talk to payment gateway.  If unsuccessful/error, raise a
-		# PaymentError exception which we allow to percolate up to be caught
-		# and handled by the core PaymentDetailsView.
+	def handle_payment(self, order_number, total, *args, **kwargs):
+		print('\n** handling payment **\n')
+		print(f'\n dir self {dir(self)}')
+		print(f'\n dir request {dir(self.request)}')
+		print(f'\n self.args {self.args}')
+		print(f'\n self.kwargs {self.kwargs}')
 
-		gateway = ''
-		reference = gateway.pre_auth(order_number, total.incl_tax, kwargs['bankcard'])
+		print(f'\n dir checkout_session {dir(self.checkout_session)}')
+		print(f'\n shipping address set: {self.checkout_session.is_shipping_address_set()}')
+		print(f'\n is_billing_address_same_as_shipping: {self.checkout_session.is_billing_address_same_as_shipping()}')
+		print(f'\n is_billing_address_set: {self.checkout_session.is_billing_address_set()}')
+		print(f'\n payment_method: {self.checkout_session.payment_method()}')
 
-		# Payment successful! Record payment source
-		source_type, __ = models.SourceType.objects.get_or_create(
-			name="SomeGateway")
-		source = models.Source(
+		print(f'\n dir kwargs {[x for x in kwargs.items()]}')
+
+
+		basket = self.request.basket
+
+		shipping_address_obj = self.get_shipping_address(self.request.basket)
+		print('\n dir shipping_address: ', dir(shipping_address_obj))
+
+		shipping = {
+			'address': {
+				'city': shipping_address_obj.city,
+				'country': shipping_address_obj.country,
+				'line1': shipping_address_obj.line1,
+				'line2': shipping_address_obj.line2,
+				'postal_code': shipping_address_obj.postcode,
+				'state': shipping_address_obj.state,
+			},
+			'name': shipping_address_obj.name,
+		}
+
+		print(f'\n kwargs shipping_address {kwargs["shipping_address"]}')
+
+
+		stripe_ref = Facade().charge(
+			order_number,
+			total,
+			card=self.request.POST[STRIPE_TOKEN],
+			description=self.payment_description(order_number, total, **kwargs),
+			metadata=self.payment_metadata(order_number, total, **kwargs))
+
+		source_type, __ = SourceType.objects.get_or_create(name=PAYMENT_METHOD_STRIPE)
+		source = Source(
 			source_type=source_type,
+			currency=settings.STRIPE_CURRENCY,
 			amount_allocated=total.incl_tax,
-			reference=reference)
+			amount_debited=total.incl_tax,
+			reference=stripe_ref)
 		self.add_payment_source(source)
 
-		# Record payment event
-		self.add_payment_event('pre-auth', total.incl_tax)
+		self.add_payment_event(PAYMENT_EVENT_PURCHASE, total.incl_tax)
 
+	def payment_description(self, order_number, total, **kwargs):
+		return self.request.POST[STRIPE_EMAIL]
+
+	def payment_metadata(self, order_number, total, **kwargs):
+		return {'order_number': order_number}
+
+	#### OLD ####
+	# def handle_payment(self, order_number, total, **kwargs):
+	# 	# method = self.checkout_session.payment_method()
+	# 	# Talk to payment gateway.  If unsuccessful/error, raise a
+	# 	# PaymentError exception which we allow to percolate up to be caught
+	# 	# and handled by the core PaymentDetailsView.
+	#
+	# 	gateway = ''
+	# 	reference = gateway.pre_auth(order_number, total.incl_tax, kwargs['bankcard'])
+	#
+	# 	# Payment successful! Record payment source
+	# 	source_type, __ = models.SourceType.objects.get_or_create(
+	# 		name="SomeGateway")
+	# 	source = models.Source(
+	# 		source_type=source_type,
+	# 		amount_allocated=total.incl_tax,
+	# 		reference=reference)
+	# 	self.add_payment_source(source)
+	#
+	# 	# Record payment event
+	# 	self.add_payment_event('pre-auth', total.incl_tax)
+	#
 
 class PaymentMethodView(views.PaymentMethodView):
 	"""

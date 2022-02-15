@@ -1,4 +1,3 @@
-wheel
 asgiref==3.5.0
 astroid==2.9.3
 autopep8==1.6.0
@@ -7,6 +6,7 @@ cached-property==1.5.2
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.11
+dj-stripe==2.5.1
 Django==3.2.11
 django-better-admin-arrayfield==1.4.2
 django-environ==0.8.1
@@ -14,6 +14,7 @@ django-extra-views==0.13.0
 django-haystack==3.1.1
 django-oscar==3.1
 django-phonenumber-field==5.2.0
+django-sslserver==0.22
 django-tables2==2.3.4
 django-treebeard==4.4
 django-widget-tweaks==1.4.12
@@ -26,6 +27,7 @@ idna==3.3
 importlib-metadata==4.2.0
 isort==5.10.1
 jedi==0.17.2
+jsonfield==3.1.0
 lazy-object-proxy==1.7.1
 mccabe==0.6.1
 mypy==0.931

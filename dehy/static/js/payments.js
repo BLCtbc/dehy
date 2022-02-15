@@ -1,6 +1,6 @@
 window.addEventListener('load', function () {
 	same_as_shipping_handler();
-}
+});
 
 function same_as_shipping_handler() {
 	var same_as_shipping_checkbox = document.querySelector("input[name=same_as_shipping]");

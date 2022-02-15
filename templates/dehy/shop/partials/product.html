@@ -10,7 +10,7 @@
         {% block product_image %}
 		{% with images=product.get_all_images|slice:":2" %}
 		<a class="image-link" href="{{ product.get_absolute_url }}" aria-label="{{ product.get_title }} Link">
-			<div class="image-container">
+			<div class="product-image-container">
 				{% for image in images %}
 					{% oscar_thumbnail image.original "x1000" quality=95 crop=center upscale=True as thumb %}
 					{% if image == images|first %}

@@ -1,5 +1,6 @@
 {% extends "dehy/checkout/checkout.html" %}
 {% load i18n %}
+{% load currency_filters %}
 
 {% block title %}
     {% trans "Payment details" %} | {{ block.super }}
@@ -17,7 +18,10 @@
 {% block payment_method %}{% endblock %}
 
 {% block payment_details %}
+
+	{% comment %}
     {% block payment_details_content %}
+
 	<div class="container-fluid">
 		{# oscar implementation from oscar-paypal sandbox #}
 		<form method="post" action="{% url 'checkout:preview' %}">
@@ -31,59 +35,73 @@
 			<button type="submit" class="btn btn-large btn-primary">{% trans "Continue" %}</button>
 		</div>
 		</form>
-		{% comment firstattempt %}
-
-		<div class="row">
-
-			<div class="bankcard-container card card-body m-5 col-12">
-				<form class='bankcard-formform-vertical wysiwyg' enctype='multipart/form-data' method="post">
-					{% csrf_token %}
-					{{ form.non_field_errors }}
-
-					{{ bankcard_form }}
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="billing-address-container card card-body bg-light m-5 col-12">
-				<form class='billing-address-form form-vertical wysiwyg' enctype='multipart/form-data' method="post">
-					{% csrf_token %}
-					{{ form.non_field_errors }}
-					{% with billing_address_form as form %}
-					<div class="row">
-	                    <label class="col-sm-2 col-3" for="{{ form.first_name.id_for_label }}">First Name</label>
-	                    <div class="col-sm-8 col-9 p-0">
-	                        {{ form.first_name }}
-	                    </div>
-					</div>
-					<div class="row">
-						<label class="col-sm-2 col-3" for="{{ form.first_name.id_for_label }}">{{form.first_name.label}}</label>
-						<div class="col-sm-8 col-9 p-0">
-							{{ form.first_name }}
-						</div>
-	                    <div class="d-none d-sm-block col-2"></div>
-	                </div>
-					<div class="row">
-						{{form.first_name.label}}
-						<div class="col-sm-8 col-9 p-0">
-							{{ form.first_name }}
-						</div>
-						<div class="d-none d-sm-block col-2"></div>
-					</div>
-					{% endwith %}
-					{{ billing_address_form }}
-				</form>
-
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-8"></div>
-			<div class="col-4">
-				<a id="view_preview" href="{% url 'checkout:preview' %}" class="btn btn-primary btn-lg">{% trans "Continue" %}</a>
-			</div>
-		</div>
-		{% endcomment %}
 
 	</div>
     {% endblock payment_details_content %}
+	{% endcomment %}
+
+	{% block payment_details_content %}
+		<form action="{% url 'checkout:preview' %}" class="form-stacked" method="POST">
+		    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+		            data-key="{{ stripe_publishable_key }}" data-amount="{{ order_total_incl_tax_cents }}"
+		            data-name="{{ shop_name }}"
+		            data-description="{{ basket.num_items }} items ({{ order_total.incl_tax|currency }})">
+		    </script>
+		</form>
+	{% endblock payment_details_content %}
 {% endblock payment_details %}
+
+
+{% comment %}
+{# demonstrates how to load individual form elements #}
+
+<div class="row">
+
+	<div class="bankcard-container card card-body m-5 col-12">
+		<form class='bankcard-formform-vertical wysiwyg' enctype='multipart/form-data' method="post">
+			{% csrf_token %}
+			{{ form.non_field_errors }}
+
+			{{ bankcard_form }}
+		</form>
+	</div>
+</div>
+<div class="row">
+	<div class="billing-address-container card card-body bg-light m-5 col-12">
+		<form class='billing-address-form form-vertical wysiwyg' enctype='multipart/form-data' method="post">
+			{% csrf_token %}
+			{{ form.non_field_errors }}
+			{% with billing_address_form as form %}
+			<div class="row">
+				<label class="col-sm-2 col-3" for="{{ form.first_name.id_for_label }}">First Name</label>
+				<div class="col-sm-8 col-9 p-0">
+					{{ form.first_name }}
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-sm-2 col-3" for="{{ form.first_name.id_for_label }}">{{form.first_name.label}}</label>
+				<div class="col-sm-8 col-9 p-0">
+					{{ form.first_name }}
+				</div>
+				<div class="d-none d-sm-block col-2"></div>
+			</div>
+			<div class="row">
+				{{form.first_name.label}}
+				<div class="col-sm-8 col-9 p-0">
+					{{ form.first_name }}
+				</div>
+				<div class="d-none d-sm-block col-2"></div>
+			</div>
+			{% endwith %}
+			{{ billing_address_form }}
+		</form>
+
+	</div>
+</div>
+<div class="row">
+	<div class="col-8"></div>
+	<div class="col-4">
+		<a id="view_preview" href="{% url 'checkout:preview' %}" class="btn btn-primary btn-lg">{% trans "Continue" %}</a>
+	</div>
+</div>
+{% endcomment %}
