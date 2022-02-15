@@ -12,7 +12,7 @@
 		<a class="image-link" href="{{ product.get_absolute_url }}" aria-label="{{ product.get_title }} Link">
 			<div class="image-container">
 				{% for image in images %}
-					{% oscar_thumbnail image.original "1000x1000" quality=95 crop=center upscale=True as thumb %}
+					{% oscar_thumbnail image.original "x1000" quality=95 crop=center upscale=True as thumb %}
 					{% if image == images|first %}
 						<img class="product-img" src="{{thumb.url}}" alt="{{ product.get_title }}">
 					{% else %}

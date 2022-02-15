@@ -164,6 +164,7 @@ figure {
 	background-attachment: scroll;
 	z-index: 1;
 	overflow-x: scroll;
+	border-color: transparent !important;
 }
 
 header {

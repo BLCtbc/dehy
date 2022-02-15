@@ -135,10 +135,11 @@
 			{% if not product.is_child %}
 				{# temporary #}
 				<div class="col-3">
-				{% include "dehy/shop/partials/product_card.html" with product=product %}
+				{% render_product product %}
+
 				</div>
 				{% comment tbd %}
-				{% render_product product %}
+				{% include "dehy/shop/partials/product_card.html" with product=product %}
 
 				{% endcomment %}
 
