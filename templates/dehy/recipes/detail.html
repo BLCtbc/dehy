@@ -17,11 +17,48 @@
 {% endblock header %}
 
 {% block content_wrapper %}
-<section class="container-fluid">
+<section class="container-fluid" id="recipe_list">
 	<div class="row">
 		<div class="col-2"></div>
 		<article class="recipe-card col-8">
-			{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=0 %}
+			{% load image_tags %}
+
+				<div class="card card-body" style="padding: 3% 10%;">
+					<h4 class="card-title">{{recipe.name}}</h4>
+					<a href="{% url 'recipe_details' recipe.slug %}"></a>
+					{% if not preview %}
+					<div class='recipe-info row'>
+						<div class="col-6"><span>By: Jimberly McJanklin</span></div>
+						<div class="col-6"><span>Udpated: {{recipe.last_modified}}</span></div>
+					</div>
+					{% endif %}
+					<div class="recipe-image-container">
+						{% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' image=recipe.image %}
+						{% oscar_thumbnail image|default:default_image "500x400" as thumb %}
+						<img class='card-img' src="{{thumb.url}}" alt="{{ recipe.name }}">
+						{% endwith %}
+					</div>
+					{% if not preview %}
+					<p class='recipe-description'>{{recipe.description}}</p>
+					<h3>Ingredients</h3>
+					<div class='ingredients-list'>
+						<ul>
+						{% for ingredient in recipe.ingredients %}
+						<li><p>{{ingredient}}</p></li>
+						{% endfor %}
+						</ul>
+					</div>
+					<h3>Directions:</h3>
+					<div class='directions-list'>
+						<ul>
+						{% for step in recipe.steps %}
+						<li><p>{{step}}</p></li>
+						{% endfor %}
+						</ul>
+					</div>
+					{% endif %}
+				</div>
+
 		</article>
 		<div class="col-2"></div>
 	</div>

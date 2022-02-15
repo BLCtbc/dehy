@@ -29,7 +29,7 @@
 	</div>
 		<div class='col-5 fun-gif img-split'>
 			<figure>
-				<img style="filter: grayscale(30%) opacity(0.5);" class="image-container" src='{% static 'img/custom/dehy_flag_filter.gif' %}'>
+				<img style="filter: grayscale(30%) opacity(0.5);" class="section-image-container" src='{% static 'img/custom/dehy_flag_filter.gif' %}'>
 			</figure>
 		</div>
 </header>
@@ -49,10 +49,10 @@
 
 	<section class='content-section mailing-list-container'>
 		<div class='image-background-overlay'
-			style="background-image: url({% static 'img/product/blood_orange_rough_cuts/blood_orange_rough_cut_jar.jpg' %}); left:0; background-position: center left -20%;">
+			style="background-image: url({% static 'img/p/blood_orange_rough_cuts/blood_orange_rough_cut_jar.jpg' %}); left:0; background-position: center left -20%;">
 		</div>
 		<div class='image-background-overlay'
-			style="background-image: url({% static 'img/product/grapefruit/grapefruit_jar.jpg' %}); right:0; background-position: center right -20%;">
+			style="background-image: url({% static 'img/p/grapefruit/grapefruit_jar.jpg' %}); right:0; background-position: center right -20%;">
 		</div>
 
 		<div class="container row justify-content-center">
@@ -74,7 +74,7 @@
 				</form>
 			</div>
 			<!-- <div class="col-2">
-				<img class="image-container" src="{% static 'img/product/grapefruit/grapefruit_jar.jpg' %}">
+				<img class="section-image-container" src="{% static 'img/product/grapefruit/grapefruit_jar.jpg' %}">
 			</div> -->
 		</div>
 	</section>
@@ -85,14 +85,14 @@
 				<p>Dehy makes high quality dehydrated garnishes for an elevated cocktail experience, handmade in Austin Texas. Created for cocktail professionals and enthusiasts alike, Dehy makes it easy to put a unique finishing touch on any drink with speed.</p>
 			</div>
 			<div class='col-5 img-split'>
-				<img class="image-container" src='{% static 'img/custom/dehy_glass_filter.jpeg' %}'>
+				<img class="section-image-container" src='{% static 'img/custom/dehy_glass_filter.jpeg' %}'>
 			</div>
 		</div>
 	</section>
 
 
 	<section class='content-section'>
-		<img class="image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
+		<img class="section-image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
 	</section>
 
 	{% block recipe_list %}
@@ -109,7 +109,7 @@
 	<section class='content-section mailing-list-split'>
 		<div class="content-split">
 			<div class='img-split col-5'>
-				<img class="image-container" src='{% static 'img/custom/dehy_ice2_filter.jpeg' %}'>
+				<img class="section-image-container" src='{% static 'img/custom/dehy_ice2_filter.jpeg' %}'>
 			</div>
 			<div class="mailing-list mailing-list-container col-7">
 				<div class="col-10">
@@ -136,12 +136,11 @@
 				{# temporary #}
 				<div class="col-3">
 				{% render_product product %}
-
-				</div>
 				{% comment tbd %}
 				{% include "dehy/shop/partials/product_card.html" with product=product %}
-
 				{% endcomment %}
+				</div>
+
 
 			{% endif %}
 
