@@ -467,8 +467,10 @@ span.ig{
 
 #nav_primary {
 	/* margin-left: var(--bs-gutter-x,1.5rem); */
-	background-color: var(--dark-hg);
-	padding: 2rem 1rem;
+	/* background-color: var(--dark-hg); */
+
+	background-color: var(--beige);
+	padding: 1.5rem 1rem;
 	border-radius: 1px;
 	font-size: 1.3rem;
 	font-weight: 400;

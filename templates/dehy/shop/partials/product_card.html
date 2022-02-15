@@ -10,7 +10,7 @@
 		<a href="{% url 'catalogue:detail' product.slug %}">
 		<div class="image-container">
 			{% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' image=product.primary_image %}
-			{% oscar_thumbnail image.original|default:default_image "1000x" as thumb %}
+			{% oscar_thumbnail image.original|default:default_image "x1000" as thumb %}
 			<img class='card-img' src="{{thumb.url}}" alt="{{ recipe.name }}">
 			{% endwith %}
 		</div>

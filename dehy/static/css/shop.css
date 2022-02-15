@@ -101,3 +101,25 @@ input#id_quantity {
 	flex-direction: column;
 	-ms-flex-direction: column;
 }
+
+.category-dropdown {
+	border: 2px solid #faa61c;
+    border-radius: 9px;
+}
+
+.category-dropdown a.dropdown-toggle {
+	color: darkred;
+    letter-spacing: 0.1em;
+    font-size: 1rem;
+}
+
+.dropdown-toggle::after {
+	margin-right: 0.5rem;
+}
+
+.category-selection-label {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin-right: 0.6em;
+}

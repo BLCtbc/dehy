@@ -23,6 +23,7 @@
 7. [troubleshooting](#troubleshooting)
 	- [postgres issues](#postgresql)
 8. [clearing sorl thumbnail media cache](#clear_sorl_image_cache)
+9. [running local django server over https](#local_django_https)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1231,4 +1232,18 @@ implementing a continuous deployment workflow on Debian 10+
 
 	```sh
 	$ python manage.py thumbnail cleanup && python manage.py thumbnail clear
+	```
+
+<a name="local_django_https"></a>
+6. ###### running local django server over https
+
+	```sh
+	$ brew install mkcert
+	$ mkcert -install
+	$ mkcert -cert-file cert.pem -key-file key.pem localhost 127.0.0.1
+	$ pip install django-sslserver
+	```
+
+	```
+	python manage.py runsslserver --certificate cert.pem --key key.pem
 	```

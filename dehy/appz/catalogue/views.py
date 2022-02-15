@@ -35,14 +35,15 @@ class CatalogueView(BrowseView):
 		return get_product_search_handler_class()(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
-		ctx = {}
-		ctx['summary'] = _("All products")
+		context_data = super().get_context_data(**kwargs)
+		context_data['summary'] = _("All products")
 		search_context = self.search_handler.get_search_context_data(
 			self.context_object_name)
 
-		ctx.update(search_context)
+		context_data.update(search_context)
+		print(f'\ncontext_data: {context_data}')
 
-		return ctx
+		return context_data
 
 class ProductCategoryView(CoreProductCategoryView):
 	model = Category
@@ -50,6 +51,10 @@ class ProductCategoryView(CoreProductCategoryView):
 	slug_url_kwarg = 'category_slug'
 	template_name = 'dehy/shop/category.html'
 
+	def get_context_data(self, *args, **kwargs):
+		context_data = super().get_context_data(*args, **kwargs)
+		print(f'\ncontext_data: {context_data}')
+		return context_data
 
 	def get_category(self):
 		return get_object_or_404(Category, slug=self.kwargs['category_slug'])
