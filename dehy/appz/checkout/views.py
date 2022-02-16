@@ -7,8 +7,11 @@ from django.views.decorators.csrf import csrf_exempt
 from .facade import Facade
 from django.conf import settings
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+import json
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
+
 StripeTokenForm, ShippingAddressForm, ShippingMethodForm, GatewayForm \
 	= get_classes('checkout.forms', ['StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'GatewayForm'])
 
@@ -30,6 +33,18 @@ class IndexView(views.IndexView):
 	pre_conditions = [
 		'check_basket_is_not_empty',
 		'check_basket_is_valid']
+
+	def get_context_data(self, *args, **kwargs):
+		context_data = super().get_context_data(*args, **kwargs)
+		context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
+		shipping = context_data.get('shipping_address', None)
+		# context_data['stripe_client_secret'] = self.get_payment_intent(total=context_data['order_total'], shipping=shipping).client_secret
+
+		return context_data
+
+	# def get_payment_intent(self, total, shipping, *args, **kwargs):
+	# 	stripe_payment_intent = Facade().create_payment_intent(total, shipping=shipping)
+	# 	return stripe_payment_intent
 
 
 class PaymentDetailsView(views.PaymentDetailsView):
@@ -82,15 +97,14 @@ class PaymentDetailsView(views.PaymentDetailsView):
 		context_data = super().get_context_data(*args, **kwargs)
 		context_data['bankcard_form'] = kwargs.get('bankcard_form', BankcardForm())
 		context_data['billing_address_form'] = kwargs.get('billing_address_form', BillingAddressForm())
-		shipping_addr = context_data.get('shipping_address', None)
-		if shipping_addr:
-			# print(f'\n shipping_addr: {dir(shipping_addr)}')
+		shipping = context_data.get('shipping_address', None)
+		if shipping:
 
 			context_data['billing_address_form'].initial = {
-				'first_name':shipping_addr.first_name, 'last_name':shipping_addr.last_name,
-				'line1': shipping_addr.line1, 'line2': shipping_addr.line2, 'city':shipping_addr.city,
-				'state':shipping_addr.state, 'postcode':shipping_addr.postcode,
-				'country':shipping_addr.country, 'phone_number':shipping_addr.phone_number
+				'first_name':shipping.first_name, 'last_name':shipping.last_name,
+				'line1': shipping.line1, 'line2': shipping.line2, 'city':shipping.city,
+				'state':shipping.state, 'postcode':shipping.postcode,
+				'country':shipping.country, 'phone_number':shipping.phone_number
 			}
 
 		if self.preview:
@@ -99,10 +113,16 @@ class PaymentDetailsView(views.PaymentDetailsView):
 		else:
 			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
 			context_data['stripe_publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
+			context_data['stripe_secret_key'] = settings.STRIPE_SECRET_KEY
 
 		print(context_data)
 
 		return context_data
+
+	# def get_payment_intent(self, total, shipping, *args, **kwargs):
+	# 	stripe_payment_intent = Facade().create_payment_intent(total, shipping=shipping)
+	# 	return stripe_payment_intent
+
 
 	def handle_payment(self, order_number, total, *args, **kwargs):
 		print('\n** handling payment **\n')
@@ -135,17 +155,21 @@ class PaymentDetailsView(views.PaymentDetailsView):
 				'state': shipping_address_obj.state,
 			},
 			'name': shipping_address_obj.name,
+			'phone': shipping_address_obj.phone_number
 		}
 
-		print(f'\n kwargs shipping_address {kwargs["shipping_address"]}')
+		# print(f'\n kwargs shipping_address {kwargs["shipping_address"]}')
 
 
 		stripe_ref = Facade().charge(
 			order_number,
 			total,
+			shipping=shipping,
 			card=self.request.POST[STRIPE_TOKEN],
 			description=self.payment_description(order_number, total, **kwargs),
 			metadata=self.payment_metadata(order_number, total, **kwargs))
+
+
 
 		source_type, __ = SourceType.objects.get_or_create(name=PAYMENT_METHOD_STRIPE)
 		source = Source(

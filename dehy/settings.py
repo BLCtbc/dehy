@@ -127,6 +127,7 @@ TEMPLATES = [
 				'django.template.context_processors.request',
 				'django.contrib.auth.context_processors.auth',
 				'django.contrib.messages.context_processors.messages',
+				'dehy.context_processors.add_ig_images_to_context',
 				'oscar.apps.search.context_processors.search_form',
 				'oscar.apps.checkout.context_processors.checkout',
 				'oscar.apps.communication.notifications.context_processors.notifications',
