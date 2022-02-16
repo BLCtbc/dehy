@@ -15,9 +15,11 @@
 			and cocktail enthusiasts. We offer a variety of dehydrated fruits and dried flowers
 			to elevate your cocktails to another level. Wholesale and retail options available.
 			FREE shipping for orders over $50!">
+
         {% block favicon %}
 			<link rel="shortcut icon" type="image/x-icon" href="{% static "favicon.ico" %}">
         {% endblock %}
+		<script {% if 'checkout' not in request.resolver_match.namespaces %}async {% endif %}src="https://js.stripe.com/v3/"></script>
 
         {# Block where global CSS will go. #}
         {% block styles %}

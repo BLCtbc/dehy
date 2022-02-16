@@ -24,6 +24,7 @@
 	- [postgres issues](#postgresql)
 8. [clearing sorl thumbnail media cache](#clear_sorl_image_cache)
 9. [running local django server over https](#local_django_https)
+10. [integrating stripe with django-oscar](#stripe_integration)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1247,3 +1248,11 @@ implementing a continuous deployment workflow on Debian 10+
 	```
 	python manage.py runsslserver --certificate cert.pem --key key.pem
 	```
+
+<a name="stripe_integration"></a>
+7. ###### integrating sripe with django oscar
+
+	see: https://stackoverflow.com/questions/51243465/how-to-integrate-stripe-payments-gateway-with-django-oscar
+	and: https://groups.google.com/g/django-oscar/c/Cr8sBI0GBu0/m/PHRdXX2uFQAJ
+
+	test cc number: 4242 4242 4242 4242

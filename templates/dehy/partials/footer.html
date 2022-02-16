@@ -1,10 +1,11 @@
 {% block footer %}
 {% load static %}
+{% load image_tags %}
 
 <footer class="justify-content-center footer-container">
 	<!-- <div class="justify-content-center row"> -->
 
-		<div class="brand-logo-big col-4">
+		<div class="brand-logo-big col-3">
 			<div class="brand-logo image-container col-12">
 				<a href="{% url 'home' %}"><img style="width: 80%" src="{% static 'img/custom/dehy_logo1_clipped2.png' %}" alt='Dehy Logo 1'></a>
 			</div>
@@ -30,10 +31,9 @@
 			</div>
 
 		</div>
-		<div class="col-8 site-directory row">
-			<div class="col-1"></div>
+		<div class="col-9 site-directory row">
 
-			<div class="about-us col-4">
+			<div class="about-us col-3">
 				<h3>About Us</h3>
 				<ul>
 					<li><a href="{% url 'recipes' %}">Recipes</a></li>
@@ -44,7 +44,7 @@
 				</ul>
 			</div>
 
-			<div class="contact-us col-4">
+			<div class="contact-us col-3">
 				<h3>Contact Us</h3>
 				<p>Email us:</p>
 				<p><a href="mailto:info@dehygarnish.com" target="_blank">info@dehygarnish.com</a></p>
@@ -56,9 +56,29 @@
 				<p>512 Rio Grande St. Austin, Texas 78701</p>
 
 			</div>
+			<div class="ig-images col-5">
+				<div class="ig-img-grid">
+				{% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' %}
+				{% for image in ig_images %}
+					{% oscar_thumbnail image|default:default_image "500x400" as thumb %}
+						<a class="image-link" href="https://www.instagram.com/p/{{image}}/">
+							<div class='image-container'>
+								<img class="product-img" src="{% static 'img/ig/'|add:image %}.jpeg">
+							</div>
+						</a>
+				{% endfor %}
+				{% endwith %}
+
+				</div>
+
+			</div>
 		</div>
-		<div class="bg-beige text-dark-hg row col-12 font-lydia">
-			<small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small>
+		<div class="bg-beige text-dark-hg container-fluid font-lydia">
+			<div class="row">
+				<div class="col-12">
+					<small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small> | <small><a href="#">SITEMAP</a></small>
+				</div>
+			</div>
 		</div>
 	<!-- </div> -->
 
