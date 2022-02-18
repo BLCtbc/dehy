@@ -1,0 +1,322 @@
+{% extends "dehy/checkout/layout_v2.html" %}
+{% load currency_filters %}
+{% load i18n %}
+{% load image_tags %}
+{% load purchase_info_tags %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+    {% trans "Checkout" %} | {{ block.super }}
+{% endblock %}
+
+{% block checkout_nav %}
+    {% include 'dehy/checkout/nav.html' %}
+{% endblock %}
+
+{% block content %}
+	<div class="col-6">
+	{% block checkout_flow %}
+
+		<section class="col-10 customer-info">
+		{% block user_setup %}
+		<h4>{% trans "1. Your Email" %}</h4>
+		<form method="post" class="card card-body bg-light">
+	        {% csrf_token %}
+	        {{ form.non_field_errors }}
+
+	        {% include "oscar/partials/form_field.html" with field=form.username %}
+
+	        <div class="form-group">
+	            <div class="controls">
+	                <div class="radio">
+	                    {{ form.options.0 }}
+	                </div>
+	            </div>
+	        </div>
+
+	        <div class="form-group {% if form.password.errors %}error{% endif %}">
+	            {{ form.options.errors }}
+	            <div class="controls">
+	                <div class="radio">
+	                    {{ form.options.2 }}
+	                    <div class="form-inline">
+	                        {% render_field form.password class+="form-control mr-sm-2" %}
+	                        <small><a href="{% url 'password-reset' %}" tabindex="-1">{% trans "Get a password reminder" %}</a></small>
+	                        {% for error in form.password.errors %}
+	                            <span class="error-block">{{ error }}</span>
+	                        {% endfor %}
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+
+	        <div class="form-group">
+	            <div class="controls">
+	                <div class="radio">
+	                    {{ form.options.1 }}
+	                </div>
+	            </div>
+	        </div>
+
+	        <div class="form-group">
+	            <div class="row">
+	                <div class="col-sm-3">
+	                    <button type="submit" class="btn btn-lg btn-block btn-primary" data-loading-text="{% trans 'Continuing...' %}">{% trans "Continue" %}</button>
+	                </div>
+	            </div>
+	        </div>
+	    </form>
+		{% endblock user_setup %}
+		</section>
+
+	    {% if error %}
+	        <div class="alert alert-danger">
+	            {{ error }}
+	        </div>
+	    {% endif %}
+
+		    <section class="col-10 shipping-address">
+				{% block shipping_address %}
+				<div class="col-sm-12">
+				    <div class="sub-header">
+				        <h2>{% trans "Where should we ship to?" %}</h2>
+				    </div>
+				    {% if user.is_authenticated %}
+				        {% if addresses %}
+				            <h3>{% trans "An address from your address book?" %}</h3>
+				            <div class="choose-block">
+				                <div class="row">
+				                    {% for address in addresses %}
+				                        {% block select_address_form %}
+				                            <div class="col-sm-6 d-flex">
+				                                <div class="card card-body bg-light">
+				                                    <address>
+				                                        {% block select_address_fields %}
+				                                            {% for field in address.active_address_fields %}
+				                                                <span>{{ field }}</span>{% if not forloop.first %}<br/>{% endif %}
+				                                            {% endfor %}
+				                                        {% endblock %}
+				                                    </address>
+				                                    <form action="{% url 'checkout:shipping-address' %}" method="post" id="select_shipping_address_{{ address.id }}" class="mb-0">
+				                                        {% csrf_token %}
+				                                        <input type="hidden" name="action" value="ship_to" />
+				                                        <input type="hidden" name="address_id" value="{{ address.id }}" />
+				                                        {% if address.is_default_for_shipping %}
+				                                            <button type="submit" class="btn btn-success btn-large ship-address" data-loading-text="{% trans 'Saving...' %}"><i class="fas fa-check-circle"></i> {% trans "Ship to your default shipping address" %}</button>
+				                                        {% else %}
+				                                            <button type="submit" class="btn btn-primary btn-large ship-address" data-loading-text="{% trans 'Saving...' %}">{% trans "Ship to this address" %}</button>
+				                                        {% endif %}
+
+				                                        <div class="btn-group address-controls">
+				                                            <a href="{% url 'checkout:user-address-update' pk=address.id %}" class="btn btn-secondary">{% trans "Edit address" %}</a>
+				                                            <button class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"></button>
+				                                            <ul class="dropdown-menu">
+				                                                <a href="{% url 'checkout:user-address-delete' pk=address.id %}" class="btn-remove-address nav-link">{% trans "Delete" %}</a>
+				                                            </ul>
+				                                        </div>
+				                                    </form>
+				                                </div>
+				                            </div>
+				                            {% if forloop.counter|divisibleby:2 %}
+				                                </div><div class="row">
+				                            {% endif %}
+				                        {% endblock %}
+				                    {% endfor %}
+				                </div>
+				            </div>
+				            <h3>{% trans "Or a new address?" %}</h3>
+				        {% endif %}
+				    {% endif %}
+
+				    {% block new_address_form %}
+				        <div class="card card-body bg-light">
+				            <form action="{% url 'checkout:shipping-address' %}" method="post" id="new_shipping_address">
+				                {% csrf_token %}
+				                {% include "oscar/partials/form_fields.html" with form=form style='horizontal' %}
+				                <div class="form-group row">
+				                    <div class="offset-sm-4 col-sm-8">
+				                        <button type="submit" class="btn btn-lg btn-primary" data-loading-text="{% trans 'Continuing...' %}">{% trans "Continue" %}</button>
+				                        {% trans "or" %} <a href="{% url 'basket:summary' %}">{% trans "return to basket" %}</a>
+				                    </div>
+				                </div>
+				            </form>
+				        </div>
+				    {% endblock %}
+				</div>
+				{% endblock shipping_address %}
+				</section>
+
+			<section class="col-10 shipping-method">
+				{% block shipping_method %}
+				    <div class="basket-title">
+				        <div class="row">
+				            <h4 class="col-sm-8 m-0">{% trans "Method" %}</h4>
+				            <h4 class="col-sm-3 m-0">{% trans "Cost" %}</h4>
+				        </div>
+				    </div>
+				    {% for method in methods %}
+				        <div class="basket-items">
+				            <div class="row">
+				                <div class="col-sm-8">
+				                    <h4>{{ method.name }}</h4>
+				                    {% if method.description %}
+				                        <p>{{ method.description|safe }}</p>
+				                    {% endif %}
+				                    {% if method.is_discounted %}
+				                        <small>
+				                            {% shipping_charge_discount method basket as discount %}
+				                            {% blocktrans with amount=discount|currency:basket.currency name=method.discount_name %}
+				                                This includes a discount of <strong>{{ amount }}</strong> as
+				                                your basket qualifies for the <strong>{{ name }}</strong> offer.
+				                            {% endblocktrans %}
+				                        </small>
+				                    {% endif %}
+				                </div>
+				                <div class="col-sm-1">
+				                    {% shipping_charge method basket as charge %}
+				                    {% if charge.is_tax_known %}
+				                        {{ charge.incl_tax|currency:basket.currency }}
+				                    {% else %}
+				                        {{ charge.excl_tax|currency:basket.currency }}
+				                    {% endif %}
+				                </div>
+				                <div class="col-sm-3">
+				                    <form method="post" action="{% url 'checkout:shipping-method' %}">
+				                        {% csrf_token %}
+				                        <input type="hidden" name="method_code" value="{{ method.code }}" />
+				                        <button type="submit" class="btn btn-lg btn-primary float-right" data-loading-text="{% trans 'Submitting...' %}">{% trans "Select option" %}</button>
+				                    </form>
+				                </div>
+				            </div>
+				        </div>
+				    {% endfor %}
+				{% endblock shipping_method %}
+				</section>
+
+		        {# You will almost certainly want to override this block to provide a payment summary #}
+			<section class="col-10 payment-method">
+		        {% block payment_method %}
+		            <div class="col-sm-6">
+		                <div class="sub-header">
+		                    <h2>{% trans "Payment" %}</h2>
+		                </div>
+		                <div class="card test card-body bg-light card card-body bg-light-success">
+		                    <h3>
+		                      {% trans "Payment" %}
+		                      <a href="{% url 'checkout:payment-details' %}" class="float-right">
+		                        {% trans "Change" %}
+		                      </a>
+		                    </h3>
+		                    <p>{% trans "Payment details to go here" %}</p>
+		                </div>
+		            </div>
+		        {% endblock payment_method %}
+				</section>
+
+			<section class="col-10 payment-details">
+				{% block payment_details %}
+				<form id="payment-form">
+				  <div id="payment-element">
+					<!-- Elements will create form elements here -->
+				  </div>
+				  <button id="submit">Submit</button>
+				  <div id="error-message">
+					<!-- Display error message to your customers here -->
+				  </div>
+				</form>
+				<form id="billing-address" class='billing-address-form form-vertical wysiwyg' enctype='multipart/form-data' method="post">
+					{% csrf_token %}
+					<div id="error-message">
+						<!-- Display error message here -->
+						{{ form.non_field_errors }}
+					</div>
+
+					<h4>{% trans "Billing address" %}</h4>
+					{% include "oscar/partials/form_fields.html" with form=billing_address_form %}
+
+				</form>
+				{% endblock payment_details %}
+			</section>
+			{% block place_order %}
+			{% endblock place_order %}
+	    </div>
+
+
+
+	{% endblock checkout_flow %}
+	</div>
+	<div class="col-6">
+
+	{% block order_contents %}
+		<div class="sub-header">
+			{% block order_contents_actions %}
+				<a href="{% url 'basket:summary' %}" class="float-right">
+					{% trans "Edit order contents" %}
+				</a>
+			{% endblock %}
+
+			<h2>{% trans "Order contents" %}</h2>
+		</div>
+		<div class="basket-title">
+			<div class="row">
+				<p class="col-sm-9 h4">{% trans "Item" %}</p>
+				<p class="col-sm-1 h4 text-center">{% trans "Quantity" %}</p>
+				<p class="col-sm-2 h4 text-right">{% trans "Total" %}</p>
+			</div>
+		</div>
+		{% for line in basket.all_lines %}
+			{% purchase_info_for_line request line as session %}
+			<div class="basket-items">
+				<div class="row">
+					<div class="col-sm-2">
+						<div class="image_container w-100">
+							{% with image=line.product.primary_image %}
+								{% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
+								<a href="{{ form.instance.product.get_absolute_url }}">
+									<img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail w-auto mx-auto my-0">
+								</a>
+							{% endwith %}
+						</div>
+					</div>
+					<div class="col-sm-7">
+						<h3><a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a></h3>
+						<span class="availability {{ session.availability.code }}">{{ session.availability.message }}</span>
+					</div>
+					<div class="col-sm-1 text-center">
+						{{ line.quantity }}
+					</div>
+					<div class="col-sm-2 text-right">
+						<p class="price_color">
+							{% if not show_tax_separately and line.is_tax_known %}
+								{{ line.line_price_incl_tax|currency:basket.currency }}
+							{% else %}
+								{{ line.line_price_excl_tax|currency:basket.currency }}
+							{% endif %}
+						</p>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+
+		<div class="row">
+			<div class="col-sm-6">&nbsp;</div>
+			<div class="col-sm-6">
+				<div class="sub-header">
+					<h2>{% trans 'Totals' %}</h2>
+				</div>
+				{% include 'oscar/basket/partials/basket_totals.html' %}
+			</div>
+		</div>
+
+	{% endblock order_contents %}
+{% endblock content %}
+
+
+{% block extra_scripts %}
+{{ stripe_data|json_script:"stripe-data" }}
+<script>
+	const stripe = Stripe("{{stripe_data.publishable_key}}");
+</script>
+<script src="{% static "js/checkout.js" %}"></script>
+{% endblock extra_scripts %}

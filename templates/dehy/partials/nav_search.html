@@ -30,29 +30,49 @@
     {% block navbar_collapse %}
         <div class="collapse navbar-collapse justify-content-space-around" id="navbarSupportedContent">
             {% block nav %}
-                <ul class="navbar-nav">
+			<div class="d-flex">
+				<div class="category-selection-label">CATEGORY:</div>
+				<ul class="navbar-nav category-dropdown">
                     {% block nav_items %}
                         <li id="shop_dropdown" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							{% comment olddropdown %}
+							<a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {% block browse_store_text %}{% trans "Browse store" %}{% endblock %}
                             </a>
+							{% endcomment %}
+
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								{% if category %}
+								{{ category|upper }}
+								{% else %}
+								{% trans "All products"|upper %}
+								{% endif %}
+                            </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
                                 {% category_tree depth=1 as tree_categories %}
-                                <a class="dropdown-item" href="{% url 'catalogue:index' %}">{% trans "All products" %}</a>
+                                <a class="dropdown-item" href="{% url 'catalogue:index' %}">{% trans "All products"|upper %}</a>
                                 {% if tree_categories %}
                                     <div class="dropdown-divider"></div>
                                     {% for tree_category in tree_categories %}
-                                        <a class="dropdown-item" href="{{ tree_category.get_absolute_url }}">{{ tree_category.name }}</a>
+                                        <a class="dropdown-item" href="{{ tree_category.get_absolute_url }}">{{ tree_category.name|upper }}</a>
                                     {% endfor %}
                                 {% endif %}
+
+								{% comment offers %}
                                 <div class="dropdown-divider"></div>
                                 {% block nav_dropdown_extra_items %}
                                     <a class="dropdown-item" href="{% url 'offer:list' %}">{% trans "Offers" %}</a>
                                 {% endblock %}
+								{% endcomment %}
+
                             </div>
                         </li>
                    {% endblock %}
                </ul>
+			</div>
+
+
             {% endblock %}
 
             {% block nav_extra %}

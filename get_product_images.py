@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dehy.settings")
 django.setup()
 
-from deploy_tools.fixture_creator import FixtureCreator
+from fixture_creator import FixtureCreator
 
 Product = get_model('catalogue', 'Product')
 ProductImage = get_model('catalogue', 'ProductImage')

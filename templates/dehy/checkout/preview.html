@@ -25,7 +25,9 @@
             get re-submitted when the user confirms the order.
         {% endcomment %}
         <div style="display:none">
-            {% block hiddenforms %}{% endblock %}
+            {% block hiddenforms %}
+			{{ stripe_token_form }}
+			{% endblock %}
         </div>
 
         <div class="form-group clearfix">
