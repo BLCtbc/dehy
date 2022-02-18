@@ -12,6 +12,10 @@ AbstractAddressForm = get_class('address.forms', 'AbstractAddressForm')
 Country = get_model('address', 'Country')
 
 
+class StripeTokenForm(forms.Form):
+	stripeEmail = forms.EmailField(widget=forms.HiddenInput())
+	stripeToken = forms.CharField(widget=forms.HiddenInput())
+
 class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 
 	def __init__(self, *args, **kwargs):

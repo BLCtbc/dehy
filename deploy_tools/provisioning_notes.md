@@ -23,6 +23,8 @@
 7. [troubleshooting](#troubleshooting)
 	- [postgres issues](#postgresql)
 8. [clearing sorl thumbnail media cache](#clear_sorl_image_cache)
+9. [running local django server over https](#local_django_https)
+10. [integrating stripe with django-oscar](#stripe_integration)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -110,6 +112,16 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			```sql
 			postgres=# CREATE DATABASE dehy_staging WITH TEMPLATE dehy OWNER dehydevuser;
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy_staging TO dehydevuser;
+			```
+
+		- loading fixtures:
+			```sh
+			python fixture_creator.py # file must be placed called in same directory as manage.py
+			```
+
+		- loading images into database:
+			```sh
+			python get_product_images.py # file must be placed called in same directory as manage.py
 			```
 
 	- create and setup the `.env` file:
@@ -1160,11 +1172,20 @@ Note, any changes made to `settings.py` might require restarting the server in o
 6. ###### troubleshooting
 
 	<a name="postgresql"></a>
+	- troubleshooting fresh install:
+
+		```sh
+		brew services stop postgresql
+		rm -rf "$(brew --prefix)/var/postgres"
+		initdb --locale=C -E UTF-8 "$(brew --prefix)/var/postgres"
+		brew services start postgresql
+		```
+
 	- To check what is running on port 5432, issue the following command on your terminal.
 		`$ sudo lsof -i :5432`
 
 	- finding all postgres processes
-		`$ ps -ef | grep postgres`
+		`$ ps -ef | grep postgresp`
 
 		output might look something like:
 
@@ -1232,3 +1253,25 @@ implementing a continuous deployment workflow on Debian 10+
 	```sh
 	$ python manage.py thumbnail cleanup && python manage.py thumbnail clear
 	```
+
+<a name="local_django_https"></a>
+6. ###### running local django server over https
+
+	```sh
+	$ brew install mkcert
+	$ mkcert -install
+	$ mkcert -cert-file cert.pem -key-file key.pem localhost 127.0.0.1
+	$ pip install django-sslserver
+	```
+
+	```
+	python manage.py runsslserver --certificate cert.pem --key key.pem
+	```
+
+<a name="stripe_integration"></a>
+7. ###### integrating sripe with django oscar
+
+	see: https://stackoverflow.com/questions/51243465/how-to-integrate-stripe-payments-gateway-with-django-oscar
+	and: https://groups.google.com/g/django-oscar/c/Cr8sBI0GBu0/m/PHRdXX2uFQAJ
+
+	test cc number: 4242 4242 4242 4242

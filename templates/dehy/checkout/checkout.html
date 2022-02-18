@@ -174,5 +174,10 @@
 {% endblock content %}
 
 {% block extra_scripts %}
+{{ stripe_data|json_script:"stripe-data" }}
+<script>
+</script>
+<script src="{% static "js/checkout.js" %}"></script>
 <script src="{% static "js/payments.js" %}"></script>
+
 {% endblock extra_scripts %}
