@@ -35,9 +35,25 @@ class IndexView(views.IndexView):
 		'check_basket_is_valid']
 
 	def get_context_data(self, *args, **kwargs):
+
 		context_data = super().get_context_data(*args, **kwargs)
+		print(f'\n context_data: {context_data}')
+
 		context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
 		shipping = context_data.get('shipping_address', None)
+		context_data['stripe_data'] = {
+			'publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
+		}
+		payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
+		if payment_intent:
+			# print(f'\n payment intent: {payment_intent}')
+			self.request.basket.payment_intent_id = payment_intent.id
+			context_data['stripe_data']['client_secret'] = payment_intent.client_secret
+			self.checkout_session.client_secret = payment_intent.client_secret
+			self.checkout_session.payment_intent_id = payment_intent.id
+
+		# context_data['stripe_data']['client_secret'] = Facade().payment_intent(total=context_data['order_total'], shipping=shipping).client_secret
+
 		# context_data['stripe_client_secret'] = self.get_payment_intent(total=context_data['order_total'], shipping=shipping).client_secret
 
 		return context_data
@@ -45,7 +61,17 @@ class IndexView(views.IndexView):
 	# def get_payment_intent(self, total, shipping, *args, **kwargs):
 	# 	stripe_payment_intent = Facade().create_payment_intent(total, shipping=shipping)
 	# 	return stripe_payment_intent
+class ShippingAddressView(views.ShippingAddressView):
+	template_name = 'dehy/checkout/shipping_address.html'
 
+class UserAddressUpdateView(views.UserAddressUpdateView):
+	template_name = 'dehy/checkout/user_address_form.html'
+
+class UserAddressDeleteView(views.UserAddressDeleteView):
+	template_name = 'dehy/checkout/user_address_delete.html'
+
+class ShippingMethodView(views.ShippingMethodView):
+	template_name = 'dehy/checkout/shipping_methods.html'
 
 class PaymentDetailsView(views.PaymentDetailsView):
 	"""
@@ -107,15 +133,21 @@ class PaymentDetailsView(views.PaymentDetailsView):
 				'country':shipping.country, 'phone_number':shipping.phone_number
 			}
 
+		context_data['stripe_data'] = {}
+
+		payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
+		context_data['stripe_data']['client_secret'] = payment_intent.client_secret
+		context_data['stripe_data']['publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
+
 		if self.preview:
-			context_data['stripe_token_form'] = StripeTokenForm(self.request.POST)
+			# context_data['stripe_token_form'] = StripeTokenForm(self.request.POST)
 			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
 		else:
 			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
-			context_data['stripe_publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
-			context_data['stripe_secret_key'] = settings.STRIPE_SECRET_KEY
 
-		print(context_data)
+		payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
+		context_data['stripe_data']['client_secret'] = payment_intent.client_secret
+		context_data['stripe_data']['publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
 
 		return context_data
 
@@ -125,25 +157,9 @@ class PaymentDetailsView(views.PaymentDetailsView):
 
 
 	def handle_payment(self, order_number, total, *args, **kwargs):
-		print('\n** handling payment **\n')
-		print(f'\n dir self {dir(self)}')
-		print(f'\n dir request {dir(self.request)}')
-		print(f'\n self.args {self.args}')
-		print(f'\n self.kwargs {self.kwargs}')
-
-		print(f'\n dir checkout_session {dir(self.checkout_session)}')
-		print(f'\n shipping address set: {self.checkout_session.is_shipping_address_set()}')
-		print(f'\n is_billing_address_same_as_shipping: {self.checkout_session.is_billing_address_same_as_shipping()}')
-		print(f'\n is_billing_address_set: {self.checkout_session.is_billing_address_set()}')
-		print(f'\n payment_method: {self.checkout_session.payment_method()}')
-
-		print(f'\n dir kwargs {[x for x in kwargs.items()]}')
-
 
 		basket = self.request.basket
-
 		shipping_address_obj = self.get_shipping_address(self.request.basket)
-		print('\n dir shipping_address: ', dir(shipping_address_obj))
 
 		shipping = {
 			'address': {
@@ -158,16 +174,34 @@ class PaymentDetailsView(views.PaymentDetailsView):
 			'phone': shipping_address_obj.phone_number
 		}
 
+		# print('self: ', self.request.GET.get(billing_address_form))
+		billing_addr_form = self.request.GET.get('billing_address_form', None)
+
+		if hasattr(billing_addr_form, 'same_as_shipping'):
+			self.checkout_session.bill_to_shipping_address()
+
+		else:
+			## need to set the billing address elsewhere
+			## self.get_billing_address()
+			pass
+
 		# print(f'\n kwargs shipping_address {kwargs["shipping_address"]}')
-
-
-		stripe_ref = Facade().charge(
-			order_number,
-			total,
-			shipping=shipping,
+		
+		stripe_ref = Facade().confirm_payment_intent(
+			id=self.request.basket.payment_intent_id,
 			card=self.request.POST[STRIPE_TOKEN],
+			shipping=shipping, order_number=order_number,
 			description=self.payment_description(order_number, total, **kwargs),
-			metadata=self.payment_metadata(order_number, total, **kwargs))
+			metadata=self.payment_metadata(order_number, total, **kwargs)
+		)
+
+		# stripe_ref = Facade().charge(
+		# 	order_number,
+		# 	total,
+		# 	shipping=shipping,
+		# 	card=self.request.POST[STRIPE_TOKEN],
+		# 	description=self.payment_description(order_number, total, **kwargs),
+		# 	metadata=self.payment_metadata(order_number, total, **kwargs))
 
 
 
@@ -178,6 +212,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
 			amount_allocated=total.incl_tax,
 			amount_debited=total.incl_tax,
 			reference=stripe_ref)
+
 		self.add_payment_source(source)
 
 		self.add_payment_event(PAYMENT_EVENT_PURCHASE, total.incl_tax)
@@ -188,28 +223,6 @@ class PaymentDetailsView(views.PaymentDetailsView):
 	def payment_metadata(self, order_number, total, **kwargs):
 		return {'order_number': order_number}
 
-	#### OLD ####
-	# def handle_payment(self, order_number, total, **kwargs):
-	# 	# method = self.checkout_session.payment_method()
-	# 	# Talk to payment gateway.  If unsuccessful/error, raise a
-	# 	# PaymentError exception which we allow to percolate up to be caught
-	# 	# and handled by the core PaymentDetailsView.
-	#
-	# 	gateway = ''
-	# 	reference = gateway.pre_auth(order_number, total.incl_tax, kwargs['bankcard'])
-	#
-	# 	# Payment successful! Record payment source
-	# 	source_type, __ = models.SourceType.objects.get_or_create(
-	# 		name="SomeGateway")
-	# 	source = models.Source(
-	# 		source_type=source_type,
-	# 		amount_allocated=total.incl_tax,
-	# 		reference=reference)
-	# 	self.add_payment_source(source)
-	#
-	# 	# Record payment event
-	# 	self.add_payment_event('pre-auth', total.incl_tax)
-	#
 
 class PaymentMethodView(views.PaymentMethodView):
 	"""

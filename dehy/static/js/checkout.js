@@ -1,0 +1,151 @@
+
+
+window.addEventListener('load', function () {
+	SHIPPING.set_address();
+	same_as_shipping_handler();
+	payment_element_setup();
+});
+
+var SHIPPING = {
+	ADDRESS: {},
+	set_address: function() {
+		var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
+		if (billing_address_container) {
+			billing_address_container.querySelectorAll("input[type='text'], input[type='number']").forEach(function(elem) {
+				SHIPPING.ADDRESS[elem.name] = elem.value;
+			});
+			var country_selector = billing_address_container.querySelector("select[name='country']");
+			if (country_selector) {
+				SHIPPING.ADDRESS['country'] = country_selector.value;
+			}
+		}
+
+	}
+}
+
+function payment_element_setup() {
+	const stripe_data = JSON.parse(document.getElementById('stripe-data').textContent);
+
+	var stripe = Stripe(stripe_data.publishable_key);
+	var payment_form = document.getElementById('billing-form');
+
+	if (payment_form) {
+
+		const appearance = {
+  			theme: 'night',
+			labels: 'floating'
+		};
+		const options = {
+		  clientSecret: stripe_data.client_secret,
+		  // Fully customizable with appearance API.
+		  appearance: appearance,
+		};
+
+		// Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 2
+		const elements = stripe.elements(options);
+
+		// Create and mount the Payment Element
+		const paymentElement = elements.create('payment');
+		paymentElement.mount('#payment-element');
+
+		// var style = {
+		//   base: {
+		//     // Add your base input styles here. For example:
+		//     fontSize: '16px',
+		//     color: '#32325d',
+		// 	fontSmoothing: 'antialiased',
+      	// 	':-webkit-autofill': {
+        // 		color: '#fce883',
+      	// 	},
+		// 	'::placeholder': {
+        // 		color: '#87BBFD',
+      	// 	},
+		// 	// padding: '0.75rem',
+		// 	backgroundColor: '#30313d',
+		// 	// borderRadius: '5px',
+		// 	// transition: 'background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease',
+		// 	// border: `1px solid #424353`,
+		// 	// boxShadow: "0px 2px 4px rgb(0 0 0 / 50%), 0px 1px 6px rgb(0 0 0 / 25%)"
+		// }};
+
+		// var elements = stripe.elements();
+		// var card = elements.create('card');
+		// var cardContainer = document.getElementById('card-element')
+		// card.mount(cardContainer);
+
+		// var cardNumber = elements.create('cardNumber');
+		// var cardExpiry = elements.create('cardExpiry');
+		// var cardCvc = elements.create('cardCvc');
+		//
+		// cardNumber.mount("#card-element-new")
+		// cardExpiry.mount("#card-element-new")
+		// cardCvc.mount("#card-element-new")
+
+
+	}
+}
+
+function same_as_shipping_handler() {
+	var same_as_shipping_checkbox = document.querySelector("input[name=same_as_shipping]");
+
+	if (same_as_shipping_checkbox) {
+		same_as_shipping_checkbox.addEventListener('change', e=>{
+			var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
+
+			billing_address_container.querySelectorAll('.form-group').forEach(function(elem) {
+				elem.classList.toggle('hide', e.target.checked)
+			})
+
+			for (let [key, val] of Object.entries(SHIPPING.ADDRESS)) {
+				if (val) {
+					let elem = billing_address_container.querySelector(`input[name=${key}]`);
+					if (elem) {
+						if (e.target.checked) {
+							elem.value = val
+						} else {
+							elem.value = ''
+						}
+					}
+				}
+			}
+
+			var country_selector = billing_address_container.querySelector("select[name='country']");
+			if (country_selector) {
+				if (e.target.checked) {
+					country_selector.value = SHIPPING.ADDRESS['country']
+				} else {
+					country_selector.selectedIndex = 0
+				}
+			}
+		})
+	}
+}
+
+function redirectToCheckoutHandler() {
+	var stripe_redirect_btn = document.getElementById('stripe_redirect');
+
+	if (stripe_redirect_btn) {
+		stripe_redirect_btn.addEventListener('submit', e=>{
+			e.preventDefault();
+
+			var stripe = Stripe('pk_test_51KTDOrLpSVHc8H4yhmmmivcD8wYAIH7WzoslAGkQPCZ0iGQVWIsPsskwa5f4TSRoh42mg9gLKS0txZuZxzTAnYLh00K6pki08H');
+
+			stripe.redirectToCheckout({
+			  lineItems: [{
+			    price: 'price_1KUEr3LpSVHc8H4yVn96Typb', // Replace with the ID of your price
+			    quantity: 1,
+			  }],
+			  mode: 'payment',
+			  successUrl: 'https://127.0.0.1/',
+			  cancelUrl: 'https://127.0.0.1/',
+			}).then(function (result) {
+				document.querySelector("#error-message").innerText = result.error.message;
+			  // If `redirectToCheckout` fails due to a browser or network
+			  // error, display the localized error message to your customer
+			  // using `result.error.message`.
+			});
+		})
+		return false;
+	}
+
+}

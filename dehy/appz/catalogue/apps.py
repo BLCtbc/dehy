@@ -4,7 +4,7 @@ from django.urls import include, path
 class CatalogueConfig(apps.CatalogueConfig):
 	name = 'dehy.appz.catalogue'
 	# name = 'shop'
-	# label = 'shop'
+	label = 'catalogue'
 	namespace = 'shop'
 
 	def get_urls(self):

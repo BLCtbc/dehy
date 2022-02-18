@@ -1,6 +1,10 @@
 from django.views.generic import ListView, TemplateView
 from django.http import JsonResponse
 from oscar.core.loading import get_class, get_model
+from dehy.appz.checkout import facade
+from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
@@ -40,6 +44,10 @@ class FAQView(ListView):
 	context_object_name = "faq_list"
 	template_name = "dehy/faq.html"
 
+@method_decorator(csrf_exempt)
+def create_checkout_session(request):
+	session = facade.Facade().session()
+	return redirect(session.url, code=303)
 
 def get_cart_quantity(request):
 	status_code = 200

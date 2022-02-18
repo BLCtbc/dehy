@@ -114,6 +114,16 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy_staging TO dehydevuser;
 			```
 
+		- loading fixtures:
+			```sh
+			python fixture_creator.py # file must be placed called in same directory as manage.py
+			```
+
+		- loading images into database:
+			```sh
+			python get_product_images.py # file must be placed called in same directory as manage.py
+			```
+
 	- create and setup the `.env` file:
 
 		```sh
@@ -1162,11 +1172,20 @@ Note, any changes made to `settings.py` might require restarting the server in o
 6. ###### troubleshooting
 
 	<a name="postgresql"></a>
+	- troubleshooting fresh install:
+
+		```sh
+		brew services stop postgresql
+		rm -rf "$(brew --prefix)/var/postgres"
+		initdb --locale=C -E UTF-8 "$(brew --prefix)/var/postgres"
+		brew services start postgresql
+		```
+
 	- To check what is running on port 5432, issue the following command on your terminal.
 		`$ sudo lsof -i :5432`
 
 	- finding all postgres processes
-		`$ ps -ef | grep postgres`
+		`$ ps -ef | grep postgresp`
 
 		output might look something like:
 
