@@ -1,11 +1,6 @@
 {% extends "dehy/layout.html" %}
 {% load i18n %}
 {% load category_tags %}
-{% load static %}
-
-{% block extrastyles %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/checkout.css' %}"/>
-{% endblock extrastyles %}
 
 {% block layout %}
 
@@ -45,7 +40,12 @@
                 {% endfor %}
             {% endblock %}
 
-            {% block content %}{% endblock %}
+			<div class="row">
+				{% block content %}
+				{% endblock content %}
+			</div>
+
+
 
         </div><!-- /page_inner -->
     </div>

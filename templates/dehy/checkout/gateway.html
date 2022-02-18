@@ -1,4 +1,4 @@
-{% extends "dehy/checkout/layout.html" %}
+{% extends "oscar/checkout/checkout.html" %}
 
 {% load i18n %}
 {% load widget_tweaks %}
@@ -13,7 +13,7 @@
 
 {% block checkout_title %}{% trans "Who are you?" %}{% endblock %}
 
-{% block content %}
+{% block checkout_flow %}
 
     <form method="post" class="card card-body bg-light">
         {% csrf_token %}
@@ -62,7 +62,7 @@
         </div>
     </form>
 
-{% endblock content %}
+{% endblock checkout_flow %}
 
 {% block onbodyload %}
     {{ block.super }}
