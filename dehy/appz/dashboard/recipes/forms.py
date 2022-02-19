@@ -65,16 +65,12 @@ class IngredientWidget(forms.MultiWidget):
 
 	# only called on update, not create
 	def decompress(self, value):
-		print(f'\n *** decompressing: {value}')
 		if value:
 			return value.split(',')
 		return ['', '', '']
 
 	def value_from_datadict(self, data, files, name, *args, **kwargs):
-		print('\n *** value_from_datadict')
-		print(f'\n name {name}')
-		print(f'\n pre super*** data {data}')
-		print(f'\n dir(self) multiwidget {dir(self)}')
+
 		step = len(self.widgets)
 
 		vals = []
@@ -85,17 +81,12 @@ class IngredientWidget(forms.MultiWidget):
 		else:
 			vals = super().value_from_datadict(data, files, name, *args, **kwargs)
 
-		print(f'\n vals: {vals}')
-		print('\n end value_from_datadict ***')
-
 		return vals
 
 
 	# only called on update, not create
 	def get_context(self, name, value, attrs):
 		value = value or ['']
-		print(f'\n ** FORMS get_context value {value}')
-		print(f'\n ** FORMS get_context name {name}')
 
 		context = super().get_context(name, value, attrs)
 
@@ -121,17 +112,11 @@ class IngredientField(forms.MultiValueField):
 	)
 
 	def clean(self, value, *args, **kwargs):
-		print('\n *** cleaning multivaluefield')
-		print(f'\n dir(self) multivaluefield {dir(self)} \n')
-		print(f'\n uncleaned value multivaluefield: {value}')
 		cleaned_data = super().clean(value, *args, **kwargs)
-		print(f'\n cleaned data multivaluefield: {value}')
-
 		cleaned_data['ingredients'] = value
 		return cleaned_data
 
 	def compress(self, data_list):
-		print(f'\n** compressing ** {data_list}')
 		data_list = [str(x) for x in data_list]
 		data_list = str(','.join(data_list))
 		return data_list

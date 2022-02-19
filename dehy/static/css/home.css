@@ -23,6 +23,7 @@
 	min-height: 350px;
 	justify-content: center;
 	display: flex;
+	position: relative;
 }
 
 .content-section:not(:first-child) {

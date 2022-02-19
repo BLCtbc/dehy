@@ -23,7 +23,7 @@
 				<h1>NOW YOU FINNA BUY SHIT</h1>
 			</div>
 			<div class='shop-link-container'>
-				<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">SHOP NOW</a>
+				<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">All Recipes</a>
 			</div>
 		</div>
 	</div>
@@ -36,15 +36,12 @@
 {% endblock header %}
 
 {% block content_wrapper %}
-
-
 	<section class='about content-section' id='about'>
 		<div class='container'>
 			<h2>Virtue & Craft</h2>
 			<p>Dehy makes high quality dehydrated garnishes for an elevated cocktail experience, handmade in Austin Texas. Created for cocktail professionals and enthusiasts alike, Dehy makes it easy to put a unique finishing touch on any drink with speed.</p>
 		</div>
 	</section>
-
 
 
 	<section class='content-section mailing-list-container'>
@@ -97,7 +94,9 @@
 
 	{% block recipe_list %}
 	<section class='content-section' id='recipe_list'>
-
+		<div style="position: absolute; top:0; left:10px;">
+			<a role='button' style="line-height: normal; color: var(--dark-hg); border-color: var(--dark-hg);" class="shop-link btn btn-black" href="{% url 'recipes' %}">All Recipes</a>
+		</div>
 		{% for recipe in recipes %}
 		<article class="recipe-card col-3">
 		{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
@@ -131,6 +130,9 @@
 	</section>
 
 	<section class='content-section mini-shop'>
+		<div style="position: sticky; top:0; left:10px;">
+			<a role='button' style="position: absolute; top: -3rem; line-height: normal; color: var(--dark-hg); border-color: var(--dark-hg);" class="shop-link btn btn-black" href="{% url 'shop:index' %}">Shop</a>
+		</div>
 		{% for product in products %}
 			{% if not product.is_child %}
 				{# temporary #}

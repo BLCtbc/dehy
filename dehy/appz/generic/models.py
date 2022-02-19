@@ -22,3 +22,20 @@ class VisionStatement(models.Model):
 	def __str__(self):
 		return f"{self.title}, created: {self.date_created}, modified: {self.last_modified}"
 
+class Message(models.Model):
+	email = models.ForeignKey('MessageUser', on_delete=models.CASCADE)
+	message = models.TextField(default="", help_text='message')
+	first_name = models.CharField(blank=True, null=True, max_length=50)
+	last_name = models.CharField(blank=True, null=True, max_length=50)
+	date_created = models.DateField(auto_now_add=True, editable=False)
+
+	def __str__(self):
+		return f"{self.email}, message: {self.message}, created: {self.date_created}"
+
+
+class MessageUser(models.Model):
+	email = models.EmailField(unique=True, help_text='Email Address')
+	date_created = models.DateField(auto_now_add=True, editable=False)
+
+	def __str__(self):
+		return f"{self.email}"

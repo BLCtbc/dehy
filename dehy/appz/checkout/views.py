@@ -34,33 +34,31 @@ class IndexView(views.IndexView):
 		'check_basket_is_not_empty',
 		'check_basket_is_valid']
 
-	def get_context_data(self, *args, **kwargs):
-
-		context_data = super().get_context_data(*args, **kwargs)
-		print(f'\n context_data: {context_data}')
-
-		context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
-		shipping = context_data.get('shipping_address', None)
-		context_data['stripe_data'] = {
-			'publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
-		}
-		payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
-		if payment_intent:
+	# def get_context_data(self, *args, **kwargs):
+	#
+	# 	context_data = super().get_context_data(*args, **kwargs)
+	# 	print(f'\n context_data: {context_data}')
+	#
+	# 	shipping = context_data.get('shipping_address', None)
+	# 	context_data['stripe_data'] = {
+	# 		'publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
+	# 	}
+	# 	payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping) or None
+	# 	print(f'\n payment_intent: {payment_intent}')
+		# if payment_intent:
 			# print(f'\n payment intent: {payment_intent}')
-			self.request.basket.payment_intent_id = payment_intent.id
-			context_data['stripe_data']['client_secret'] = payment_intent.client_secret
-			self.checkout_session.client_secret = payment_intent.client_secret
-			self.checkout_session.payment_intent_id = payment_intent.id
+			# self.request.basket.payment_intent_id = payment_intent.id
+			# context_data['stripe_data']['client_secret'] = payment_intent.client_secret
+			# self.checkout_session.client_secret = payment_intent.client_secret
+			# self.checkout_session.payment_intent_id = payment_intent.id
 
 		# context_data['stripe_data']['client_secret'] = Facade().payment_intent(total=context_data['order_total'], shipping=shipping).client_secret
 
 		# context_data['stripe_client_secret'] = self.get_payment_intent(total=context_data['order_total'], shipping=shipping).client_secret
 
-		return context_data
+		# return context_data
 
-	# def get_payment_intent(self, total, shipping, *args, **kwargs):
-	# 	stripe_payment_intent = Facade().create_payment_intent(total, shipping=shipping)
-	# 	return stripe_payment_intent
+
 class ShippingAddressView(views.ShippingAddressView):
 	template_name = 'dehy/checkout/shipping_address.html'
 
@@ -135,17 +133,19 @@ class PaymentDetailsView(views.PaymentDetailsView):
 
 		context_data['stripe_data'] = {}
 
+		print(f'\n context_data: {context_data}')
 		payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
+		print(f'\n payment_intent: {payment_intent}')
 		context_data['stripe_data']['client_secret'] = payment_intent.client_secret
 		context_data['stripe_data']['publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
 
 		if self.preview:
-			# context_data['stripe_token_form'] = StripeTokenForm(self.request.POST)
+			context_data['stripe_token_form'] = StripeTokenForm(self.request.POST)
 			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
 		else:
 			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
 
-		payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
+		# payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
 		context_data['stripe_data']['client_secret'] = payment_intent.client_secret
 		context_data['stripe_data']['publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
 
@@ -186,7 +186,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
 			pass
 
 		# print(f'\n kwargs shipping_address {kwargs["shipping_address"]}')
-		
+
 		stripe_ref = Facade().confirm_payment_intent(
 			id=self.request.basket.payment_intent_id,
 			card=self.request.POST[STRIPE_TOKEN],
