@@ -691,3 +691,43 @@ small {
 	margin: 5px;
 	border-color: rgba(0, 0, 0, 0.2);
 }
+
+input, select, textarea {
+	padding: 0.75rem;
+	border-radius: 5px;
+	transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+	border: 1px solid #424353;
+	box-shadow: 0px 2px 4px rgb(0 0 0 / 50%), 0px 1px 6px rgb(0 0 0 / 25%);
+	font-weight: 400;
+}
+
+select {
+	padding-right: calc(12px + 1em)!important;
+	padding-top: 32px !important;
+	display: block;
+	width: 100%
+}
+
+input, select, label {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
+}
+
+label {
+	-webkit-transform: translateY(13px) scale(0.8888888888888888) !important;
+	-ms-transform: translateY(13px) scale(0.8888888888888888) !important;
+	transform: translateY(13px) scale(0.8888888888888888) !important;
+	padding-bottom: max(2px, 0.25rem);
+	opacity: 0.8;
+	font-weight: 400;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+	position: absolute;
+	z-index: 1;
+	pointer-events: none;
+	will-change: transform;
+	font-size: 16px !important;
+	-webkit-transform-origin: top left!important;
+	-ms-transform-origin: top left!important;
+	transform-origin: top left!important;
+	margin-left: 13px !important;
+	margin-bottom: 0.25rem;
+}

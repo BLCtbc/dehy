@@ -42,17 +42,19 @@ class Facade(object):
 		except stripe.error.StripeError as e:
 			raise InvalidGatewayRequestError(self.get_friendly_error_message(e))
 
-	def payment_intent(self, total, currency=settings.STRIPE_CURRENCY, description=None, metadata=None, shipping=None, **kwargs):
+	def payment_intent(self, total, confirm=False, currency=settings.STRIPE_CURRENCY, description=None, metadata=None, shipping=None, **kwargs):
 		try:
 
 			# Create a PaymentIntent with the order amount and currency
 			intent = stripe.PaymentIntent.create(
-				confirm=True,
+				confirm=confirm,
 				amount=(total.incl_tax * 100).to_integral_value(),
 				currency=settings.STRIPE_CURRENCY,
 				payment_method_types=["card"],
 				confirmation_method='manual'
 			)
+
+			print(f'\n payment_intent: {intent}')
 			return intent
 		except Exception as e:
 			return json.dumps({
@@ -69,8 +71,6 @@ class Facade(object):
 		pass
 
 	def confirm_payment_intent(self, id, card, shipping=None, order_number=None, description=None, metadata=None):
-
-
 
 		return stripe.PaymentIntent.confirm(
 			id,

@@ -5,26 +5,26 @@ from dehy.appz.checkout import facade
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from dehy.appz.generic import forms
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
 
 class CustomView(TemplateView):
-	template_name = "dehy/custom.html"
+	template_name = "dehy/generic/custom.html"
 
 class WholesaleView(TemplateView):
-	template_name = "dehy/wholesale.html"
-
+	template_name = "dehy/generic/wholesale.html"
 
 class PrivacyPolicyView(TemplateView):
-	template_name = "dehy/privacy_policy.html"
+	template_name = "dehy/generic/privacy_policy.html"
 
 class TermsOfServiceView(TemplateView):
-	template_name = "dehy/terms_of_service.html"
+	template_name = "dehy/generic/terms_of_service.html"
 
 class HomeView(TemplateView):
-	template_name = "dehy/home.html"
+	template_name = "dehy/generic/home.html"
 
 	def get_context_data(self, *args, **kwargs):
 		data = super().get_context_data(*args, **kwargs)
@@ -34,15 +34,29 @@ class HomeView(TemplateView):
 		return data
 
 class ReturnsRefundsView(TemplateView):
-	template_name = "dehy/returns.html"
+	template_name = "dehy/generic/returns.html"
 
 class ContactView(TemplateView):
-	template_name = "dehy/contact.html"
+	template_name = "dehy/generic/contact.html"
+	form_class = forms.ContactForm
+
+	def get_context_data(self, *args, **kwargs):
+		context_data = super().get_context_data(*args, **kwargs)
+		context_data['contact_form'] = kwargs.get('contact_form', self.form_class)
+		return context_data
+
+	def post(self, request, *args, **kwargs):
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			pass
+
+			# email_user = MessageUser.objects.get_or_create()
+			# add some kind of rate limiting here
 
 class FAQView(ListView):
 	model = FAQ
 	context_object_name = "faq_list"
-	template_name = "dehy/faq.html"
+	template_name = "dehy/generic/faq.html"
 
 @method_decorator(csrf_exempt)
 def create_checkout_session(request):

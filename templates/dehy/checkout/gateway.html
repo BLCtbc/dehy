@@ -13,8 +13,7 @@
 
 {% block checkout_title %}{% trans "Who are you?" %}{% endblock %}
 
-{% block checkout_flow %}
-
+{% block content %}
     <form method="post" class="card card-body bg-light">
         {% csrf_token %}
         {{ form.non_field_errors }}
@@ -62,7 +61,7 @@
         </div>
     </form>
 
-{% endblock checkout_flow %}
+{% endblock content %}
 
 {% block onbodyload %}
     {{ block.super }}
