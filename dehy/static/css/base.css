@@ -222,8 +222,8 @@ nav .nav-item:not(:first-child) {
 .icon {
     position: relative;
     display: block;
-    width: 25px;
-    height: 25px;
+    width: 32px;
+    height: 32px;
     box-sizing: content-box;
     line-height: 1;
 }
@@ -264,13 +264,10 @@ nav .nav-item:not(:first-child) {
 	margin-left: 1.2vw;
 }
 
-.icon-cart {
-	width: 32px;
-	height: 32px;
-}
 
-.cart-container {
-	margin-left: 2vw;
+.icon-container {
+	margin-left: 1vw;
+	display: flex;
 }
 
 .socials a {
@@ -288,15 +285,12 @@ nav .nav-item:not(:first-child) {
     content: "\f39e";
 }
 
-.fa:hover {
-	color: var(--secondary-accent-color);
-}
-
-svg.icon-cart:hover {
+svg.icon:hover {
 	stroke: var(--secondary-accent-color);
+	fill: var(--secondary-accent-color);
 }
 
-nav a.nav-link:hover {
+nav a.nav-link:hover, .fa:hover {
 	color: var(--secondary-accent-color);
 }
 
@@ -332,8 +326,8 @@ nav a.nav-link.active {
 
 footer {
     /* width: 90% !important; */
-    margin: 2rem auto 0 auto;
-    /* padding: 10vh 0 !important; */
+    /* margin: 2rem auto 0 auto; */
+    padding: 2rem 0 0;
     /* border-top: 1px solid var(--beige); */
     text-align: center;
     /* display: block !important; */
@@ -692,7 +686,7 @@ small {
 	border-color: rgba(0, 0, 0, 0.2);
 }
 
-input, select, textarea {
+.input, .select, .textarea {
 	padding: 0.75rem;
 	border-radius: 5px;
 	transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
@@ -701,7 +695,7 @@ input, select, textarea {
 	font-weight: 400;
 }
 
-select {
+.select {
 	padding-right: calc(12px + 1em)!important;
 	padding-top: 32px !important;
 	display: block;
@@ -712,7 +706,7 @@ input, select, label {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
 }
 
-label {
+.label {
 	-webkit-transform: translateY(13px) scale(0.8888888888888888) !important;
 	-ms-transform: translateY(13px) scale(0.8888888888888888) !important;
 	transform: translateY(13px) scale(0.8888888888888888) !important;
@@ -730,4 +724,14 @@ label {
 	transform-origin: top left!important;
 	margin-left: 13px !important;
 	margin-bottom: 0.25rem;
+}
+
+.container-fluid.no-pad {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.container-fluid.no-pad > .row {
+	margin-left: 0;
+	margin-right: 0;
 }

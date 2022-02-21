@@ -28,15 +28,8 @@
 			<ul class="navbar">
 
 				<li class="nav-item">
-					{% comment %}
-					{% endcomment %}
 					<a class="nav-link{% if url_name == 'index' or url_name == 'detail' or url_name == 'category' %} active{% endif %}"  href="{% url 'catalogue:index' %}">Shop</a>
-
 					<!-- <a class="nav-link{% if request.resolver_match.url_name == 'shop' %} active{% endif %}"  href="/shop">Shop</a> -->
-
-				</li>
-				<li class="nav-item">
-					<a class="nav-link{% if url_name == 'custom' %} active{% endif %}" href="{% url 'custom' %}">Custom</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link{% if url_name == 'contact' %} active{% endif %}" href="{% url 'contact' %}">Contact</a>
@@ -61,23 +54,83 @@
 				</li>
 			</ul>
 		</div>
-		<div class="cart-container" data-controller="Cart">
-	        <a aria-label="{{request.basket.num_items}} items in cart" data-test="continue-to-cart" class="icon icon-cart" href="/basket">
-	          <span>
-	            <svg viewBox="0 0 31 24" class="icon icon-cart">
-				  <g class="svg-icon cart-icon">
-				    <circle stroke-miterlimit="10" cx="22.5" cy="21.5" r="1"></circle>
-				    <circle stroke-miterlimit="10" cx="9.5" cy="21.5" r="1"></circle>
-				    <path fill="none" stroke-miterlimit="10" d="M0,1.5h5c0.6,0,1.1,0.4,1.1,1l1.7,13
-				      c0.1,0.5,0.6,1,1.1,1h15c0.5,0,1.2-0.4,1.4-0.9l3.3-8.1c0.2-0.5-0.1-0.9-0.6-0.9H12"></path>
-				  </g>
-			  	</svg>
-	            <div class="cart-quantity-container">
-	              <span id="cart-quantity" class="cart-quantity">{{request.basket.num_items}}</span>
-	            </div>
-	          </span>
-	        </a>
-    	</div>
+		<div class="icon-container">
+			<div class="account-container">
+				<a class="icon" href="{% url 'customer:login' %}">
+			      <span class="svg-container">
+			        <svg style="stroke-width:0.1rem; top:3px;"class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">
+					    <g>
+					        <circle cx="50" cy="43.4" r="17.16"></circle>
+					        <path d="M50,4A46,46,0,1,0,96,50,46.06,46.06,0,0,0,50,4ZM77.63,76.76a31.67,31.67,0,0,0-55.27,0A38.15,38.15,0,0,1,11.51,50,38.49,38.49,0,1,1,77.63,76.76Z"></path>
+					    </g>
+					</svg>
+			      </span>
+			    </a>
+			</div>
+			<div class="cart-container" data-controller="Cart">
+		        <a aria-label="{{request.basket.num_items}} items in cart" data-test="continue-to-cart" class="icon icon-cart" href="/basket">
+		          <span class="svg-container">
+		            <svg viewBox="0 0 31 24" class="icon icon-cart">
+					  <g class="svg-icon cart-icon">
+					    <circle stroke-miterlimit="10" cx="22.5" cy="21.5" r="1"></circle>
+					    <circle stroke-miterlimit="10" cx="9.5" cy="21.5" r="1"></circle>
+					    <path fill="none" stroke-miterlimit="10" d="M0,1.5h5c0.6,0,1.1,0.4,1.1,1l1.7,13
+					      c0.1,0.5,0.6,1,1.1,1h15c0.5,0,1.2-0.4,1.4-0.9l3.3-8.1c0.2-0.5-0.1-0.9-0.6-0.9H12"></path>
+					  </g>
+				  	</svg>
+		            <div class="cart-quantity-container">
+		              <span id="cart-quantity" class="cart-quantity">{{request.basket.num_items}}</span>
+		            </div>
+		          </span>
+		        </a>
+	    	</div>
+		</div>
+
+
+			{% comment %}
+			<ul class="navbar-nav ml-md-auto d-md-flex">
+
+					{% if user.is_authenticated %}
+					{% block nav_account_navbar_authenticated %}
+						<li class="nav-item mr-2">
+							{% if num_unread_notifications > 0 %}
+								{# If user has new notifications - we change account link to go to inbox #}
+								<a href="{% url 'customer:notifications-inbox' %}" class="nav-link mt-2 mt-lg-0">
+									<i class="far fa-user mr-2"></i>
+									<span class="badge badge-warning">{{ num_unread_notifications }}</span>
+								</a>
+							{% else %}
+								<a href="{% url 'customer:summary' %}" class="nav-link mt-2 mt-lg-0">
+									<i class="far fa-user mr-2"></i>
+								</a>
+							{% endif %}
+						</li>
+						{% if user.is_staff or perms.partner.dashboard_access %}
+							<li class="nav-item mr-2">
+								<a href="{% url 'dashboard:index' %}" class="nav-link">
+									<i class="fas fa-list-ul mr-2"></i>
+								</a>
+							</li>
+						{% endif %}
+						<li class="nav-item mr-2">
+							<a id="logout_link" href="{% url 'customer:logout' %}" class="nav-link">
+								<i class="fas fa-sign-out-alt mr-2"></i>
+							</a>
+						</li>
+					{% endblock %}
+					{% else %}
+						<li class="nav-item mr-2">
+							<a id="login_link" href="{% url 'customer:login' %}" class="nav-link">
+								<i class="fas fa-sign-in-alt mr-2"></i>
+								{% trans "Login or register" %}
+							</a>
+						</li>
+					{% endif %}
+			</ul>
+			{% endcomment %}
+		</div>
+
+
 	</div>
 </nav>
 

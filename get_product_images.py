@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dehy.settings")
 django.setup()
 
-from fixture_creator import FixtureCreator
+from deploy_tools.fixture_creator import FixtureCreator
 
 Product = get_model('catalogue', 'Product')
 ProductImage = get_model('catalogue', 'ProductImage')
@@ -43,8 +43,8 @@ def main():
 
 		image_links = df.at[ix, "all_image_links"]
 		alt_images = [df.at[ix, x] for x in ['alt_image1', 'alt_image2', 'alt_image3'] if df.at[ix, x]]
-		print(f'\nnumber of images: {len(alt_images)}')
-		print(f'\nalt_images: {alt_images}')
+		print(f'\n number of images: {len(alt_images)}')
+		print(f'\n alt_images: {alt_images}')
 		for index, img_name in enumerate(alt_images):
 			image_path = product_image_folder_path / img_name
 			media_img_path = settings.BASE_DIR / 'media/images/products' / row['group_id'] / img_name
@@ -54,6 +54,7 @@ def main():
 				continue
 
 			elif os.path.exists(media_img_path):
+				## need to add another check here for seeing if the image exists in the database also
 				print(f'file path: {media_img_path} already exists')
 				continue
 

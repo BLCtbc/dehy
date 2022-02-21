@@ -41,7 +41,6 @@ class CatalogueView(BrowseView):
 			self.context_object_name)
 
 		context_data.update(search_context)
-		print(f'\ncontext_data: {context_data}')
 
 		return context_data
 
@@ -53,7 +52,6 @@ class ProductCategoryView(CoreProductCategoryView):
 
 	def get_context_data(self, *args, **kwargs):
 		context_data = super().get_context_data(*args, **kwargs)
-		print(f'\ncontext_data: {context_data}')
 		return context_data
 
 	def get_category(self):

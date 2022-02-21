@@ -32,9 +32,9 @@ header {
 	list-style: decimal;
 }
 
-#recipe_list {
+#recipe_list, #mini_recipe_list {
 	background: url(/static/img/textures/bg_subtle_dots.png) repeat scroll 0 0;
-	border-color: white;
+	border-top: 12px solid white;
 }
 
 .recipe-description {

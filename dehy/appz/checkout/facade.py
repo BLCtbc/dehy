@@ -54,7 +54,6 @@ class Facade(object):
 				confirmation_method='manual'
 			)
 
-			print(f'\n payment_intent: {intent}')
 			return intent
 		except Exception as e:
 			return json.dumps({

@@ -103,7 +103,7 @@ figure {
 
 .mailing-list-container {
 	padding: 0.5rem 0 4rem;
-	background-color: white;
+	background-color: var(--beige);
 	text-align: center;
 	position: relative;
 	background-image: linear-gradient(to right, rgba(221, 210, 193, 1), rgba(243, 237, 229, 1));
@@ -158,6 +158,7 @@ figure {
 .mailing-list-split {
 	border-color: #f4ecdc61 !important;
 	background-color: white;
+	max-height: 600px;
 }
 
 .mini-shop {
@@ -167,6 +168,7 @@ figure {
 	overflow-x: scroll;
 	border-color: transparent !important;
 	padding-top: 3rem;
+	border-bottom: 12px solid white;
 }
 
 header {
@@ -183,4 +185,23 @@ b	ottom: 1rem;
 
 .recipe-preview .card-title {
 	font-size: 1.5rem !important;
+}
+
+.footer-container {
+	border-top: 12px solid white;
+}
+
+.temp {
+	line-height: normal;
+	color: var(--dark-hg);
+	border-color: var(--dark-hg);
+}
+
+.temp:hover {
+	background-color: var(--dark-hg);
+	color: white;
+}
+
+#recipe_list.content-section {
+	border-color: inherit;
 }
