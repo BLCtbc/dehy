@@ -11,9 +11,6 @@ FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
 
-class CustomView(TemplateView):
-	template_name = "dehy/generic/custom.html"
-
 class WholesaleView(TemplateView):
 	template_name = "dehy/generic/wholesale.html"
 

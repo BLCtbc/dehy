@@ -4,10 +4,12 @@ from oscar.core.loading import get_class, get_classes, get_model
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-from .facade import Facade
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
+from django.views.generic import TemplateView
+from .facade import Facade
+
 import json
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
@@ -119,6 +121,10 @@ class PaymentDetailsView(views.PaymentDetailsView):
 	def get_context_data(self, *args, **kwargs):
 
 		context_data = super().get_context_data(*args, **kwargs)
+
+		## for testing
+		context_data['old'] = True
+
 		context_data['bankcard_form'] = kwargs.get('bankcard_form', BankcardForm())
 		context_data['billing_address_form'] = kwargs.get('billing_address_form', BillingAddressForm())
 		shipping = context_data.get('shipping_address', None)
@@ -133,9 +139,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
 
 		context_data['stripe_data'] = {}
 
-		print(f'\n context_data: {context_data}')
 		payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
-		print(f'\n payment_intent: {payment_intent}')
 		context_data['stripe_data']['client_secret'] = payment_intent.client_secret
 		context_data['stripe_data']['publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
 
@@ -158,6 +162,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
 
 	def handle_payment(self, order_number, total, *args, **kwargs):
 
+		print(f'\n dir(self): {dir(self)}')
 		basket = self.request.basket
 		shipping_address_obj = self.get_shipping_address(self.request.basket)
 
@@ -185,7 +190,6 @@ class PaymentDetailsView(views.PaymentDetailsView):
 			## self.get_billing_address()
 			pass
 
-		# print(f'\n kwargs shipping_address {kwargs["shipping_address"]}')
 
 		stripe_ref = Facade().confirm_payment_intent(
 			id=self.request.basket.payment_intent_id,
