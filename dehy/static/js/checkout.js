@@ -1,27 +1,89 @@
 
 
 window.addEventListener('load', function () {
-	SHIPPING.set_address();
-	same_as_shipping_handler();
-	payment_element_setup();
+	DEHY.checkout.shipping.set_address();
+
+	// DEHY.handlers.checkout.forms = checkout_flow_handler()
+	// DEHY.handlers.checkout.shipping = same_as_shipping_handler()
+	// DEHY.handlers.checkout.init = function() {
+	// 	DEHY.handlers.checkout.forms()
+	// 	DEHY.handlers.checkout.shipping()
+	// }
+	// same_as_shipping_handler();
+	// payment_element_setup();
+	// checkout_flow_handler();
 });
 
-var SHIPPING = {
-	ADDRESS: {},
-	set_address: function() {
-		var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
-		if (billing_address_container) {
-			billing_address_container.querySelectorAll("input[type='text'], input[type='number']").forEach(function(elem) {
-				SHIPPING.ADDRESS[elem.name] = elem.value;
-			});
-			var country_selector = billing_address_container.querySelector("select[name='country']");
-			if (country_selector) {
-				SHIPPING.ADDRESS['country'] = country_selector.value;
-			}
-		}
 
-	}
+// function checkout_flow_handler() {
+// 	var form = document.querySelector('form.checkout-form');
+// 	if (form) {
+// 		form.addEventListener('submit', e=>{
+// 			e.preventDefault();
+// 			submit_form_info(e.target);
+// 			// get form data
+// 			// do ajax post request
+// 			//
+// 		});
+// 	}
+// }
+
+function submit_form_info(form) {
+
+	// var data = {
+	// 	'checkout_step': form.closest('section').id,
+	// 	'form': DEHY.utils.serialize(form)
+	// }
+
+	var data = DEHY.utils.serialize(form)
+	
+
+	$.ajax({
+		method: "POST",
+		url: form.action,
+		data: data,
+		success: form_validation_success,
+		error: form_validation_error,
+		complete: function() {
+			return
+		}
+	});
 }
+
+function form_validation_error(response) {
+	console.log('error: ', response);
+}
+
+function form_validation_success(response) {
+	console.log('success: ', response);
+
+	var data = response.data
+	var next_section = data.next_section
+	var previous_sections = document.querySelectorAll(`section:not(.${next_section})`);
+	previous_sections.forEach(function(elem) {
+		elem.classList.toggle('preview', true);
+	});
+	// set all previous sections to preview mode
+
+	// paint the next form
+}
+
+
+// var SHIPPING = {
+// 	ADDRESS: {},
+// 	set_address: function() {
+// 		var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
+// 		if (billing_address_container) {
+// 			billing_address_container.querySelectorAll("input[type='text'], input[type='number']").forEach(function(elem) {
+// 				SHIPPING.ADDRESS[elem.name] = elem.value;
+// 			});
+// 			var country_selector = billing_address_container.querySelector("select[name='country']");
+// 			if (country_selector) {
+// 				SHIPPING.ADDRESS['country'] = country_selector.value;
+// 			}
+// 		}
+// 	}
+// }
 
 function payment_element_setup() {
 	const stripe_data = JSON.parse(document.getElementById('stripe-data').textContent);
@@ -85,41 +147,41 @@ function payment_element_setup() {
 	}
 }
 
-function same_as_shipping_handler() {
-	var same_as_shipping_checkbox = document.querySelector("input[name=same_as_shipping]");
-
-	if (same_as_shipping_checkbox) {
-		same_as_shipping_checkbox.addEventListener('change', e=>{
-			var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
-
-			billing_address_container.querySelectorAll('.form-group').forEach(function(elem) {
-				elem.classList.toggle('hide', e.target.checked)
-			})
-
-			for (let [key, val] of Object.entries(SHIPPING.ADDRESS)) {
-				if (val) {
-					let elem = billing_address_container.querySelector(`input[name=${key}]`);
-					if (elem) {
-						if (e.target.checked) {
-							elem.value = val
-						} else {
-							elem.value = ''
-						}
-					}
-				}
-			}
-
-			var country_selector = billing_address_container.querySelector("select[name='country']");
-			if (country_selector) {
-				if (e.target.checked) {
-					country_selector.value = SHIPPING.ADDRESS['country']
-				} else {
-					country_selector.selectedIndex = 0
-				}
-			}
-		})
-	}
-}
+// function same_as_shipping_handler() {
+// 	var same_as_shipping_checkbox = document.querySelector("input[name=same_as_shipping]");
+//
+// 	if (same_as_shipping_checkbox) {
+// 		same_as_shipping_checkbox.addEventListener('change', e=>{
+// 			var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
+//
+// 			billing_address_container.querySelectorAll('.form-group').forEach(function(elem) {
+// 				elem.classList.toggle('hide', e.target.checked)
+// 			})
+//
+// 			for (let [key, val] of Object.entries(SHIPPING.ADDRESS)) {
+// 				if (val) {
+// 					let elem = billing_address_container.querySelector(`input[name=${key}]`);
+// 					if (elem) {
+// 						if (e.target.checked) {
+// 							elem.value = val
+// 						} else {
+// 							elem.value = ''
+// 						}
+// 					}
+// 				}
+// 			}
+//
+// 			var country_selector = billing_address_container.querySelector("select[name='country']");
+// 			if (country_selector) {
+// 				if (e.target.checked) {
+// 					country_selector.value = SHIPPING.ADDRESS['country']
+// 				} else {
+// 					country_selector.selectedIndex = 0
+// 				}
+// 			}
+// 		})
+// 	}
+// }
 
 function redirectToCheckoutHandler() {
 	var stripe_redirect_btn = document.getElementById('stripe_redirect');
@@ -148,4 +210,77 @@ function redirectToCheckoutHandler() {
 		return false;
 	}
 
+}
+
+
+DEHY.checkout = {
+	gateway: {
+		init: function() {
+			DEHY.checkout.forms();
+		}
+	},
+	forms: function() {
+		var form = document.querySelector('form.checkout-form');
+		if (form) {
+			form.addEventListener('submit', e=>{
+				e.preventDefault();
+				submit_form_info(e.target);
+				// get form data
+				// do ajax post request
+				//
+			});
+		}
+	},
+	shipping: {
+		ADDRESS: {},
+		set_address: function() {
+			var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
+			if (billing_address_container) {
+				billing_address_container.querySelectorAll("input[type='text'], input[type='number']").forEach(function(elem) {
+					DEHY.checkout.shipping.ADDRESS[elem.name] = elem.value;
+				});
+				var country_selector = billing_address_container.querySelector("select[name='country']");
+				if (country_selector) {
+					DEHY.checkout.shipping.ADDRESS['country'] = country_selector.value;
+				}
+			}
+		},
+		init: function() {
+			DEHY.checkout.shipping.set_address();
+
+			var same_as_shipping_checkbox = document.querySelector("input[name=same_as_shipping]");
+
+			if (same_as_shipping_checkbox) {
+				same_as_shipping_checkbox.addEventListener('change', e=>{
+					var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
+
+					billing_address_container.querySelectorAll('.form-group').forEach(function(elem) {
+						elem.classList.toggle('hide', e.target.checked)
+					})
+
+					for (let [key, val] of Object.entries(DEHY.checkout.shiping.ADDRESS)) {
+						if (val) {
+							let elem = billing_address_container.querySelector(`input[name=${key}]`);
+							if (elem) {
+								if (e.target.checked) {
+									elem.value = val
+								} else {
+									elem.value = ''
+								}
+							}
+						}
+					}
+
+					var country_selector = billing_address_container.querySelector("select[name='country']");
+					if (country_selector) {
+						if (e.target.checked) {
+							country_selector.value = DEHY.checkout.shipping.ADDRESS['country']
+						} else {
+							country_selector.selectedIndex = 0
+						}
+					}
+				})
+			}
+		},
+	}
 }

@@ -52,8 +52,12 @@ class ShippingMethodForm(forms.Form):
 		super().__init__(*args, **kwargs)
 		self.fields['method_code'].choices = ((m.code, m.name) for m in methods)
 
+class ShippingForm(ShippingAddressForm, ShippingMethodForm):
 
-class GatewayForm(AuthenticationForm):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+class UserInfoForm(AuthenticationForm):
 	username = forms.EmailField(label=_("My email address is"))
 	GUEST, NEW, EXISTING = 'anonymous', 'new', 'existing'
 	CHOICES = (
@@ -63,6 +67,10 @@ class GatewayForm(AuthenticationForm):
 		(EXISTING, _('I am a returning customer, and my password is')))
 	options = forms.ChoiceField(widget=forms.widgets.RadioSelect,
 								choices=CHOICES, initial=GUEST)
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['password'].widget.attrs.update({'disabled': 'disabled'})
 
 	def clean_username(self):
 		return normalise_email(self.cleaned_data['username'])
