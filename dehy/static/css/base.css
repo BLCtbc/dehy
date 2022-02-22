@@ -735,3 +735,8 @@ input, select, label {
 	margin-left: 0;
 	margin-right: 0;
 }
+
+.sub-header h2 {
+	color: inherit;
+	font-weight: 400;
+}

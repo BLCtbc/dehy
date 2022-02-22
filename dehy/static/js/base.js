@@ -1,6 +1,13 @@
 var DEHY = {
 	init: function(choice='') {
 		this.handler_choice(choice);
+		$.ajaxSetup({
+			beforeSend: function(xhr, settings) {
+				if (!DEHY.utils.csrfSafeMethod(settings.type) && !this.crossDomain) {
+					xhr.setRequestHeader("X-CSRFToken", DEHY.utils.getCookie('csrftoken'));
+				}
+			}
+		});
 	},
 	handler_choice: function(choice='') {
 		switch (choice) {
@@ -61,6 +68,56 @@ var DEHY = {
 		update_cart_quantity: function(data) {
 			var cart = document.getElementById("cart-quantity");
 			cart.innerText = data.num_cart_items
+		}
+	},
+	utils: {
+		serialize: function(form) {
+
+			// Setup our serialized data
+			var serialized = [];
+
+			// Loop through each field in the form
+			for (var i = 0; i < form.elements.length; i++) {
+
+				var field = form.elements[i];
+
+				// Don't serialize fields without a name, submits, buttons, file and reset inputs, and disabled fields
+				if (!field.name || field.disabled || field.type === 'file' || field.type === 'reset' || field.type === 'submit' || field.type === 'button') continue;
+
+				// If a multi-select, get all selections
+				if (field.type === 'select-multiple') {
+					for (var n = 0; n < field.options.length; n++) {
+						if (!field.options[n].selected) continue;
+						serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.options[n].value));
+					}
+				}
+
+				// Convert field data to a query string
+				else if ((field.type !== 'checkbox' && field.type !== 'radio') || field.checked) {
+					serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
+				}
+			}
+
+			return serialized.join('&');
+
+		},
+		getCookie: function(name) {
+			var cookieValue = null;
+			if (document.cookie && document.cookie !== '') {
+				var cookies = document.cookie.split(';');
+				for (var i = 0; i < cookies.length; i++) {
+					var cookie = cookies[i].trim();
+					if (cookie.substring(0, name.length + 1) === (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
+				}
+			}
+			return cookieValue;
+		},
+
+		csrfSafeMethod: function(method) {
+			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 		}
 	}
 }
