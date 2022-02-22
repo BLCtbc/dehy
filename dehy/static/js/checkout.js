@@ -36,7 +36,8 @@ function submit_form_info(form) {
 	// }
 
 	var data = DEHY.utils.serialize(form)
-	
+	console.log('form data: ', data)
+
 
 	$.ajax({
 		method: "POST",
