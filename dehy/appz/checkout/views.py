@@ -61,6 +61,17 @@ class CheckoutView(TemplateView, CheckoutSessionMixin):
 		return context_data
 
 
+	def validate_user_info(self, request):
+		valid = False
+		self.pre_conditions += ['check_user_email_is_captured']
+		self.check_pre_conditions(request)
+		form = self.UserInfoForm(request.POST)
+
+		if form.is_valid():
+			valid = True
+
+		return valid
+
 	def post(self, request, *args, **kwargs):
 		print('\n *** post() ***')
 		data = {}
@@ -71,14 +82,14 @@ class CheckoutView(TemplateView, CheckoutSessionMixin):
 			print(f'\n dir(request): {dir(request)}')
 
 			if request.resolver_match.url_name is 'shipping':
-				## also need to do any other user validation that oscar might do
-				self.pre_conditions += ['check_user_email_is_captured']
-				self.check_pre_conditions(request)
-				user_info_form = self.UserInfoForm(request.POST)
-				if user_info_form.is_valid():
+
+				if self.validate_user_info(request):
 					print('\n **** validated user_info **** \n')
 					data['forms'] = [self.ShippingAddressForm(), self.ShippingMethodForm()]
 					data['next_section'] = 'shipping'
+
+				## also need to do any other user validation that oscar might do
+
 
 			elif request.resolver_match.url_name is 'additional_info':
 				# validate shipping forms
