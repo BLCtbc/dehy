@@ -1,4 +1,4 @@
-from oscar.apps.checkout import views
+from oscar.apps.checkout import views, signals
 from oscar.apps.payment import models
 from oscar.core.loading import get_class, get_classes, get_model
 from django.urls import reverse, reverse_lazy
@@ -35,6 +35,38 @@ class IndexView(views.IndexView):
 	pre_conditions = [
 		'check_basket_is_not_empty',
 		'check_basket_is_valid']
+
+	def form_valid(self, form):
+		print('\n ---- checking if form is valid \n')
+		if form.is_guest_checkout() or form.is_new_account_checkout():
+			email = form.cleaned_data['username']
+			self.checkout_session.set_guest_email(email)
+
+			# We raise a signal to indicate that the user has entered the
+			# checkout process by specifying an email address.
+			signals.start_checkout.send_robust(
+				sender=self, request=self.request, email=email)
+
+			if form.is_new_account_checkout():
+				messages.info(
+					self.request,
+					_("Create your account and then you will be redirected "
+					  "back to the checkout process"))
+				self.success_url = "%s?next=%s&email=%s" % (
+					reverse('customer:register'),
+					reverse('checkout:shipping-address'),
+					quote(email)
+				)
+		else:
+			user = form.get_user()
+			login(self.request, user)
+
+			# We raise a signal to indicate that the user has entered the
+			# checkout process.
+			signals.start_checkout.send_robust(
+				sender=self, request=self.request)
+
+		return redirect(self.get_success_url())
 
 	# def get_context_data(self, *args, **kwargs):
 	#
