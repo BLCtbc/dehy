@@ -1,7 +1,7 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
-<form id="checkout" method="post" class="card card-body bg-light checkout-form" action="{% url 'checkout:shipping' %}">
+<form id="checkout" method="post" class="card card-body bg-light checkout-form" action="{% url 'checkout:checkout' %}">
 	{% csrf_token %}
 	{{ form.non_field_errors }}
 

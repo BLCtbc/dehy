@@ -1,20 +1,24 @@
 {% extends "dehy/layout.html" %}
 {% load i18n %}
 {% load category_tags %}
+{% load static %}
+
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/checkout.css' %}"/>
+{% endblock extrastyles %}
 
 {% block layout %}
 
     <header class="header container">
-        <div class="page_inner">
             <div class="row">
+				<div class="col-12 mt-5 mb-5">
                 {% include "dehy/partials/brand.html" %}
+				</div>
             </div><!-- /row -->
-        </div>
         {% block checkout_nav %}{% endblock %}
     </header><!-- /header -->
 
     <div class="container page">
-       <div class="page_inner">
             {% include 'oscar/partials/alert_messages.html' %}
 
             <div class="sub-header">
@@ -47,7 +51,6 @@
 
 
 
-        </div><!-- /page_inner -->
     </div>
     {% include "oscar/partials/footer_checkout.html" %}
 {% endblock %}

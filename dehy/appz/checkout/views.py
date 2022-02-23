@@ -1,4 +1,4 @@
-from oscar.apps.checkout import views
+from oscar.apps.checkout import signals, views
 from oscar.apps.payment import models
 from oscar.core.loading import get_class, get_classes, get_model
 from django.urls import reverse, reverse_lazy
@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
-from django.views.generic import TemplateView
+from django.views import generic
 from .facade import Facade
 
 # from oscar.apps.basket.middleware import BasketMiddleware
@@ -16,6 +16,11 @@ import json
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
 
+StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, ShippingForm \
+	= get_classes('checkout.forms', ['StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'ShippingForm'])
+
+BankcardForm, BillingAddressForm \
+	= get_classes('payment.forms', ['BankcardForm', 'BillingAddressForm'])
 
 Repository = get_class('shipping.repository', 'Repository')
 CheckoutSessionMixin = get_class('checkout.session', 'CheckoutSessionMixin')
@@ -29,76 +34,100 @@ def get_shipping(request):
 def get_billing(request):
 	pass
 
-class CheckoutView(TemplateView, CheckoutSessionMixin):
-	StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, ShippingForm \
-		= get_classes('checkout.forms', ['StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'ShippingForm'])
+class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
-	BankcardForm, BillingAddressForm \
-		= get_classes('payment.forms', ['BankcardForm', 'BillingAddressForm'])
-
-	CHECKOUT_FORMS = {
-		'USER_INFO': {'forms': [UserInfoForm]},
-		'SHIPPING': {'forms': [ShippingAddressForm, ShippingMethodForm]},
-		'ADDITIONAL_INFO': '',
-		'BILLING':[BillingAddressForm, BankcardForm],
-		'PREVIEW_AND_CONFIRM': '',
-	}
-	CHECKOUT_FLOW = list(CHECKOUT_FORMS.keys())
 
 	pre_conditions = [
 		'check_basket_is_not_empty',
 		'check_basket_is_valid'
 	]
-
+	success_url = reverse_lazy('checkout:shipping')
 	template_name = "dehy/checkout/checkout_v2.html"
 	form_class = UserInfoForm
+	# def dispatch(self, request, *args, **kwargs):
+	# 	return super().dispatch(request, *args, **kwargs)
+
 
 	def get_context_data(self, *args, **kwargs):
-		print('get_context_data')
 		context_data = super().get_context_data(*args, **kwargs)
-		print(f'\n context_data: {context_data}')
-
+		print(f'\n context_data (index): {context_data}')
 		return context_data
 
+	def form_valid(self, form):
+		print(f'\n *** form_valid() index *** \n')
 
-	def validate_user_info(self, request):
-		valid = False
-		self.pre_conditions += ['check_user_email_is_captured']
-		self.check_pre_conditions(request)
-		form = self.UserInfoForm(request.POST)
+		# must use form_valid method...cannot validate this form directly
+		# why? see: https://docs.djangoproject.com/en/3.2/ref/forms/api/#behavior-of-unbound-forms
 
-		if form.is_valid():
-			valid = True
+		if form.is_guest_checkout() or form.is_new_account_checkout():
+			email = form.cleaned_data['username']
+			self.checkout_session.set_guest_email(email)
 
-		return valid
+			# We raise a signal to indicate that the user has entered the
+			# checkout process by specifying an email address.
+			signals.start_checkout.send_robust(
+				sender=self, request=self.request, email=email)
+
+			if form.is_new_account_checkout():
+				messages.info(
+					self.request,
+					_("Create your account and then you will be redirected "
+					  "back to the checkout process"))
+				self.success_url = "%s?next=%s&email=%s" % (
+					reverse('customer:register'),
+					reverse('checkout:shipping-address'),
+					quote(email)
+				)
+		else:
+			user = form.get_user()
+			login(self.request, user)
+
+			# We raise a signal to indicate that the user has entered the
+			# checkout process.
+			signals.start_checkout.send_robust(
+				sender=self, request=self.request)
+
+		return redirect(self.get_success_url())
 
 	def post(self, request, *args, **kwargs):
-		print('\n *** post() ***')
+		# super().get_context_data(*args, **kwargs)
+		print("\n *** post() index *** \n")
 		data = {}
+		status_code = 400
 		if request.is_ajax():
-			# get the form
-			# checkout_step = request.POST.get('checkout_step', None).upper()
 			print(f'\n request.POST: {request.POST}')
 			print(f'\n dir(request): {dir(request)}')
+			print(f'\n dir(self): {dir(self)}')
+
+			self.pre_conditions += ['check_user_email_is_captured']
+			print('\n *** check_pre_conditions() *** \n')
+
+			self.check_pre_conditions(request)
+			form = self.form_class(request, request.POST)
+			response = super().post(request, *args, **kwargs)
+
+			if form.is_valid():
+				print(f'\n form.is_valid(): {form.is_valid()}')
+				status_code = 200
+				data['section'] = 'user_info'
+				data['next_section'] = 'shipping'
+
+				# send all elems to be previewed, along with the values
+				data['preview_elems'] = {'email': form.cleaned_data['username']}
+			
+
 
 			if request.resolver_match.url_name is 'shipping':
+				pass
 
-				if self.validate_user_info(request):
-					print('\n **** validated user_info **** \n')
-					data['forms'] = [self.ShippingAddressForm(), self.ShippingMethodForm()]
-					data['next_section'] = 'shipping'
+				# if self.validate_user_info(request):
+					# print('\n **** validated user_info **** \n')
+					# data['forms'] = [self.ShippingAddressForm(), self.ShippingMethodForm()]
+
 
 				## also need to do any other user validation that oscar might do
 
 
-			elif request.resolver_match.url_name is 'additional_info':
-				# validate shipping forms
-				# do oscar stuff, like check_pre_conditions
-				self.pre_conditions += ['check_shipping_data_is_captured']
-				self.check_pre_conditions(request)
-				if all([self.ShippingAddressForm(request.POST).is_valid(), self.ShippingMethodForm(request.POST).is_valid()]):
-					data['next_section'] = 'additional_info'
-					pass
 
 			elif request.resolver_match.url_name is 'billing':
 				pass
@@ -110,10 +139,16 @@ class CheckoutView(TemplateView, CheckoutSessionMixin):
 				# and
 				# get the next form
 				# then return it
-			print('data: ', data)
-			response = JsonResponse(data)
+		print('data: ', data)
+			# response = JsonResponse(data)
+		response = JsonResponse(data)
+		response.status_code = status_code
 
 		return response
+	#
+	# def setup(self, request, *args, **kwargs):
+	# 	return super().setup(request, *args, **kwargs)
+
 
 	def get(self, request, *args, **kwargs):
 		print('\n*** get() ***')
@@ -121,6 +156,35 @@ class CheckoutView(TemplateView, CheckoutSessionMixin):
 		response.context_data.update({'form': self.form_class()})
 		return response
 
+	# def dispatch(self, request, *args, **kwargs):
+	# 	return super().dispatch(request, *args, **kwargs)
+
+
+
+class ShippingView(CheckoutSessionMixin, generic.FormView):
+	pre_conditions = [
+		'check_basket_is_not_empty',
+		'check_basket_is_valid',
+		'check_user_email_is_captured'
+	]
+	success_url = reverse_lazy('checkout:additional_info')
+	template_name = "dehy/checkout/checkout_v2.html"
+	form_class = ShippingAddressForm
+
+	def get_available_addresses(self):
+		# Include only addresses where the country is flagged as valid for
+		# shipping. Also, use ordering to ensure the default address comes
+		# first.
+		return self.request.user.addresses.filter(
+			country__is_shipping_country=True).order_by(
+			'-is_default_for_shipping')
+
+	def get_context_data(self, **kwargs):
+		ctx = super().get_context_data(**kwargs)
+		if self.request.user.is_authenticated:
+			# Look up address book data
+			ctx['addresses'] = self.get_available_addresses()
+		return ctx
 
 	def get_available_shipping_methods(self):
 		"""
@@ -128,19 +192,51 @@ class CheckoutView(TemplateView, CheckoutSessionMixin):
 		"""
 		# Shipping methods can depend on the user, the contents of the basket
 		# and the shipping address (so we pass all these things to the
-		# repository).  I haven't come across a scenario that doesn't fit this
+		# repository). I haven't come across a scenario that doesn't fit this
 		# system.
 		return Repository().get_shipping_methods(
 			basket=self.request.basket, user=self.request.user,
 			shipping_addr=self.get_shipping_address(self.request.basket),
 			request=self.request)
 
+	## from ShippingMethodView
+	def form_valid(self, form):
+		print('\n*** form_valid() ShippingView ***')
 
+		# Save the code for the chosen shipping method in the session
+		# and continue to the next step.
+		self.checkout_session.use_shipping_method(form.cleaned_data['method_code'])
+		return self.get_success_response()
 
-	def get_next_form(self, request, current_step):
-		current_step = CHECKOUT_FLOW.index(current_step)
-		return CHECKOUT_FORMS[CHECKOUT_FLOW[CHECKOUT_FLOW.index(current_step)+1]]
+	def get(self, request, *args, **kwargs):
+		print('\n*** get() ShippingView ***')
+		response = super().get(request, *args, **kwargs)
+		response.context_data.update({'form': self.form_class()})
+		return response
 
+	def post(self, request, *args, **kwargs):
+		# super().get_context_data(*args, **kwargs)
+		print("\n *** post() ShippingView *** \n")
+		self._methods = self.get_available_shipping_methods()
+		data = {}
+		status_code = 400
+		if request.is_ajax():
+			# self.pre_conditions += ['check_user_email_is_captured']
+			print('\n *** check_pre_conditions() *** \n')
+			self.check_pre_conditions(request)
+			shipping_method_form = ShippingMethodForm(request.POST)
+			shipping_address_form = ShippingAddressForm(request.POST)
+			response = super().post(request, *args, **kwargs)
+			print(f'shipping_method: {shipping_method_form.is_valid()} shipping_address: {shipping_address_form.is_valid()}')
+			if all([shipping_address_form.is_valid(), shipping_method_form.is_valid()]):
+
+				status_code = 200
+				data['next_section'] = 'additional_info'
+
+		response = JsonResponse(data)
+		response.status_code = status_code
+
+		return response
 # class IndexView(views.IndexView):
 # 	"""
 # 	First page of the checkout.  We prompt user to either sign in, or

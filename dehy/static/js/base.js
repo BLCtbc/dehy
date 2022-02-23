@@ -118,6 +118,30 @@ var DEHY = {
 
 		csrfSafeMethod: function(method) {
 			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+		},
+		create_element: function({tag, classes, style, text, attrs} = {}) {
+			var elem = document.createElement(`${tag}`)
+			if (classes) {
+				elem.className = classes
+			}
+
+			if (style) {
+				elem.style.cssText = style
+			}
+
+			if (text) {
+				var content = document.createTextNode(`${text}`);
+				elem.appendChild(content)
+			}
+
+			if (attrs) {
+				for (let [key, val] of Object.entries(attrs)) {
+					var dataItem = document.createAttribute(`${key}`);
+					dataItem.value = val
+					elem.setAttributeNode(dataItem)
+				}
+			}
+			return elem
 		}
 	}
 }

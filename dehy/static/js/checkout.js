@@ -28,46 +28,45 @@ window.addEventListener('load', function () {
 // 	}
 // }
 
-function submit_form_info(form) {
+// function submit_form_info(form) {
+//
+// 	// var data = {
+// 	// 	'checkout_step': form.closest('section').id,
+// 	// 	'form': 'aaaaaaaaaa'
+// 	// }
+//
+// 	var data = DEHY.utils.serialize(form)
+// 	console.log('form data: ', data)
+//
+//
+// 	$.ajax({
+// 		method: "POST",
+// 		url: form.action,
+// 		data: data,
+// 		success: form_validation_success,
+// 		error: form_validation_error,
+// 		complete: function() {
+// 			return
+// 		}
+// 	});
+// }
 
-	// var data = {
-	// 	'checkout_step': form.closest('section').id,
-	// 	'form': DEHY.utils.serialize(form)
-	// }
+// function form_validation_error(response) {
+// 	console.log('error: ', response);
+// }
 
-	var data = DEHY.utils.serialize(form)
-	console.log('form data: ', data)
-
-
-	$.ajax({
-		method: "POST",
-		url: form.action,
-		data: data,
-		success: form_validation_success,
-		error: form_validation_error,
-		complete: function() {
-			return
-		}
-	});
-}
-
-function form_validation_error(response) {
-	console.log('error: ', response);
-}
-
-function form_validation_success(response) {
-	console.log('success: ', response);
-
-	var data = response.data
-	var next_section = data.next_section
-	var previous_sections = document.querySelectorAll(`section:not(.${next_section})`);
-	previous_sections.forEach(function(elem) {
-		elem.classList.toggle('preview', true);
-	});
-	// set all previous sections to preview mode
-
-	// paint the next form
-}
+// function form_validation_success(response) {
+// 	console.log('success: ', response);
+//
+// 	var next_section = response.next_section
+// 	var previous_sections = document.querySelectorAll(`section:not(.${next_section})`);
+// 	previous_sections.forEach(function(elem) {
+// 		elem.classList.toggle('preview', true);
+// 	});
+// 	// set all previous sections to preview mode
+//
+// 	// paint the next form
+// }
 
 
 // var SHIPPING = {
@@ -217,20 +216,106 @@ function redirectToCheckoutHandler() {
 DEHY.checkout = {
 	gateway: {
 		init: function() {
-			DEHY.checkout.forms();
+			DEHY.checkout.forms.init();
 		}
 	},
-	forms: function() {
-		var form = document.querySelector('form.checkout-form');
-		if (form) {
-			form.addEventListener('submit', e=>{
-				e.preventDefault();
-				submit_form_info(e.target);
-				// get form data
-				// do ajax post request
-				//
+	forms: {
+		create: function(action) {
+			// create the form
+			var form = DEHY.utils.create_element({tag:'form', attrs:{'action': action}});
+			return form
+		},
+		submit_form_info: function(form) {
+
+			var data = DEHY.utils.serialize(form)
+			console.log('form data: ', data)
+			$.ajax({
+				method: "POST",
+				url: form.action,
+				data: data,
+				success: DEHY.checkout.forms.success,
+				error: DEHY.checkout.forms.error,
+				complete: function() {
+					return
+				}
 			});
-		}
+		},
+		success: function(response) {
+			function get_preview_section(elems, section) {
+
+				switch(section) {
+					case 'user_info':
+						console.log('user_info');
+						let elem = DEHY.utils.create_element({tag:'div', classes:'email', text:elems['email']})
+						return elem;
+					case 'shipping':
+						// do stuff
+						return ;
+					case 'additional_info':
+						return ;
+					case 'billing':
+						return ;
+					case 'review_and_purchase':
+						return ;
+
+					default:
+						console.log(`Sorry, we are out of ${section}.`);
+				}
+			}
+
+			console.log('success: ', response);
+
+			var next_section = response.next_section
+			var previous_sections = document.querySelectorAll(`section:not(.${next_section})`);
+			previous_sections.forEach(function(elem) {
+				// set all other sections to preview mode
+				elem.classList.toggle('preview', true);
+				elem.querySelectorAll('form').forEach(function(form) {
+					form.remove()
+				});
+			});
+
+			// create the elements we're going to reserve, retrieving necessary info from the pageNav
+			// paint the elements
+
+			var preview_container = DEHY.utils.create_element({tag:'div', classes:'preview_container'});
+
+			preview_container.appendChild(get_preview_section(response.preview_elems, response.section))
+
+			var next_section_elem = document.querySelector(`section.${next_section}`)
+
+
+			next_section_elem.appendChild(DEHY.checkout.forms.create(action=`/${next_section}/`))
+
+			// if (response.preview_elems) {
+			// 	for (let [tag, val] of Object.entries(response.preview_elems)) {
+			// 		let elem = DEHY.utils.create_element({tag:tag, classes:key, text:val['text']})
+			// 		preview_container.appendChild(elem)
+			// 	}
+			// }
+			document.getElementById(response.section).appendChild(preview_container)
+
+
+
+
+
+		},
+		error: function(response) {
+			console.log('error: ', response);
+
+		},
+		init: function() {
+			var form = document.querySelector('form.checkout-form');
+			if (form) {
+				form.addEventListener('submit', e=>{
+					e.preventDefault();
+					DEHY.checkout.forms.submit_form_info(e.target);
+					// get form data
+					// do ajax post request
+					//
+				});
+			}
+		},
 	},
 	shipping: {
 		ADDRESS: {},
