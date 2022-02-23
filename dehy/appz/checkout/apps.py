@@ -13,7 +13,10 @@ class CheckoutConfig(apps.CheckoutConfig):
 	namespace = 'checkout'
 
 	def ready(self):
-		self.checkout_view = get_class('checkout.views', 'CheckoutView')
+		self.checkout_view = get_class('checkout.views', 'CheckoutIndexView')
+		self.shipping_view = get_class('checkout.views', 'ShippingView')
+		# self.additional_info_view = get_class('checkout.views', 'AdditionalInfoView')
+		# self.billing_view = get_class('checkout.views', 'BillingView')
 
 		# self.index_view = get_class('checkout.views', 'IndexView')
 		# self.shipping_address_view = get_class('checkout.views', 'ShippingAddressView')
@@ -29,8 +32,9 @@ class CheckoutConfig(apps.CheckoutConfig):
 	def get_urls(self):
 		urls = [
 			path('', self.checkout_view.as_view(), name='checkout'),
-			path('shipping/', self.checkout_view.as_view(), name='shipping'),
-			path('additional_info/', self.checkout_view.as_view(), name='additional_info'),
+			path('shipping/', self.shipping_view.as_view(), name='shipping'),
+			# path('additional_info/', self.additional_info_view.as_view(), name='additional_info'),
+			# path('billing/', self.billing_view.as_view(), name='additional_info'),
 
 			# path('', self.index_view.as_view(), name='index'),
 			#

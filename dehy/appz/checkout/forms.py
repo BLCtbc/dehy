@@ -68,14 +68,15 @@ class UserInfoForm(AuthenticationForm):
 	options = forms.ChoiceField(widget=forms.widgets.RadioSelect,
 								choices=CHOICES, initial=GUEST)
 
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self.fields['password'].widget.attrs.update({'disabled': 'disabled'})
+	# def __init__(self, *args, **kwargs):
+	# 	super().__init__(*args, **kwargs)
+	# 	self.fields['password'].widget.attrs.update({'disabled': 'disabled'})
 
 	def clean_username(self):
 		return normalise_email(self.cleaned_data['username'])
 
 	def clean(self):
+		print("\n *** clean() *** \n")
 		if self.is_guest_checkout() or self.is_new_account_checkout():
 			if 'password' in self.errors:
 				del self.errors['password']
