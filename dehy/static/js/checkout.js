@@ -2,88 +2,9 @@
 
 window.addEventListener('load', function () {
 	DEHY.checkout.shipping.set_address();
-
-	// DEHY.handlers.checkout.forms = checkout_flow_handler()
-	// DEHY.handlers.checkout.shipping = same_as_shipping_handler()
-	// DEHY.handlers.checkout.init = function() {
-	// 	DEHY.handlers.checkout.forms()
-	// 	DEHY.handlers.checkout.shipping()
-	// }
-	// same_as_shipping_handler();
-	// payment_element_setup();
-	// checkout_flow_handler();
 });
 
 
-// function checkout_flow_handler() {
-// 	var form = document.querySelector('form.checkout-form');
-// 	if (form) {
-// 		form.addEventListener('submit', e=>{
-// 			e.preventDefault();
-// 			submit_form_info(e.target);
-// 			// get form data
-// 			// do ajax post request
-// 			//
-// 		});
-// 	}
-// }
-
-// function submit_form_info(form) {
-//
-// 	// var data = {
-// 	// 	'checkout_step': form.closest('section').id,
-// 	// 	'form': 'aaaaaaaaaa'
-// 	// }
-//
-// 	var data = DEHY.utils.serialize(form)
-// 	console.log('form data: ', data)
-//
-//
-// 	$.ajax({
-// 		method: "POST",
-// 		url: form.action,
-// 		data: data,
-// 		success: form_validation_success,
-// 		error: form_validation_error,
-// 		complete: function() {
-// 			return
-// 		}
-// 	});
-// }
-
-// function form_validation_error(response) {
-// 	console.log('error: ', response);
-// }
-
-// function form_validation_success(response) {
-// 	console.log('success: ', response);
-//
-// 	var next_section = response.next_section
-// 	var previous_sections = document.querySelectorAll(`section:not(.${next_section})`);
-// 	previous_sections.forEach(function(elem) {
-// 		elem.classList.toggle('preview', true);
-// 	});
-// 	// set all previous sections to preview mode
-//
-// 	// paint the next form
-// }
-
-
-// var SHIPPING = {
-// 	ADDRESS: {},
-// 	set_address: function() {
-// 		var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
-// 		if (billing_address_container) {
-// 			billing_address_container.querySelectorAll("input[type='text'], input[type='number']").forEach(function(elem) {
-// 				SHIPPING.ADDRESS[elem.name] = elem.value;
-// 			});
-// 			var country_selector = billing_address_container.querySelector("select[name='country']");
-// 			if (country_selector) {
-// 				SHIPPING.ADDRESS['country'] = country_selector.value;
-// 			}
-// 		}
-// 	}
-// }
 
 function payment_element_setup() {
 	const stripe_data = JSON.parse(document.getElementById('stripe-data').textContent);
@@ -220,14 +141,40 @@ DEHY.checkout = {
 		}
 	},
 	forms: {
-		create: function(action) {
+		submit_handler: function(e, form=DEHY.checkout.forms.get()) {
+			console.log('submit_handler');
+			e.preventDefault();
+			if (!form.checkValidity()) {
+				console.log('submit handler')
+				document.getElementById('error_container').classList.toggle('hidden', false);
+				console.log(form.reportValidity());
+				return false
+			}
+			DEHY.checkout.forms.submit_form_info(e.target);
+		},
+		get: function() {
+			return document.getElementById('checkout')
+		},
+		create: function(data) {
 			// create the form
-			var form = DEHY.utils.create_element({tag:'form', attrs:{'action': action}});
+
+			var form = DEHY.utils.create_element({tag:'form', classes: 'card card-body checkout-form', attrs:{'method':"post", 'id':'checkout', 'action': `/checkout/${data.next_section}/`}});
+			let csrftoken_elem = DEHY.utils.create_element({tag:'input', attrs:{'name':'csrfmiddlewaretoken', 'type': 'hidden', 'value':DEHY.utils.getCookie('csrftoken')}})
+			form.append(csrftoken_elem)
+
+			form.append(DEHY.utils.create_elements(data.form_structure))
 			return form
 		},
 		submit_form_info: function(form) {
 
-			var data = DEHY.utils.serialize(form)
+			var data = {}
+			if (form.closest('section').id == 'shipping') {
+				// create two different forms
+				data['shipping_address'] = DEHY.utils.serialize(form.querySelector('.address-container'));
+				data['shipping_method'] = DEHY.utils.serialize(form.querySelector('.shipping-method-container'));
+			} else {
+				data = DEHY.utils.serialize(form)
+			}
 			console.log('form data: ', data)
 			$.ajax({
 				method: "POST",
@@ -250,6 +197,10 @@ DEHY.checkout = {
 						return elem;
 					case 'shipping':
 						// do stuff
+						for (let [tag, val] of Object.entries(response.preview_elems)) {
+							let elem = DEHY.utils.create_element({tag:tag, classes:key, text:val['text']})
+							preview_container.append(elem)
+						}
 						return ;
 					case 'additional_info':
 						return ;
@@ -279,46 +230,60 @@ DEHY.checkout = {
 			// paint the elements
 
 			var preview_container = DEHY.utils.create_element({tag:'div', classes:'preview_container'});
+			preview_container.append(get_preview_section(response.preview_elems, response.section));
+			var next_section_elem = document.querySelector(`section.${next_section}`);
 
-			preview_container.appendChild(get_preview_section(response.preview_elems, response.section))
-
-			var next_section_elem = document.querySelector(`section.${next_section}`)
-
-
-			next_section_elem.appendChild(DEHY.checkout.forms.create(action=`/${next_section}/`))
-
-			// if (response.preview_elems) {
-			// 	for (let [tag, val] of Object.entries(response.preview_elems)) {
-			// 		let elem = DEHY.utils.create_element({tag:tag, classes:key, text:val['text']})
-			// 		preview_container.appendChild(elem)
-			// 	}
-			// }
-			document.getElementById(response.section).appendChild(preview_container)
-
-
-
-
+			next_section_elem.append(DEHY.checkout.forms.create(response));
+			document.getElementById(response.section).append(preview_container);
+			DEHY.checkout.forms.init();
 
 		},
 		error: function(response) {
+			// add errors to the error element
 			console.log('error: ', response);
+			document.getElementById('error_container').append(DEHY.utils.create_element({tag:'div', classes:'error', text: response.statusText, attrs:{'id':'errors'}}))
 
 		},
 		init: function() {
+			// debounceBtn.addEventListener("click", debounce(this, function () {displayDebounce.textContent = "Today is: " + new Date().toUTCString();}, 1000));
+
 			var form = document.querySelector('form.checkout-form');
 			if (form) {
+				/******
+					debounce testing
+				*****/
+				// form.addEventListener('submit', DEHY.utils.debounce(this, DEHY.checkout.forms.submit_handler, 500));
+				// form.addEventListener('submit', e=> {
+				// 	e.preventDefault();
+				// 	DEHY.utils.debounce(e, DEHY.checkout.forms.submit_handler(e), 500);
+				// });
+
 				form.addEventListener('submit', e=>{
 					e.preventDefault();
+					if (!form.checkValidity()) {
+						document.getElementById('error_container').classList.toggle('hidden', false);
+						return false
+					}
 					DEHY.checkout.forms.submit_form_info(e.target);
-					// get form data
-					// do ajax post request
-					//
+					form.reportValidity();
 				});
+				form.addEventListener('change', e=> {
+					console.log('form changed')
+					if (e.target.matches('#id_postcode, #id_state, #id_city')) {
+						var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action}
+						DEHY.checkout.shipping.get_shipping_methods(data)
+						console.log('matched')
+						// get shipping methods
+					}
+				})
 			}
 		},
 	},
 	shipping: {
 		ADDRESS: {},
+		address_is_valid: function() {
+			//
+		},
 		set_address: function() {
 			var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
 			if (billing_address_container) {
@@ -368,5 +333,67 @@ DEHY.checkout = {
 				})
 			}
 		},
+		get_shipping_methods: function(data) {
+			//
+			$.ajax({
+				method: "GET",
+				url: data.action,
+				data: data,
+				success: DEHY.checkout.shipping.display_shipping_methods,
+				error: DEHY.checkout.forms.error,
+				complete: function() {
+					return
+				}
+			});
+		},
+		display_shipping_methods: function(data) {
+			// add the shipping methods to the existing form
+			var form = DEHY.checkout.forms.get(),
+				fieldset = DEHY.utils.create_element({tag:'fieldset'});
+
+			var shipping_method_container = document.querySelector('.shipping-method-container');
+
+			if (shipping_method_container) {
+				DEHY.utils.remove_children(shipping_method_container);
+			} else {
+				shipping_method_container = DEHY.utils.create_element({tag:'div', classes:'shipping-method-container'})
+			}
+
+
+			shipping_method_container.append(fieldset)
+			fieldset.append(DEHY.utils.create_element({tag:'legend', classes: "required", text:'Shipping Methods'}))
+			data.shipping_methods.forEach((method, ix) => {
+				// create form group
+				let id = `id_shipping_options_${ix}`;
+				var method_structure = [{
+					'tag': 'div',
+					'classes': 'form-group form-check row',
+					'elems': [{
+						'tag': 'input',
+						'classes':'form-check-input',
+						'attrs': {
+							'type':'radio', 'name':'shipping_options', 'id':id, 'value': method.code
+						}
+					},
+					{
+						'tag': 'label',
+						'classes': 'form-check-label',
+						'text': `${method.name} — $${method.cost}`,
+						'attrs': {
+							'for': id,
+						}
+					}]
+				}]
+				let elem = DEHY.utils.create_elements(method_structure, fieldset)
+				// append it to the shipping_method_container
+
+			})
+
+			DEHY.utils.cleanup_temp_containers()
+			form.insertBefore(shipping_method_container, document.querySelector('.error-container.button-container'))
+			form.querySelector("button[type='submit']").hidden = false;
+			console.log('display_shipping_methods: ', data)
+		},
 	}
 }
+

@@ -740,3 +740,7 @@ input, select, label {
 	color: inherit;
 	font-weight: 400;
 }
+
+.hidden {
+	display: none;
+}

@@ -1,7 +1,7 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
-<form id="checkout" method="post" class="card card-body bg-light checkout-form" action="{% url 'checkout:checkout' %}">
+<form id="checkout" method="post" class="card card-body checkout-form" action="{% url 'checkout:checkout' %}">
 	{% csrf_token %}
 	{{ form.non_field_errors }}
 
@@ -43,7 +43,7 @@
 	<div class="form-group">
 		<div class="row">
 			<div class="col-sm-3">
-				<button type="submit" class="btn btn-lg btn-block btn-primary" data-loading-text="{% trans 'Continuing...' %}">{% trans "Continue" %}</button>
+				<button type="submit" class="btn btn-lg btn-block btn-primary">{% trans "Continue" %}</button>
 			</div>
 		</div>
 	</div>

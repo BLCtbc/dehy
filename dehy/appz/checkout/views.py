@@ -14,7 +14,7 @@ from .facade import Facade
 
 import json
 
-from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
+from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN, FORM_STRUCTURES
 
 StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, ShippingForm \
 	= get_classes('checkout.forms', ['StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'ShippingForm'])
@@ -89,76 +89,51 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 		return redirect(self.get_success_url())
 
+	def get_form_structure(self):
+
+		return FORM_STRUCTURES.address
+
 	def post(self, request, *args, **kwargs):
 		# super().get_context_data(*args, **kwargs)
 		print("\n *** post() index *** \n")
 		data = {}
 		status_code = 400
 		if request.is_ajax():
-			print(f'\n request.POST: {request.POST}')
-			print(f'\n dir(request): {dir(request)}')
-			print(f'\n dir(self): {dir(self)}')
 
-			self.pre_conditions += ['check_user_email_is_captured']
-			print('\n *** check_pre_conditions() *** \n')
+			# self.pre_conditions += ['check_user_email_is_captured']
 
-			self.check_pre_conditions(request)
 			form = self.form_class(request, request.POST)
 			response = super().post(request, *args, **kwargs)
+
+			self.check_pre_conditions(request)
 
 			if form.is_valid():
 				print(f'\n form.is_valid(): {form.is_valid()}')
 				status_code = 200
 				data['section'] = 'user_info'
 				data['next_section'] = 'shipping'
-
 				# send all elems to be previewed, along with the values
 				data['preview_elems'] = {'email': form.cleaned_data['username']}
-			
+				data['form_structure'] = self.get_form_structure()
+
 
 
 			if request.resolver_match.url_name is 'shipping':
 				pass
 
-				# if self.validate_user_info(request):
-					# print('\n **** validated user_info **** \n')
-					# data['forms'] = [self.ShippingAddressForm(), self.ShippingMethodForm()]
-
-
-				## also need to do any other user validation that oscar might do
-
-
-
-			elif request.resolver_match.url_name is 'billing':
-				pass
-
-			# check if all forms are valid
-			# if all(list(map(lambda x: x(request.POST.get('form')).is_valid(), forms))):
-			# 	print('all passing')
-				# if so, do stuff with the form data, depending on which form it was
-				# and
-				# get the next form
-				# then return it
 		print('data: ', data)
-			# response = JsonResponse(data)
 		response = JsonResponse(data)
 		response.status_code = status_code
 
 		return response
-	#
-	# def setup(self, request, *args, **kwargs):
-	# 	return super().setup(request, *args, **kwargs)
 
 
 	def get(self, request, *args, **kwargs):
-		print('\n*** get() ***')
+		print('\n*** get() index ***')
+
 		response = super().get(request, *args, **kwargs)
 		response.context_data.update({'form': self.form_class()})
 		return response
-
-	# def dispatch(self, request, *args, **kwargs):
-	# 	return super().dispatch(request, *args, **kwargs)
-
 
 
 class ShippingView(CheckoutSessionMixin, generic.FormView):
@@ -171,6 +146,14 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 	template_name = "dehy/checkout/checkout_v2.html"
 	form_class = ShippingAddressForm
 
+	def setup(self, request, *args, **kwargs):
+		print(f'\n *** setup()')
+		return super().setup(request, *args, **kwargs)
+
+	def dispatch(self, request, *args, **kwargs):
+		print(f'\n *** dispatch()')
+		return super().dispatch(request, *args, **kwargs)
+
 	def get_available_addresses(self):
 		# Include only addresses where the country is flagged as valid for
 		# shipping. Also, use ordering to ensure the default address comes
@@ -181,11 +164,17 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 	def get_context_data(self, **kwargs):
 		ctx = super().get_context_data(**kwargs)
+
+		ctx['methods'] = self._methods
 		if self.request.user.is_authenticated:
 			# Look up address book data
 			ctx['addresses'] = self.get_available_addresses()
+
+		print(f'\n *** context_data: {ctx}')
 		return ctx
 
+
+	## must be called prior to get_context_data(), which is also called by super().get()
 	def get_available_shipping_methods(self):
 		"""
 		Returns all applicable shipping method objects for a given basket.
@@ -199,21 +188,85 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			shipping_addr=self.get_shipping_address(self.request.basket),
 			request=self.request)
 
-	## from ShippingMethodView
-	def form_valid(self, form):
-		print('\n*** form_valid() ShippingView ***')
+	def form_valid(self, form, option=None):
+		# shipping method form
+		if option and option is 'sm':
 
-		# Save the code for the chosen shipping method in the session
-		# and continue to the next step.
-		self.checkout_session.use_shipping_method(form.cleaned_data['method_code'])
-		return self.get_success_response()
+			print('\n*** form_valid() ShippingView ***')
+			# Save the code for the chosen shipping method in the session
+			# and continue to the next step.
+			self.checkout_session.use_shipping_method(form.cleaned_data['method_code'])
+			return self.get_success_response()
+
+
+		# Store the address details in the session and redirect to next step
+		address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
+		self.checkout_session.ship_to_new_address(address_fields)
+		return super().form_valid(form)
+
+	## checks validity of zipcode or city + state
+	## required: country? zip-code OR city+state
+	def geolocation_is_valid(self, request):
+		return True
 
 	def get(self, request, *args, **kwargs):
 		print('\n*** get() ShippingView ***')
-		response = super().get(request, *args, **kwargs)
-		response.context_data.update({'form': self.form_class()})
+		status_code = 400
+		print(f'\n dir(self) {dir(self)}')
+		print(f'\n dir(self.request) {dir(self.request)}')
+		print(f'\n self.request.session {self.request.session}')
+		print(f'\n dir(self.request.session) {dir(self.request.session)}')
+		print('\n itens: ', list(self.request.session.items()))
+
+		# print(f'\n dir(request.basket) \n{dir(request.basket)}')
+		#
+		# print(f'\n dir(request.basket.strategy) \n{dir(request.basket.strategy)}')
+		# print(f'\n request.basket.strategy \n{request.basket.strategy}')
+		# print(f'\n dir(request.basket.strategy) \n{dir(request.basket.strategy)}')
+		#
+		# print(f'\n dir(self.checkout_session)\n{dir(self.checkout_session)}')
+
+		if not hasattr(self, '_methods'):
+			print('\n *** _methods not found *** \n')
+			self._methods = self.get_available_shipping_methods() ## must be called prior to super().get()
+
+
+		## indicates shipping methods haven't changed
+		elif self._methods == self.get_available_shipping_methods():
+
+			print('\n *** NO ChANGES *** \n')
+			status_code = 204
+
+		print(dir(self.get_available_shipping_methods()[0]))
+		print(dir(self._methods[0]))
+
+		# response = super().get(request, *args, **kwargs) ## also calls get_context_data
+		context_data = self.get_context_data()
+
+		data = {'shipping_methods':[]}
+		if request.is_ajax():
+
+			if self.geolocation_is_valid(request):
+				## attempt to get shipping methods available based on geolocation
+				status_code = 200
+				for method in self._methods:
+					data['shipping_methods'].append({'name': method.name, 'cost': method.calculate(self.request.basket).incl_tax, 'code':method.code})
+
+				response = JsonResponse(data)
+				response.status_code = status_code
+
+		else:
+		# return a redirect since none of these urls should be called directly
+			response = redirect(reverse_lazy('checkout:checkout'))
+
 		return response
 
+	def get_available_addresses(self):
+		return self.request.user.addresses.filter(
+			country__is_shipping_country=True).order_by(
+			'-is_default_for_shipping')
+
+	## should validate both shipping method and shipping address forms
 	def post(self, request, *args, **kwargs):
 		# super().get_context_data(*args, **kwargs)
 		print("\n *** post() ShippingView *** \n")
@@ -224,10 +277,16 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			# self.pre_conditions += ['check_user_email_is_captured']
 			print('\n *** check_pre_conditions() *** \n')
 			self.check_pre_conditions(request)
-			shipping_method_form = ShippingMethodForm(request.POST)
-			shipping_address_form = ShippingAddressForm(request.POST)
+			print(f'\n request.POST: {request.POST}')
+			print(f'\n dir(request.POST): {dir(request.POST)}')
+
+			shipping_method_form = ShippingMethodForm(request.POST.get('shipping_method'))
+			shipping_address_form = ShippingAddressForm(request.POST.get('shipping_address'))
 			response = super().post(request, *args, **kwargs)
-			print(f'shipping_method: {shipping_method_form.is_valid()} shipping_address: {shipping_address_form.is_valid()}')
+			print('shipping method form valid: ', shipping_method_form.is_valid())
+			print(f'\n form_validation \n shipping_method: {self.form_valid(shipping_method_form, "sm")} shipping_address: {self.form_valid(shipping_address)}')
+
+			# print(f'\n form_validation \n shipping_method: {shipping_method_form.is_valid()} shipping_address: {shipping_address_form.is_valid()}')
 			if all([shipping_address_form.is_valid(), shipping_method_form.is_valid()]):
 
 				status_code = 200
@@ -237,6 +296,8 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		response.status_code = status_code
 
 		return response
+
+
 # class IndexView(views.IndexView):
 # 	"""
 # 	First page of the checkout.  We prompt user to either sign in, or
