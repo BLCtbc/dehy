@@ -95,6 +95,17 @@ class IndexView(views.IndexView):
 
 class ShippingAddressView(views.ShippingAddressView):
 	template_name = 'dehy/checkout/shipping_address.html'
+	def get(self, request, *args, **kwargs):
+		print('\n *** get() ***')
+		response = super().get(request, *args, **kwargs)
+		return response
+
+	def post(self, request, *args, **kwargs):
+
+		print('\n *** post() ShippingAddressView ***')
+		print(f'\n request.POST: {request.POST}')
+		response = super().post(request, *args, **kwargs)
+		return response
 
 class UserAddressUpdateView(views.UserAddressUpdateView):
 	template_name = 'dehy/checkout/user_address_form.html'
@@ -104,6 +115,13 @@ class UserAddressDeleteView(views.UserAddressDeleteView):
 
 class ShippingMethodView(views.ShippingMethodView):
 	template_name = 'dehy/checkout/shipping_methods.html'
+
+	def post(self, request, *args, **kwargs):
+		self._methods = self.get_available_shipping_methods()
+		print('\n *** post() ShippingMethodView ***')
+		print(f'\n request.POST: {request.POST}')
+		return super().post(request, *args, **kwargs)
+
 
 class PaymentDetailsView(views.PaymentDetailsView):
 	"""
