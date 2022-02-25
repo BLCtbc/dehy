@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
 	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
 	# oscar overrides
+	'dehy.appz.address.apps.AddressConfig',
 	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
 	'dehy.appz.dashboard.catalogue.apps.CatalogueDashboardConfig',
@@ -72,7 +73,6 @@ INSTALLED_APPS = [
 	# oscar apps
 	'oscar.config.Shop',
 	'oscar.apps.analytics.apps.AnalyticsConfig',
-	'oscar.apps.address.apps.AddressConfig',
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
 	'oscar.apps.offer.apps.OfferConfig',

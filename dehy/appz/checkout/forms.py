@@ -18,6 +18,7 @@ class StripeTokenForm(forms.Form):
 
 class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 
+
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.adjust_country_field()
@@ -35,22 +36,24 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 			self.fields['country'].empty_label = None
 
 	class Meta:
-		model = get_model('order', 'shippingaddress')
+		model = get_model('order', 'ShippingAddress')
 		fields = [
 			'first_name', 'last_name',
-			'line1', 'line2', 'line3', 'line4',
+			'line1', 'line2', 'line4',
 			'state', 'postcode', 'country',
-			'phone_number', 'notes',
+			'phone_number',
 		]
+
+		# fields = '__all__'
 
 
 class ShippingMethodForm(forms.Form):
-	method_code = forms.ChoiceField(widget=forms.HiddenInput)
+	shipping_options = forms.ChoiceField(widget=forms.widgets.RadioSelect)
 
 	def __init__(self, *args, **kwargs):
 		methods = kwargs.pop('methods', [])
 		super().__init__(*args, **kwargs)
-		self.fields['method_code'].choices = ((m.code, m.name) for m in methods)
+		self.fields['shipping_options'].choices = ((m.code, m.name) for m in methods)
 
 class ShippingForm(ShippingAddressForm, ShippingMethodForm):
 
@@ -67,10 +70,6 @@ class UserInfoForm(AuthenticationForm):
 		(EXISTING, _('I am a returning customer, and my password is')))
 	options = forms.ChoiceField(widget=forms.widgets.RadioSelect,
 								choices=CHOICES, initial=GUEST)
-
-	# def __init__(self, *args, **kwargs):
-	# 	super().__init__(*args, **kwargs)
-	# 	self.fields['password'].widget.attrs.update({'disabled': 'disabled'})
 
 	def clean_username(self):
 		return normalise_email(self.cleaned_data['username'])

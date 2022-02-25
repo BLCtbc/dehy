@@ -71,15 +71,35 @@ var DEHY = {
 		}
 	},
 	utils: {
+		debounce: function(context, func, delay) {
+			console.log('debouncing')
+			console.log('context: ', context)
+			console.log('func: ', func)
+
+			if (context && context.preventDefault) {
+				context.preventDefault();
+			}
+
+			let timeout;
+			return (...args) => {
+				if (timeout) {
+					clearTimeout(timeout);
+				}
+				timeout = setTimeout(() => {
+					func.apply(context, args);
+				}, delay);
+			}
+		},
 		serialize: function(form) {
 
 			// Setup our serialized data
 			var serialized = [];
-
+			var elements = (form.elements) ? form.elements: form.querySelectorAll('input, select, fieldset, button');
+			console.log('elements: ', elements)
 			// Loop through each field in the form
-			for (var i = 0; i < form.elements.length; i++) {
+			for (var i = 0; i < elements.length; i++) {
 
-				var field = form.elements[i];
+				var field = elements[i];
 
 				// Don't serialize fields without a name, submits, buttons, file and reset inputs, and disabled fields
 				if (!field.name || field.disabled || field.type === 'file' || field.type === 'reset' || field.type === 'submit' || field.type === 'button') continue;
@@ -96,6 +116,7 @@ var DEHY = {
 				else if ((field.type !== 'checkbox' && field.type !== 'radio') || field.checked) {
 					serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
 				}
+				console.log('serialized: ', serialized)
 			}
 
 			return serialized.join('&');
@@ -142,9 +163,66 @@ var DEHY = {
 				}
 			}
 			return elem
+		},
+		/*********************************************
+		Given an array of objects, attempts to recursively create elements using the following format:
+		elems = [{
+			'tag': 'div','classes': 'shipping-address-container', 'elems': [
+				{'tag':'div', 'classes':'form-group row' 'elems': [
+					{'tag':'input','attrs': {'required':'', 'maxlength': '50', 'type': 'text', 'id_first_name', 'placeholder':"First Name", 'aria-label':"First Name"}},
+				}]
+			}]
+		}]
+		*********************************************/
+		create_elements: function(elems, parent) {
+			var container = parent || DEHY.utils.create_element({tag:'div', classes:'temp-container'});
+			for (let i = 0; i < elems.length; i++) {
+				var elem = DEHY.utils.create_element(elems[i]);
+				container.appendChild(elem);
+				if (elems[i].elems) {
+					elem.replaceWith(DEHY.utils.create_elements(elems[i].elems, elem));
+				}
+			}
+			return container
+		},
+		cleanup_temp_containers: function(container=document) {
+			container.querySelectorAll('div.temp-container').forEach(function(elem){
+				if (elem.hasChildNodes()) {
+					elem.replaceWith(...elem.childNodes)
+				}
+			})
+			if (container.matches && container.matches('div.temp-container')) {
+				container.replaceWith(...container.childNodes)
+			}
+			return container
+		},
+		remove_children: function(elem) {
+			if (elem && elem.hasChildNodes && elem.hasChildNodes()) {
+				while (elem.firstChild) {
+  					elem.removeChild(elem.firstChild);
+				}
+			}
 		}
 	}
 }
+
+let optionSupported = false;
+
+try {
+  const options = {
+    get once() { // This function will be called when the browser
+                    //   attempts to access the passive property.
+      optionSupported = true;
+      return false;
+    }
+  };
+
+  window.addEventListener("test", null, options);
+  window.removeEventListener("test", null, options);
+} catch(err) {
+  optionSupported = false;
+}
+
 
 // function handlers() {
 // 	console.log('handlers')
@@ -169,3 +247,4 @@ function update_cart_quantity(data) {
 	var cart = document.getElementById("cart-quantity");
 	cart.innerText = data.num_cart_items
 }
+
