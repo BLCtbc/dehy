@@ -11,13 +11,14 @@ from django.views import generic
 from .facade import Facade
 
 # from oscar.apps.basket.middleware import BasketMiddleware
+from bs4 import BeautifulSoup
 
 import json
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN, FORM_STRUCTURES
 
-StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, ShippingForm \
-	= get_classes('checkout.forms', ['StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'ShippingForm'])
+StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, AdditionalInfoForm \
+	= get_classes('checkout.forms', ['StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'AdditionalInfoForm'])
 
 BankcardForm, BillingAddressForm \
 	= get_classes('payment.forms', ['BankcardForm', 'BillingAddressForm'])
@@ -27,12 +28,8 @@ CheckoutSessionMixin = get_class('checkout.session', 'CheckoutSessionMixin')
 
 SourceType = get_model('payment', 'SourceType')
 Source = get_model('payment', 'Source')
+Country = get_model('address', 'Country')
 
-def get_shipping(request):
-	pass
-
-def get_billing(request):
-	pass
 
 class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
@@ -96,6 +93,8 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 	def post(self, request, *args, **kwargs):
 		# super().get_context_data(*args, **kwargs)
 		print("\n *** post() index *** \n")
+		print(f"\n request.POST: {request.POST}")
+
 		data = {}
 		status_code = 400
 		if request.is_ajax():
@@ -127,6 +126,14 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 		return response
 
+	def get_form_kwargs(self):
+		kwargs = super().get_form_kwargs()
+		email = self.checkout_session.get_guest_email()
+		if email:
+			kwargs['initial'] = {
+				'username': email,
+			}
+		return kwargs
 
 	def get(self, request, *args, **kwargs):
 		print('\n*** get() index ***')
@@ -179,25 +186,37 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		"""
 		Returns all applicable shipping method objects for a given basket.
 		"""
-		# Shipping methods can depend on the user, the contents of the basket
-		# and the shipping address (so we pass all these things to the
-		# repository). I haven't come across a scenario that doesn't fit this
-		# system.
 		return Repository().get_shipping_methods(
 			basket=self.request.basket, user=self.request.user,
 			shipping_addr=self.get_shipping_address(self.request.basket),
 			request=self.request)
 
+	def get_initial(self):
+		initial = self.checkout_session.new_shipping_address_fields()
+		if initial:
+			initial = initial.copy()
+			# Convert the primary key stored in the session into a Country
+			# instance
+			try:
+				initial['country'] = Country.objects.get(
+					iso_3166_1_a2=initial.pop('country_id'))
+			except Country.DoesNotExist:
+				# Hmm, the previously selected Country no longer exists. We
+				# ignore this.
+				pass
+		return initial
+
+	def shipping_method_form_valid(self, form):
+		# Save the code for the chosen shipping method in the session
+		# and continue to the next step.
+		if not form.is_valid() and form.errors:
+			print(f'\n *** form.errors: {form.errors}')
+			return False
+
+		self.checkout_session.use_shipping_method(form.cleaned_data['method_code'])
+		return True
+
 	def form_valid(self, form, option=None):
-		# shipping method form
-		if option and option is 'sm':
-
-			print('\n*** form_valid() ShippingView ***')
-			# Save the code for the chosen shipping method in the session
-			# and continue to the next step.
-			self.checkout_session.use_shipping_method(form.cleaned_data['method_code'])
-			return self.get_success_response()
-
 
 		# Store the address details in the session and redirect to next step
 		address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
@@ -213,23 +232,12 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		print('\n*** get() ShippingView ***')
 		status_code = 400
 		print(f'\n dir(self) {dir(self)}')
-		print(f'\n dir(self.request) {dir(self.request)}')
-		print(f'\n self.request.session {self.request.session}')
-		print(f'\n dir(self.request.session) {dir(self.request.session)}')
-		print('\n itens: ', list(self.request.session.items()))
+		print(f'\n request.GET {request.GET}')
 
-		# print(f'\n dir(request.basket) \n{dir(request.basket)}')
-		#
-		# print(f'\n dir(request.basket.strategy) \n{dir(request.basket.strategy)}')
-		# print(f'\n request.basket.strategy \n{request.basket.strategy}')
-		# print(f'\n dir(request.basket.strategy) \n{dir(request.basket.strategy)}')
-		#
-		# print(f'\n dir(self.checkout_session)\n{dir(self.checkout_session)}')
 
 		if not hasattr(self, '_methods'):
 			print('\n *** _methods not found *** \n')
 			self._methods = self.get_available_shipping_methods() ## must be called prior to super().get()
-
 
 		## indicates shipping methods haven't changed
 		elif self._methods == self.get_available_shipping_methods():
@@ -237,8 +245,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			print('\n *** NO ChANGES *** \n')
 			status_code = 204
 
-		print(dir(self.get_available_shipping_methods()[0]))
-		print(dir(self._methods[0]))
 
 		# response = super().get(request, *args, **kwargs) ## also calls get_context_data
 		context_data = self.get_context_data()
@@ -266,6 +272,14 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			country__is_shipping_country=True).order_by(
 			'-is_default_for_shipping')
 
+	def get_form_kwargs(self):
+		print("\n *** get_form_kwargs() ShippingView *** \n")
+		kwargs = super().get_form_kwargs()
+
+		# kwargs.update({'methods':self._methods})
+
+		return kwargs
+
 	## should validate both shipping method and shipping address forms
 	def post(self, request, *args, **kwargs):
 		# super().get_context_data(*args, **kwargs)
@@ -274,29 +288,66 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		data = {}
 		status_code = 400
 		if request.is_ajax():
+			shipping_address_data,shipping_method_data = {},{}
+
 			# self.pre_conditions += ['check_user_email_is_captured']
-			print('\n *** check_pre_conditions() *** \n')
+			print('\n *** check_pre_conditions() ***')
 			self.check_pre_conditions(request)
 			print(f'\n request.POST: {request.POST}')
 			print(f'\n dir(request.POST): {dir(request.POST)}')
+			qd = request.POST.dict()
+			shipping_method_data.update({'csrfmiddlewaretoken': [qd['csrfmiddlewaretoken']], 'method_code': qd.pop('method_code')})
 
-			shipping_method_form = ShippingMethodForm(request.POST.get('shipping_method'))
-			shipping_address_form = ShippingAddressForm(request.POST.get('shipping_address'))
+			shipping_address_data.update(qd)
+			print(f'shipping_address_data: ', shipping_address_data)
+			print(f'shipping_method_data: ', shipping_method_data)
+
+			# shipping_method_form = ShippingMethodForm({'method_code':'standard_ground'})
+
+			shipping_method_form = ShippingMethodForm(shipping_method_data, methods=self._methods)
+			shipping_address_form = ShippingAddressForm(shipping_address_data, *args, **kwargs)
 			response = super().post(request, *args, **kwargs)
-			print('shipping method form valid: ', shipping_method_form.is_valid())
-			print(f'\n form_validation \n shipping_method: {self.form_valid(shipping_method_form, "sm")} shipping_address: {self.form_valid(shipping_address)}')
 
-			# print(f'\n form_validation \n shipping_method: {shipping_method_form.is_valid()} shipping_address: {shipping_address_form.is_valid()}')
-			if all([shipping_address_form.is_valid(), shipping_method_form.is_valid()]):
+			# print('shipping method form valid: ', shipping_method_form.is_valid())
+			# print(f'\n \n shipping_method.form_valid(): {self.shipping_method_form_valid(shipping_method_form)}')
+			# print(f'\n shipping_address.form_valid(): {self.form_valid(shipping_address)}')
 
+			print(f'\n form_validation \n shipping_method: {shipping_method_form.is_valid()} shipping_address: {shipping_address_form.is_valid()}')
+
+			if all([shipping_address_form.is_valid(), self.shipping_method_form_valid(shipping_method_form)]):
+				## return additional_info form structure
 				status_code = 200
 				data['next_section'] = 'additional_info'
+
+				soup = BeautifulSoup(AdditionalInfoForm().as_p(), 'html.parser')
+
+
+
+
 
 		response = JsonResponse(data)
 		response.status_code = status_code
 
 		return response
 
+
+
+class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
+	template_name = 'dehy/checkout/checkout_v2.html'
+	pre_conditions = [
+		'check_basket_is_not_empty',
+		'check_basket_is_valid',
+		'check_user_email_is_captured',
+		'check_shipping_data_is_captured'
+	]
+	success_url = reverse_lazy('checkout:additional_info')
+	template_name = "dehy/checkout/checkout_v2.html"
+	form_class = ShippingAddressForm
+	def get(self, request, *args, **kwargs):
+		return super().get(request,*args, **kwargs)
+
+	def post(self, request, *args, **kwargs):
+		return super().post(request,*args, **kwargs)
 
 # class IndexView(views.IndexView):
 # 	"""
@@ -335,8 +386,7 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		# return context_data
 
 
-# class ShippingAddressView(views.ShippingAddressView):
-# 	template_name = 'dehy/checkout/shipping_address.html'
+
 
 # class UserAddressUpdateView(views.UserAddressUpdateView):
 # 	template_name = 'dehy/checkout/user_address_form.html'

@@ -145,7 +145,7 @@ DEHY.checkout = {
 			console.log('submit_handler');
 			e.preventDefault();
 			if (!form.checkValidity()) {
-				console.log('submit handler')
+				console.log('submit_handler')
 				document.getElementById('error_container').classList.toggle('hidden', false);
 				console.log(form.reportValidity());
 				return false
@@ -168,7 +168,7 @@ DEHY.checkout = {
 		submit_form_info: function(form) {
 
 			var data = {}
-			if (form.closest('section').id == 'shipping') {
+			if (form.closest('section').id == '___shipping') {
 				// create two different forms
 				data['shipping_address'] = DEHY.utils.serialize(form.querySelector('.address-container'));
 				data['shipping_method'] = DEHY.utils.serialize(form.querySelector('.shipping-method-container'));
@@ -362,9 +362,10 @@ DEHY.checkout = {
 
 			shipping_method_container.append(fieldset)
 			fieldset.append(DEHY.utils.create_element({tag:'legend', classes: "required", text:'Shipping Methods'}))
+			var prefix = (data.prefix) ? `${data.prefix}-`:'';
 			data.shipping_methods.forEach((method, ix) => {
 				// create form group
-				let id = `id_shipping_options_${ix}`;
+				let id = `id_${prefix}method_code_${ix}`;
 				var method_structure = [{
 					'tag': 'div',
 					'classes': 'form-group form-check row',
@@ -372,7 +373,7 @@ DEHY.checkout = {
 						'tag': 'input',
 						'classes':'form-check-input',
 						'attrs': {
-							'type':'radio', 'name':'shipping_options', 'id':id, 'value': method.code
+							'type':'radio', 'name':'method_code', 'id':id, 'value': method.code
 						}
 					},
 					{
@@ -385,11 +386,13 @@ DEHY.checkout = {
 					}]
 				}]
 				let elem = DEHY.utils.create_elements(method_structure, fieldset)
+				elem.querySelector
 				// append it to the shipping_method_container
 
 			})
 
 			DEHY.utils.cleanup_temp_containers()
+			shipping_method_container.querySelector("input[type='radio']").checked = true;
 			form.insertBefore(shipping_method_container, document.querySelector('.error-container.button-container'))
 			form.querySelector("button[type='submit']").hidden = false;
 			console.log('display_shipping_methods: ', data)

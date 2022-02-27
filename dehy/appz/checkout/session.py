@@ -1,8 +1,8 @@
-
 from oscar.apps.checkout import session
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from oscar.apps.checkout import exceptions
+from dehy.appz.checkout import tax
 
 class CheckoutSessionMixin(session.CheckoutSessionMixin):
 	def check_user_email_is_captured(self, request):

@@ -17,12 +17,12 @@ class FORM_STRUCTURES:
 						{
 							'tag':'input',
 							'classes': 'required col',
-							'attrs': {'required':'', 'maxlength': '50', 'type': 'text', 'id':'id_first_name', 'placeholder':"First Name", 'aria-label':"First Name"}
+							'attrs': {'name':'first_name', 'required':'', 'maxlength': '50', 'type': 'text', 'id':'id_first_name', 'placeholder':"First Name", 'aria-label':"First Name"}
 						},
 						{
 							'tag':'input',
 							'classes': 'required col',
-							'attrs': {'required':'', 'maxlength': '50', 'type': 'text', 'id':'id_last_name', 'placeholder':"Last Name", 'aria-label':"Last Name"}
+							'attrs': {'name':'last_name', 'required':'', 'maxlength': '50', 'type': 'text', 'id':'id_last_name', 'placeholder':"Last Name", 'aria-label':"Last Name"}
 						}
 					]
 				},
@@ -82,7 +82,7 @@ class FORM_STRUCTURES:
 						{	## city
 							'tag':'input',
 							'classes': 'required col',
-							'attrs': {'required':'', 'name':'city','maxlength': '70', 'type': 'text', 'id':'id_line4', 'placeholder':"City", 'aria-label':"City"}
+							'attrs': {'required':'', 'name':'line4','maxlength': '70', 'type': 'text', 'id':'id_line4', 'placeholder':"City", 'aria-label':"City"}
 						},
 						{	## state
 							'tag':'input',
