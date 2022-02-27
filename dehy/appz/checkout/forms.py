@@ -10,7 +10,7 @@ from oscar.forms.mixins import PhoneNumberMixin
 User = get_user_model()
 AbstractAddressForm = get_class('address.forms', 'AbstractAddressForm')
 Country = get_model('address', 'Country')
-
+AdditionalInfoQuestionaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionaire')
 
 class StripeTokenForm(forms.Form):
 	stripeEmail = forms.EmailField(widget=forms.HiddenInput())
@@ -48,17 +48,31 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 
 
 class ShippingMethodForm(forms.Form):
-	shipping_options = forms.ChoiceField(widget=forms.widgets.RadioSelect)
+
+	method_code = forms.ChoiceField(widget=forms.widgets.RadioSelect)
 
 	def __init__(self, *args, **kwargs):
 		methods = kwargs.pop('methods', [])
+		# print('\n methods: ', methods, '\n')
 		super().__init__(*args, **kwargs)
-		self.fields['shipping_options'].choices = ((m.code, m.name) for m in methods)
+		self.fields['method_code'].choices = ((m.code, m.name) for m in methods)
 
-class ShippingForm(ShippingAddressForm, ShippingMethodForm):
+		# print(f'\n method_code.choices: {self.fields["method_code"].choices}')
 
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
+	# class Meta:
+	# 	fields = [
+	# 		'method_code'
+	# 	]
+
+class AdditionalInfoForm(forms.ModelForm):
+	# purchase_source = forms.ChoiceField(widget=forms.widgets.RadioSelect)
+
+	class Meta:
+		model = AdditionalInfoQuestionaire
+		fields = '__all__'
+	# def __init__(self, *args, **kwargs):
+	# 	super().__init__(*args, **kwargs)
+	# 	self.fields['purchase_source']
 
 class UserInfoForm(AuthenticationForm):
 	username = forms.EmailField(label=_("My email address is"))
@@ -75,7 +89,6 @@ class UserInfoForm(AuthenticationForm):
 		return normalise_email(self.cleaned_data['username'])
 
 	def clean(self):
-		print("\n *** clean() *** \n")
 		if self.is_guest_checkout() or self.is_new_account_checkout():
 			if 'password' in self.errors:
 				del self.errors['password']

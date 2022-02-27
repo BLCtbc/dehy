@@ -39,3 +39,17 @@ class MessageUser(models.Model):
 
 	def __str__(self):
 		return f"{self.email}"
+
+class AdditionalInfoQuestionaire(models.Model):
+	BAR_OR_RESTAURANT,HOME,OTHER = 'b_r','h','o'
+	CHOICES = [
+		(BAR_OR_RESTAURANT, 'Bar or Restaurant'),
+		(HOME, 'Home'),
+		(OTHER, 'Other')
+	]
+	purchase_source = models.CharField(choices=CHOICES, default=BAR_OR_RESTAURANT, max_length=3)
+	response = models.CharField(max_length=100, help_text="What is the name of your Bar/Restaurant/Business?")
+	date_created = models.DateField(auto_now_add=True, editable=False)
+
+	# need a way of identifying who took the questionaire, ie. record user email, username, etc.
+	# email = models.EmailField(unique=True, help_text='Email Address')
