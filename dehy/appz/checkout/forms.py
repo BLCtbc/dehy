@@ -6,11 +6,14 @@ from oscar.apps.customer.utils import normalise_email
 from oscar.core.compat import get_user_model
 from oscar.core.loading import get_class, get_model
 from oscar.forms.mixins import PhoneNumberMixin
+from oscar.apps.payment import forms as payment_forms
 
 User = get_user_model()
 AbstractAddressForm = get_class('address.forms', 'AbstractAddressForm')
 Country = get_model('address', 'Country')
 AdditionalInfoQuestionaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionaire')
+CoreBillingAddressForm = get_class('payment.forms', 'BillingAddressForm')
+BillingAddress = get_model('order', 'BillingAddress')
 
 class StripeTokenForm(forms.Form):
 	stripeEmail = forms.EmailField(widget=forms.HiddenInput())
@@ -53,16 +56,9 @@ class ShippingMethodForm(forms.Form):
 
 	def __init__(self, *args, **kwargs):
 		methods = kwargs.pop('methods', [])
-		# print('\n methods: ', methods, '\n')
 		super().__init__(*args, **kwargs)
 		self.fields['method_code'].choices = ((m.code, m.name) for m in methods)
 
-		# print(f'\n method_code.choices: {self.fields["method_code"].choices}')
-
-	# class Meta:
-	# 	fields = [
-	# 		'method_code'
-	# 	]
 
 class AdditionalInfoForm(forms.ModelForm):
 	# purchase_source = forms.ChoiceField(widget=forms.widgets.RadioSelect)
@@ -106,5 +102,72 @@ class UserInfoForm(AuthenticationForm):
 	def is_new_account_checkout(self):
 		return self.cleaned_data.get('options', None) == self.NEW
 
+# class BillingAddressForm(CoreBillingAddressForm):
+# 	same_as_shipping = forms.BooleanField(required=False, initial=True, label=)
+#
+# 	def __init__(self, *args, **kwargs):
+# 		super().__init__(*args, **kwargs)
+# 		self.adjust_country_field()
+#
+# 	def adjust_country_field(self):
+# 		countries = Country._default_manager.filter(
+# 			is_shipping_country=True)
+#
+# 		# No need to show country dropdown if there is only one option
+# 		if len(countries) == 1:
+# 			self.fields.pop('country', None)
+# 			self.instance.country = countries[0]
+# 		else:
+# 			self.fields['country'].queryset = countries
+# 			self.fields['country'].empty_label = None
+#
+# 	class Meta:
+# 		model = BillingAddress
+# 		fields = [
+# 			'same_as_shipping',
+# 			'first_name', 'last_name',
+# 			'line1', 'line2', 'line4',
+# 			'state', 'postcode', 'country'
+# 		]
+
+
+class BillingAddressForm(payment_forms.BillingAddressForm):
+
+	same_as_shipping = forms.BooleanField(required=False, initial=True, label='Same as shipping?')
+	# city = forms.CharField(required=True, max_length=100, min_length=2)
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.adjust_country_field()
+
+		self.fields['first_name'].widget.attrs['placeholder'] = _('First name')
+		self.fields['last_name'].widget.attrs['placeholder'] = _('Last name')
+		self.fields['state'].widget.attrs['placeholder'] = _('State')
+		self.fields['line1'].widget.attrs['placeholder'] = _('Address 1')
+		self.fields['line2'].widget.attrs['placeholder'] = _('Address 2')
+		self.fields['city'].widget.attrs['placeholder'] = _('City')
+		self.fields['country'].widget.attrs['placeholder'] = _('Country')
+		self.fields['postcode'].widget.attrs['placeholder'] = _('ZIP Code')
+
+
+	def adjust_country_field(self):
+		countries = Country._default_manager.filter(
+			is_shipping_country=True)
+
+		# No need to show country dropdown if there is only one option
+		if len(countries) == 1:
+			self.fields.pop('country', None)
+			self.instance.country = countries[0]
+		else:
+			self.fields['country'].queryset = countries
+			self.fields['country'].empty_label = None
+
+	class Meta:
+		model = BillingAddress
+		fields = [
+			'same_as_shipping',
+			'first_name', 'last_name',
+			'line1', 'line2', 'line4',
+			'state', 'postcode', 'country'
+		]
 
 # The BillingAddress form is in oscar.apps.payment.forms

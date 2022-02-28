@@ -141,6 +141,22 @@ DEHY.checkout = {
 		}
 	},
 	forms: {
+		show_submit_button: function(form=null) {
+			var form = form || DEHY.checkout.forms.get(),
+				hidden = true;
+
+			if (form.closest('section').id=='shipping') {
+				if (DEHY.checkout.shipping.check_if_shipping_methods_displayed()) {
+					hidden = false;
+				}
+			} else {
+				hidden = false
+			}
+			console.log('hidden: ', hidden)
+			form.querySelector("button[type='submit']").hidden = hidden;
+			return hidden;
+
+		},
 		submit_handler: function(e, form=DEHY.checkout.forms.get()) {
 			console.log('submit_handler');
 			e.preventDefault();
@@ -197,8 +213,8 @@ DEHY.checkout = {
 						return elem;
 					case 'shipping':
 						// do stuff
-						for (let [tag, val] of Object.entries(response.preview_elems)) {
-							let elem = DEHY.utils.create_element({tag:tag, classes:key, text:val['text']})
+						for (let [key, val] of Object.entries(response.preview_elems)) {
+							let elem = DEHY.utils.create_element({tag:'div', classes:key, text:val})
 							preview_container.append(elem)
 						}
 						return ;
@@ -217,7 +233,10 @@ DEHY.checkout = {
 			console.log('success: ', response);
 
 			var next_section = response.next_section
-			var previous_sections = document.querySelectorAll(`section:not(.${next_section})`);
+			var checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
+			var previous_sections = checkout_sections.slice(0,checkout_sections.indexOf(document.querySelector(`section#${next_section}`)))
+
+			console.log('previous_sections: ', previous_sections)
 			previous_sections.forEach(function(elem) {
 				// set all other sections to preview mode
 				elem.classList.toggle('preview', true);
@@ -227,11 +246,10 @@ DEHY.checkout = {
 			});
 
 			// create the elements we're going to reserve, retrieving necessary info from the pageNav
-			// paint the elements
 
 			var preview_container = DEHY.utils.create_element({tag:'div', classes:'preview_container'});
 			preview_container.append(get_preview_section(response.preview_elems, response.section));
-			var next_section_elem = document.querySelector(`section.${next_section}`);
+			var next_section_elem = document.querySelector(`section#${next_section}`);
 
 			next_section_elem.append(DEHY.checkout.forms.create(response));
 			document.getElementById(response.section).append(preview_container);
@@ -258,29 +276,40 @@ DEHY.checkout = {
 				// 	DEHY.utils.debounce(e, DEHY.checkout.forms.submit_handler(e), 500);
 				// });
 
+				DEHY.utils.cleanup_temp_containers();
+				DEHY.checkout.forms.show_submit_button();
+
 				form.addEventListener('submit', e=>{
 					e.preventDefault();
 					if (!form.checkValidity()) {
 						document.getElementById('error_container').classList.toggle('hidden', false);
 						return false
+					} else {
+						document.getElementById('error_container').classList.toggle('hidden', true)
 					}
+
 					DEHY.checkout.forms.submit_form_info(e.target);
 					form.reportValidity();
 				});
-				form.addEventListener('change', e=> {
-					console.log('form changed')
-					if (e.target.matches('#id_postcode, #id_state, #id_city')) {
-						var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action}
-						DEHY.checkout.shipping.get_shipping_methods(data)
-						console.log('matched')
-						// get shipping methods
-					}
-				})
+				if (form.closest('section').id == 'shipping') {
+					// get shipping methods
+					form.addEventListener('change', e=> {
+						console.log('form changed')
+						if (e.target.matches('#id_postcode, #id_state, #id_city')) {
+							var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action}
+							DEHY.checkout.shipping.get_shipping_methods(data)
+							console.log('matched')
+							// get shipping methods
+							DEHY.checkout.forms.show_submit_button();
+						}
+					})
+				}
 			}
 		},
 	},
 	shipping: {
 		ADDRESS: {},
+		METHOD: '',
 		address_is_valid: function() {
 			//
 		},
@@ -347,6 +376,7 @@ DEHY.checkout = {
 			});
 		},
 		display_shipping_methods: function(data) {
+			console.log('display_shipping_methods: ', data);
 			// add the shipping methods to the existing form
 			var form = DEHY.checkout.forms.get(),
 				fieldset = DEHY.utils.create_element({tag:'fieldset'});
@@ -392,11 +422,24 @@ DEHY.checkout = {
 			})
 
 			DEHY.utils.cleanup_temp_containers()
+
 			shipping_method_container.querySelector("input[type='radio']").checked = true;
 			form.insertBefore(shipping_method_container, document.querySelector('.error-container.button-container'))
-			form.querySelector("button[type='submit']").hidden = false;
-			console.log('display_shipping_methods: ', data)
+			DEHY.checkout.forms.show_submit_button();
+
+			console.log('display_shipping_methods: ', data);
 		},
+		// check if shipping methods are on the page
+		check_if_shipping_methods_displayed: function() {
+			var displayed = false;
+			if (document.querySelector(".shipping-method-container")) {
+				var fieldset = document.querySelector(".shipping-method-container fieldset");
+				if (fieldset && fieldset.querySelectorAll('input').length > 0) {
+					displayed = true;
+				}
+			}
+			return displayed;
+		}
 	}
 }
 

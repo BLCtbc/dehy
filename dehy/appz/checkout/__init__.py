@@ -5,6 +5,38 @@ STRIPE_EMAIL = 'stripeEmail'
 STRIPE_TOKEN = 'stripeToken'
 
 class FORM_STRUCTURES:
+	error_container = {
+		'tag':'div',
+		'classes':'form-group row',
+		'attrs': {'id': 'error_container'},
+		'elems': [
+			{
+				'tag':'div',
+				'classes': 'col-12 errors',
+				'attrs': {
+					'id': 'errors',
+				}
+			}]
+	}
+	submit_button_container = {
+		'tag':'div',
+		'classes':'form-group row',
+		'elems': [
+			{
+				'tag':'button',
+				'text': 'Continue',
+				'classes': 'col-12',
+				'attrs': {
+					'type': 'submit', 'hidden': '', 'aria-label':'Continue'
+				}
+			}
+		],
+	}
+	submit_button_error_container = {
+		'tag': 'div',
+		'classes': 'error-container button-container',
+		'elems': [error_container, submit_button_container],
+	}
 	address = [
 		{
 			'tag': 'div',
@@ -103,39 +135,8 @@ class FORM_STRUCTURES:
 				},
 			]
 		},
-
-		{
-			'tag': 'div',
-			'classes': 'error-container button-container',
-			'elems': [{
-				'tag':'div',
-				'classes':'form-group row',
-				'attrs': {'id': 'error_container'},
-				'elems': [
-					{
-						'tag':'div',
-						'classes': 'col-12 errors',
-						'attrs': {
-							'id': 'errors',
-						}
-					}]
-				},
-				{
-					'tag':'div',
-					'classes':'form-group row',
-					'elems': [
-						{
-							'tag':'button',
-							'text': 'Continue',
-							'classes': 'col-12',
-							'attrs': {
-								'type': 'submit', 'hidden': '', 'aria-label':'Continue'
-							}
-						}
-					],
-				},
-			],
-		}]
+		submit_button_error_container
+	]
 
 	shipping_methods = [{
 		'tag': 'div',
