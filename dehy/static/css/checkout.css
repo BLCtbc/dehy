@@ -99,3 +99,8 @@ button.edit {
 	min-height: 2rem;
 	display: none;
 }
+
+.helptext {
+	font-size: smaller;
+	color: darkolivegreen;
+}

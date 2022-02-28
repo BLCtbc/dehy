@@ -9,9 +9,7 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from django.views import generic
 from .facade import Facade
-
-# from oscar.apps.basket.middleware import BasketMiddleware
-from bs4 import BeautifulSoup
+from django.forms.models import model_to_dict
 
 import json
 
@@ -25,6 +23,8 @@ BankcardForm, BillingAddressForm \
 
 Repository = get_class('shipping.repository', 'Repository')
 CheckoutSessionMixin = get_class('checkout.session', 'CheckoutSessionMixin')
+
+AdditionalInfoQuestionaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionaire')
 
 SourceType = get_model('payment', 'SourceType')
 Source = get_model('payment', 'Source')
@@ -230,27 +230,24 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 	def get(self, request, *args, **kwargs):
 		print('\n*** get() ShippingView ***')
-		status_code = 400
-		print(f'\n dir(self) {dir(self)}')
-		print(f'\n request.GET {request.GET}')
-
-
-		if not hasattr(self, '_methods'):
-			print('\n *** _methods not found *** \n')
-			self._methods = self.get_available_shipping_methods() ## must be called prior to super().get()
-
-		## indicates shipping methods haven't changed
-		elif self._methods == self.get_available_shipping_methods():
-
-			print('\n *** NO ChANGES *** \n')
-			status_code = 204
-
-
-		# response = super().get(request, *args, **kwargs) ## also calls get_context_data
-		context_data = self.get_context_data()
-
-		data = {'shipping_methods':[]}
+		status_code = 302
 		if request.is_ajax():
+			status_code = 400
+
+			# need some kind of check here to see if shipping methods should be returned
+			# need another check to  see if shipping methods should have changed, i.e
+			if not hasattr(self, '_methods'):
+				print('\n *** _methods not found *** \n')
+				self._methods = self.get_available_shipping_methods() ## must be called prior to super().get()
+
+			## indicates shipping methods haven't changed (DOESNT WORK)
+			elif self._methods == self.get_available_shipping_methods():
+				status_code = 204
+
+			# response = super().get(request, *args, **kwargs) ## also calls get_context_data
+			context_data = self.get_context_data()
+
+			data = {'shipping_methods':[]}
 
 			if self.geolocation_is_valid(request):
 				## attempt to get shipping methods available based on geolocation
@@ -259,12 +256,13 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 					data['shipping_methods'].append({'name': method.name, 'cost': method.calculate(self.request.basket).incl_tax, 'code':method.code})
 
 				response = JsonResponse(data)
-				response.status_code = status_code
+
 
 		else:
 		# return a redirect since none of these urls should be called directly
 			response = redirect(reverse_lazy('checkout:checkout'))
 
+		response.status_code = status_code
 		return response
 
 	def get_available_addresses(self):
@@ -284,8 +282,9 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 	def post(self, request, *args, **kwargs):
 		# super().get_context_data(*args, **kwargs)
 		print("\n *** post() ShippingView *** \n")
+		print(f"\nrequest.session.modified: {request.session.modified}")
 		self._methods = self.get_available_shipping_methods()
-		data = {}
+		data = {'section': 'shipping', 'next_section':'additional_info'}
 		status_code = 400
 		if request.is_ajax():
 			shipping_address_data,shipping_method_data = {},{}
@@ -317,12 +316,42 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			if all([shipping_address_form.is_valid(), self.shipping_method_form_valid(shipping_method_form)]):
 				## return additional_info form structure
 				status_code = 200
-				data['next_section'] = 'additional_info'
+				country = shipping_address_form.cleaned_data['country']
 
-				soup = BeautifulSoup(AdditionalInfoForm().as_p(), 'html.parser')
+				data['preview_elems'] = {
+					'first_name': shipping_address_form.cleaned_data['first_name'],
+					'last_name': shipping_address_form.cleaned_data['last_name'],
+					'phone_number': shipping_address_form.cleaned_data['phone_number'].raw_input,
+					'line1': shipping_address_form.cleaned_data['line1'],
+					'line2': shipping_address_form.cleaned_data['line2'],
+					'line4': shipping_address_form.cleaned_data['line4'],
+					'state': shipping_address_form.cleaned_data['state'],
+					'postcode': shipping_address_form.cleaned_data['postcode'],
+					'country': shipping_address_form.cleaned_data['country'].printable_name,
+					'shipping_method': shipping_method_form.cleaned_data['method_code'],
 
-
-
+				}
+				# form_structure = {'tag':'div', 'classes':'form-container', 'elems': []}
+				# soup = BeautifulSoup(AdditionalInfoForm().as_p(), 'html.parser')
+				# for elem in soup.find_all(['select', 'input', 'fieldset']):
+				# 	_elem = {'tag': elem.name, 'attrs': elem.attrs}
+				#
+				# 	if elem.has_attr('required'):
+				# 		_elem['classes'] = 'required'
+				#
+				# 	child_elems = []
+				#
+				# 	for child in elem.findChildren(['input', 'option']):
+				# 		child_elems.append({'tag':child.name, 'attrs':child.attrs})
+				# 		if child.has_attr('required'):
+				# 			child_elems[-1]['classes'] = 'required'
+				#
+				# 	if child_elems:
+				# 		_elem['elems'] = child_elems
+				#
+				# 	form_structure['elems'].append(_elem)
+				data['form_structure'] = self.get_form_structure(AdditionalInfoForm, use_help_text=True)
+				print(f"\n data['form_structure']: {data['form_structure']}")
 
 
 		response = JsonResponse(data)
@@ -342,12 +371,85 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 	]
 	success_url = reverse_lazy('checkout:additional_info')
 	template_name = "dehy/checkout/checkout_v2.html"
-	form_class = ShippingAddressForm
+	form_class = AdditionalInfoForm
 	def get(self, request, *args, **kwargs):
-		return super().get(request,*args, **kwargs)
+		status_code = 302
+		super().get(request,*args, **kwargs)
+		if request.is_ajax():
+			status_code = 400
+			pass
+		else:
+			# return a redirect since none of these urls should be called directly
+			response = redirect(reverse_lazy('checkout:checkout'))
+
+		response.status_code = status_code
+		return response
 
 	def post(self, request, *args, **kwargs):
-		return super().post(request,*args, **kwargs)
+		status_code = 400
+		response = super().post(request,*args, **kwargs)
+		data = {'section': 'additional_data', 'next_section':'billing'}
+		if request.is_ajax():
+			form = self.form_class(request.POST)
+
+			if self.form_valid(form) and form.is_valid():
+				if not self.checkout_session.is_additional_info_set(request.basket):
+					form.cleaned_data['purchase_business_type']
+					form.cleaned_data['business_name']
+
+					additional_info_obj = AdditionalInfoQuestionaire.objects.create(purchase_business_type=form.cleaned_data['purchase_business_type'], business_name=form.cleaned_data['business_name'])
+					self.checkout_session.set_additional_info(additional_info_obj)
+
+				data['preview_elems'] = {'purchase_business_type': additional_info_obj.purchase_business_type, 'business_name': additional_info_obj.business_name}
+				data['form_structure'] = self.get_form_structure(BillingAddressForm, label_exceptions=['id_same_as_shipping'])
+				## where do we save
+				status_code = 200
+
+				response = JsonResponse(data)
+
+		response.status_code = status_code
+		return response
+
+
+class BillingView(views.PaymentDetailsView):
+
+	template_name = 'dehy/checkout/checkout_v2.html'
+	# template_name_preview = 'dehy/checkout/preview.html'
+	form_class = BillingAddressForm
+	success_url = reverse_lazy('checkout:billing')
+	# These conditions are extended at runtime depending on whether we are in
+	# 'preview' mode or not.
+	pre_conditions = [
+		'check_basket_is_not_empty',
+		'check_basket_is_valid',
+		'check_user_email_is_captured',
+		'check_shipping_data_is_captured']
+
+	# If preview=True, then we render a preview template that shows all order
+	# details ready for submission.
+	preview = False
+
+
+	def get(self, request, *args, **kwargs):
+		status_code = 302
+		super().get(request,*args, **kwargs)
+		if request.is_ajax():
+			status_code = 400
+			pass
+		else:
+			# return a redirect since none of these urls should be called directly
+			response = redirect(reverse_lazy('checkout:checkout'))
+
+		response.status_code = status_code
+		return response
+
+	def post(self, request, *args, **kwargs):
+		## form validation here
+		return super().post(request, *args, **kwargs)
+
+	def payment_metadata(self, order_number, total, **kwargs):
+		return {'order_number': order_number}
+
 
 # class IndexView(views.IndexView):
 # 	"""
@@ -396,7 +498,7 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 
 # class ShippingMethodView(views.ShippingMethodView):
 # 	template_name = 'dehy/checkout/shipping_methods.html'
-
+#
 # class PaymentDetailsView(views.PaymentDetailsView):
 # 	"""
 # 	For taking the details of payment and creating the order.

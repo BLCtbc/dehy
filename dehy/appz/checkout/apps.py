@@ -16,6 +16,7 @@ class CheckoutConfig(apps.CheckoutConfig):
 		self.checkout_view = get_class('checkout.views', 'CheckoutIndexView')
 		self.shipping_view = get_class('checkout.views', 'ShippingView')
 		self.additional_info_view = get_class('checkout.views', 'AdditionalInfoView')
+		self.billing_view = get_class('checkout.views', 'BillingView')
 
 		# self.additional_info_view = get_class('checkout.views', 'AdditionalInfoView')
 		# self.billing_view = get_class('checkout.views', 'BillingView')
@@ -36,6 +37,7 @@ class CheckoutConfig(apps.CheckoutConfig):
 			path('', self.checkout_view.as_view(), name='checkout'),
 			path('shipping/', self.shipping_view.as_view(), name='shipping'),
 			path('additional_info/', self.additional_info_view.as_view(), name='additional_info'),
+			path('billing/', self.billing_view.as_view(), name='billing'),
 
 			# path('additional_info/', self.additional_info_view.as_view(), name='additional_info'),
 			# path('billing/', self.billing_view.as_view(), name='additional_info'),

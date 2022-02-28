@@ -37,26 +37,38 @@
 			</section>
 
 			<section id="shipping" class="card card-body col-10 shipping">
-				<div class="card-title">
-					<h2>{% trans "2. Shipping" %}</h2>
+				<div class="card-header">
+					<div class="card-title">
+						<h2>{% trans "2. Shipping" %}</h2>
+					</div>
+					<button class="edit" aria-label="Edit Shipping Information"><span>Edit</span></button>
 				</div>
+
 
 				{% block shipping %}
 				{% endblock shipping %}
 			</section>
 
 			<section id="additional_info" class="card card-body col-10 additional-info">
-				<div class="card-title">
-					<h2>{% trans "3. Additional Info" %}</h2>
+				<div class="card-header">
+					<div class="card-title">
+						<h2>{% trans "3. Additional Info" %}</h2>
+					</div>
+					<button class="edit" aria-label="Edit Additional Information"><span>Edit</span></button>
 				</div>
+
 				{% block additional_info %}
 				{% endblock additional_info %}
 				</section>
 
 			<section id="billing" class="card card-body col-10 billing">
-				<div class="card-title">
-					<h2>{% trans "3. Billing" %}</h2>
+				<div class="card-header">
+					<div class="card-title">
+						<h2>{% trans "4. Billing" %}</h2>
+					</div>
+					<button class="edit" aria-label="Edit Billing Information"><span>Edit</span></button>
 				</div>
+
 				{% block billing %}
 				{% endblock billing %}
 			</section>
@@ -69,10 +81,7 @@
 				{% block place_order %}
 				{% endblock place_order %}
 			</section>
-
-
 	    </div>
-
 
 	{% endblock checkout_flow %}
 
