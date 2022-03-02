@@ -40,7 +40,7 @@ class MessageUser(models.Model):
 	def __str__(self):
 		return f"{self.email}"
 
-class AdditionalInfoQuestionaire(models.Model):
+class AdditionalInfoQuestionnaire(models.Model):
 	BAR_OR_RESTAURANT,HOME,OTHER = 'b_r','h','o'
 	CHOICES = [
 		(BAR_OR_RESTAURANT, 'Bar or Restaurant'),

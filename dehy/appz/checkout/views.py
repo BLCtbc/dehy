@@ -15,16 +15,16 @@ import json
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN, FORM_STRUCTURES
 
-StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, AdditionalInfoForm \
-	= get_classes('checkout.forms', ['StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'AdditionalInfoForm'])
+BillingAddressForm, StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, AdditionalInfoForm \
+	= get_classes('checkout.forms', ['BillingAddressForm', 'StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'AdditionalInfoForm'])
 
-BankcardForm, BillingAddressForm \
-	= get_classes('payment.forms', ['BankcardForm', 'BillingAddressForm'])
+# BankcardForm, BillingAddressForm \
+# 	= get_classes('payment.forms', ['BankcardForm', 'BillingAddressForm'])
 
 Repository = get_class('shipping.repository', 'Repository')
 CheckoutSessionMixin = get_class('checkout.session', 'CheckoutSessionMixin')
 
-AdditionalInfoQuestionaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionaire')
+AdditionalInfoQuestionnaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionnaire')
 
 SourceType = get_model('payment', 'SourceType')
 Source = get_model('payment', 'Source')
@@ -41,9 +41,6 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 	success_url = reverse_lazy('checkout:shipping')
 	template_name = "dehy/checkout/checkout_v2.html"
 	form_class = UserInfoForm
-	# def dispatch(self, request, *args, **kwargs):
-	# 	return super().dispatch(request, *args, **kwargs)
-
 
 	def get_context_data(self, *args, **kwargs):
 		context_data = super().get_context_data(*args, **kwargs)
@@ -51,15 +48,9 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		return context_data
 
 	def form_valid(self, form):
-		print(f'\n *** form_valid() index *** \n')
-
-		# must use form_valid method...cannot validate this form directly
-		# why? see: https://docs.djangoproject.com/en/3.2/ref/forms/api/#behavior-of-unbound-forms
-
 		if form.is_guest_checkout() or form.is_new_account_checkout():
 			email = form.cleaned_data['username']
 			self.checkout_session.set_guest_email(email)
-
 			# We raise a signal to indicate that the user has entered the
 			# checkout process by specifying an email address.
 			signals.start_checkout.send_robust(
@@ -86,9 +77,8 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 		return redirect(self.get_success_url())
 
-	def get_form_structure(self):
-
-		return FORM_STRUCTURES.address
+	# def get_form_structure(self):
+	# 	return FORM_STRUCTURES.address
 
 	def post(self, request, *args, **kwargs):
 		# super().get_context_data(*args, **kwargs)
@@ -113,8 +103,29 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 				data['next_section'] = 'shipping'
 				# send all elems to be previewed, along with the values
 				data['preview_elems'] = {'email': form.cleaned_data['username']}
-				data['form_structure'] = self.get_form_structure()
+				data['form_structure'] = self.get_form_structure(ShippingAddressForm, use_labels=True)
 
+				## get or create the stripe customer object
+				print(f'\n dir(request.user): {dir(request.user)}')
+				print(f'\n dir(self): {dir(self.checkout_session)}')
+
+				stripe_customer = Facade().get_or_create_customer(
+					checkout_session=self.checkout_session,
+					email=form.cleaned_data['username'],
+				)
+
+				print(f'\n stripe_customer_id: {stripe_customer}')
+
+				# request.basket.stripe_customer_id = stripe_customer_id
+
+				self.checkout_session.set_stripe_customer(stripe_customer)
+				# stripe_ref = Facade().confirm_payment_intent(
+				# 			id=self.request.basket.payment_intent_id,
+				# 			card=self.request.POST[STRIPE_TOKEN],
+				# 			shipping=shipping, order_number=order_number,
+				# 			description=self.payment_description(order_number, total, **kwargs),
+				# 			metadata=self.payment_metadata(order_number, total, **kwargs)
+				# 		)
 
 
 			if request.resolver_match.url_name is 'shipping':
@@ -317,7 +328,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 				## return additional_info form structure
 				status_code = 200
 				country = shipping_address_form.cleaned_data['country']
-
 				data['preview_elems'] = {
 					'first_name': shipping_address_form.cleaned_data['first_name'],
 					'last_name': shipping_address_form.cleaned_data['last_name'],
@@ -331,27 +341,44 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 					'shipping_method': shipping_method_form.cleaned_data['method_code'],
 
 				}
-				# form_structure = {'tag':'div', 'classes':'form-container', 'elems': []}
-				# soup = BeautifulSoup(AdditionalInfoForm().as_p(), 'html.parser')
-				# for elem in soup.find_all(['select', 'input', 'fieldset']):
-				# 	_elem = {'tag': elem.name, 'attrs': elem.attrs}
-				#
-				# 	if elem.has_attr('required'):
-				# 		_elem['classes'] = 'required'
-				#
-				# 	child_elems = []
-				#
-				# 	for child in elem.findChildren(['input', 'option']):
-				# 		child_elems.append({'tag':child.name, 'attrs':child.attrs})
-				# 		if child.has_attr('required'):
-				# 			child_elems[-1]['classes'] = 'required'
-				#
-				# 	if child_elems:
-				# 		_elem['elems'] = child_elems
-				#
-				# 	form_structure['elems'].append(_elem)
+
+				client_secret = self.checkout_session.get_stripe_payment_intent()['id'] if self.checkout_session.is_stripe_payment_intent_set() else None
+
+				full_name = f"{shipping_address_form.cleaned_data['first_name']} {shipping_address_form.cleaned_data['last_name']}"
+
+				context_data = self.get_context_data(*args, **kwargs)
+
+				print(f'\n context_data: {context_data}')
+				print(f"self.checkout_session.get_stripe_customer(): {self.checkout_session.get_stripe_customer()}")
+
+				payment_intent = Facade().payment_intent_update_or_create(
+					checkout_session=self.checkout_session, total=context_data["order_total"],
+					email=context_data['user'].username, name=full_name,
+					customer=self.checkout_session.get_stripe_customer(),
+					client_secret=client_secret, shipping={
+						'name': full_name,
+						'phone':shipping_address_form.cleaned_data['phone_number'],
+						'address': {
+								'city':shipping_address_form.cleaned_data['line4'],
+								'country': shipping_address_form.cleaned_data['country'],
+								'line1':shipping_address_form.cleaned_data['line1'],
+								'line2':shipping_address_form.cleaned_data['line2'],
+								'state':shipping_address_form.cleaned_data['state'],
+								'postal_code':shipping_address_form.cleaned_data['postcode'],
+
+							}
+						}
+				)
+
+				print(f'\n payment_intent: {payment_intent}')
+				self.checkout_session.set_stripe_payment_intent(payment_intent)
+
+				# data['client_secret'] = payment_intent['client_secret']
+				# data['stripe_pkey'] = Facade().pkey
+
 				data['form_structure'] = self.get_form_structure(AdditionalInfoForm, use_help_text=True)
-				print(f"\n data['form_structure']: {data['form_structure']}")
+
+
 
 
 		response = JsonResponse(data)
@@ -388,22 +415,45 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 	def post(self, request, *args, **kwargs):
 		status_code = 400
 		response = super().post(request,*args, **kwargs)
-		data = {'section': 'additional_data', 'next_section':'billing'}
+		data = {'section': 'additional_info', 'next_section':'billing'}
 		if request.is_ajax():
 			form = self.form_class(request.POST)
 
 			if self.form_valid(form) and form.is_valid():
-				if not self.checkout_session.is_additional_info_set(request.basket):
-					form.cleaned_data['purchase_business_type']
-					form.cleaned_data['business_name']
 
-					additional_info_obj = AdditionalInfoQuestionaire.objects.create(purchase_business_type=form.cleaned_data['purchase_business_type'], business_name=form.cleaned_data['business_name'])
-					self.checkout_session.set_additional_info(additional_info_obj)
+				form.cleaned_data['purchase_business_type']
+				form.cleaned_data['business_name']
 
+				additional_info_obj,created = AdditionalInfoQuestionnaire.objects.update_or_create(
+					id=self.checkout_session.get_questionnaire_response('id'),
+					defaults={
+						'purchase_business_type':form.cleaned_data['purchase_business_type'],
+						'business_name':form.cleaned_data['business_name']
+						}
+				)
+
+
+				self.checkout_session.set_questionnaire_response(additional_info_obj)
+				additional_info_obj.save()
+				data['section'] = 'additional_info'
+				data['next_section'] = 'billing'
 				data['preview_elems'] = {'purchase_business_type': additional_info_obj.purchase_business_type, 'business_name': additional_info_obj.business_name}
-				data['form_structure'] = self.get_form_structure(BillingAddressForm, label_exceptions=['id_same_as_shipping'])
+				print(f'\n dir(self): {dir(self)}')
+				shipping_address = self.get_shipping_address(self.request.basket)
+				initial={
+					'same_as_shipping':True,
+					'first_name': shipping_address.first_name, 'last_name':shipping_address.last_name,
+					'line1': shipping_address.line1, 'line2': shipping_address.line2, 'line4': shipping_address.line4,
+					'state': shipping_address.state, 'postcode': shipping_address.postcode, 'phone_number': shipping_address.phone_number,
+					'country': shipping_address.country
+				}
+
+				data['form_structure'] = self.get_form_structure(BillingAddressForm, label_exceptions=['id_same_as_shipping'], initial=initial)
 				## where do we save
 				status_code = 200
+
+				data['client_secret'] = self.checkout_session.get_stripe_payment_intent()['client_secret']
+				data['stripe_pkey'] = Facade().pkey
 
 				response = JsonResponse(data)
 
@@ -428,6 +478,28 @@ class BillingView(views.PaymentDetailsView):
 	# If preview=True, then we render a preview template that shows all order
 	# details ready for submission.
 	preview = False
+	# def get_initial(self):
+	# 	print(f"\n get_initial** dir(self): {dir(self)}")
+	# 	shipping = self.request.basket
+	# 	# get the shipping address and set the billing address to that
+	# 	initial = {
+	# 		'first_name':shipping.first_name, 'last_name':shipping.last_name,
+	# 		'line1': shipping.line1, 'line2': shipping.line2, 'city':shipping.city,
+	# 		'state':shipping.state, 'postcode':shipping.postcode,
+	# 		'country':shipping.country, 'phone_number':shipping.phone_number
+	# 	}
+
+	# def get_context_data(self, *args, **kwargs):
+	# 	context_data = super().get_context_data(*args, **kwargs)
+	#
+	# 	shipping = context_data.get('shipping_address', None)
+	# 		if shipping:
+	# 			context_data['billing_address_form'].initial = {
+	# 				'first_name':shipping.first_name, 'last_name':shipping.last_name,
+	# 				'line1': shipping.line1, 'line2': shipping.line2, 'city':shipping.city,
+	# 				'state':shipping.state, 'postcode':shipping.postcode,
+	# 				'country':shipping.country, 'phone_number':shipping.phone_number
+	# 			}
 
 
 	def get(self, request, *args, **kwargs):
@@ -444,8 +516,16 @@ class BillingView(views.PaymentDetailsView):
 		return response
 
 	def post(self, request, *args, **kwargs):
-		## form validation here
-		return super().post(request, *args, **kwargs)
+		status_code = 400
+		response = super().post(request, *args, **kwargs)
+		form = self.form_class(request.POST)
+		if self.form_valid(form):
+			if form.cleaned_data['same_as_shipping']:
+				self.bill_to_shipping_address()
+
+
+		return response
+
 
 	def payment_metadata(self, order_number, total, **kwargs):
 		return {'order_number': order_number}
