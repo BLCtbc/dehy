@@ -1,5 +1,5 @@
 from oscar.apps.checkout import exceptions, session
-
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from dehy.appz.checkout import utils, tax
@@ -10,6 +10,10 @@ from oscar.core.loading import get_class, get_model
 CheckoutSessionData = utils.CheckoutSessionData
 
 class CheckoutSessionMixin(session.CheckoutSessionMixin):
+	def get_context_data(self, **kwargs):
+		ctx = super().get_context_data(**kwargs)
+		ctx['stripe_pkey'] = settings.STRIPE_PUBLISHABLE_KEY
+		return ctx
 
 	def dispatch(self, request, *args, **kwargs):
 		# Assign the checkout session manager so it's available in all checkout
@@ -42,7 +46,16 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 					"Please either sign in or enter your email address")
 			)
 
+	def check_stripe_user_id_is_captured(self, request):
+		if not self.checkout_session.get_stripe_customer_id():
+			raise exceptions.FailedPreCondition(
+				url=reverse('checkout:checkout'),
+				message=_(
+					"Please either sign in or enter your email address")
+			)
+
 	def build_submission(self, **kwargs):
+		print('\n build_submission() called \n')
 		submission = super().build_submission(
 			**kwargs)
 
@@ -56,7 +69,10 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 
 		return submission
 
-	def get_form_structure(self, form, use_placeholders=False, use_labels=False, use_help_text=False, label_exceptions=[]):
+	def get_form_structure(self, form, use_placeholders=False, use_labels=True, use_help_text=False,
+		label_exceptions=[], initial={}):
+
+		print(f'\n dir(form): {dir(form)}')
 		outter_tags = ['select', 'input', 'fieldset']
 		inner_tags = ['input', 'option']
 		if use_labels or label_exceptions:
@@ -68,17 +84,17 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 			inner_tags+=[('span', 'helptext')]
 
 		form_structure = [{'tag':'div', 'classes':'form-container', 'elems': []}]
-		soup = BeautifulSoup(form().as_table(), 'html.parser')
-
+		soup = BeautifulSoup(form(initial).as_table(), 'html.parser')
+		print('soup: ', soup)
 		for elem in soup.find_all(outter_tags):
 			elem_dict = {'tag': elem.name, 'attrs': elem.attrs}
 			if elem.name == 'label':
 				for_attr = elem.attrs['for']
-				if not label_exceptions or for_attr not in label_exceptions:
-					continue
-
-				else:
+				elem_dict['classes'] = 'floating-label'
+				if use_labels or (use_labels and for_attr in label_exceptions):
 					elem_dict['text'] = elem.text
+				else:
+					continue
 
 
 			if elem.has_attr('required'):

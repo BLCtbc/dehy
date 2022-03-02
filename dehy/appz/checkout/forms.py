@@ -11,7 +11,7 @@ from oscar.apps.payment import forms as payment_forms
 User = get_user_model()
 AbstractAddressForm = get_class('address.forms', 'AbstractAddressForm')
 Country = get_model('address', 'Country')
-AdditionalInfoQuestionaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionaire')
+AdditionalInfoQuestionaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionnaire')
 CoreBillingAddressForm = get_class('payment.forms', 'BillingAddressForm')
 BillingAddress = get_model('order', 'BillingAddress')
 
@@ -133,10 +133,12 @@ class UserInfoForm(AuthenticationForm):
 
 class BillingAddressForm(payment_forms.BillingAddressForm):
 
-	same_as_shipping = forms.BooleanField(required=False, initial=True, label='Same as shipping?')
+	same_as_shipping = forms.BooleanField(required=False, initial=True, label='Use shipping address')
 	# city = forms.CharField(required=True, max_length=100, min_length=2)
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		print(f"\n BillingAddressForm dir(self): {dir(self)}")
+		print(f"\n self.initial: {self.initial}")
 		self.adjust_country_field()
 
 		self.fields['first_name'].widget.attrs['placeholder'] = _('First name')
@@ -144,9 +146,10 @@ class BillingAddressForm(payment_forms.BillingAddressForm):
 		self.fields['state'].widget.attrs['placeholder'] = _('State')
 		self.fields['line1'].widget.attrs['placeholder'] = _('Address 1')
 		self.fields['line2'].widget.attrs['placeholder'] = _('Address 2')
-		self.fields['city'].widget.attrs['placeholder'] = _('City')
+		self.fields['line4'].widget.attrs['placeholder'] = _('City')
 		self.fields['country'].widget.attrs['placeholder'] = _('Country')
 		self.fields['postcode'].widget.attrs['placeholder'] = _('ZIP Code')
+		self.fields['phone_number'].widget.attrs['placeholder'] = _('Phone Number')
 
 
 	def adjust_country_field(self):

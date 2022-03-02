@@ -1,7 +1,7 @@
 
 
 window.addEventListener('load', function () {
-	DEHY.checkout.shipping.set_address();
+	//
 });
 
 
@@ -110,7 +110,6 @@ function redirectToCheckoutHandler() {
 	if (stripe_redirect_btn) {
 		stripe_redirect_btn.addEventListener('submit', e=>{
 			e.preventDefault();
-
 			var stripe = Stripe('pk_test_51KTDOrLpSVHc8H4yhmmmivcD8wYAIH7WzoslAGkQPCZ0iGQVWIsPsskwa5f4TSRoh42mg9gLKS0txZuZxzTAnYLh00K6pki08H');
 
 			stripe.redirectToCheckout({
@@ -130,11 +129,71 @@ function redirectToCheckoutHandler() {
 		})
 		return false;
 	}
-
 }
 
 
 DEHY.checkout = {
+	_stripe: null,
+	stripe: {
+		client_secret: null,
+		pkey: null,
+		elements_setup(client_secret=DEHY.checkout.stripe.client_secret) {
+			var stripe = DEHY.checkout.stripe.get();
+
+			const appearance = {
+	  			theme: 'night',
+				labels: 'floating'
+			};
+			const options = {
+			  clientSecret: this.client_secret,
+			  // Fully customizable with appearance API.
+			  appearance: appearance,
+			};
+
+			// Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 2
+			const elements = stripe.elements(options);
+
+			// Create and mount the Payment Element
+			// const paymentElement = elements.create('payment');
+			// paymentElement.mount('#payment-element');
+
+			// Create and mount the Payment Element
+			const paymentElement = elements.create('payment');
+			var stripe_payment_container = document.getElementById("stripe_payment_container") || DEHY.utils.create_element({tag:'div', attrs:{'id':'stripe_payment_container'}})
+			var form = DEHY.checkout.forms.get();
+			var form_container = form.querySelector('.form-container');
+			form.insertBefore(stripe_payment_container, form_container)
+			paymentElement.mount(stripe_payment_container);
+		},
+		set(pkey=null) {
+			if (pkey) {
+				DEHY.checkout.stripe.set_pkey(pkey);
+			}
+			DEHY.checkout._stripe = Stripe(DEHY.checkout.stripe.get_pkey());
+		},
+		get() {
+			return DEHY.checkout._stripe;
+		},
+		set_pkey(pkey) {
+			DEHY.checkout.stripe.pkey = pkey;
+		},
+		get_pkey() {
+			return DEHY.checkout.stripe.pkey;
+		},
+		init(pkey=null, client_secret=null) {
+			// attempts to set the pkey and add the stripe elements to the page
+			if (pkey) {
+				DEHY.checkout.stripe.set_pkey(pkey)
+			}
+			if (DEHY.checkout.stripe.get_pkey()) {
+				DEHY.checkout.stripe.set();
+			}
+			if (client_secret) {
+				DEHY.checkout.stripe.client_secret = client_secret;
+				DEHY.checkout.stripe.elements_setup(client_secret);
+			}
+		},
+	},
 	gateway: {
 		init: function() {
 			DEHY.checkout.forms.init();
@@ -152,7 +211,6 @@ DEHY.checkout = {
 			} else {
 				hidden = false
 			}
-			console.log('hidden: ', hidden)
 			form.querySelector("button[type='submit']").hidden = hidden;
 			return hidden;
 
@@ -161,12 +219,14 @@ DEHY.checkout = {
 			console.log('submit_handler');
 			e.preventDefault();
 			if (!form.checkValidity()) {
-				console.log('submit_handler')
 				document.getElementById('error_container').classList.toggle('hidden', false);
-				console.log(form.reportValidity());
 				return false
+			} else {
+				document.getElementById('error_container').classList.toggle('hidden', true)
 			}
+
 			DEHY.checkout.forms.submit_form_info(e.target);
+			form.reportValidity();
 		},
 		get: function() {
 			return document.getElementById('checkout')
@@ -179,6 +239,9 @@ DEHY.checkout = {
 			form.append(csrftoken_elem)
 
 			form.append(DEHY.utils.create_elements(data.form_structure))
+
+			DEHY.checkout.forms.init();
+
 			return form
 		},
 		submit_form_info: function(form) {
@@ -196,14 +259,14 @@ DEHY.checkout = {
 				method: "POST",
 				url: form.action,
 				data: data,
-				success: DEHY.checkout.forms.success,
+				success: DEHY.checkout.forms.success_handler,
 				error: DEHY.checkout.forms.error,
 				complete: function() {
 					return
 				}
 			});
 		},
-		success: function(response) {
+		success_handler: function(response) {
 			function get_preview_section(elems, section) {
 
 				switch(section) {
@@ -226,11 +289,11 @@ DEHY.checkout = {
 						return ;
 
 					default:
-						console.log(`Sorry, we are out of ${section}.`);
+						console.log(`no match for switch statement found with section=${section}.`);
 				}
 			}
 
-			console.log('success: ', response);
+			console.log('success response: ', response);
 
 			var next_section = response.next_section
 			var checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
@@ -245,8 +308,6 @@ DEHY.checkout = {
 				});
 			});
 
-			// create the elements we're going to reserve, retrieving necessary info from the pageNav
-
 			var preview_container = DEHY.utils.create_element({tag:'div', classes:'preview_container'});
 			preview_container.append(get_preview_section(response.preview_elems, response.section));
 			var next_section_elem = document.querySelector(`section#${next_section}`);
@@ -254,6 +315,9 @@ DEHY.checkout = {
 			next_section_elem.append(DEHY.checkout.forms.create(response));
 			document.getElementById(response.section).append(preview_container);
 			DEHY.checkout.forms.init();
+			if (response.stripe_pkey && response.client_secret && response.next_section=="billing") {
+				DEHY.checkout.stripe.init(response.stripe_pkey, response.client_secret)
+			}
 
 		},
 		error: function(response) {
@@ -263,6 +327,7 @@ DEHY.checkout = {
 
 		},
 		init: function() {
+
 			// debounceBtn.addEventListener("click", debounce(this, function () {displayDebounce.textContent = "Today is: " + new Date().toUTCString();}, 1000));
 
 			var form = document.querySelector('form.checkout-form');
@@ -278,55 +343,90 @@ DEHY.checkout = {
 
 				DEHY.utils.cleanup_temp_containers();
 				DEHY.checkout.forms.show_submit_button();
+				DEHY.checkout.shipping.billing_same_as_shipping_handler();
 
 				form.addEventListener('submit', e=>{
-					e.preventDefault();
-					if (!form.checkValidity()) {
-						document.getElementById('error_container').classList.toggle('hidden', false);
-						return false
-					} else {
-						document.getElementById('error_container').classList.toggle('hidden', true)
-					}
-
-					DEHY.checkout.forms.submit_form_info(e.target);
-					form.reportValidity();
+					DEHY.checkout.forms.submit_handler(e);
 				});
-				if (form.closest('section').id == 'shipping') {
-					// get shipping methods
-					form.addEventListener('change', e=> {
-						console.log('form changed')
+				form.addEventListener('change', e=> {
+					console.log('form changed')
+					if (form.closest('section').id == 'shipping') {
+						DEHY.checkout.shipping.ADDRESS.set();
+
 						if (e.target.matches('#id_postcode, #id_state, #id_city')) {
+							// get/update the shipping methods
 							var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action}
 							DEHY.checkout.shipping.get_shipping_methods(data)
 							console.log('matched')
-							// get shipping methods
 							DEHY.checkout.forms.show_submit_button();
 						}
-					})
-				}
+					}
+					if (e.target.matches("input#id_same_as_shipping")) {
+						// set or reset the address elements
+						DEHY.checkout.shipping.billing_same_as_shipping_handler(e.target.checked);
+					}
+				});
 			}
 		},
 	},
 	shipping: {
-		ADDRESS: {},
-		METHOD: '',
-		address_is_valid: function() {
-			//
-		},
-		set_address: function() {
-			var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
-			if (billing_address_container) {
-				billing_address_container.querySelectorAll("input[type='text'], input[type='number']").forEach(function(elem) {
-					DEHY.checkout.shipping.ADDRESS[elem.name] = elem.value;
-				});
-				var country_selector = billing_address_container.querySelector("select[name='country']");
+		billing_same_as_shipping_handler(checked=true, form=DEHY.checkout.forms.get()) {
+
+			for (let [key, val] of Object.entries(DEHY.checkout.shipping.ADDRESS.get())) {
+				let inputElem = form.querySelector(`input[name=${key}]`);
+				if (inputElem) {
+					inputElem.classList.toggle('hidden', checked)
+					inputElem.value = (checked) ? val : '';
+				}
+				var country_selector = form.querySelector("select[name='country']");
 				if (country_selector) {
-					DEHY.checkout.shipping.ADDRESS['country'] = country_selector.value;
+					country_selector.value = (checked) ? val : '';
+					country_selector.classList.toggle('hidden', checked);
 				}
 			}
 		},
+		ADDRESS: {
+			_address: {},
+			get() {
+				return this._address;
+			},
+			set(address=null) {
+				var form = DEHY.checkout.forms.get();
+				form.querySelectorAll("input[type='text'], input[type='number'], input[type='tel']").forEach(function(elem) {
+					DEHY.checkout.shipping.ADDRESS._address[elem.name] = elem.value;
+				});
+				var country_selector = form.querySelector("select[name='country']");
+				if (country_selector) {
+					DEHY.checkout.shipping.ADDRESS._address['country'] = country_selector.value;
+				}
+			},
+		},
+		METHOD: {
+			_method: {},
+			get() {
+				return this._method;
+			},
+			set() {
+				return false;
+			}
+		},
+		address_is_valid: function() {
+			//
+		},
+		// set_address: function() {
+		// 	var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
+		// 	if (billing_address_container) {
+		// 		billing_address_container.querySelectorAll("input[type='text'], input[type='number']").forEach(function(elem) {
+		// 			DEHY.checkout.shipping.ADDRESS[elem.name] = elem.value;
+		// 		});
+		// 		var country_selector = billing_address_container.querySelector("select[name='country']");
+		// 		if (country_selector) {
+		// 			DEHY.checkout.shipping.ADDRESS['country'] = country_selector.value;
+		// 		}
+		// 	}
+		// },
 		init: function() {
-			DEHY.checkout.shipping.set_address();
+			DEHY.checkout.shipping.ADDRESS.set();
 
 			var same_as_shipping_checkbox = document.querySelector("input[name=same_as_shipping]");
 
