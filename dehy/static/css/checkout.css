@@ -1,7 +1,14 @@
 :root {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+	--checkout-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 	--c-labelRestingTransform:translateY(23px) scale(1);
 	--c-labelFloatingTransform: translateY(13px) scale(0.8888888888888888);
+	--c-inputFloatingPaddingTop: 32px;
+	--c-labelFloatingHeight: 20.0938px;
+	--c-labelFloatingTransform: translateY(13px) scale(0.8888888888888888);
+	--c-labelRestingTransform: translateY(23px) scale(1);
+	--c-inputFloatingPaddingTop: 32px;
+	--c-inputFloatingMarginLeft: 13px;
+	--c-inputFloatingMarginRight: 13px;
 	--p-colorPrimaryAlpha20: hsla(132, 53%, 69%, 25%);
 	--p-colorPrimaryAlpha40: hsla(132, 53%, 69%, 40%);
 	--p-colorPrimaryAlpha50: hsla(132, 53%, 69%, 50%);
@@ -31,6 +38,13 @@
 	--p-colorBackgroundDeemphasize10: #4b4d5e;
 	--p-colorBackgroundDeemphasize15: #555668;
 	--p-colorBackgroundDeemphasize20: #5f6073;
+	--colorBackground: #30313d;
+    --focusBoxShadow: 0 0 0 3px var(--p-colorPrimaryAlpha20), 0 1px 1px 0 var(--p-colorBackgroundContrastAlpha08);
+	font-family: var(--checkout-font) !important;
+}
+
+body {
+	font-size: 20px;
 }
 
 form.preview {
@@ -46,12 +60,25 @@ form, .billing-card {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
 	background-color: rgb(26,31,54);
 }
+.form-control {
+	position: relative;
+	background-color: #30313d;
+	min-height: 50px;
+	margin: 5px 10px;
+	border: none;
+}
 
+.form-group {
+	position: relative;
+}
 .hide {
 	display: none;
 }
 
-input:not([type="radio"]), select, textarea {
+.radio {
+    position: relative;
+}
+/* input:not([type="radio"]), select, textarea {
 	padding: 0.75rem;
 	background-color: #30313d;
 	border-radius: 5px;
@@ -60,7 +87,7 @@ input:not([type="radio"]), select, textarea {
 	box-shadow: 0px 2px 4px rgb(0 0 0 / 50%), 0px 1px 6px rgb(0 0 0 / 25%);
 	font-weight: 400;
 	color: white;
-}
+} */
 
 select {
 	padding-right: calc(12px + 1em)!important;
@@ -69,7 +96,7 @@ select {
 	width: 100%
 }
 
-input, select, label {
+input, select, label, div, h1,h2,h3,h4,h5 {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
 }
 
@@ -93,6 +120,151 @@ input, select, label {
 	margin-bottom: 0.25rem;
 } */
 
+/* label {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  bottom: 8px;
+  color: #cfd7df;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform-origin: 0 50%;
+  cursor: text;
+  pointer-events: none;
+  transition-property: color, transform;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+input {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  padding-bottom: 7px;
+  color: #32325d;
+  background-color: #30313d
+  padding: var(--p-spacing3);
+  background-color: var(--colorBackground);
+  border-radius: var(--borderRadius);
+  transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  border: 1px solid var(--p-colorBackgroundDeemphasize05);;
+} */
+
+input::-webkit-input-placeholder,
+input:-ms-input-placeholder {
+  color: transparent;
+  transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+input.focused,
+input:not(.empty) {
+  opacity: 1;
+}
+
+input.focused::-webkit-input-placeholder,
+input:not(.empty)::-webkit-input-placeholder,
+input.focused::-moz-placeholder,
+input:not(.empty)::-moz-placeholder,
+input.focused:-ms-input-placeholder,
+input:not(.empty):-ms-input-placeholder{
+  color: #cfd7df;
+}
+
+input.focused + label,
+input:not(.empty) + label {
+  color: #aab7c4;
+  transform: scale(0.85) translateY(-25px);
+  cursor: default;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: #e39f48;
+  transition: background-color 100000000s;
+  -webkit-animation: 1ms void-animation-out;
+}
+
+.StripeElement--webkit-autofill {
+  background: transparent !important;
+}
+input:not([type="radio"], [type="checkbox"]), button {
+  -webkit-animation: 1ms void-animation-out;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+  border-style: none;
+}
+
+.baseline {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  left: 0;
+  bottom: 0;
+  background-color: #cfd7df;
+  transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+button {
+  display: block;
+  width: calc(100% - 30px);
+  height: 40px;
+  margin: 40px 15px 0;
+  background-color: #24b47e;
+  border-radius: 4px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.field {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  margin: 0 10px;
+}
+
+.error svg {
+  margin-top: 0 !important;
+}
+
+.error svg .base {
+  fill: #e25950;
+}
+
+.error svg .glyph {
+  fill: #fff;
+}
+
+.error .message {
+  color: #e25950;
+}
+
+.success .icon .border {
+  stroke: #abe9d2;
+}
+
+.success .icon .checkmark {
+  stroke: #24b47e;
+}
+
+.success .title {
+  color: #32325d;
+  font-size: 16px !important;
+}
+
+.success .message {
+  color: #8898aa;
+  font-size: 13px !important;
+}
+
+.success .reset path {
+  fill: #24b47e;
+}
+
 .checkout-flow section {
 	margin-bottom: 2rem;
 }
@@ -105,11 +277,8 @@ input, select, label {
 }
 
 button.edit {
-	display: none;
-}
-
-.preview button.edit {
-	display:contents;
+	display: contents;
+	color: grey;
 }
 
 .card-header {
@@ -128,7 +297,10 @@ button.edit {
 
 #error_container.form-group {
 	min-height: 2rem;
-	display: none;
+	background-color: red;
+	color: white;
+	font-weight: 500;
+	font-size: 1rem;
 }
 
 .helptext {
@@ -146,7 +318,7 @@ button.edit {
 	transform: var(--c-labelRestingTransform)!important;
 }
 
-input:focus {
+input:focus, .form-control:focus {
 	outline: var(--focusOutline);
 	border-color: var(--p-colorPrimaryAlpha40);
 	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5), 0px 1px 6px rgba(0, 0, 0, 0.25), var(--focusBoxShadow);
@@ -155,4 +327,30 @@ input:focus {
 	border-radius: var(--borderRadius);
 	transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 	border: 1px solid var(--p-colorBackgroundDeemphasize05);
+	color: inherit;
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5), 0px 1px 6px rgba(0, 0, 0, 0.25), var(--focusBoxShadow);
+	background-color: inherit;
+}
+
+.table {
+	color: inherit;
+}
+
+.total {
+	background-color: inherit;
+}
+
+label {
+	font-size: smaller;
+}
+
+.radio {
+	position: relative;
+}
+
+input:disabled {
+	background-color: var(--p-colorBackgroundDisabled);
+    color: var(--colorTextPlaceholder);
+    border-color: var(--p-colorBackgroundDisabledDeemphasize05);
+    box-shadow: none;
 }

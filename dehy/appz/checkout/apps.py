@@ -17,6 +17,7 @@ class CheckoutConfig(apps.CheckoutConfig):
 		self.shipping_view = get_class('checkout.views', 'ShippingView')
 		self.additional_info_view = get_class('checkout.views', 'AdditionalInfoView')
 		self.billing_view = get_class('checkout.views', 'BillingView')
+		# self.confirmation_view = get_class('checkout.views', 'ConfirmationView')
 
 		# self.additional_info_view = get_class('checkout.views', 'AdditionalInfoView')
 		# self.billing_view = get_class('checkout.views', 'BillingView')
@@ -30,7 +31,7 @@ class CheckoutConfig(apps.CheckoutConfig):
 		# self.shipping_method_view = get_class('checkout.views', 'ShippingMethodView')
 		# self.payment_method_view = get_class('checkout.views', 'PaymentMethodView')
 		# self.payment_details_view = get_class('checkout.views', 'PaymentDetailsView')
-		# self.thankyou_view = get_class('checkout.views', 'ThankYouView')
+		self.thankyou_view = get_class('checkout.views', 'ThankYouView')
 
 	def get_urls(self):
 		urls = [
@@ -38,12 +39,10 @@ class CheckoutConfig(apps.CheckoutConfig):
 			path('shipping/', self.shipping_view.as_view(), name='shipping'),
 			path('additional_info/', self.additional_info_view.as_view(), name='additional_info'),
 			path('billing/', self.billing_view.as_view(), name='billing'),
-
-			# path('additional_info/', self.additional_info_view.as_view(), name='additional_info'),
-			# path('billing/', self.billing_view.as_view(), name='additional_info'),
+			path('place_order/', self.billing_view.as_view(preview=True), name='place_order'),
 
 			# path('', self.index_view.as_view(), name='index'),
-			#
+
 			# # Shipping/user address views
 			# path('shipping-address/', self.shipping_address_view.as_view(), name='shipping-address'),
 			# path('user-address/edit/<int:pk>/', self.user_address_update_view.as_view(), name='user-address-update'),
@@ -58,7 +57,7 @@ class CheckoutConfig(apps.CheckoutConfig):
 			#
 			# # Preview and thankyou
 			# path('preview/', self.payment_details_view.as_view(preview=True), name='preview'),
-			# path('thank-you/', self.thankyou_view.as_view(), name='thank-you'),
+			path('thank_you/', self.thankyou_view.as_view(), name='thank_you'),
 		]
 		return self.post_process_urls(urls)
 

@@ -7,6 +7,7 @@ from oscar.core.compat import get_user_model
 from oscar.core.loading import get_class, get_model
 from oscar.forms.mixins import PhoneNumberMixin
 from oscar.apps.payment import forms as payment_forms
+from django.db.models import Q
 
 User = get_user_model()
 AbstractAddressForm = get_class('address.forms', 'AbstractAddressForm')
@@ -14,6 +15,15 @@ Country = get_model('address', 'Country')
 AdditionalInfoQuestionaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionnaire')
 CoreBillingAddressForm = get_class('payment.forms', 'BillingAddressForm')
 BillingAddress = get_model('order', 'BillingAddress')
+
+class PurchaseConfirmationForm(forms.Form):
+	create_new_account = forms.BooleanField(label=_("Create an account for faster checkout"), required=True, initial=False)
+	remember_payment_info = forms.BooleanField(label=_("Remember my payment information"), required=False, initial=False)
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['remember_payment_info'].widget.attrs['hidden'] = True
+
 
 class StripeTokenForm(forms.Form):
 	stripeEmail = forms.EmailField(widget=forms.HiddenInput())
@@ -27,8 +37,7 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 		self.adjust_country_field()
 
 	def adjust_country_field(self):
-		countries = Country._default_manager.filter(
-			is_shipping_country=True)
+		countries = Country._default_manager.filter(Q(iso_3166_1_a2='US')|Q(iso_3166_1_a2='CA'))
 
 		# No need to show country dropdown if there is only one option
 		if len(countries) == 1:
@@ -46,8 +55,6 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 			'state', 'postcode', 'country',
 			'phone_number',
 		]
-
-		# fields = '__all__'
 
 
 class ShippingMethodForm(forms.Form):
@@ -71,7 +78,7 @@ class AdditionalInfoForm(forms.ModelForm):
 	# 	self.fields['purchase_source']
 
 class UserInfoForm(AuthenticationForm):
-	username = forms.EmailField(label=_("My email address is"))
+	username = forms.EmailField(label=_("Email"))
 	GUEST, NEW, EXISTING = 'anonymous', 'new', 'existing'
 	CHOICES = (
 		(GUEST, _('I am a new customer and want to checkout as a guest')),
@@ -102,43 +109,13 @@ class UserInfoForm(AuthenticationForm):
 	def is_new_account_checkout(self):
 		return self.cleaned_data.get('options', None) == self.NEW
 
-# class BillingAddressForm(CoreBillingAddressForm):
-# 	same_as_shipping = forms.BooleanField(required=False, initial=True, label=)
-#
-# 	def __init__(self, *args, **kwargs):
-# 		super().__init__(*args, **kwargs)
-# 		self.adjust_country_field()
-#
-# 	def adjust_country_field(self):
-# 		countries = Country._default_manager.filter(
-# 			is_shipping_country=True)
-#
-# 		# No need to show country dropdown if there is only one option
-# 		if len(countries) == 1:
-# 			self.fields.pop('country', None)
-# 			self.instance.country = countries[0]
-# 		else:
-# 			self.fields['country'].queryset = countries
-# 			self.fields['country'].empty_label = None
-#
-# 	class Meta:
-# 		model = BillingAddress
-# 		fields = [
-# 			'same_as_shipping',
-# 			'first_name', 'last_name',
-# 			'line1', 'line2', 'line4',
-# 			'state', 'postcode', 'country'
-# 		]
-
-
 class BillingAddressForm(payment_forms.BillingAddressForm):
 
 	same_as_shipping = forms.BooleanField(required=False, initial=True, label='Use shipping address')
 	# city = forms.CharField(required=True, max_length=100, min_length=2)
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		print(f"\n BillingAddressForm dir(self): {dir(self)}")
-		print(f"\n self.initial: {self.initial}")
+
 		self.adjust_country_field()
 
 		self.fields['first_name'].widget.attrs['placeholder'] = _('First name')
@@ -153,8 +130,8 @@ class BillingAddressForm(payment_forms.BillingAddressForm):
 
 
 	def adjust_country_field(self):
-		countries = Country._default_manager.filter(
-			is_shipping_country=True)
+
+		countries = Country._default_manager.filter(is_shipping_country=True)
 
 		# No need to show country dropdown if there is only one option
 		if len(countries) == 1:

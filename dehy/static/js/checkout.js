@@ -6,152 +6,96 @@ window.addEventListener('load', function () {
 
 
 
-function payment_element_setup() {
-	const stripe_data = JSON.parse(document.getElementById('stripe-data').textContent);
+// DEHY.checkout namespace
+dehy.ch = {
+	utils: {
+		get_next_section(section=null) {
+			var checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
+			var index = checkout_sections.indexOf(document.querySelector(`section#${section}`))
+			return checkout_sections[Math.min(4, index+1)];
+		},
+		get_next_sections(section=null, include_self=0) {
+			var checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
+			return checkout_sections.slice(checkout_sections.indexOf(dehy.ch.utils.get_next_section(section))+1-include_self, checkout_sections.length);
+		},
+		get_previous_section(section=null) {
+			var checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
+			var index = checkout_sections.indexOf(document.querySelector(`section#${section}`));
+			return checkout_sections[Math.max(0, index)];
+		},
+		get_previous_sections(section=null, include_self=0) {
+			var checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
+			var index = checkout_sections.indexOf(document.querySelector(`section#${section}`))
+			return checkout_sections.slice(0, Math.min(4, index+include_self))
+		},
 
-	var stripe = Stripe(stripe_data.publishable_key);
-	var payment_form = document.getElementById('billing-form');
-
-	if (payment_form) {
-
-		const appearance = {
-  			theme: 'night',
-			labels: 'floating'
-		};
-		const options = {
-		  clientSecret: stripe_data.client_secret,
-		  // Fully customizable with appearance API.
-		  appearance: appearance,
-		};
-
-		// Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 2
-		const elements = stripe.elements(options);
-
-		// Create and mount the Payment Element
-		const paymentElement = elements.create('payment');
-		paymentElement.mount('#payment-element');
-
-		// var style = {
-		//   base: {
-		//     // Add your base input styles here. For example:
-		//     fontSize: '16px',
-		//     color: '#32325d',
-		// 	fontSmoothing: 'antialiased',
-      	// 	':-webkit-autofill': {
-        // 		color: '#fce883',
-      	// 	},
-		// 	'::placeholder': {
-        // 		color: '#87BBFD',
-      	// 	},
-		// 	// padding: '0.75rem',
-		// 	backgroundColor: '#30313d',
-		// 	// borderRadius: '5px',
-		// 	// transition: 'background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease',
-		// 	// border: `1px solid #424353`,
-		// 	// boxShadow: "0px 2px 4px rgb(0 0 0 / 50%), 0px 1px 6px rgb(0 0 0 / 25%)"
-		// }};
-
-		// var elements = stripe.elements();
-		// var card = elements.create('card');
-		// var cardContainer = document.getElementById('card-element')
-		// card.mount(cardContainer);
-
-		// var cardNumber = elements.create('cardNumber');
-		// var cardExpiry = elements.create('cardExpiry');
-		// var cardCvc = elements.create('cardCvc');
-		//
-		// cardNumber.mount("#card-element-new")
-		// cardExpiry.mount("#card-element-new")
-		// cardCvc.mount("#card-element-new")
-
-
-	}
-}
-
-// function same_as_shipping_handler() {
-// 	var same_as_shipping_checkbox = document.querySelector("input[name=same_as_shipping]");
-//
-// 	if (same_as_shipping_checkbox) {
-// 		same_as_shipping_checkbox.addEventListener('change', e=>{
-// 			var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
-//
-// 			billing_address_container.querySelectorAll('.form-group').forEach(function(elem) {
-// 				elem.classList.toggle('hide', e.target.checked)
-// 			})
-//
-// 			for (let [key, val] of Object.entries(SHIPPING.ADDRESS)) {
-// 				if (val) {
-// 					let elem = billing_address_container.querySelector(`input[name=${key}]`);
-// 					if (elem) {
-// 						if (e.target.checked) {
-// 							elem.value = val
-// 						} else {
-// 							elem.value = ''
-// 						}
-// 					}
-// 				}
-// 			}
-//
-// 			var country_selector = billing_address_container.querySelector("select[name='country']");
-// 			if (country_selector) {
-// 				if (e.target.checked) {
-// 					country_selector.value = SHIPPING.ADDRESS['country']
-// 				} else {
-// 					country_selector.selectedIndex = 0
-// 				}
-// 			}
-// 		})
-// 	}
-// }
-
-function redirectToCheckoutHandler() {
-	var stripe_redirect_btn = document.getElementById('stripe_redirect');
-
-	if (stripe_redirect_btn) {
-		stripe_redirect_btn.addEventListener('submit', e=>{
-			e.preventDefault();
-			var stripe = Stripe('pk_test_51KTDOrLpSVHc8H4yhmmmivcD8wYAIH7WzoslAGkQPCZ0iGQVWIsPsskwa5f4TSRoh42mg9gLKS0txZuZxzTAnYLh00K6pki08H');
-
-			stripe.redirectToCheckout({
-			  lineItems: [{
-			    price: 'price_1KUEr3LpSVHc8H4yVn96Typb', // Replace with the ID of your price
-			    quantity: 1,
-			  }],
-			  mode: 'payment',
-			  successUrl: 'https://127.0.0.1/',
-			  cancelUrl: 'https://127.0.0.1/',
-			}).then(function (result) {
-				document.querySelector("#error-message").innerText = result.error.message;
-			  // If `redirectToCheckout` fails due to a browser or network
-			  // error, display the localized error message to your customer
-			  // using `result.error.message`.
-			});
-		})
-		return false;
-	}
-}
-
-
-DEHY.checkout = {
+	},
 	_stripe: null,
 	stripe: {
+		// async paymentSubmissionHandler() {
+		// 		var stripe = dehy.ch.stripe.get();
+		// 		var elements = dehy.ch.stripe.elements.get();
+		//
+		// 		const {error} = await stripe.confirmPayment({
+		// 			//`Elements` instance that was used to create the Payment Element
+		// 			elements,
+		// 			redirect: 'if_required',
+		// 			confirmParams: {
+		// 			  return_url: 'http://127.0.0.1:8000/checkout/thank_you/',
+		// 			},
+		// 	  })
+		// 	  if (error) {
+		// 		    // This point will only be reached if there is an immediate error when
+		// 		    // confirming the payment. Show error to your customer (for example, payment
+		// 		    // details incomplete)
+		// 			console.log('error: ', error);
+		// 		    const messageContainer = document.querySelector('#error_container');
+		// 		    messageContainer.textContent = error.message;
+		// 		  } else {
+		//
+		// 		    // Your customer will be redirected to your `return_url`. For some payment
+		// 		    // methods like iDEAL, your customer will be redirected to an intermediate
+		// 		    // site first to authorize the payment, then redirected to the `return_url`.
+		// 		 }
+		//
+		//   },
+
+		async confirmSetupHandler() {
+			  var stripe = dehy.ch.stripe.get();
+			  var elements = dehy.ch.stripe.elements.get();
+
+			  const {error} = await stripe.confirmSetup({
+				  //`Elements` instance that was used to create the Payment Element
+				  elements,
+				  redirect: 'if_required',
+				  confirmParams: {
+					return_url: '/checkout/thank_you/',
+				  },
+			});
+		},
 		client_secret: null,
 		pkey: null,
-		elements_setup(client_secret=DEHY.checkout.stripe.client_secret) {
-			var stripe = DEHY.checkout.stripe.get();
+		_elements: null,
+		elements: {
+			set(options=null) {
+				let stripe = dehy.ch.stripe.get();
+				dehy.ch.stripe._elements = (options) ? stripe.elements(options) : stripe.elements();
+			},
+			get(options=null) {
+				if (dehy.ch.stripe._elements) {
+					return dehy.ch.stripe._elements;
+				} else {
+					let stripe = dehy.ch.stripe.get();
+					dehy.ch.stripe._elements = (options) ? stripe.elements(options) : stripe.elements();
+				}
+				return dehy.ch.stripe._elements;
+			},
+		},
 
-			const appearance = {
-	  			theme: 'night',
-				labels: 'floating'
-			};
-			const options = {
-			  clientSecret: this.client_secret,
-			  // Fully customizable with appearance API.
-			  appearance: appearance,
-			};
-
+		payment_element_setup(client_secret=dehy.ch.stripe.client_secret) {
+			var stripe = dehy.ch.stripe.get();
 			// Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 2
-			const elements = stripe.elements(options);
+			const elements = dehy.ch.stripe.elements.get();
 
 			// Create and mount the Payment Element
 			// const paymentElement = elements.create('payment');
@@ -159,53 +103,305 @@ DEHY.checkout = {
 
 			// Create and mount the Payment Element
 			const paymentElement = elements.create('payment');
-			var stripe_payment_container = document.getElementById("stripe_payment_container") || DEHY.utils.create_element({tag:'div', attrs:{'id':'stripe_payment_container'}})
-			var form = DEHY.checkout.forms.get();
+			var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', attrs:{'id':'stripe_payment_container'}})
+			var form = dehy.ch.forms.get();
 			var form_container = form.querySelector('.form-container');
 			form.insertBefore(stripe_payment_container, form_container)
 			paymentElement.mount(stripe_payment_container);
 		},
+		card_setup(style=null) {
+			console.log('called card setup');
+			// dehy.utils.remove_event_listeners(form);
+			var cardClasses = {
+				base: 'testicles',
+				focus: 'focused',
+				empty: 'empty',
+				invalid: 'invalid',
+			}
+			var style = style || {
+				base: {
+					color: "#32325d",
+					fontFamily: 'Consolas, Menlo, monospace',
+					fontSmoothing: "antialiased",
+					fontSize: "16px",
+					"::placeholder": {
+						color: "#aab7c4"
+					},
+					'::placeholder': {
+				        color: '#CFD7DF',
+				    },
+				    ':-webkit-autofill': {
+						color: '#e39f48',
+					},
+			},
+			invalid: {
+				color: "#fa755a",
+				iconColor: "#fa755a"
+				},
+			};
+
+			var inputs = document.querySelectorAll('input');
+			Array.prototype.forEach.call(inputs, function(input) {
+				input.addEventListener('focus', function() {
+					input.classList.add('focused');
+				});
+				input.addEventListener('blur', function() {
+					input.classList.remove('focused');
+				});
+				input.addEventListener('keyup', function() {
+					if (input.value.length === 0) {
+						input.classList.add('empty');
+					} else {
+						input.classList.remove('empty');
+					}
+				});
+			});
+
+			var options = {style: style, classes: cardClasses};
+
+			var form = dehy.ch.forms.get();
+
+			// form.removeEventListener('submit', dehy.ch.forms.submit_handler);
+
+			var stripe = dehy.ch.stripe.get();
+			var elements = dehy.ch.stripe.elements.get();
+
+			var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', classes: 'form-group row', attrs:{'id':'stripe_payment_container'}});
+			var stripe_cardNumber_container = document.getElementById("stripe_card_number") || dehy.utils.create_element({tag:'label', classes: 'col-7', text:'Card Number', attrs:{'for': 'Card Number', 'id':'stripe_card_number'}});
+			var stripe_cardExpiry_container = document.getElementById("stripe_card_expiry") || dehy.utils.create_element({tag:'label', classes: 'col-3', text:'Exp', attrs:{'id':'stripe_card_expiry'}});
+			var stripe_cardCvc_container = document.getElementById("stripe_card_cvc") || dehy.utils.create_element({tag:'label', classes: 'col-2', text:'CVC', attrs:{'id':'stripe_card_cvc'}});
+
+			stripe_payment_container.append(stripe_cardNumber_container, stripe_cardExpiry_container, stripe_cardCvc_container);
+			var form_container = form.querySelector('.form-container');
+			form.insertBefore(stripe_payment_container, form_container);
+
+			// we create the individual card elements since we'll be using our own zipcode element
+			// get or create the card element
+
+			var cardNumber = (elements.getElement('cardNumber')) ? elements.getElement('cardNumber') : elements.create('cardNumber', options);
+			var cardExpiry = (elements.getElement('cardExpiry')) ? elements.getElement('cardExpiry') : elements.create('cardExpiry', options);
+			var cardCvc = (elements.getElement('cardCvc')) ? elements.getElement('cardCvc') : elements.create('cardCvc', options);
+
+			// mount the card elements to the page
+			cardNumber.mount(stripe_cardNumber_container);
+			cardExpiry.mount(stripe_cardExpiry_container);
+			cardCvc.mount(stripe_cardCvc_container);
+
+			cardNumber.on('change', function(event) {
+				var displayError = document.getElementById('error_container');
+				if (event.error) {
+					displayError.classList.toggle('hide', false);
+					displayError.textContent = event.error.message;
+				} else {
+					displayError.classList.toggle('hide', true);
+					displayError.textContent = '';
+				}
+			});
+
+			form.removeEventListener('submit', dehy.ch.forms.submit_handler);
+
+			form.addEventListener('submit', e=> {
+				// We don't want to let default form submission happen here,
+				// which would refresh the page.
+				e.preventDefault();
+				var form_data = new FormData(form);
+				stripe.createPaymentMethod({
+					type: 'card',
+					card: cardNumber,
+					billing_details: {
+						// Include any additional collected billing details.
+						name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
+						phone: `${form_data.get('phone_number')}`,
+						address: {
+							line1: form_data.get('line1'),
+							line2: form_data.get('line2'),
+							city: form_data.get('line4'),
+							state: form_data.get('state'),
+							postal_code: form_data.get('postcode'),
+							country: form_data.get('country'),
+						}
+					},
+				}).then(dehy.ch.stripe.paymentMethodHandler);
+			});
+
+			var myPostalCodeField = document.querySelector('input[name="postcode"]');
+			myPostalCodeField.addEventListener('change', function(event) {
+				cardElement.update({value: {postalCode: event.target.value}});
+			});
+		},
+
+		paymentMethodHandler(response) {
+
+			console.log('paymentMethodHandler response: ', response);
+			if (response.error) {
+				// Show error in payment form
+				dehy.ch.forms.errors.display(response.error);
+				console.log('ERROR: ', response.error);
+  			} else {
+				var card = response.paymentMethod.card;
+				var form_data = new FormData(dehy.ch.forms.get());
+				form_data.set('payment_method_id', response.paymentMethod.id);
+
+				$.ajax({
+					method: "POST",
+					dataType: 'json',
+					url: '/checkout/billing/',
+					contentType: false,
+					processData: false,
+					data: form_data,
+					success: dehy.ch.forms.success_handler,
+					error: dehy.ch.forms.error,
+					complete: function() {
+						console.log('completed!!!')
+						return
+					}
+				});
+
+				// var place_order_btn = document.querySelector('#place_order');
+				// place_order_btn.hidden = false;
+
+				// dehy.ch.forms.create_preview('billing', {'card_number':`****-${card.last4}`, 'brand':card.brand, 'exp': `Exp. ${card.exp_month}/${card.exp_year}`});
+
+				// var form_data = dehy.utils.serialize(dehy.ch.forms.get());
+				// return new Promise((resolve, reject) => {
+				// 	$.ajax({
+				// 		method: "POST",
+				// 		dataType: 'json',
+				// 		url: '/checkout/billing/',
+				// 		contentType: false,
+				// 		processData: false,
+				// 		data: form_data,
+				// 		success: dehy.ch.forms.success_handler,
+				// 		error: dehy.ch.forms.error,
+				// 		complete: function() {
+				// 			console.log('completed!!!')
+				// 			return
+				// 		}
+				// 	})
+				// });
+
+			}
+		},
+		handleServerResponse(response) {
+			console.log('handleServerResponse response: ', response);
+
+			if (response.error) {
+				// Show error from server on payment form
+				dehy.ch.forms.errors.display(response.error);
+				console.log('ERROR: ', response.error);
+			} else if (response.requires_action) {
+				// Use Stripe.js to handle required card action
+				stripe.handleCardAction(
+					response.payment_intent_client_secret
+				).then(dehy.ch.stripe.handleStripeJsResult);
+			} else {
+				// Show success message
+				dehy.ch.forms.errors.display(response.error);
+				console.log('ERROR: ', response.error);
+			}
+		},
+		handleStripeJsResult(result) {
+			console.log('handleStripeJsResult result: ', result);
+
+			if (result.error) {
+				// Show error in payment form
+				console.log('ERROR: ', response.error);
+				dehy.ch.forms.errors.display(result.error);
+			} else {
+				var form_data = new FormData(dehy.ch.forms.get());
+
+				$.ajax({
+					method: "POST",
+					dataType: 'json',
+					url: '/checkout/place_order/',
+					contentType: false,
+					processData: false,
+					data: form_data,
+					success: dehy.ch.forms.success_handler,
+					error: dehy.ch.forms.error,
+					complete: function() {
+						console.log('completed!!!')
+						return
+					}
+				});
+
+				form_data.set('payment_intent_id', result.paymentIntent.id);
+
+				// The card action has been handled
+				// The PaymentIntent can be confirmed again on the server
+				// fetch('/checkout/place_order/', {
+				// 	method: 'POST',
+				// 	headers: { 'Content-Type': 'application/json' },
+				// 	body: JSON.stringify({ form_data })
+				// }).then(function(confirmResult) {
+				// 	return confirmResult.json();
+				// }).then(dehy.ch.stripe.handleServerResponse);
+			}
+		},
 		set(pkey=null) {
 			if (pkey) {
-				DEHY.checkout.stripe.set_pkey(pkey);
+				dehy.ch.stripe.set_pkey(pkey);
 			}
-			DEHY.checkout._stripe = Stripe(DEHY.checkout.stripe.get_pkey());
+			dehy.ch._stripe = Stripe(dehy.ch.stripe.get_pkey());
 		},
 		get() {
-			return DEHY.checkout._stripe;
+			return dehy.ch._stripe;
 		},
 		set_pkey(pkey) {
-			DEHY.checkout.stripe.pkey = pkey;
+			dehy.ch.stripe.pkey = pkey;
 		},
 		get_pkey() {
-			return DEHY.checkout.stripe.pkey;
+			return dehy.ch.stripe.pkey;
 		},
-		init(pkey=null, client_secret=null) {
-			// attempts to set the pkey and add the stripe elements to the page
-			if (pkey) {
-				DEHY.checkout.stripe.set_pkey(pkey)
-			}
-			if (DEHY.checkout.stripe.get_pkey()) {
-				DEHY.checkout.stripe.set();
-			}
-			if (client_secret) {
-				DEHY.checkout.stripe.client_secret = client_secret;
-				DEHY.checkout.stripe.elements_setup(client_secret);
+		init(pkey=dehy.ch.stripe.pkey, client_secret=dehy.ch.stripe.client_secret) {
+			console.log('initiating stripe');
+			if (dehy.ch.stripe.get() && dehy.ch.stripe.elements.get()) {
+				// already created, just need to unhide it
+				var stripe_payment_container = document.getElementById('stripe_payment_container');
+				stripe_payment_container.classList.toggle('display-none', false);
+				stripe_payment_container.closest('form').classList.toggle('display-none', false);
+			} else {// attempts to set the pkey and add the stripe elements to the page
+				if (pkey) {
+					dehy.ch.stripe.set_pkey(pkey)
+				}
+				if (dehy.ch.stripe.get_pkey()) {
+					dehy.ch.stripe.set();
+				}
+				// will never be true,
+				if (client_secret==false) {
+					// var appearance = {
+			  		// 	theme: 'night',
+					// 	labels: 'floating'
+					// };
+					// var options = {
+					//   clientSecret: client_secret,
+					//   // Fully customizable with appearance API.
+					//   appearance: appearance,
+					// };
+					// dehy.ch.stripe.elements.set(options)
+					// dehy.ch.stripe.client_secret = client_secret;
+					// dehy.ch.stripe.payment_element_setup(client_secret);
+
+				} else {
+					dehy.ch.stripe.elements.set()
+					dehy.ch.stripe.card_setup()
+				}
 			}
 		},
 	},
 	gateway: {
 		init: function() {
-			DEHY.checkout.forms.init();
+			dehy.ch.forms.init();
 		}
 	},
 	forms: {
+		saved: {},
 		show_submit_button: function(form=null) {
-			var form = form || DEHY.checkout.forms.get(),
+			var form = form || dehy.ch.forms.get(),
 				hidden = true;
 
 			if (form.closest('section').id=='shipping') {
-				if (DEHY.checkout.shipping.check_if_shipping_methods_displayed()) {
+				if (dehy.ch.shipping.check_if_shipping_methods_displayed()) {
 					hidden = false;
 				}
 			} else {
@@ -215,175 +411,339 @@ DEHY.checkout = {
 			return hidden;
 
 		},
-		submit_handler: function(e, form=DEHY.checkout.forms.get()) {
-			console.log('submit_handler');
+		submit_handler(e) {
+			var form = dehy.ch.forms.get();
+			// var form = e.target();
 			e.preventDefault();
 			if (!form.checkValidity()) {
 				document.getElementById('error_container').classList.toggle('hidden', false);
-				return false
 			} else {
 				document.getElementById('error_container').classList.toggle('hidden', true)
 			}
+			// if (form.closest('section').id=='place_order') {
+			// 	dehy.ch.stripe.paymentSubmissionHandler();
+			// }
 
-			DEHY.checkout.forms.submit_form_info(e.target);
+			dehy.ch.forms.submit_form_info(e.target);
 			form.reportValidity();
 		},
-		get: function() {
-			return document.getElementById('checkout')
-		},
-		create: function(data) {
-			// create the form
-
-			var form = DEHY.utils.create_element({tag:'form', classes: 'card card-body checkout-form', attrs:{'method':"post", 'id':'checkout', 'action': `/checkout/${data.next_section}/`}});
-			let csrftoken_elem = DEHY.utils.create_element({tag:'input', attrs:{'name':'csrfmiddlewaretoken', 'type': 'hidden', 'value':DEHY.utils.getCookie('csrftoken')}})
-			form.append(csrftoken_elem)
-
-			form.append(DEHY.utils.create_elements(data.form_structure))
-
-			DEHY.checkout.forms.init();
-
+		get(name) {
+			var form = document.querySelectorAll('form:not(.display-none)')[0];
+			if (name) {
+				form = dehy.ch.forms.saved[name];
+			}
 			return form
 		},
-		submit_form_info: function(form) {
+		create(section, form_structure) {
+			// create the form
 
+			var form = dehy.utils.create_element({tag:'form', classes: 'card card-body checkout-form', attrs:{'method':"post", 'id':'checkout', 'action': `/checkout/${section}/`}});
+			let csrftoken_elem = dehy.utils.create_element({tag:'input', attrs:{'name':'csrfmiddlewaretoken', 'type': 'hidden', 'value':dehy.utils.getCookie('csrftoken')}})
+			form.append(csrftoken_elem)
+			form.append(dehy.utils.create_elements(form_structure))
+
+			dehy.ch.forms.init();
+			return form
+		},
+		reverse_form_labels(form=dehy.ch.forms.get()) {
+			form.querySelectorAll('label').forEach(function(label) {
+				var row_element = label.closest('.row');
+				row_element.insertAdjacentElement('beforeend', label);
+			});
+		},
+		submit_form_info(form) {
+			var form_data = new FormData(form);
+			form.querySelectorAll("input[type='checkbox']").forEach(function(checkbox) {
+				form_data.set(checkbox.name, form_data.has(checkbox.name) ? 'on':'off');
+			})
 			var data = {}
+
 			if (form.closest('section').id == '___shipping') {
 				// create two different forms
-				data['shipping_address'] = DEHY.utils.serialize(form.querySelector('.address-container'));
-				data['shipping_method'] = DEHY.utils.serialize(form.querySelector('.shipping-method-container'));
+				data['shipping_address'] = dehy.utils.serialize(form.querySelector('.address-container'));
+				data['shipping_method'] = dehy.utils.serialize(form.querySelector('.shipping-method-container'));
 			} else {
-				data = DEHY.utils.serialize(form)
+				data = dehy.utils.serialize(form)
 			}
 			console.log('form data: ', data)
+
 			$.ajax({
 				method: "POST",
 				url: form.action,
-				data: data,
-				success: DEHY.checkout.forms.success_handler,
-				error: DEHY.checkout.forms.error,
+				contentType: false,
+				processData: false,
+				data: form_data,
+				success: dehy.ch.forms.success_handler,
+				error: dehy.ch.forms.error,
 				complete: function() {
 					return
 				}
 			});
 		},
-		success_handler: function(response) {
-			function get_preview_section(elems, section) {
+		success_handler(response) {
+			console.log('success response: ', response);
+			console.log('response.section: ', response.section);
 
+
+			// if ((response.section=='billing'||response.section=='place_order') && response.status == 'requires_confirmation') {
+			// 	console.log('requires_confirmation');
+			// 	dehy.ch._stripe.handleCardAction(
+			// 		response.payment_intent_client_secret
+			// 	).then(dehy.ch.stripe.handleStripeJsResult);
+			// }
+			if (response.section=='billing') {
+				var stripe_payment_container = document.getElementById('stripe_payment_container');
+				stripe_payment_container.classList.toggle('display-none', true);
+				stripe_payment_container.closest('form').classList.toggle('display-none', true);
+
+			} else {
+				dehy.ch.forms.save_and_remove(); //1
+			}
+
+			var next_section = dehy.ch.utils.get_next_section(response.section);
+
+			var form = dehy.ch.forms.get_or_create(next_section.id, response.form_structure); //2
+			next_section.append(form); //3
+			dehy.ch.forms.disable_edit_buttons(); //4
+			let previous_section = dehy.ch.utils.get_previous_section(response.section);
+			dehy.ch.forms.create_preview(response.section, response.preview_elems); //5
+			dehy.ch.forms.enable_edit_buttons(next_section.id); //6
+			dehy.ch.forms.init();
+			dehy.ch.forms.reverse_form_labels();
+
+			console.log('next_section.id', next_section.id)
+
+			if (next_section.id=="billing") {
+				dehy.ch.shipping.billing_same_as_shipping_handler();
+				if (response.stripe_pkey) {
+					dehy.ch.stripe.init(response.stripe_pkey, response.client_secret);
+				}
+			}
+
+		},
+		// Attempts to get a previously saved form, or create one if it doesn't exist
+		// If a form isnt saved under the section name, creates a new one from given form structure (required)
+		// If no form structure given, falls back to the current form using the get() method
+		get_or_create(section=null, form_structure=null) {
+			var form = dehy.ch.forms.get();
+			if (section && dehy.ch.forms.saved.hasOwnProperty(section)) {
+				form = dehy.ch.forms.saved[section]
+			} else if (form_structure){
+				form = dehy.ch.forms.create(section, form_structure)
+			}
+			return form;
+		},
+		save(form, section) {
+			dehy.ch.forms.saved[section] = form;
+		},
+		save_and_remove() {
+			var all_checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
+
+			all_checkout_sections.forEach(function(elem) {
+				if (elem.querySelector('form')) {
+					let form = elem.querySelector('form')
+					let copy = form.cloneNode(true)
+					dehy.ch.forms.save(form, elem.id);
+					form.remove();
+				}
+			});
+
+		},
+		// enables all edit buttons in sections prior to given section
+		enable_edit_buttons(section_name) {
+			dehy.ch.utils.get_previous_sections(section_name).forEach(function(section) {
+				let edit_btn = section.querySelector('button.edit')
+				if (edit_btn) {
+
+					edit_btn.hidden = false;
+					edit_btn.disabled = false;
+
+
+					edit_btn.addEventListener('click', e=>{
+						var preview_container = section.querySelector('.preview_container');
+						if (preview_container) {
+							preview_container.remove()
+						}
+						dehy.ch.forms.save_and_remove(); //1
+						var form = dehy.ch.forms.get_or_create(section.id); //2
+						section.append(form); //3
+						if (section.id=='billing') {
+							dehy.ch.stripe.init();
+						}
+						dehy.ch.forms.disable_edit_buttons(); //4
+						dehy.ch.forms.clear_previews(section.id) //5
+						// let previous_section = dehy.ch.utils.get_previous_section(section.id);
+						dehy.ch.forms.enable_edit_buttons(dehy.ch.utils.get_previous_section(section.id).id) //6
+						// dehy.ch.forms.init();
+					});
+				}
+			})
+		},
+		// disables and hides all edit buttons
+		disable_edit_buttons() {
+			document.querySelectorAll("button.edit").forEach(function(elem) {
+				elem.hidden = true;
+				elem.disabled = true;
+				dehy.utils.remove_event_listeners(elem);
+			});
+		},
+
+		// create a preview of a section form and append it to that section
+		create_preview(section, elems) {
+			function get_preview_section(elems, section) {
 				switch(section) {
 					case 'user_info':
 						console.log('user_info');
-						let elem = DEHY.utils.create_element({tag:'div', classes:'email', text:elems['email']})
+						let elem = dehy.utils.create_element({tag:'div', classes:'email', text:elems['email']})
 						return elem;
 					case 'shipping':
 						// do stuff
-						for (let [key, val] of Object.entries(response.preview_elems)) {
-							let elem = DEHY.utils.create_element({tag:'div', classes:key, text:val})
+						for (let [key, val] of Object.entries(elems)) {
+							let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
 							preview_container.append(elem)
 						}
 						return ;
 					case 'additional_info':
-						return ;
+
+						for (let [key, val] of Object.entries(elems)) {
+							let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
+							preview_container.append(elem)
+						}
 					case 'billing':
+						for (let [key, val] of Object.entries(elems)) {
+							let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
+							preview_container.append(elem)
+						}
 						return ;
-					case 'review_and_purchase':
+					case 'place_order':
 						return ;
 
 					default:
 						console.log(`no match for switch statement found with section=${section}.`);
 				}
 			}
+			var preview_container = dehy.utils.create_element({tag:'div', classes:'preview_container'});
+			preview_container.append(get_preview_section(elems, section));
+			document.getElementById(section).append(preview_container);
+		},
 
-			console.log('success response: ', response);
+		clear_previews(section) {
 
-			var next_section = response.next_section
-			var checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
-			var previous_sections = checkout_sections.slice(0,checkout_sections.indexOf(document.querySelector(`section#${next_section}`)))
-
-			console.log('previous_sections: ', previous_sections)
-			previous_sections.forEach(function(elem) {
-				// set all other sections to preview mode
-				elem.classList.toggle('preview', true);
-				elem.querySelectorAll('form').forEach(function(form) {
-					form.remove()
+			dehy.ch.utils.get_next_sections(section, 1).forEach(function(section) {
+				section.querySelectorAll('.preview_container').forEach(function(elem) {
+					elem.remove();
 				});
 			});
-
-			var preview_container = DEHY.utils.create_element({tag:'div', classes:'preview_container'});
-			preview_container.append(get_preview_section(response.preview_elems, response.section));
-			var next_section_elem = document.querySelector(`section#${next_section}`);
-
-			next_section_elem.append(DEHY.checkout.forms.create(response));
-			document.getElementById(response.section).append(preview_container);
-			DEHY.checkout.forms.init();
-			if (response.stripe_pkey && response.client_secret && response.next_section=="billing") {
-				DEHY.checkout.stripe.init(response.stripe_pkey, response.client_secret)
-			}
-
 		},
-		error: function(response) {
-			// add errors to the error element
-			console.log('error: ', response);
-			document.getElementById('error_container').append(DEHY.utils.create_element({tag:'div', classes:'error', text: response.statusText, attrs:{'id':'errors'}}))
-
+		errors: {
+			display(error_message) {
+				console.log('error: ', error_message);
+				var form = dehy.ch.forms.get();
+				var error_container = form.querySelector('#error_container');
+				error_container.classList.toggle('hide', false);
+				error_container.textContent = error_message
+				// error_container.append(dehy.utils.create_element({tag:'div', classes:'error', text: error_message, attrs:{'id':'errors'}}));
+			},
+			hide() {
+				var form = dehy.ch.forms.get();
+				var error_container = form.querySelector('#error_container');
+				error_container.classList.toggle('hide', true);
+				error_container.textContent = ''
+			},
 		},
-		init: function() {
+		// dehy.ch.forms.init()
+		init() {
 
 			// debounceBtn.addEventListener("click", debounce(this, function () {displayDebounce.textContent = "Today is: " + new Date().toUTCString();}, 1000));
 
-			var form = document.querySelector('form.checkout-form');
+			var form = dehy.ch.forms.get();
 			if (form) {
 				/******
 					debounce testing
 				*****/
-				// form.addEventListener('submit', DEHY.utils.debounce(this, DEHY.checkout.forms.submit_handler, 500));
+				// form.addEventListener('submit', dehy.utils.debounce(this, dehy.ch.forms.submit_handler, 500));
 				// form.addEventListener('submit', e=> {
 				// 	e.preventDefault();
-				// 	DEHY.utils.debounce(e, DEHY.checkout.forms.submit_handler(e), 500);
+				// 	dehy.utils.debounce(e, dehy.ch.forms.submit_handler(e), 500);
 				// });
 
-				DEHY.utils.cleanup_temp_containers();
-				DEHY.checkout.forms.show_submit_button();
-				DEHY.checkout.shipping.billing_same_as_shipping_handler();
+				dehy.utils.cleanup_temp_containers();
+				dehy.ch.forms.show_submit_button();
 
-				form.addEventListener('submit', e=>{
-					DEHY.checkout.forms.submit_handler(e);
+				var inputs = document.querySelectorAll('input');
+				Array.prototype.forEach.call(inputs, function(input) {
+					if (input.value.length === 0) {
+					  input.classList.add('empty');
+					} else {
+					  input.classList.remove('empty');
+					}
+
+				    input.addEventListener('focus', function() {
+				      input.classList.add('focused');
+				    });
+				    input.addEventListener('blur', function() {
+				      input.classList.remove('focused');
+				    });
+				    input.addEventListener('keyup', function() {
+				      if (input.value.length === 0) {
+				        input.classList.add('empty');
+				      } else {
+				        input.classList.remove('empty');
+				      }
+				    });
 				});
+
+				// dehy.utils.remove_event_listeners(place_order_btn);
+
+				form.addEventListener('submit', dehy.ch.forms.submit_handler);
 				form.addEventListener('change', e=> {
 					console.log('form changed')
 					if (form.closest('section').id == 'shipping') {
-						DEHY.checkout.shipping.ADDRESS.set();
+						dehy.ch.shipping.ADDRESS.set();
 
 						if (e.target.matches('#id_postcode, #id_state, #id_city')) {
 							// get/update the shipping methods
 							var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action}
-							DEHY.checkout.shipping.get_shipping_methods(data)
+							dehy.ch.shipping.get_shipping_methods(data)
 							console.log('matched')
-							DEHY.checkout.forms.show_submit_button();
+							dehy.ch.forms.show_submit_button();
 						}
 					}
 					if (e.target.matches("input#id_same_as_shipping")) {
 						// set or reset the address elements
-						DEHY.checkout.shipping.billing_same_as_shipping_handler(e.target.checked);
+						dehy.ch.shipping.billing_same_as_shipping_handler(e.target.checked);
 					}
 				});
 			}
 		},
 	},
 	shipping: {
-		billing_same_as_shipping_handler(checked=true, form=DEHY.checkout.forms.get()) {
+		billing_same_as_shipping_handler(checked=true, form=dehy.ch.forms.get()) {
+			var elems = Array.from(form.querySelector('.form-container').querySelectorAll("input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping']), select"));
+			var form_controls = [...new Set(elems.map(function(e) {return e.closest('.form-control')}))]
+			var address = dehy.ch.shipping.ADDRESS.get();
+			form_controls.forEach(function(row) {
+				row.classList.toggle('hidden', checked);
+				var inputs_and_labels = row.querySelectorAll("input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping']), select")
+				inputs_and_labels.forEach(function(elem) {
+					if (elem.name && address.hasOwnProperty(elem.name)) {
+						elem.value = (checked) ? address[elem.name] : '';
+					}
+				});
+			});
 
-			for (let [key, val] of Object.entries(DEHY.checkout.shipping.ADDRESS.get())) {
-				let inputElem = form.querySelector(`input[name=${key}]`);
-				if (inputElem) {
-					inputElem.classList.toggle('hidden', checked)
-					inputElem.value = (checked) ? val : '';
-				}
-				var country_selector = form.querySelector("select[name='country']");
-				if (country_selector) {
-					country_selector.value = (checked) ? val : '';
-					country_selector.classList.toggle('hidden', checked);
-				}
-			}
+			// for (let [key, val] of Object.entries(dehy.ch.shipping.ADDRESS.get())) {
+			// 	let inputElem = form.querySelector(`input[name=${key}]`);
+			// 	if (inputElem) {
+			// 		inputElem.classList.toggle('hidden', checked)
+			// 		inputElem.value = (checked) ? val : '';
+			// 	}
+			// 	var country_selector = form.querySelector("select[name='country']");
+			// 	if (country_selector) {
+			// 		country_selector.value = (checked) ? val : '';
+			// 		country_selector.classList.toggle('hidden', checked);
+			// 	}
+			// }
 		},
 		ADDRESS: {
 			_address: {},
@@ -391,13 +751,13 @@ DEHY.checkout = {
 				return this._address;
 			},
 			set(address=null) {
-				var form = DEHY.checkout.forms.get();
+				var form = dehy.ch.forms.get();
 				form.querySelectorAll("input[type='text'], input[type='number'], input[type='tel']").forEach(function(elem) {
-					DEHY.checkout.shipping.ADDRESS._address[elem.name] = elem.value;
+					dehy.ch.shipping.ADDRESS._address[elem.name] = elem.value;
 				});
 				var country_selector = form.querySelector("select[name='country']");
 				if (country_selector) {
-					DEHY.checkout.shipping.ADDRESS._address['country'] = country_selector.value;
+					dehy.ch.shipping.ADDRESS._address['country'] = country_selector.value;
 				}
 			},
 		},
@@ -410,23 +770,23 @@ DEHY.checkout = {
 				return false;
 			}
 		},
-		address_is_valid: function() {
+		address_is_valid() {
 			//
 		},
 		// set_address: function() {
 		// 	var billing_address_container = document.querySelector('form.billing-form .billing-address-container');
 		// 	if (billing_address_container) {
 		// 		billing_address_container.querySelectorAll("input[type='text'], input[type='number']").forEach(function(elem) {
-		// 			DEHY.checkout.shipping.ADDRESS[elem.name] = elem.value;
+		// 			dehy.ch.shipping.ADDRESS[elem.name] = elem.value;
 		// 		});
 		// 		var country_selector = billing_address_container.querySelector("select[name='country']");
 		// 		if (country_selector) {
-		// 			DEHY.checkout.shipping.ADDRESS['country'] = country_selector.value;
+		// 			dehy.ch.shipping.ADDRESS['country'] = country_selector.value;
 		// 		}
 		// 	}
 		// },
-		init: function() {
-			DEHY.checkout.shipping.ADDRESS.set();
+		init() {
+			dehy.ch.shipping.ADDRESS.set();
 
 			var same_as_shipping_checkbox = document.querySelector("input[name=same_as_shipping]");
 
@@ -438,7 +798,7 @@ DEHY.checkout = {
 						elem.classList.toggle('hide', e.target.checked)
 					})
 
-					for (let [key, val] of Object.entries(DEHY.checkout.shiping.ADDRESS)) {
+					for (let [key, val] of Object.entries(dehy.ch.shiping.ADDRESS)) {
 						if (val) {
 							let elem = billing_address_container.querySelector(`input[name=${key}]`);
 							if (elem) {
@@ -454,7 +814,7 @@ DEHY.checkout = {
 					var country_selector = billing_address_container.querySelector("select[name='country']");
 					if (country_selector) {
 						if (e.target.checked) {
-							country_selector.value = DEHY.checkout.shipping.ADDRESS['country']
+							country_selector.value = dehy.ch.shipping.ADDRESS['country']
 						} else {
 							country_selector.selectedIndex = 0
 						}
@@ -468,8 +828,8 @@ DEHY.checkout = {
 				method: "GET",
 				url: data.action,
 				data: data,
-				success: DEHY.checkout.shipping.display_shipping_methods,
-				error: DEHY.checkout.forms.error,
+				success: dehy.ch.shipping.display_shipping_methods,
+				error: dehy.ch.forms.errors.display,
 				complete: function() {
 					return
 				}
@@ -478,20 +838,20 @@ DEHY.checkout = {
 		display_shipping_methods: function(data) {
 			console.log('display_shipping_methods: ', data);
 			// add the shipping methods to the existing form
-			var form = DEHY.checkout.forms.get(),
-				fieldset = DEHY.utils.create_element({tag:'fieldset'});
+			var form = dehy.ch.forms.get(),
+				fieldset = dehy.utils.create_element({tag:'fieldset'});
 
 			var shipping_method_container = document.querySelector('.shipping-method-container');
 
 			if (shipping_method_container) {
-				DEHY.utils.remove_children(shipping_method_container);
+				dehy.utils.remove_children(shipping_method_container);
 			} else {
-				shipping_method_container = DEHY.utils.create_element({tag:'div', classes:'shipping-method-container'})
+				shipping_method_container = dehy.utils.create_element({tag:'div', classes:'shipping-method-container'})
 			}
 
 
 			shipping_method_container.append(fieldset)
-			fieldset.append(DEHY.utils.create_element({tag:'legend', classes: "required", text:'Shipping Methods'}))
+			fieldset.append(dehy.utils.create_element({tag:'legend', classes: "required", text:'Shipping Methods'}))
 			var prefix = (data.prefix) ? `${data.prefix}-`:'';
 			data.shipping_methods.forEach((method, ix) => {
 				// create form group
@@ -515,17 +875,17 @@ DEHY.checkout = {
 						}
 					}]
 				}]
-				let elem = DEHY.utils.create_elements(method_structure, fieldset)
+				let elem = dehy.utils.create_elements(method_structure, fieldset)
 				elem.querySelector
 				// append it to the shipping_method_container
 
 			})
 
-			DEHY.utils.cleanup_temp_containers()
+			dehy.utils.cleanup_temp_containers()
 
 			shipping_method_container.querySelector("input[type='radio']").checked = true;
 			form.insertBefore(shipping_method_container, document.querySelector('.error-container.button-container'))
-			DEHY.checkout.forms.show_submit_button();
+			dehy.ch.forms.show_submit_button();
 
 			console.log('display_shipping_methods: ', data);
 		},

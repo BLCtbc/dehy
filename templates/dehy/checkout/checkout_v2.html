@@ -28,7 +28,7 @@
 					<div class="card-title">
 						<h2>{% trans "1. Your Email" %}</h2>
 					</div>
-					<button class="edit" aria-label="Edit Customer Information"><span>Edit</span></button>
+					<button class="edit" disabled hidden aria-label="Edit Customer Information"><span>Edit</span></button>
 				</div>
 
 				{% block user_info %}
@@ -41,7 +41,7 @@
 					<div class="card-title">
 						<h2>{% trans "2. Shipping" %}</h2>
 					</div>
-					<button class="edit" aria-label="Edit Shipping Information"><span>Edit</span></button>
+					<button class="edit" disabled hidden aria-label="Edit Shipping Information"><span>Edit</span></button>
 				</div>
 
 
@@ -54,7 +54,7 @@
 					<div class="card-title">
 						<h2>{% trans "3. Additional Info" %}</h2>
 					</div>
-					<button class="edit" aria-label="Edit Additional Information"><span>Edit</span></button>
+					<button class="edit" disabled hidden aria-label="Edit Additional Information"><span>Edit</span></button>
 				</div>
 
 				{% block additional_info %}
@@ -66,7 +66,7 @@
 					<div class="card-title">
 						<h2>{% trans "4. Billing" %}</h2>
 					</div>
-					<button class="edit" aria-label="Edit Billing Information"><span>Edit</span></button>
+					<button class="edit" disabled hidden aria-label="Edit Billing Information"><span>Edit</span></button>
 				</div>
 
 				{% block billing %}
@@ -74,7 +74,7 @@
 			</section>
 
 
-			<section id="review_and_purchase" class="card card-body col-10 review-purchase">
+			<section id="place_order" class="card card-body col-10 place-order">
 				<div class="card-title">
 					<h2>{% trans "5. Review & Purchase" %}</h2>
 				</div>
@@ -88,29 +88,14 @@
 		<div class="col-6 card card-body order-contents">
 			{% block order_contents %}
 				<div class="card-title">
-					{% block order_contents_actions %}
-						<a href="{% url 'basket:summary' %}" class="float-right">
-							{% trans "Edit order contents" %}
-						</a>
-					{% endblock %}
+					<h2>{% trans "Order Summary" %}</h2>
+				</div>
 
-					<h2>{% trans "Order contents" %}</h2>
-				</div>
-				{% comment %}
-				<div class="basket-title">
-					<div class="row">
-						<p class="col-sm-9 h4">{% trans "Item" %}</p>
-						<p class="col-sm-1 h4 text-center">{% trans "Quantity" %}</p>
-						<p class="col-sm-2 h4 text-right">{% trans "Total" %}</p>
-					</div>
-				</div>
-				{% endcomment %}
 				{% for line in basket.all_lines %}
 					{% purchase_info_for_line request line as session %}
-					<div class="basket-items">
-						<div class="row">
+					<div class="basket-items row">
 							<div class="col-sm-3">
-								<div class="image_container w-100">
+								<div class="image-container w-100">
 									{% with image=line.product.primary_image %}
 										{% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
 										<a href="{{ form.instance.product.get_absolute_url }}">
@@ -120,7 +105,7 @@
 								</div>
 							</div>
 							<div class="col-sm-6">
-								<a href="{{ line.product.get_absolute_url }}">{{ line.product.parent.title|default:line.product.title }}</a>
+								<span>{{ line.product.parent.title|default:line.product.title }}</span>
 								{% if line.product.is_child %}
 								<p class="size"><small>Size: {{line.description}}</small></p>
 								{% endif %}
@@ -130,14 +115,18 @@
 							</div>
 							<div class="col-sm-2 text-right">
 								<p class="price_color">
+									{{ line.line_price_excl_tax|currency:basket.currency }}
+
+									{% comment %}
 									{% if not show_tax_separately and line.is_tax_known %}
 										{{ line.line_price_incl_tax|currency:basket.currency }}
 									{% else %}
 										{{ line.line_price_excl_tax|currency:basket.currency }}
 									{% endif %}
+									{% endcomment %}
+
 								</p>
 							</div>
-						</div>
 					</div>
 				{% endfor %}
 
@@ -157,16 +146,17 @@
 
 
 {% block extra_scripts %}
-{{ stripe_data|json_script:"stripe-data" }}
+
+{% comment %}{{ stripe_data|json_script:"stripe-data" }}{% endcomment %}
 
 <script src="{% static "js/checkout.js" %}"></script>
-<script>
+<!-- <script>
 	const stripe = Stripe("{{stripe_data.publishable_key}}");
-</script>
+</script> -->
 {% endblock extra_scripts %}
 
 {% block onbodyload %}
     {{ block.super }}
     oscar.checkout.gateway.init();
-	DEHY.checkout.gateway.init();
+	dehy.ch.gateway.init();
 {% endblock %}
