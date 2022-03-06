@@ -1,33 +1,37 @@
-var DEHY = {
+var dehy = {
 	init: function(choice='') {
 		this.handler_choice(choice);
 		$.ajaxSetup({
 			beforeSend: function(xhr, settings) {
-				if (!DEHY.utils.csrfSafeMethod(settings.type) && !this.crossDomain) {
-					xhr.setRequestHeader("X-CSRFToken", DEHY.utils.getCookie('csrftoken'));
+				console.log('beforeSend xhr: ', xhr);
+				console.log('beforeSend settings: ', settings);
+
+				if (!dehy.utils.csrfSafeMethod(settings.type) && !this.crossDomain) {
+					xhr.setRequestHeader("X-CSRFToken", dehy.utils.getCookie('csrftoken'));
 				}
+
 			}
 		});
 	},
 	handler_choice: function(choice='') {
 		switch (choice) {
 			case 'detail':
-				DEHY.handlers.cart();
+				dehy.handlers.cart();
 				break;
 			case 'index':
-				DEHY.handlers.shop();
+				dehy.handlers.shop();
 				break;
 			default:
-				DEHY.handlers.all();
+				dehy.handlers.all();
 		}
 	},
 	handlers: {
 		all: function() {
-			DEHY.handlers.cart();
-			DEHY.handlers.shop();
+			dehy.handlers.cart();
+			dehy.handlers.shop();
 		},
 		shop: function() {
-			// DEHY.handlers.cart();
+			// dehy.handlers.cart();
 		},
 		cart: function() {
 			var size_selector = document.getElementById('size_selector');
@@ -62,7 +66,7 @@ var DEHY = {
 		         url: "ajax/get_cart_quantity/",
 		         dataType: "json",
 		         cache: false,
-		         success: DEHY.ajax.update_cart_quantity
+		         success: dehy.ajax.update_cart_quantity
 		     });
 		},
 		update_cart_quantity: function(data) {
@@ -71,6 +75,15 @@ var DEHY = {
 		}
 	},
 	utils: {
+		remove_event_listeners(elem) {
+			var copy = elem.cloneNode(true);
+			elem.parentNode.replaceChild(copy, elem)
+		},
+		debug(fn=null, ...args) {
+			// to call: dehy.utils.debug(this, response);
+			console.log('function name: ', fn.name);
+			console.log('return value: ', fn.call(null, args));
+		},
 		debounce: function(context, func, delay) {
 			console.log('debouncing')
 			console.log('context: ', context)
@@ -95,7 +108,6 @@ var DEHY = {
 			// Setup our serialized data
 			var serialized = [];
 			var elements = (form.elements) ? form.elements: form.querySelectorAll('input, select, fieldset, button');
-			console.log('elements: ', elements)
 			// Loop through each field in the form
 			for (var i = 0; i < elements.length; i++) {
 
@@ -116,7 +128,6 @@ var DEHY = {
 				else if ((field.type !== 'checkbox' && field.type !== 'radio') || field.checked) {
 					serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
 				}
-				console.log('serialized: ', serialized)
 			}
 
 			return serialized.join('&');
@@ -175,12 +186,12 @@ var DEHY = {
 		}]
 		*********************************************/
 		create_elements: function(elems, parent) {
-			var container = parent || DEHY.utils.create_element({tag:'div', classes:'temp-container'});
+			var container = parent || dehy.utils.create_element({tag:'div', classes:'temp-container'});
 			for (let i = 0; i < elems.length; i++) {
-				var elem = DEHY.utils.create_element(elems[i]);
+				var elem = dehy.utils.create_element(elems[i]);
 				container.appendChild(elem);
 				if (elems[i].elems) {
-					elem.replaceWith(DEHY.utils.create_elements(elems[i].elems, elem));
+					elem.replaceWith(dehy.utils.create_elements(elems[i].elems, elem));
 				}
 			}
 			return container

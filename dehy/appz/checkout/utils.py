@@ -36,5 +36,23 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 	def is_stripe_payment_intent_set(self):
 		return self.get_stripe_payment_intent() is not None
 
+	def set_stripe_payment_method(self, payment_method):
+		self._set('stripe', 'payment_method', payment_method)
+
+	def get_stripe_payment_method(self):
+		return self._get('stripe', 'payment_method')
+
+	def is_stripe_payment_method_set(self):
+		return self.get_stripe_payment_method() is not None
+
+	def set_stripe_client_secret(self, client_secret):
+		self._set('stripe', 'client_secret', client_secret)
+
+	def get_stripe_client_secret(self):
+		return self._get('stripe', 'client_secret')
+
+	def is_stripe_client_secret_set(self):
+		return self.get_stripe_client_secret() is not None
+
 	is_stripe_customer_set = is_stripe_customer_field_set
 	is_stripe_customer_id_set = is_stripe_customer_field_set

@@ -1,15 +1,23 @@
 from oscar.apps.checkout import exceptions, session
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-from django.urls import reverse
-from dehy.appz.checkout import utils, tax
-from bs4 import BeautifulSoup
-from . import FORM_STRUCTURES
 from oscar.core.loading import get_class, get_model
+from django import http
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
+from django.urls import reverse, reverse_lazy
+from bs4 import BeautifulSoup
+
+import json
+
+from dehy.appz.checkout import utils, tax
+from . import FormStructure
 
 CheckoutSessionData = utils.CheckoutSessionData
 
 class CheckoutSessionMixin(session.CheckoutSessionMixin):
+
+
 	def get_context_data(self, **kwargs):
 		ctx = super().get_context_data(**kwargs)
 		ctx['stripe_pkey'] = settings.STRIPE_PUBLISHABLE_KEY
@@ -55,9 +63,7 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 			)
 
 	def build_submission(self, **kwargs):
-		print('\n build_submission() called \n')
-		submission = super().build_submission(
-			**kwargs)
+		submission = super().build_submission(**kwargs)
 
 		if submission['shipping_address'] and submission['shipping_method']:
 			tax.apply_to(submission)
@@ -70,9 +76,11 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		return submission
 
 	def get_form_structure(self, form, use_placeholders=False, use_labels=True, use_help_text=False,
-		label_exceptions=[], initial={}):
+		label_exceptions=[], initial={}, submit_text='Continue'):
 
-		print(f'\n dir(form): {dir(form)}')
+		form = form(initial) if form else self.form_class(initial)
+
+		# print(f'\n dir(form): {dir(form)}')
 		outter_tags = ['select', 'input', 'fieldset']
 		inner_tags = ['input', 'option']
 		if use_labels or label_exceptions:
@@ -84,37 +92,81 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 			inner_tags+=[('span', 'helptext')]
 
 		form_structure = [{'tag':'div', 'classes':'form-container', 'elems': []}]
-		soup = BeautifulSoup(form(initial).as_table(), 'html.parser')
-		print('soup: ', soup)
-		for elem in soup.find_all(outter_tags):
-			elem_dict = {'tag': elem.name, 'attrs': elem.attrs}
-			if elem.name == 'label':
-				for_attr = elem.attrs['for']
-				elem_dict['classes'] = 'floating-label'
-				if use_labels or (use_labels and for_attr in label_exceptions):
-					elem_dict['text'] = elem.text
-				else:
-					continue
+		soup = BeautifulSoup(form.as_table(), 'html.parser')
+
+		for row in soup.find_all('tr'):
+
+			row_element = {'tag': 'div', 'classes':'form-control row', 'attrs': row.attrs, 'elems':[]}
+			if not row_element['attrs']: row_element.pop('attrs')
+
+			for elem in row.find_all(outter_tags):
+
+				elem_dict = {'tag': elem.name, 'attrs': elem.attrs, 'elems':[]}
+
+				if elem.name == 'label':
+					for_attr = elem.attrs['for']
+					elem_dict['classes'] = 'floating-label'
+					if use_labels or (use_labels and for_attr in label_exceptions):
+						elem_dict['text'] = elem.text
+					else:
+						continue
 
 
-			if elem.has_attr('required'):
-				elem_dict['classes'] = 'required'
+				if elem.has_attr('required'):
+					elem_dict['classes'] = 'required'
 
-			if use_help_text and elem.name=='span' and 'helptext' in elem['class']:
-				elem_dict.update({'text':elem.text})
+				if use_help_text and elem.name=='span' and 'helptext' in elem['class']:
+					elem_dict.update({'text':elem.text})
 
-			child_elems = []
+				child_elems = []
 
-			for child in elem.findChildren(inner_tags):
-				child_elems.append({'tag':child.name, 'text': child.text, 'attrs':child.attrs})
-				if child.has_attr('required'):
-					child_elems[-1]['classes'] = 'required'
+				for child in elem.findChildren(inner_tags):
+					child_elems.append({'tag':child.name, 'text': child.text, 'attrs':child.attrs})
+					if child.has_attr('required'):
+						child_elems[-1]['classes'] = 'required'
 
-			if child_elems:
-				elem_dict['elems'] = child_elems
+				if child_elems:
+					elem_dict['elems'] = child_elems
 
-			form_structure[-1]['elems'].append(elem_dict)
+				if not elem_dict['elems']: elem_dict.pop('elems')
 
-		form_structure.append(FORM_STRUCTURES.submit_button_error_container)
+				row_element['elems'].append(elem_dict)
+
+			form_structure[-1]['elems'].append(row_element)
+
+		# # old
+		# for elem in soup.find_all(outter_tags):
+		# 	elem_dict = {'tag': elem.name, 'attrs': elem.attrs}
+		# 	if elem.name == 'label':
+		# 		for_attr = elem.attrs['for']
+		# 		elem_dict['classes'] = 'floating-label'
+		# 		if use_labels or (use_labels and for_attr in label_exceptions):
+		# 			elem_dict['text'] = elem.text
+		# 		else:
+		# 			continue
+		#
+		#
+		# 	if elem.has_attr('required'):
+		# 		elem_dict['classes'] = 'required'
+		#
+		# 	if use_help_text and elem.name=='span' and 'helptext' in elem['class']:
+		# 		elem_dict.update({'text':elem.text})
+		#
+		# 	child_elems = []
+		#
+		# 	for child in elem.findChildren(inner_tags):
+		# 		child_elems.append({'tag':child.name, 'text': child.text, 'attrs':child.attrs})
+		# 		if child.has_attr('required'):
+		# 			child_elems[-1]['classes'] = 'required'
+		#
+		# 	if child_elems:
+		# 		elem_dict['elems'] = child_elems
+		#
+		# 	form_structure[-1]['elems'].append(elem_dict)
+		#
+
+		form_structure.append(FormStructure().get_submit_button_error_container())
+		# print(f"\n form structure for {self.form_class} : {json.dumps(form_structure)}")
+
 		return form_structure
 

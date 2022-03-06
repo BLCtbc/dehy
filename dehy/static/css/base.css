@@ -102,6 +102,9 @@ a.navbar-brand {
 	position: relative;
 }
 
+.display-none {
+	display: none !important;
+}
 .product-category-link::after,
 .navbar-brand::after
  {

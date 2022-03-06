@@ -5,37 +5,40 @@
 	{% csrf_token %}
 	{{ form.non_field_errors }}
 
-	{# testing what this does #}
-	{% include "oscar/partials/form_field.html" with field=form.username %}
+	<div class="form-container">
 
-	<div class="form-group">
-		<div class="controls">
-			<div class="radio">
-				{{ form.options.0 }}
-			</div>
-		</div>
-	</div>
+		{# testing what this does #}
+		{% include "oscar/partials/form_field.html" with field=form.username %}
 
-	<div class="form-group {% if form.password.errors %}error{% endif %}">
-		{{ form.options.errors }}
-		<div class="controls">
-			<div class="radio">
-				{{ form.options.2 }}
-				<div class="form-inline">
-					{% render_field form.password class+="form-control mr-sm-2" %}
-					<small><a href="{% url 'password-reset' %}" tabindex="-1">{% trans "Get a password reminder" %}</a></small>
-					{% for error in form.password.errors %}
-						<span class="error-block">{{ error }}</span>
-					{% endfor %}
+		<div class="form-group">
+			<div class="controls">
+				<div class="radio">
+					{{ form.options.0 }}
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="form-group">
-		<div class="controls">
-			<div class="radio">
-				{{ form.options.1 }}
+		<div class="form-group {% if form.password.errors %}error{% endif %}">
+			{{ form.options.errors }}
+			<div class="controls">
+				<div class="radio">
+					{{ form.options.2 }}
+					<div class="form-inline">
+						{% render_field form.password class+="form-control mr-sm-2" %}
+						<small><a href="{% url 'password-reset' %}" tabindex="-1">{% trans "Get a password reminder" %}</a></small>
+						{% for error in form.password.errors %}
+							<span class="error-block">{{ error }}</span>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="controls">
+				<div class="radio">
+					{{ form.options.1 }}
+				</div>
 			</div>
 		</div>
 	</div>
