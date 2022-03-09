@@ -747,3 +747,7 @@ input, select, label {
 .hidden {
 	display: none;
 }
+
+.modal {
+	background-color: #fdfdfd2e;
+}
