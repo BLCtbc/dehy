@@ -70,7 +70,7 @@ def create_checkout_session(request):
 def get_cart_quantity(request):
 	status_code = 200
 	cart = request.basket
-	data = {'num_cart_items': cart.num_items}
+	data = {'basket_items': cart.num_items}
 	response = JsonResponse(data, safe=False)
 	response.status_code = status_code
 

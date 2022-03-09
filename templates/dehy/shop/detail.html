@@ -108,7 +108,7 @@
 					<div class="d-flex justify-content-between">
 						<div class="variant-option col-8">
 							<div class="variant-select-container" data-text="Select Size">
-								<select id="size_selector" class="custom-select" aria-label="Select Size" data-variant-option-name="Size">
+								<select id="size_selector" class="custom-select variant-size-selector" aria-label="Select Size" data-variant-option-name="Size">
 							        <option value>Select Size</option>
 									{% for child in product.children.public %}
 									  {% purchase_info_for_product request child as child_session %}
@@ -128,7 +128,7 @@
 						  <div class="col-2">
 						  </div>
 						  <div class="col-8">
-							  <button style="border-radius: 20px;" type="submit" class="btn btn-lg w-100 btn-primary" value="{% trans "Add to basket" %}" data-loading-text="{% trans 'Adding...' %}">{% trans "Add to basket" %}</button>
+							  <button style="border-radius: 20px;" type="submit" class="btn btn-lg w-100 btn-primary" value="{% trans "Add to basket" %}">{% trans "Add to basket" %}</button>
 						  </div>
 						  <div class="col-2">
 						  </div>
@@ -283,5 +283,4 @@
 
 {% block onbodyload %}
     {{ block.super }}
-	dehy.init('detail');
 {% endblock %}

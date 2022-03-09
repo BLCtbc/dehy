@@ -1,10 +1,10 @@
 :root {
+	--borderRadius: 5px;
 	--checkout-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 	--c-labelRestingTransform:translateY(23px) scale(1);
-	--c-labelFloatingTransform: translateY(13px) scale(0.8888888888888888);
+	--c-labelFloatingTransform: scale(0.85) translateY(-0.85rem);
 	--c-inputFloatingPaddingTop: 32px;
 	--c-labelFloatingHeight: 20.0938px;
-	--c-labelFloatingTransform: translateY(13px) scale(0.8888888888888888);
 	--c-labelRestingTransform: translateY(23px) scale(1);
 	--c-inputFloatingPaddingTop: 32px;
 	--c-inputFloatingMarginLeft: 13px;
@@ -62,10 +62,14 @@ form, .billing-card {
 }
 .form-control {
 	position: relative;
-	background-color: #30313d;
+	background-color: inherit;
 	min-height: 50px;
 	margin: 5px 10px;
+	margin: 0;
+	padding: 0;
 	border: none;
+	height: inherit;
+
 }
 
 .form-group {
@@ -93,7 +97,8 @@ select {
 	padding-right: calc(12px + 1em)!important;
 	padding-top: 32px !important;
 	display: block;
-	width: 100%
+	width: 100%;
+	padding: 1rem 0.75rem 0.5rem;
 }
 
 input, select, label, div, h1,h2,h3,h4,h5 {
@@ -120,11 +125,11 @@ input, select, label, div, h1,h2,h3,h4,h5 {
 	margin-bottom: 0.25rem;
 } */
 
-/* label {
+input:not([type="radio"], [type="checkbox"]) + label {
   position: absolute;
   width: 100%;
-  left: 0;
-  bottom: 8px;
+  left: 1.25rem;
+  bottom: 0.75rem;
   color: #cfd7df;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -137,20 +142,21 @@ input, select, label, div, h1,h2,h3,h4,h5 {
   transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-input {
+input:not([type="radio"], [type="checkbox"]), select {
   position: absolute;
-  width: 100%;
-  left: 0;
+  width: 95%;
+  left: 0.5rem;
   bottom: 0;
-  padding-bottom: 7px;
-  color: #32325d;
-  background-color: #30313d
-  padding: var(--p-spacing3);
+  padding: 1.25rem 0.75rem 0.5rem;
+  color: white;
+  background-color: #30313d;
   background-color: var(--colorBackground);
   border-radius: var(--borderRadius);
   transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
-  border: 1px solid var(--p-colorBackgroundDeemphasize05);;
-} */
+  border: 1px solid var(--p-colorBackgroundDeemphasize05);
+  box-shadow: 0px 2px 4px rgb(0 0 0 / 50%), 0px 1px 6px rgb(0 0 0 / 25%);
+  /* margin-left: 0.5rem; */
+}
 
 input::-webkit-input-placeholder,
 input:-ms-input-placeholder {
@@ -159,6 +165,7 @@ input:-ms-input-placeholder {
 }
 
 input.focused,
+input:focus,
 input:not(.empty) {
   opacity: 1;
 }
@@ -172,15 +179,24 @@ input:not(.empty):-ms-input-placeholder{
   color: #cfd7df;
 }
 
-input.focused + label,
-input:not(.empty) + label {
+input:not([type="radio"], [type="checkbox"]).focused + label,
+input:not([type="radio"], [type="checkbox"]):focus + label,
+input:not([type="radio"], [type="checkbox"]):not(.empty) + label,
+select:focus + label,
+select:not(.empty) + label{
   color: #aab7c4;
-  transform: scale(0.85) translateY(-25px);
+  transform: var(--c-labelFloatingTransform) !important;
+  -webkit-transform: var(--c-labelFloatingTransform)!important;
+  -ms-transform: var(--c-labelFloatingTransform) !important;
   cursor: default;
 }
 
-input:-webkit-autofill {
+input:-webkit-autofill,
+input:autofill,
+select:-webkit-autofill,
+select:autofill {
   -webkit-text-fill-color: #e39f48;
+  background-color: inherit;
   transition: background-color 100000000s;
   -webkit-animation: 1ms void-animation-out;
 }
@@ -188,13 +204,12 @@ input:-webkit-autofill {
 .StripeElement--webkit-autofill {
   background: transparent !important;
 }
-input:not([type="radio"], [type="checkbox"]), button {
+input:not([type="radio"], [type="checkbox"]), button, select {
   -webkit-animation: 1ms void-animation-out;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   outline: none;
-  border-style: none;
 }
 
 .baseline {
@@ -223,8 +238,9 @@ button {
 .field {
   position: relative;
   width: 100%;
-  height: 50px;
-  margin: 0 10px;
+  min-height: 50px;
+  margin-bottom: 1.5rem;
+  height: 100%;
 }
 
 .error svg {
@@ -267,6 +283,8 @@ button {
 
 .checkout-flow section {
 	margin-bottom: 2rem;
+	padding: 0.25rem;
+	border: none;
 }
 .card-title * {
 	font-weight: 400;
@@ -306,6 +324,9 @@ button.edit {
 .helptext {
 	font-size: smaller;
 	color: darkolivegreen;
+	position: absolute;
+	left: 0;
+	top: 3.25rem;
 }
 
 .floating-label {
@@ -322,14 +343,11 @@ input:focus, .form-control:focus {
 	outline: var(--focusOutline);
 	border-color: var(--p-colorPrimaryAlpha40);
 	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5), 0px 1px 6px rgba(0, 0, 0, 0.25), var(--focusBoxShadow);
-	padding: var(--p-spacing3);
 	background-color: var(--colorBackground);
 	border-radius: var(--borderRadius);
 	transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 	border: 1px solid var(--p-colorBackgroundDeemphasize05);
-	color: inherit;
 	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5), 0px 1px 6px rgba(0, 0, 0, 0.25), var(--focusBoxShadow);
-	background-color: inherit;
 }
 
 .table {
@@ -353,4 +371,25 @@ input:disabled {
     color: var(--colorTextPlaceholder);
     border-color: var(--p-colorBackgroundDisabledDeemphasize05);
     box-shadow: none;
+}
+
+.checkout-form {
+	padding: 0;
+}
+
+.form-container * {
+	vertical-align: top;
+	display: inline-block;
+}
+
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active  {
+    transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+input[data-autocompleted] {
+    background-color: transparent !important;
 }

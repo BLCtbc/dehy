@@ -4,7 +4,7 @@ from oscar.core.loading import get_class, get_classes, get_model
 
 from django.conf import settings
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.forms.models import model_to_dict
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect, render
@@ -15,7 +15,7 @@ from django.views import generic
 
 from .facade import Facade
 
-import json, logging
+import json, logging, sys
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
 
@@ -28,7 +28,7 @@ RedirectRequired, UnableToTakePayment, PaymentError = get_classes('payment.excep
 
 Repository = get_class('shipping.repository', 'Repository')
 CheckoutSessionMixin = get_class('checkout.session', 'CheckoutSessionMixin')
-
+OrderDispatcher = get_class('order.utils', 'OrderDispatcher')
 AdditionalInfoQuestionnaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionnaire')
 UnableToPlaceOrder = get_class('order.exceptions', 'UnableToPlaceOrder')
 
@@ -44,8 +44,10 @@ logger = logging.getLogger('oscar.checkout')
 # 		if form_name:
 #
 
-class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
+def Deb(msg=''):
+	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
 
+class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 	pre_conditions = [
 		'check_basket_is_not_empty',
@@ -510,11 +512,19 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			print('form errors: ', form.errors)
 
 		if request.is_ajax() and form.is_valid():
+			status_code = 200
 			cleaned_data = form.cleaned_data
 			data['section'] = section
 			if self.preview:
 				print('\n handling order placement \n')
 				response = self.handle_place_order_submission(request)
+				if response.url is "/checkout/thank-you/":
+					status_code = 302
+					data['redirect'] = True
+					data['url'] = response.url
+					response = JsonResponse(data)
+				else:
+					status_code = 400
 
 			elif payment_method_id:
 
@@ -541,7 +551,6 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 					'state': cleaned_data['state'],
 					'postcode': cleaned_data['postcode'],
 					'country': cleaned_data['country'].printable_name,
-
 				}
 
 				data['status'] = intent['status']
@@ -549,10 +558,10 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 				print('intent status: ', intent['status'])
 				data['form_structure'] = self.get_form_structure(form=SubmitOrderForm, use_labels=True)
 				data['preview_elems'] = preview_elems
+				response = JsonResponse(data)
 
-
-			status_code = 200
-			response = JsonResponse(data)
+		print(f'\nresponse: {response}')
+		print(f'\nstatus_code: {status_code}')
 
 		response.status_code = status_code
 		return response
@@ -617,9 +626,54 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 
 		self.add_payment_event(PAYMENT_EVENT_PURCHASE, total.incl_tax)
 
+	def handle_order_placement(self, order_number, user, basket, shipping_address, shipping_method,
+		shipping_charge, billing_address, order_total, surcharges=None, **kwargs):
+
+		"""
+		Write out the order models and return the appropriate HTTP response
+		We deliberately pass the basket in here as the one tied to the request
+		isn't necessarily the correct one to use in placing the order.  This
+		can happen when a basket gets frozen.
+		"""
+		order = self.place_order(
+			order_number=order_number, user=user, basket=basket,
+			shipping_address=shipping_address, shipping_method=shipping_method,
+			shipping_charge=shipping_charge, order_total=order_total,
+			billing_address=billing_address, surcharges=surcharges, **kwargs)
+		basket.submit()
+		return self.handle_successful_order(order)
+
+	def handle_successful_order(self, order):
+		"""
+		Handle the various steps required after an order has been successfully
+		placed.
+		Override this view if you want to perform custom actions when an
+		order is submitted.
+		"""
+		# Send confirmation message (normally an email)
+		try:
+			self.send_order_placed_email(order)
+
+		except Exception as e:
+			print('Error sending order placed email')
+
+		# Flush all session data
+		self.checkout_session.flush()
+
+		# Save order id in session so thank-you page can load it
+		self.request.session['checkout_order_id'] = order.id
+
+		response = HttpResponseRedirect(self.get_success_url())
+		self.send_signal(self.request, response, order)
+		return response
+
+	def send_order_placed_email(self, order):
+		extra_context = self.get_message_context(order)
+		dispatcher = OrderDispatcher(logger=logger)
+		dispatcher.send_order_placed_email_for_user(order, extra_context)
+
 	def handle_place_order_submission(self, request):
 		print('\n handling place_order_submission \n')
-
 		"""
 		Handle a request to place an order.
 		This method is normally called after the customer has clicked "place
@@ -696,7 +750,7 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			print('\n RedirectRequired \n')
 
 			logger.info("Order #%s: redirecting to %s", order_number, e.url)
-			return http.HttpResponseRedirect(e.url)
+			return HttpResponseRedirect(e.url)
 		except UnableToTakePayment as e:
 			# Something went wrong with payment but in an anticipated way.  Eg
 			# their bankcard has expired, wrong card number - that kind of
@@ -748,6 +802,8 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			return self.handle_order_placement(
 				order_number, user, basket, shipping_address, shipping_method,
 				shipping_charge, billing_address, order_total, surcharges=surcharges, **order_kwargs)
+
+
 		except UnableToPlaceOrder as e:
 			# It's possible that something will go wrong while trying to
 			# actually place an order.  Not a good situation to be in as a
@@ -779,6 +835,9 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			# correctly captured.
 			return self.pre_conditions + ['check_payment_data_is_captured']
 		return super().get_pre_conditions(request)
+
+	def get_success_url(self):
+		return reverse('checkout:thank_you')
 
 class ThankYouView(views.ThankYouView):
 	"""

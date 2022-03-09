@@ -142,6 +142,7 @@
 		{% endblock order_contents %}
 		</div>
 
+{% include "dehy/checkout/partials/loading_modal.html" %}
 {% endblock content %}
 
 
@@ -150,6 +151,8 @@
 {% comment %}{{ stripe_data|json_script:"stripe-data" }}{% endcomment %}
 
 <script src="{% static "js/checkout.js" %}"></script>
+<script src="{% static "js/form_structures.js" %}"></script>
+
 <!-- <script>
 	const stripe = Stripe("{{stripe_data.publishable_key}}");
 </script> -->

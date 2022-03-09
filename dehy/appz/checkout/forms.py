@@ -78,7 +78,8 @@ class AdditionalInfoForm(forms.ModelForm):
 	# 	self.fields['purchase_source']
 
 class UserInfoForm(AuthenticationForm):
-	username = forms.EmailField(label=_("Email"))
+	username = forms.EmailField(label=_("Email"), help_text="You'll receive receipts and notifications at this email address.")
+
 	GUEST, NEW, EXISTING = 'anonymous', 'new', 'existing'
 	CHOICES = (
 		(GUEST, _('I am a new customer and want to checkout as a guest')),
@@ -87,6 +88,11 @@ class UserInfoForm(AuthenticationForm):
 		(EXISTING, _('I am a returning customer, and my password is')))
 	options = forms.ChoiceField(widget=forms.widgets.RadioSelect,
 								choices=CHOICES, initial=GUEST)
+
+	signup = forms.BooleanField(initial=True, required=False, label=_("Subscribe to our mailing list to learn about new products and promotions!"))
+
+	class Meta:
+		fields = ['username', 'signup']
 
 	def clean_username(self):
 		return normalise_email(self.cleaned_data['username'])

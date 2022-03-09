@@ -32,34 +32,6 @@ dehy.ch = {
 	},
 	_stripe: null,
 	stripe: {
-		// async paymentSubmissionHandler() {
-		// 		var stripe = dehy.ch.stripe.get();
-		// 		var elements = dehy.ch.stripe.elements.get();
-		//
-		// 		const {error} = await stripe.confirmPayment({
-		// 			//`Elements` instance that was used to create the Payment Element
-		// 			elements,
-		// 			redirect: 'if_required',
-		// 			confirmParams: {
-		// 			  return_url: 'http://127.0.0.1:8000/checkout/thank_you/',
-		// 			},
-		// 	  })
-		// 	  if (error) {
-		// 		    // This point will only be reached if there is an immediate error when
-		// 		    // confirming the payment. Show error to your customer (for example, payment
-		// 		    // details incomplete)
-		// 			console.log('error: ', error);
-		// 		    const messageContainer = document.querySelector('#error_container');
-		// 		    messageContainer.textContent = error.message;
-		// 		  } else {
-		//
-		// 		    // Your customer will be redirected to your `return_url`. For some payment
-		// 		    // methods like iDEAL, your customer will be redirected to an intermediate
-		// 		    // site first to authorize the payment, then redirected to the `return_url`.
-		// 		 }
-		//
-		//   },
-
 		async confirmSetupHandler() {
 			  var stripe = dehy.ch.stripe.get();
 			  var elements = dehy.ch.stripe.elements.get();
@@ -250,7 +222,7 @@ dehy.ch = {
 					processData: false,
 					data: form_data,
 					success: dehy.ch.forms.success_handler,
-					error: dehy.ch.forms.error,
+					error: dehy.ch.forms.errors.display,
 					complete: function() {
 						console.log('completed!!!')
 						return
@@ -318,7 +290,7 @@ dehy.ch = {
 					processData: false,
 					data: form_data,
 					success: dehy.ch.forms.success_handler,
-					error: dehy.ch.forms.error,
+					error: dehy.ch.forms.errors.display,
 					complete: function() {
 						console.log('completed!!!')
 						return
@@ -411,6 +383,9 @@ dehy.ch = {
 			return hidden;
 
 		},
+		place_order() {
+
+		},
 		submit_handler(e) {
 			var form = dehy.ch.forms.get();
 			// var form = e.target();
@@ -447,8 +422,8 @@ dehy.ch = {
 		},
 		reverse_form_labels(form=dehy.ch.forms.get()) {
 			form.querySelectorAll('label').forEach(function(label) {
-				var row_element = label.closest('.row');
-				row_element.insertAdjacentElement('beforeend', label);
+				var parent = label.parentElement;
+				parent.insertAdjacentElement('beforeend', label);
 			});
 		},
 		submit_form_info(form) {
@@ -475,14 +450,12 @@ dehy.ch = {
 				data: form_data,
 				success: dehy.ch.forms.success_handler,
 				error: dehy.ch.forms.error,
-				complete: function() {
-					return
-				}
 			});
 		},
-		success_handler(response) {
+		success_handler(response, textStatus, xhr) {
 			console.log('success response: ', response);
-			console.log('response.section: ', response.section);
+			console.log('textStatus: ', textStatus);
+			console.log('xhr.status: ', xhr.status);
 
 
 			// if ((response.section=='billing'||response.section=='place_order') && response.status == 'requires_confirmation') {
@@ -491,25 +464,32 @@ dehy.ch = {
 			// 		response.payment_intent_client_secret
 			// 	).then(dehy.ch.stripe.handleStripeJsResult);
 			// }
-			if (response.section=='billing') {
-				var stripe_payment_container = document.getElementById('stripe_payment_container');
-				stripe_payment_container.classList.toggle('display-none', true);
-				stripe_payment_container.closest('form').classList.toggle('display-none', true);
 
+			if (xhr.status===302) {
+				console.log('hi')
 			} else {
-				dehy.ch.forms.save_and_remove(); //1
+				if (response.section=='billing') {
+					var stripe_payment_container = document.getElementById('stripe_payment_container');
+					stripe_payment_container.classList.toggle('display-none', true);
+					stripe_payment_container.closest('form').classList.toggle('display-none', true);
+
+				} else {
+					dehy.ch.forms.save_and_remove(); //1
+				}
+
+				var next_section = dehy.ch.utils.get_next_section(response.section);
+				// var form = dehy.ch.forms.get_or_create(next_section.id, FormStructures[next_section.id]); //2
+				var form = dehy.ch.forms.get_or_create(next_section.id, response.form_structure); //2
+
+				next_section.append(form); //3
+				dehy.ch.forms.disable_edit_buttons(); //4
+				let previous_section = dehy.ch.utils.get_previous_section(response.section);
+				dehy.ch.forms.create_preview(response.section, response.preview_elems); //5
+				dehy.ch.forms.enable_edit_buttons(next_section.id); //6
+				dehy.ch.forms.init();
+				dehy.ch.forms.reverse_form_labels(form);
 			}
 
-			var next_section = dehy.ch.utils.get_next_section(response.section);
-
-			var form = dehy.ch.forms.get_or_create(next_section.id, response.form_structure); //2
-			next_section.append(form); //3
-			dehy.ch.forms.disable_edit_buttons(); //4
-			let previous_section = dehy.ch.utils.get_previous_section(response.section);
-			dehy.ch.forms.create_preview(response.section, response.preview_elems); //5
-			dehy.ch.forms.enable_edit_buttons(next_section.id); //6
-			dehy.ch.forms.init();
-			dehy.ch.forms.reverse_form_labels();
 
 			console.log('next_section.id', next_section.id)
 
@@ -565,7 +545,7 @@ dehy.ch = {
 							preview_container.remove()
 						}
 						dehy.ch.forms.save_and_remove(); //1
-						var form = dehy.ch.forms.get_or_create(section.id); //2
+						var form = dehy.ch.forms.get_or_create(section.id, FormStructures[section.id]); //2
 						section.append(form); //3
 						if (section.id=='billing') {
 							dehy.ch.stripe.init();
@@ -723,7 +703,7 @@ dehy.ch = {
 			var form_controls = [...new Set(elems.map(function(e) {return e.closest('.form-control')}))]
 			var address = dehy.ch.shipping.ADDRESS.get();
 			form_controls.forEach(function(row) {
-				row.classList.toggle('hidden', checked);
+				row.classList.toggle('display-none', checked);
 				var inputs_and_labels = row.querySelectorAll("input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping']), select")
 				inputs_and_labels.forEach(function(elem) {
 					if (elem.name && address.hasOwnProperty(elem.name)) {

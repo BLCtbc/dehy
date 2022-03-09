@@ -1275,3 +1275,10 @@ implementing a continuous deployment workflow on Debian 10+
 	and: https://groups.google.com/g/django-oscar/c/Cr8sBI0GBu0/m/PHRdXX2uFQAJ
 
 	test cc number: 4242 4242 4242 4242
+
+
+8. ###### testing
+
+	fixture used:
+	
+		`python manage.py dumpdata --exclude=auth --exclude=address --exclude=contenttypes --indent=4 --exclude='admin.logentry' --exclude='sessions.session' --exclude=analytics --exclude=thumbnail --exclude=basket --exclude=order --exclude=payment --output='fixtures.json'`

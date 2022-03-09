@@ -146,7 +146,20 @@ WSGI_APPLICATION = 'dehy.wsgi.application'
 # Parse database connection url strings
 # like psql://user:pass@127.0.0.1:8458/db
 DATABASES = {
-	'default': env.db('DATABASE_URL')
+	# 'default': env.db('DATABASE_URL'),
+	'default': {
+		'ENGINE': 'django.db.backends.postgresql',
+		'USER': env.str('DB_USER'),
+		'NAME': env.str('DB_NAME'),
+		'PASSWORD': env.str('DB_PASS'),
+		'HOST': env.str('DB_HOST'),
+		'PORT': env.str('DB_PORT'),
+		'ATOMIC_REQUESTS': True,
+		'TEST': {
+            'NAME': 'test_db',
+        },
+
+	}
 	# read os.environ['DATABASE_URL'] and raises
 	# ImproperlyConfigured exception if not found
 	#
