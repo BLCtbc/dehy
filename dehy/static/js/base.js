@@ -1,66 +1,121 @@
 var dehy = {
-	init: function(choice='') {
-		this.handler_choice(choice);
+	loadStart: '',
+	init(choice='') {
+		dehy.handlers.all();
+		$( document ).ajaxStart(function(xhr, settings) {
+			$( "#loading_modal" ).show();
+			dehy.utils.freeze_forms();
+			dehy.loadStart = window.performance.now();
+		});
+
+		$( document ).ajaxStop(function(xhr, settings) {
+			if (window.performance.now() - dehy.loadStart < 500) {
+				setTimeout(function() {
+					dehy.utils.unfreeze_forms();
+					$( "#loading_modal" ).hide();
+				}, (dehy.loadStart + 500) - window.performance.now());
+			} else {
+				dehy.utils.unfreeze_forms();
+				$( "#loading_modal" ).hide();
+			}
+		});
+
 		$.ajaxSetup({
 			beforeSend: function(xhr, settings) {
+
 				console.log('beforeSend xhr: ', xhr);
 				console.log('beforeSend settings: ', settings);
 
 				if (!dehy.utils.csrfSafeMethod(settings.type) && !this.crossDomain) {
 					xhr.setRequestHeader("X-CSRFToken", dehy.utils.getCookie('csrftoken'));
 				}
+			},
+			complete: function(e, xhr, status) {
+				console.log('ajax complete');
+				console.log('e: ', e);
+				console.log('xhr: ', xhr);
+				console.log('status: ', status);
 
-			}
+			},
 		});
 	},
-	handler_choice: function(choice='') {
-		switch (choice) {
-			case 'detail':
-				dehy.handlers.cart();
-				break;
-			case 'index':
-				dehy.handlers.shop();
-				break;
-			default:
-				dehy.handlers.all();
-		}
-	},
 	handlers: {
-		all: function() {
-			dehy.handlers.cart();
-			dehy.handlers.shop();
+		all() {
+			dehy.handlers.shop.all();
 		},
-		shop: function() {
-			// dehy.handlers.cart();
-		},
-		cart: function() {
-			var size_selector = document.getElementById('size_selector');
-			size_selector.addEventListener('change', e=> {
+		shop: {
+			all() {
+				dehy.handlers.shop.add_item_to_cart_handler();
+				dehy.handlers.shop.variant_size_selection_handler();
+			},
+			add_item_to_cart_handler() {
+				console.log('add_item_to_cart_handler');
+				var forms = document.querySelectorAll('form.add-to-basket');
+				forms.forEach(function(form) {
+					form.addEventListener('submit', e=> {
+						e.preventDefault();
+						var form_data = new FormData(e.target);
+						$.ajax({
+							method: "POST",
+							dataType: 'json',
+							url: form.action,
+							contentType: false,
+							processData: false,
+							data: form_data,
+							success: dehy.handlers.shop.item_added_to_cart_success,
+							error: dehy.handlers.shop.item_added_to_cart_error,
+						});
+					});
+				})
 
-				var variant_select_container = e.target.closest('.variant-select-container'),
-					not_price_selector = e.target.closest('.product_main').querySelector('span.not_price_color'),
-					variant_price = e.target.closest('.product_main').querySelector('span.variant_price'),
-					option_price = e.target.selectedOptions[0].dataset.price,
-					variant_id = e.target.selectedOptions[0].dataset.id,
-					form = e.target.closest('form');
+			},
+			item_added_to_cart_success(response, xhr, status) {
+				dehy.ajax.update_cart_quantity(response);
+				console.log('success response: ', response);
+				console.log('success xhr: ', xhr);
+				console.log('success status: ', status);
+			},
+			item_added_to_cart_error(error, xhr, status) {
+				console.log('error: ', error);
+				console.log('xhr: ', xhr);
+				console.log('status: ', status);
 
-				if (e.target.selectedOptions[0].dataset.price) {
-					not_price_selector.innerText = "";
-					variant_select_container.dataset.text = e.target.value
-					variant_price.innerText = `$${option_price}`
-					form.action = `/basket/add/${variant_id}/`
+				var error_container = document.querySelector('#error_container');
+				error_container.classList.toggle('hide', false);
+				error_container.textContent = error
+				// error_container.append(dehy.utils.create_element({tag:'div', classes:'error', text: error_message, attrs:{'id':'errors'}}));
+			},
+			variant_size_selection_handler() {
+				var size_selectors = document.querySelectorAll('.variant-size-selector');
+				size_selectors.forEach(function(select_elem) {
+					select_elem.addEventListener('change', e=> {
+						var variant_select_container = e.target.closest('.variant-select-container'),
+							not_price_selector = e.target.closest('.product_main').querySelector('span.not_price_color'),
+							variant_price = e.target.closest('.product_main').querySelector('span.variant_price'),
+							option_price = e.target.selectedOptions[0].dataset.price,
+							variant_id = e.target.selectedOptions[0].dataset.id,
+							form = e.target.closest('form');
 
-				} else {
-					not_price_selector.innerText = 'from ';
-					variant_price.innerText = `$${e.target.options[1].dataset.price}`;
-					variant_select_container.dataset.text = e.target.options[0].text;
-					form.action = "/basket/"
-				}
-			});
+							if (e.target.selectedOptions[0].dataset.price) {
+								not_price_selector.innerText = "";
+								variant_select_container.dataset.text = e.target.value
+								variant_price.innerText = `$${option_price}`
+								form.action = `/basket/add/${variant_id}/`
+
+							} else {
+								not_price_selector.innerText = 'from ';
+								variant_price.innerText = `$${e.target.options[1].dataset.price}`;
+								variant_select_container.dataset.text = e.target.options[0].text;
+								form.action = "/basket/"
+							}
+
+					})
+				})
+			},
 		},
 	},
 	ajax: {
-		get_cart_quantity: function(data) {
+		get_cart_quantity(data) {
 			$.ajax({
 		         method: "GET",
 		         url: "ajax/get_cart_quantity/",
@@ -69,12 +124,35 @@ var dehy = {
 		         success: dehy.ajax.update_cart_quantity
 		     });
 		},
-		update_cart_quantity: function(data) {
-			var cart = document.getElementById("cart-quantity");
-			cart.innerText = data.num_cart_items
+		update_cart_quantity(data) {
+			var cart_container = document.querySelector('.cart-container');
+			cart_container.querySelector('a.icon-cart').ariaLabel = `${data.basket_items} items in cart`;
+			var cart_quantity_span = document.getElementById("cart-quantity");
+			cart_quantity_span.innerText = data.basket_items
 		}
 	},
 	utils: {
+		notifyUser(message) {
+			let notificationContainer = ($("<div/>", {
+				class: "notification-container",
+				text: message,
+			}));
+			$("body").append(notificationContainer)
+			setTimeout(() => {
+				$(".notification-container").remove()
+			}, 4500);
+		},
+		freeze_forms(force=true) {
+			var forms = document.querySelectorAll('form');
+			forms.forEach(function(form) {
+				form.querySelectorAll("input, select, button").forEach(function(elem) {
+					elem.disabled = force
+				})
+			})
+		},
+		unfreeze_forms() {
+			this.freeze_forms(false);
+		},
 		remove_event_listeners(elem) {
 			var copy = elem.cloneNode(true);
 			elem.parentNode.replaceChild(copy, elem)
@@ -84,7 +162,7 @@ var dehy = {
 			console.log('function name: ', fn.name);
 			console.log('return value: ', fn.call(null, args));
 		},
-		debounce: function(context, func, delay) {
+		debounce(context, func, delay) {
 			console.log('debouncing')
 			console.log('context: ', context)
 			console.log('func: ', func)
@@ -133,7 +211,7 @@ var dehy = {
 			return serialized.join('&');
 
 		},
-		getCookie: function(name) {
+		getCookie(name) {
 			var cookieValue = null;
 			if (document.cookie && document.cookie !== '') {
 				var cookies = document.cookie.split(';');
@@ -148,10 +226,10 @@ var dehy = {
 			return cookieValue;
 		},
 
-		csrfSafeMethod: function(method) {
+		csrfSafeMethod(method) {
 			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 		},
-		create_element: function({tag, classes, style, text, attrs} = {}) {
+		create_element({tag, classes, style, text, attrs} = {}) {
 			var elem = document.createElement(`${tag}`)
 			if (classes) {
 				elem.className = classes
@@ -185,7 +263,7 @@ var dehy = {
 			}]
 		}]
 		*********************************************/
-		create_elements: function(elems, parent) {
+		create_elements(elems, parent) {
 			var container = parent || dehy.utils.create_element({tag:'div', classes:'temp-container'});
 			for (let i = 0; i < elems.length; i++) {
 				var elem = dehy.utils.create_element(elems[i]);
@@ -196,7 +274,7 @@ var dehy = {
 			}
 			return container
 		},
-		cleanup_temp_containers: function(container=document) {
+		cleanup_temp_containers(container=document) {
 			container.querySelectorAll('div.temp-container').forEach(function(elem){
 				if (elem.hasChildNodes()) {
 					elem.replaceWith(...elem.childNodes)
@@ -207,7 +285,7 @@ var dehy = {
 			}
 			return container
 		},
-		remove_children: function(elem) {
+		remove_children(elem) {
 			if (elem && elem.hasChildNodes && elem.hasChildNodes()) {
 				while (elem.firstChild) {
   					elem.removeChild(elem.firstChild);
@@ -217,22 +295,6 @@ var dehy = {
 	}
 }
 
-let optionSupported = false;
-
-try {
-  const options = {
-    get once() { // This function will be called when the browser
-                    //   attempts to access the passive property.
-      optionSupported = true;
-      return false;
-    }
-  };
-
-  window.addEventListener("test", null, options);
-  window.removeEventListener("test", null, options);
-} catch(err) {
-  optionSupported = false;
-}
 
 
 // function handlers() {

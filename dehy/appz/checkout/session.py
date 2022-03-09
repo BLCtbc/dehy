@@ -75,12 +75,9 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 
 		return submission
 
-	def get_form_structure(self, form, use_placeholders=False, use_labels=True, use_help_text=False,
+	def get_form_structure(self, form, use_placeholders=False, use_labels=True, use_help_text=True,
 		label_exceptions=[], initial={}, submit_text='Continue'):
-
 		form = form(initial) if form else self.form_class(initial)
-
-		# print(f'\n dir(form): {dir(form)}')
 		outter_tags = ['select', 'input', 'fieldset']
 		inner_tags = ['input', 'option']
 		if use_labels or label_exceptions:
@@ -95,12 +92,10 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		soup = BeautifulSoup(form.as_table(), 'html.parser')
 
 		for row in soup.find_all('tr'):
-
 			row_element = {'tag': 'div', 'classes':'form-control row', 'attrs': row.attrs, 'elems':[]}
 			if not row_element['attrs']: row_element.pop('attrs')
-
+			field_element = {'tag': 'div', 'classes':'field col', 'elems':[]}
 			for elem in row.find_all(outter_tags):
-
 				elem_dict = {'tag': elem.name, 'attrs': elem.attrs, 'elems':[]}
 
 				if elem.name == 'label':
@@ -110,7 +105,6 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 						elem_dict['text'] = elem.text
 					else:
 						continue
-
 
 				if elem.has_attr('required'):
 					elem_dict['classes'] = 'required'
@@ -130,43 +124,14 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 
 				if not elem_dict['elems']: elem_dict.pop('elems')
 
-				row_element['elems'].append(elem_dict)
+				field_element['elems'].append(elem_dict)
 
+			row_element['elems'].append(field_element)
 			form_structure[-1]['elems'].append(row_element)
 
-		# # old
-		# for elem in soup.find_all(outter_tags):
-		# 	elem_dict = {'tag': elem.name, 'attrs': elem.attrs}
-		# 	if elem.name == 'label':
-		# 		for_attr = elem.attrs['for']
-		# 		elem_dict['classes'] = 'floating-label'
-		# 		if use_labels or (use_labels and for_attr in label_exceptions):
-		# 			elem_dict['text'] = elem.text
-		# 		else:
-		# 			continue
-		#
-		#
-		# 	if elem.has_attr('required'):
-		# 		elem_dict['classes'] = 'required'
-		#
-		# 	if use_help_text and elem.name=='span' and 'helptext' in elem['class']:
-		# 		elem_dict.update({'text':elem.text})
-		#
-		# 	child_elems = []
-		#
-		# 	for child in elem.findChildren(inner_tags):
-		# 		child_elems.append({'tag':child.name, 'text': child.text, 'attrs':child.attrs})
-		# 		if child.has_attr('required'):
-		# 			child_elems[-1]['classes'] = 'required'
-		#
-		# 	if child_elems:
-		# 		elem_dict['elems'] = child_elems
-		#
-		# 	form_structure[-1]['elems'].append(elem_dict)
-		#
 
 		form_structure.append(FormStructure().get_submit_button_error_container())
-		# print(f"\n form structure for {self.form_class} : {json.dumps(form_structure)}")
+		print(f"\n form structure for {self.form_class} : {json.dumps(form_structure)}")
 
 		return form_structure
 
