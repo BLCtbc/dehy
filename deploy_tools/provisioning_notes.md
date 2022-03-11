@@ -1280,5 +1280,20 @@ implementing a continuous deployment workflow on Debian 10+
 8. ###### testing
 
 	fixture used:
-	
+
 		`python manage.py dumpdata --exclude=auth --exclude=address --exclude=contenttypes --indent=4 --exclude='admin.logentry' --exclude='sessions.session' --exclude=analytics --exclude=thumbnail --exclude=basket --exclude=order --exclude=payment --output='fixtures.json'`
+
+<a name='django_view_inserted_into_another_view'></a>
+9. ###### insert a django view (child) into another view (parent)
+
+	add the following lines within the parent view's `get()` function:
+
+		```py
+		# dehy/appz/checkout/views.py
+		...
+		response = super().get(request, *args, **kwargs)
+		basket_view = BasketView.as_view()(request)
+		response.context_data.update({'form': self.form_class(), 'basket_summary_context_data': basket_view.context_data})
+		```
+
+

@@ -15,9 +15,12 @@ from django.views import generic
 
 from .facade import Facade
 
+from urllib.parse import quote
 import json, logging, sys
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
+
+BasketView = get_class('basket.views', 'BasketView')
 
 BillingAddressForm, StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, AdditionalInfoForm, SubmitOrderForm \
 	= get_classes('checkout.forms', ['BillingAddressForm', 'StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'AdditionalInfoForm', 'PurchaseConfirmationForm'])
@@ -103,6 +106,9 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		form = self.form_class(request, request.POST)
 		response = super().post(request, *args, **kwargs)
 
+		print(f'form.is_valid(): {form.is_valid()}')
+		print(f'request.is_ajax(): {request.is_ajax()}')
+
 		if request.is_ajax() and form.is_valid():
 			# self.pre_conditions += ['check_user_email_is_captured']
 			self.check_pre_conditions(request)
@@ -110,7 +116,8 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 			data['section'] = 'user_info'
 			# send all elems to be previewed, along with the values
 			data['preview_elems'] = {'email': form.cleaned_data['username']}
-			data['form_structure'] = self.get_form_structure(ShippingAddressForm, use_labels=True)
+
+			self.get_form_structure(ShippingAddressForm, use_labels=True)
 			## get or create the stripe customer object
 
 
@@ -131,9 +138,17 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 	def get(self, request, *args, **kwargs):
 		print('\n*** get() index ***')
-		for_structure = self.get_form_structure(self.form_class)
+		form_structure = self.get_form_structure(self.form_class)
+
+
 		response = super().get(request, *args, **kwargs)
-		response.context_data.update({'form': self.form_class()})
+		basket_view = BasketView.as_view()(request)
+		# basket_summary_context = basket_view.get_context_data(request, *args, **kwargs)
+		print('basket_view: ', basket_view)
+		print('\n dir(basket_view): ', dir(basket_view))
+		print('basket_view.context_data: ', basket_view.context_data)
+
+		response.context_data.update({'form': self.form_class(), 'basket_summary_context_data': basket_view.context_data})
 		return response
 
 

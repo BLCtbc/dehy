@@ -12,7 +12,41 @@
 	--main-accent-color: var(--gold);
 	--secondary-accent-color: darkred;
 	--main-bg-color: var(--hunter-green);
-	--secondary-bg-color: var(beige);
+	--secondary-bg-color: var(--beige);
+}
+
+
+button,
+.btn {
+    padding: 0 3rem;
+    line-height: 3rem;
+    font-weight: 400;
+	border-radius: 2px;
+	background-color: var(--secondary-bg-color);
+	color: black;
+	transition: all 300ms ease;
+}
+
+button:hover,
+.btn:hover {
+	opacity: 0.8;
+}
+
+.btn-bg-transparent {
+	border: 2px solid var(--secondary-bg-color);
+	color: var(--secondary-bg-color);
+}
+
+.btn-bg-transparent:hover {
+    background-color: var(--secondary-bg-color);
+    color: var(--main-bg-color);
+}
+
+input:focus {
+	outline-width: 2px;
+	outline-style: solid;
+	outline-color: var(--gold);
+	outline-offset: 4px;
 }
 
 @font-face {
@@ -153,7 +187,7 @@ h1, h2, h3, h4 {
     text-transform: none;
 }
 
-h1, h3, p, p2 {
+h1, h3 {
 	font-family:'lydiacondensed-bold';
 }
 
@@ -651,26 +685,11 @@ footer .site-directory h3 {
 	justify-content: space-evenly;
 }
 
-.basket_summary, .basket_summary h3, .basket_summary p {
-	font-family: var(--avant-garde);
-}
-
-.basket_summary h3 {
-	font-size: 1.25rem;
-	font-weight: 400;
-}
-
-.basket-items:nth-child(even) {
-    background: var(--dark-hg);
-}
-
 small {
 	font-weight: 200;
-}
-
-.basket-items .price_color {
-	color: inherit;
-	font-weight: normal;
+	font-size: 75%;
+	letter-spacing: 0.01em;
+	opacity: 0.8;
 }
 
 .ig-img-grid {
@@ -750,4 +769,8 @@ input, select, label {
 
 .modal {
 	background-color: #fdfdfd2e;
+}
+
+.nav-link:focus, .nav-link:hover {
+	color: inherit;
 }
