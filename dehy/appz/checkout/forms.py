@@ -79,6 +79,7 @@ class AdditionalInfoForm(forms.ModelForm):
 
 class UserInfoForm(AuthenticationForm):
 	username = forms.EmailField(label=_("Email"), help_text="You'll receive receipts and notifications at this email address.")
+	password = forms.CharField(label=_("Password"), help_text="Already have an account? Sign in", widget=forms.PasswordInput())
 
 	GUEST, NEW, EXISTING = 'anonymous', 'new', 'existing'
 	CHOICES = (
@@ -88,6 +89,7 @@ class UserInfoForm(AuthenticationForm):
 		(EXISTING, _('I am a returning customer, and my password is')))
 	options = forms.ChoiceField(widget=forms.widgets.RadioSelect,
 								choices=CHOICES, initial=GUEST)
+
 
 	signup = forms.BooleanField(initial=True, required=False, label=_("Subscribe to our mailing list to learn about new products and promotions!"))
 

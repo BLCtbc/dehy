@@ -21,6 +21,7 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 	def get_context_data(self, **kwargs):
 		ctx = super().get_context_data(**kwargs)
 		ctx['stripe_pkey'] = settings.STRIPE_PUBLISHABLE_KEY
+		ctx['basket'] = self.request.basket
 		return ctx
 
 	def dispatch(self, request, *args, **kwargs):

@@ -1,4 +1,27 @@
 const FormStructures = {
+	"password": [
+		{
+		"tag": "label",
+		"attrs": {
+			"for": "id_password",
+			"hidden": "",
+			"disabled": "",
+		},
+		"classes": "floating-label",
+		"text": "Password"
+	},
+	{
+		"tag": "input",
+		"attrs": {
+			"type": "password",
+			"name": "password",
+			"autocomplete": "current-password",
+			"required": "",
+			"id": "id_password"
+		},
+		"classes": "required"
+		},
+	],
 	"additional_info": [
 		{
 			"tag": "div",
@@ -107,7 +130,7 @@ const FormStructures = {
 		},
 		{
 			"tag": "div",
-			"classes": "error-container button-container",
+			"classes": "error-container container button-container",
 			"elems": [
 				{
 					"tag": "div",
@@ -2213,7 +2236,7 @@ const FormStructures = {
 		},
 		{
 			"tag": "div",
-			"classes": "error-container button-container",
+			"classes": "error-container container button-container",
 			"elems": [
 				{
 					"tag": "div",
@@ -2303,7 +2326,7 @@ const FormStructures = {
 			"tag": "div"
 		},
 		{
-			"classes": "error-container button-container",
+			"classes": "error-container container button-container",
 			"elems": [
 				{
 					"attrs": {
@@ -2635,7 +2658,7 @@ const FormStructures = {
 		},
 		{
 			"tag": "div",
-			"classes": "error-container button-container",
+			"classes": "error-container container button-container",
 			"elems": [
 				{
 					"tag": "div",
@@ -2703,7 +2726,7 @@ const FormStructures = {
 									"id": "id_username"
 								},
 								"classes": "required"
-							}
+							},
 						]
 					}
 				]
@@ -2717,64 +2740,54 @@ const FormStructures = {
 						"classes": "field col",
 						"elems": [
 							{
-								"tag": "label",
+								"tag": "span",
 								"attrs": {
-									"for": "id_password"
+									"class": [
+										"helptext"
+									]
 								},
-								"classes": "floating-label",
-								"text": "Password:"
-							},
-							{
-								"tag": "input",
-								"attrs": {
-									"type": "password",
-									"name": "password",
-									"autocomplete": "current-password",
-									"required": "",
-									"id": "id_password"
-								},
-								"classes": "required"
-							}
-						]
-					}
-				]
-			},
-			{
-				"tag": "div",
-				"classes": "form-control row",
-				"elems": [
-					{
-						"tag": "div",
-						"classes": "field col",
-						"elems": [
-							{
-								"tag": "label",
-								"attrs": {
-									"for": "id_options_0"
-								},
-								"classes": "floating-label",
-								"text": "Options:"
-							},
-							{
-								"tag": "label",
-								"attrs": {
-									"for": "id_options_0"
-								},
+								"text": "You'll receive receipts and notifications at this email address.",
 								"elems": [
 									{
-										"tag": "input",
-										"text": "",
+										"tag": "br"
+									},
+									{
+										"tag":"span",
+										"text":"Already have an account?",
+									},
+									{
+										"tag": "a",
+										"classes": "signin-button",
 										"attrs": {
-											"type": "radio",
-											"name": "options",
-											"value": "anonymous",
-											"required": "",
-											"id": "id_options_0",
-											"checked": ""
+											"type":"button", "name": "sign_in_btn",
 										},
-										"classes": "required"
+										"elems": [
+											{
+												"tag": "span",
+												"text": "Sign in",
+												"style": "text-decoration: underline;"
+											}
+										]
 									}
-								],
+								]
+							}
+						]
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"classes": "form-control row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "field col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_options_0"
+								},
 								"classes": "floating-label",
 								"text": "\n I am a new customer and want to checkout as a guest"
 							},
@@ -2790,25 +2803,17 @@ const FormStructures = {
 								},
 								"classes": "required"
 							},
+						]
+					},
+					{
+						"tag": "div",
+						"classes": "field col",
+						"elems": [
 							{
 								"tag": "label",
 								"attrs": {
 									"for": "id_options_1"
 								},
-								"elems": [
-									{
-										"tag": "input",
-										"text": "",
-										"attrs": {
-											"type": "radio",
-											"name": "options",
-											"value": "new",
-											"required": "",
-											"id": "id_options_1"
-										},
-										"classes": "required"
-									}
-								],
 								"classes": "floating-label",
 								"text": "\n I am a new customer and want to create an account before checking out"
 							},
@@ -2823,25 +2828,17 @@ const FormStructures = {
 								},
 								"classes": "required"
 							},
+						]
+					},
+					{
+						"tag": "div",
+						"classes": "field col",
+						"elems": [
 							{
 								"tag": "label",
 								"attrs": {
 									"for": "id_options_2"
 								},
-								"elems": [
-									{
-										"tag": "input",
-										"text": "",
-										"attrs": {
-											"type": "radio",
-											"name": "options",
-											"value": "existing",
-											"required": "",
-											"id": "id_options_2"
-										},
-										"classes": "required"
-									}
-								],
 								"classes": "floating-label",
 								"text": "\n I am a returning customer, and my password is"
 							},
@@ -2858,7 +2855,10 @@ const FormStructures = {
 							}
 						]
 					}
+
+
 				]
+
 			},
 			{
 				"tag": "div",
@@ -2889,11 +2889,11 @@ const FormStructures = {
 					}
 				]
 			}
-		]
-	},
+			]
+		},
 	{
 		"tag": "div",
-		"classes": "error-container button-container",
+		"classes": "error-container container button-container",
 		"elems": [
 			{
 				"tag": "div",

@@ -122,4 +122,5 @@
 {% block onbodyload %}
     {{ block.super }}
     oscar.search.init();
+	dehy.loading_message = {% trans "Adding to cart..." %};
 {% endblock %}

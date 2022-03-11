@@ -1,0 +1,28 @@
+.basket-title * {
+    text-transform: uppercase;
+    font-variant-caps: all-petite-caps;
+    font-family: 'itc-avant-garde-gothic-pro';
+}
+
+.basket_summary, .basket_summary h3, .basket_summary p {
+	font-family: var(--avant-garde);
+}
+
+.basket_summary h3 {
+	font-size: 1.25rem;
+	font-weight: 300;
+	margin: 0;
+}
+
+.basket-items:nth-child(even) {
+    background: var(--dark-hg);
+}
+
+.price-text {
+    font-weight: 200;
+    font-size: 1rem;
+}
+
+input {
+	font-weight: normal;
+}
