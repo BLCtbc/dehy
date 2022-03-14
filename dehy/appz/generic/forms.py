@@ -24,3 +24,7 @@ class ContactForm(forms.Form):
 		self.fields['first_name'].widget.attrs.update({'placeholder': 'First Name'})
 		self.fields['last_name'].widget.attrs.update({'placeholder': 'Last Name'})
 		self.fields['message'].widget.attrs.update({'placeholder': 'Message'})
+
+	def send_email(self):
+		# send email using the self.cleaned_data dictionary
+		pass

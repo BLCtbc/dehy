@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from dehy.appz.generic import forms
+from django.views.generic.edit import FormView
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
@@ -33,7 +34,7 @@ class HomeView(TemplateView):
 class ReturnsRefundsView(TemplateView):
 	template_name = "dehy/generic/returns.html"
 
-class ContactView(TemplateView):
+class ContactView(FormView):
 	template_name = "dehy/generic/contact.html"
 	form_class = forms.ContactForm
 
@@ -42,13 +43,19 @@ class ContactView(TemplateView):
 		context_data['contact_form'] = kwargs.get('contact_form', self.form_class)
 		return context_data
 
-	def post(self, request, *args, **kwargs):
-		form = self.form_class(request.POST)
-		if form.is_valid():
-			pass
+	# def post(self, request, *args, **kwargs):
+	# 	form = self.form_class(request.POST)
+	# 	if form.is_valid():
+	# 		pass
 
 			# email_user = MessageUser.objects.get_or_create()
 			# add some kind of rate limiting here
+
+	def form_valid(self, form):
+		# This method is called when valid form data has been POSTed.
+		# It should return an HttpResponse.
+		form.send_email()
+		return super().form_valid(form)
 
 class FAQView(ListView):
 	model = FAQ
@@ -63,7 +70,7 @@ def create_checkout_session(request):
 def get_cart_quantity(request):
 	status_code = 200
 	cart = request.basket
-	data = {'num_cart_items': cart.num_items}
+	data = {'basket_items': cart.num_items}
 	response = JsonResponse(data, safe=False)
 	response.status_code = status_code
 
