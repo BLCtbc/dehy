@@ -138,14 +138,13 @@ class BasketView(CoreBasketView):
 		# formset = self.get_formset()
 
 		num_items = request.basket.num_items
-		print(f"\ndir(line): {dir(self.object_list[0])}")
-
+		print('dir(request.basket):\n ', dir(request.basket))
 		data['object_list'] = {}
+		if request.basket.is_tax_known:
+			print('request.basket.is_tax_known:\n ', request.basket.is_tax_known)
+
 		for line in self.object_list:
-			print("\n quantity: ", line.quantity)
-			print("\n product_id: ", line.product_id)
-			print("\n price_excl_tax: ", line.price_excl_tax)
-			print("\n price_currency: ", line.price_currency)
+
 
 			data['object_list'][line.product_id] = {'quantity': line.quantity, 'price': line.line_price_excl_tax}
 

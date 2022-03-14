@@ -299,9 +299,7 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 	def get_form_kwargs(self):
 		print("\n *** get_form_kwargs() ShippingView *** \n")
 		kwargs = super().get_form_kwargs()
-
 		# kwargs.update({'methods':self._methods})
-
 		return kwargs
 
 	## should validate both shipping method and shipping address forms
