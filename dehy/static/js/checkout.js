@@ -394,7 +394,10 @@ dehy.ch = {
 						dehy.ch.shipping.ADDRESS.set();
 						if (e.target.matches('#id_postcode, #id_state, #id_city')) {
 							// get/update the shipping methods
-							var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action};
+
+							// var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action};
+							var data = new FormData(e.target.closest('form'));
+							console.log(data.get(''))
 							dehy.ch.shipping.get_shipping_methods(data);
 							console.log('getting shipping methods');
 							dehy.ch.forms.show_submit_button();
@@ -515,17 +518,21 @@ dehy.ch = {
 				})
 			}
 		},
-		get_shipping_methods: function(data) {
-			//
+		get_shipping_methods: function(form_data) {
+			var data = {};
+			for (let[k, val] of form_data.entries()) {
+				console.log(k, val)
+				if (val) {
+					data[k] = val;
+				}
+			}
 			$.ajax({
 				method: "GET",
-				url: data.action,
+				url: '/checkout/shipping/',
 				data: data,
+				dataType: 'json',
 				success: dehy.ch.shipping.display_shipping_methods,
 				error: dehy.ch.forms.errors.display,
-				complete: function() {
-					return
-				}
 			});
 		},
 		display_shipping_methods: function(data) {
