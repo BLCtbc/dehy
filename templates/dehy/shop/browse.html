@@ -92,16 +92,6 @@
     </form>
 
     {% if products %}
-		{% comment old product list %}
-		<section id="product_list">
-			<ol class="row list-unstyled ml-0 pl-0">
-				{% for product in products %}
-					<li class="col-sm-6 col-md-4 col-lg-3">{% render_product product %}</li>
-				{% endfor %}
-			</ol>
-			{% include "oscar/partials/pagination.html" %}
-		</section>
-		{% endcomment %}
 
 		<div class="product-list-container">
 			<div class='product-list' id="product_list">
@@ -122,4 +112,5 @@
 {% block onbodyload %}
     {{ block.super }}
     oscar.search.init();
+	dehy.loading_message = {% trans "Adding to cart..." %};
 {% endblock %}

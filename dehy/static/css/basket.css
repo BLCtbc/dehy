@@ -1,0 +1,47 @@
+.basket-title * {
+    text-transform: uppercase;
+    font-variant-caps: all-petite-caps;
+    font-family: 'itc-avant-garde-gothic-pro';
+}
+
+.basket_summary, .basket_summary h3, .basket_summary p {
+	font-family: var(--avant-garde);
+}
+
+.basket_summary h3 {
+	font-size: 1.25rem;
+	font-weight: 300;
+	margin: 0;
+}
+
+.basket-items:nth-child(even) {
+    background: var(--dark-hg);
+}
+
+.price-text {
+    font-weight: 200;
+    font-size: 1rem;
+}
+
+input {
+	font-weight: normal;
+}
+
+form {
+	font-size: 1rem;
+}
+
+.remove-basket-item {
+	font-size: small;
+	font-weight: 400;
+	letter-spacing: 0.01em;
+	opacity: 0.8;
+}
+
+.checkout-quantity {
+	min-width: 4em
+}
+
+.product-quantity {
+	padding: 0.25rem 0.5rem;
+}

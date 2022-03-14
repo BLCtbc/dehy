@@ -13,10 +13,10 @@
 
 .about {
 	font-size: 1.5rem;
-	display: flex;
+	/* display: flex;
 	flex-direction: column;
 	justify-content: center;
-	padding: 2rem;
+	padding: 2rem; */
 }
 
 .content-section {
@@ -69,10 +69,11 @@ h2 {
 .shop-link, .btn {
 	border: 2px solid var(--beige);
 	color: var(--beige);
-	padding: 0 3rem;
 	line-height: 3rem;
 	font-weight: 800;
+	background-color: transparent;
 }
+
 
 .btn:hover {
 	background-color: var(--beige);
@@ -161,15 +162,21 @@ figure {
 	max-height: 600px;
 }
 
+.mini-recipe-list, .mini-shop {
+	flex-wrap: nowrap;
+	overflow-x: scroll;
+	padding-top: 3rem;
+    background-attachment: scroll;
+	z-index: 1;
+
+}
+
 .mini-shop {
 	background: #fffbf4 url(/static/img/textures/diamond_pattern-3.svg) repeat;
-	background-attachment: scroll;
-	z-index: 1;
-	overflow-x: scroll;
 	border-color: transparent !important;
-	padding-top: 3rem;
 	border-bottom: 12px solid white;
 }
+
 
 header {
 	padding-top: 0 !important;
@@ -191,17 +198,34 @@ b	ottom: 1rem;
 	border-top: 12px solid white;
 }
 
-.temp {
+#recipe_list.content-section {
+	border-color: inherit;
+}
+
+#wholesale {
+	background-image: url(/static/img/custom/dehy_jars1_filter.jpeg);
+    background-size: cover;
+    background-position: 50% 50%;
+}
+
+.recipe-link-container, .shop-link-container {
+	position: sticky;
+	top: 0;
+	left: 0;
+}
+
+.recipe-link-container > a,
+.shop-link-container > a {
+	position: absolute;
+	top: -3rem;
 	line-height: normal;
 	color: var(--dark-hg);
 	border-color: var(--dark-hg);
 }
 
-.temp:hover {
+
+.recipe-link-container > a:hover,
+.shop-link-container > a:hover {
 	background-color: var(--dark-hg);
 	color: white;
-}
-
-#recipe_list.content-section {
-	border-color: inherit;
 }

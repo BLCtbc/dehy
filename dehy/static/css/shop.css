@@ -1,24 +1,12 @@
+:root {
+	--shop-input-padding: 1.5rem;
+	--shop-input-border: 1px solid grey;
+}
 
 form {
 	font-family: itc-avant-garde-gothic-pro !important;
 	font-weight: 400;
 	font-size: 1.25rem;
-}
-
-.variant-select-container, .quantity-select-container {
-    position: relative;
-    transition: opacity .1s ease-out;
-    text-align: left;
-    box-sizing: border-box;
-    padding: 1.5rem;
-    line-height: normal;
-    color: inherit;
-    border: 1px solid grey;
-    font-size: calc(1.1 * 1rem);
-}
-
-.variant-select-container {
-	opacity: 0;
 }
 
 span.not_price_color {
@@ -38,6 +26,25 @@ span.variant_price {
 	font-size: 1.5rem;
 }
 
+.variant-select-container, .quantity-select-container {
+    position: relative;
+    transition: opacity .1s ease-out;
+    text-align: left;
+    box-sizing: border-box;
+    line-height: normal;
+    color: inherit;
+    /* font-size: calc(1.1 * 1rem); */
+}
+
+
+.variant-select-container, input#id_quantity{
+	padding: var(--shop-input-padding);
+	border: var(--shop-input-border);
+}
+
+.variant-select-container {
+	opacity: 0;
+}
 
 input#id_quantity {
 	color: inherit;
@@ -47,12 +54,11 @@ input#id_quantity {
 .variant-option select, input#id_quantity {
 
     height: 100%;
-    font-size: 1rem;
+    font-size: 1.5rem;
 	background: transparent;
 	-webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-	border: none;
 	font-weight: 400;
 }
 
@@ -63,6 +69,7 @@ input#id_quantity {
     width: 100%;
 	padding-right: 3.5rem;
 	color: rgba(0,0,0,0);
+	border: none;
 }
 
 .variant-option select:focus {

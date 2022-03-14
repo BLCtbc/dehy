@@ -1,58 +1,340 @@
 :root {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+	--borderRadius: 5px;
+	--checkout-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+	--c-labelRestingTransform:translateY(23px) scale(1);
+	--c-labelFloatingTransform: scale(0.85) translateY(-0.85rem);
+	--c-inputFloatingPaddingTop: 32px;
+	--c-labelFloatingHeight: 20.0938px;
+	--c-labelRestingTransform: translateY(23px) scale(1);
+	--c-inputFloatingPaddingTop: 32px;
+	--c-inputFloatingMarginLeft: 13px;
+	--c-inputFloatingMarginRight: 13px;
+	--p-colorPrimaryAlpha20: hsla(132, 53%, 69%, 25%);
+	--p-colorPrimaryAlpha40: hsla(132, 53%, 69%, 40%);
+	--p-colorPrimaryAlpha50: hsla(132, 53%, 69%, 50%);
+    --focusOutline: 0;
+    --focusBoxShadow: 0 0 0 3px var(--p-colorPrimaryAlpha20), 0 1px 1px 0 var(--p-colorBackgroundContrastAlpha08);
+	--p-colorBackgroundContrastAlpha05: rgba(255, 255, 255, 0.08);
+	--p-colorBackgroundContrastAlpha08: rgba(255, 255, 255, 0.12);
+	--p-colorBackgroundContrastAlpha30: rgba(255, 255, 255, 0.4);
+	--p-spacingXs: 1px;
+	--p-spacingSm: 2px;
+	--p-spacing1: 0.25rem;
+	--p-spacing2: 0.5rem;
+	--p-spacing3: 0.75rem;
+	--p-spacing4: 1rem;
+	--p-spacing5: 1.25rem;
+	--p-spacing6: 1.5rem;
+	--p-spacing7: 1.75rem;
+	--p-spacing8: 2rem;
+	--p-spacing9: 2.25rem;
+	--p-spacing10: 2.5rem;
+	--colorBackgroundText: #fff;
+	--p-colorBackgroundDivider: #4b4d5e;
+	--p-colorBackgroundDisabled: #27272b;
+	--p-colorBackgroundDisabledDeemphasize05: #3a3a3f;
+	--p-colorBackgroundDeemphasize03: #3d3e4c;
+	--p-colorBackgroundDeemphasize05: #424353;
+	--p-colorBackgroundDeemphasize10: #4b4d5e;
+	--p-colorBackgroundDeemphasize15: #555668;
+	--p-colorBackgroundDeemphasize20: #5f6073;
+	--colorBackground: #30313d;
+    --focusBoxShadow: 0 0 0 3px var(--p-colorPrimaryAlpha20), 0 1px 1px 0 var(--p-colorBackgroundContrastAlpha08);
+	font-family: var(--checkout-font) !important;
+}
+
+body {
+	font-size: 20px;
 }
 
 form.preview {
 
 }
 
+.preview-container {
+    font-size: smaller;
+    color: grey;
+}
+
 form, .billing-card {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
 	background-color: rgb(26,31,54);
+}
+.form-control {
+	background-color: inherit;
+	border-color: transparent;
 }
 
 .hide {
 	display: none;
 }
 
-input, select, textarea {
-	padding: 0.75rem;
-	background-color: #30313d;
-	border-radius: 5px;
-	transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
-	border: 1px solid #424353;
-	box-shadow: 0px 2px 4px rgb(0 0 0 / 50%), 0px 1px 6px rgb(0 0 0 / 25%);
-	font-weight: 400;
-	color: white;
-}
 
-select {
-	padding-right: calc(12px + 1em)!important;
-	padding-top: 32px !important;
-	display: block;
-	width: 100%
-}
-
-input, select, label {
+input, select, label, div, h1,h2,h3,h4,h5 {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
 }
 
-label {
-	-webkit-transform: translateY(13px) scale(0.8888888888888888) !important;
-	-ms-transform: translateY(13px) scale(0.8888888888888888) !important;
-	transform: translateY(13px) scale(0.8888888888888888) !important;
-	padding-bottom: max(2px, 0.25rem);
-	opacity: 0.8;
+#checkout_flow input:not([type=radio], [type="checkbox"]),
+#checkout_flow select {
+	width: 100%;
+	margin: 0.25rem;
+}
+
+
+input:not([type="radio"], [type="checkbox"]), select {
+  color: white !important;
+  background-color: var(--colorBackground) !important;
+  border-radius: var(--borderRadius) !important;
+  border: 1px solid var(--p-colorBackgroundDeemphasize05) !important;
+  box-shadow: 0px 2px 4px rgb(0 0 0 / 50%), 0px 1px 6px rgb(0 0 0 / 25%) !important;
+}
+
+input::-webkit-input-placeholder,
+input:-ms-input-placeholder {
+  color: transparent;
+  transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.StripeElement--webkit-autofill {
+  background: transparent !important;
+}
+input:not([type="radio"], [type="checkbox"]), button, select {
+  -webkit-animation: 1ms void-animation-out;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+.baseline {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  left: 0;
+  bottom: 0;
+  background-color: #cfd7df;
+  transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* button {
+  display: block;
+  width: calc(100% - 30px);
+  height: 40px;
+  margin: 40px 15px 0;
+  background-color: #24b47e;
+  border-radius: 4px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+} */
+
+/* .field {
+	display: block !important;
+	position: relative;
+	width: 100%;
+	height: 100%;
+} */
+
+.error svg {
+  margin-top: 0 !important;
+}
+
+.error svg .base {
+  fill: #e25950;
+}
+
+.error svg .glyph {
+  fill: #fff;
+}
+
+.error .message {
+  color: #e25950;
+}
+
+.success .icon .border {
+  stroke: #abe9d2;
+}
+
+.success .icon .checkmark {
+  stroke: #24b47e;
+}
+
+.success .title {
+  color: #32325d;
+  font-size: 16px !important;
+}
+
+.success .message {
+  color: #8898aa;
+  font-size: 13px !important;
+}
+
+.success .reset path {
+  fill: #24b47e;
+}
+
+.checkout-flow section {
+	margin-bottom: 2rem;
+	padding: 0;
+	border: none;
+}
+.card-title * {
 	font-weight: 400;
-    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-	position: absolute;
-	z-index: 1;
-	pointer-events: none;
-	will-change: transform;
-	font-size: 16px !important;
-	-webkit-transform-origin: top left!important;
-	-ms-transform-origin: top left!important;
-	transform-origin: top left!important;
-	margin-left: 13px !important;
-	margin-bottom: 0.25rem;
+}
+
+.size {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
+}
+
+button.edit {
+	display: contents;
+	color: grey;
+}
+
+.card-header {
+	display: flex;
+	justify-content: space-between;
+}
+
+.card-body {
+	background-color: rgb(26,31,54);
+}
+.required:after {
+    color: #dc3545;
+    content: "*";
+    display: inline-block;
+}
+
+#error_container.form-group {
+	min-height: 2rem;
+	background-color: red;
+	color: white;
+	font-weight: 500;
+	font-size: 1rem;
+}
+
+.helptext {
+	font-size: smaller;
+	color: darkolivegreen;
+	font-size: 12px;
+	line-height: 16px;
+	letter-spacing: 0.01em;
+	margin-bottom: 0.5rem;
+}
+
+/*
+.floating-label.resting {
+	-webkit-transform: var(--c-labelRestingTransform)!important;
+	-ms-transform: var(--c-labelRestingTransform)!important;
+	transform: var(--c-labelRestingTransform)!important;
+} */
+
+input:not([type="radio"], [type="checkbox"]):focus, .form-control:not([type="radio"], [type="checkbox"]):focus {
+	outline: var(--focusOutline);
+	border-color: var(--p-colorPrimaryAlpha40);
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5), 0px 1px 6px rgba(0, 0, 0, 0.25), var(--focusBoxShadow);
+	background-color: var(--colorBackground);
+	border-radius: var(--borderRadius);
+	transition: background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+	border: 1px solid var(--p-colorBackgroundDeemphasize05);
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5), 0px 1px 6px rgba(0, 0, 0, 0.25), var(--focusBoxShadow);
+	color: azure;
+}
+
+.table {
+	color: inherit;
+}
+
+.total {
+	background-color: inherit;
+}
+
+/* label {
+	font-size: smaller;
+} */
+
+.radio {
+	position: relative;
+}
+
+input:disabled {
+	background-color: var(--p-colorBackgroundDisabled);
+    color: var(--colorTextPlaceholder);
+    border-color: var(--p-colorBackgroundDisabledDeemphasize05);
+    box-shadow: none;
+}
+
+.checkout-form {
+	padding: 0;
+}
+
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    transition: background-color 600000s 0s, color 600000s 0s;
+}
+input[data-autocompleted] {
+    background-color: transparent !important;
+}
+
+/*
+input:-webkit-autofill,
+input:autofill,
+select:-webkit-autofill,
+select:autofill {
+  -webkit-text-fill-color: #e39f48;
+  background-color: inherit;
+  transition: background-color 100000000s;
+  -webkit-animation: 1ms void-animation-out;
+}
+
+input:autofill,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+select:autofill,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active  {
+    transition: background-color 600000s 0s, color 600000s 0s;
+} */
+
+
+
+input[type="radio"],
+input[type="checkbox"] {
+	width: 20px;
+	height: 20px;
+	top: 0.25rem;
+	position:absolute;
+}
+
+input[type="radio"],
+input[type="radio"] + label,
+input[type="checkbox"],
+input[type="checkbox"] + label{
+	/* position: absolute; */
+	/* top: 0; */
+	/* left: 1rem; */
+}
+
+
+input[type="radio"] + label,
+input[type="checkbox"] + label{
+    padding-left: 1.5rem;
+}
+
+.form-floating>label {
+	z-index: 1090;
+}
+
+.input-group {
+	padding: 0;
+}
+
+input:focus {
+	outline-offset: 0;
 }

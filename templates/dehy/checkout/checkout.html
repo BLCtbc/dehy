@@ -131,8 +131,12 @@
                         </div>
                     </div>
                     <div class="col-sm-7">
-                        <h3><a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a></h3>
-                        <span class="availability {{ session.availability.code }}">{{ session.availability.message }}</span>
+						<h3><a href="{{ line.product.get_absolute_url }}">{{ line.product.parent.title|default:line.product.title }}</a></h3>
+						{% if line.product.is_child %}
+						<p class="size"><small>Size: {{line.description}}</small></p>
+						{% endif %}
+
+        
                     </div>
                     <div class="col-sm-1 text-center">
                         {{ line.quantity }}

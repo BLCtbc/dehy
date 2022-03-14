@@ -64,4 +64,13 @@ class ProductDetailView(CoreProductDetailView):
 	slug_url_kwarg = 'product_slug'
 	template_name = 'dehy/shop/detail.html'
 
+	# Whether to redirect to the URL with the right path
+	enforce_paths = True
+
+	# Whether to redirect child products to their parent's URL. If it's disabled,
+	# we display variant product details on the separate page. Otherwise, details
+	# displayed on parent product page.
+	enforce_parent = False
+
+
 
