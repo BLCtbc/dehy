@@ -140,8 +140,14 @@ class BasketView(CoreBasketView):
 		num_items = request.basket.num_items
 		print('dir(request.basket):\n ', dir(request.basket))
 		data['object_list'] = {}
+		print('request.basket.is_tax_known:\n ', request.basket.is_tax_known)
+		print('request.basket.strategy:\n ', request.basket.strategy)
+		print('request.basket.strategy.pricing_policy:\n ', request.basket.strategy.pricing_policy)
+
+		print('dir(request.basket.strategy):\n ', dir(request.basket.strategy))
+
 		if request.basket.is_tax_known:
-			print('request.basket.is_tax_known:\n ', request.basket.is_tax_known)
+			print('request.basket.total_tax:\n ', request.basket.total_tax)
 
 		for line in self.object_list:
 
