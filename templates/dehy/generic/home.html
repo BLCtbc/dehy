@@ -15,28 +15,30 @@
 
 
 {% block header %}
-<header class='content-section' id="header">
-	<div class='col-7 col-xs-12 img-split shop-header-image' style='background-image: url({% static "img/custom/dehy_jars2_filter.jpeg"%}); background-size:cover;'>
-		<div class='shop-leadin'>
-			<div class='punchline'>
-				<h1>CATCHY PUNCHLINE</h1>
-				<h1>NOW YOU FINNA BUY SHIT</h1>
+<header class='content-section row' id="header">
+	<div class='col-12 col-sm-7 d-flex flex-column justify-content-center img-split shop-header-image'
+		style='background-image: url({% static "img/custom/dehy_jars2_filter.jpeg"%}); background-size:cover;'
+		>
+			<div class='row mx-auto'>
+				<div class="col-10 my-5">
+					<h1>CATCHY PUNCHLINE</h1>
+					<h1>NOW YOU FINNA BUY SHIT</h1>
+					<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">Shop Now</a>
+				</div>
 			</div>
-			<div class='shop-link-container'>
-				<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">Shop Now</a>
-			</div>
-		</div>
 	</div>
-		<div class='col-5 col-xs-12 fun-gif img-split'>
-			<figure>
-				<img style="filter: grayscale(30%) opacity(0.5);" class="section-image-container" src='{% static 'img/custom/dehy_flag_filter.gif' %}'>
-			</figure>
-		</div>
+	<div class='col-12 col-sm-5 fun-gif img-split'>
+		<figure>
+			<img style="filter: grayscale(30%) opacity(0.5);" class="section-image-container" src='{% static 'img/custom/dehy_flag_filter.gif' %}'>
+		</figure>
+	</div>
 </header>
+
+
 {% endblock header %}
 
 {% block content_wrapper %}
-	<section class='about content-section' id='about'>
+	<section class='about content-section row' id='about'>
 		<div class='container'>
 			<div class='row'>
 				<div class='col-12'>
@@ -49,7 +51,7 @@
 	</section>
 
 
-	<section class='content-section mailing-list-container'>
+	<section class='content-section row mailing-list-container'>
 		<div class='image-background-overlay'
 			style="background-image: url({% static 'img/p/blood_orange_rough_cuts/blood_orange_rough_cut_jar.jpg' %}); left:0; background-position: center left -20%;">
 		</div>
@@ -62,7 +64,7 @@
 			<!-- <div class="col-2">
 				<img class="image-container" src="{% static 'img/product/blood_orange_rough_cuts/blood_orange_rough_cut_jar.jpg' %}">
 			</div> -->
-			<div class="mailing-list col-8 col-xs-12">
+			<div class="mailing-list col-12 col-sm-8">
 				<p class='subhead'>STAY IN DA MIX LMAOOOO</p>
 				<h2>SUBSCRIBE FOR INSIDE ACCESS</h2>
 				<p class='monospace'>Get emails about special events, offers, and upcoming promotions. Unsubscribe whenever you want.</p>
@@ -80,45 +82,51 @@
 			</div> -->
 		</div>
 	</section>
-	<section class='content-section'>
-		<div class="content-split">
-			<div class='col-7 col-xs-12 about' style="background-image: url({% static  'img/custom/dehy_hero.jpeg' %}); background-position: bottom left 100px;">
-				<h2>Virtue & Craft</h2>
-				<p>Dehy makes high quality dehydrated garnishes for an elevated cocktail experience, handmade in Austin Texas. Created for cocktail professionals and enthusiasts alike, Dehy makes it easy to put a unique finishing touch on any drink with speed.</p>
+	<section class='content-section row'>
+
+		<div class='col-12 col-sm-7 about' style="background-image: url({% static  'img/custom/dehy_hero.jpeg' %}); background-position: bottom left 100px;">
+			<div class="container">
+				<div class="row">
+					<div class="col-12">
+						<h2>Virtue & Craft</h2>
+						<p>Dehy makes high quality dehydrated garnishes for an elevated cocktail experience, handmade in Austin Texas. Created for cocktail professionals and enthusiasts alike, Dehy makes it easy to put a unique finishing touch on any drink with speed.</p>
+					</div>
+				</div>
 			</div>
-			<div class='col-5 col-sx-12 img-split'>
-				<img class="section-image-container" src='{% static 'img/custom/dehy_glass_filter.jpeg' %}'>
-			</div>
+
+		</div>
+		<div class='col-12 col-sm-5 img-split'>
+			<img class="section-image-container" src='{% static 'img/custom/dehy_glass_filter.jpeg' %}'>
 		</div>
 	</section>
 
-	<section id="wholesale" class='content-section'>
-		<div class="" style="max-height: 600px;">
-			<img class="section-image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
+	<section id="wholesale" class='content-section row'>
+		<div class="col-12">
+			<div class="" style="max-height: 600px;">
+				<!-- <img class="section-image-container" src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'> -->
+			</div>
 		</div>
-
 	</section>
 
 	{% block recipe_list %}
-	<section class='content-section' id='mini_recipe_list'>
-		<div style="position: absolute; top:0; left:10px;">
+	<section class='content-section mini-recipe-list row' id='mini_recipe_list'>
+		<div class="recipe-link-container">
 			<a role='button' class="temp shop-link btn btn-black" href="{% url 'recipes' %}">All Recipes</a>
 		</div>
 		{% for recipe in recipes %}
-		<article class="recipe-card col-3">
+		<article class="recipe-card col-6 col-sm-3">
 		{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
 		</article>
 		{% endfor %}
 	</section>
 	{% endblock recipe_list %}
 
-	<section class='content-section mailing-list-split container-fluid'>
+	<section class='content-section mailing-list-split row'>
 
-		<div class="row">
-			<div class='img-split col-5 d-xs-none'>
+			<div class='img-split col-5 d-none d-sm-flex'>
 				<img class="section-image-container" src='{% static 'img/custom/dehy_ice2_filter.jpeg' %}'>
 			</div>
-			<div class="mailing-list mailing-list-container col-7 col-xs-12">
+			<div class="mailing-list mailing-list-container col-12 col-sm-7">
 				<div class="col-10">
 					<p class='subhead'>STAY IN DA L00pZ</p>
 					<h2>SUBSCRIBE FOR INSIDE ACCESS</h2>
@@ -134,17 +142,16 @@
 				</div>
 
 			</div>
-		</div>
 	</section>
 
-	<section class='content-section mini-shop'>
-		<div style="position: sticky; top:0; left:10px;">
+	<section class='content-section mini-shop row'>
+		<div class="shop-link-container" style="position: sticky; top:0; left:10px;">
 			<a role='button' style="position: absolute; top: -3rem;" class="temp shop-link btn btn-black" href="{% url 'shop:index' %}">Shop</a>
 		</div>
 		{% for product in products %}
 			{% if not product.is_child %}
 				{# temporary #}
-				<div class="col-3">
+				<div class="col-6 col-sm-3 product-card">
 				{% render_product product %}
 				</div>
 

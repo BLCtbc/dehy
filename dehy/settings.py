@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
 	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
 	# oscar overrides
+	'dehy.appz.address.apps.AddressConfig',
 	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
 	'dehy.appz.dashboard.catalogue.apps.CatalogueDashboardConfig',
@@ -63,20 +64,19 @@ INSTALLED_APPS = [
 	'dehy.appz.search.apps.SearchConfig',
 	'dehy.appz.customer.apps.CustomerConfig',
 	'dehy.appz.checkout.apps.CheckoutConfig',
+	'dehy.appz.order.apps.OrderConfig',
 	'dehy.appz.partner.apps.PartnerConfig',
 	'dehy.appz.payment.apps.PaymentConfig',
+	'dehy.appz.shipping.apps.ShippingConfig',
 	# django apps added by oscar
 	'django.contrib.sites',
 	'django.contrib.flatpages',
 	# oscar apps
 	'oscar.config.Shop',
 	'oscar.apps.analytics.apps.AnalyticsConfig',
-	'oscar.apps.address.apps.AddressConfig',
-	'oscar.apps.shipping.apps.ShippingConfig',
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
 	'oscar.apps.offer.apps.OfferConfig',
-	'oscar.apps.order.apps.OrderConfig',
 	'oscar.apps.voucher.apps.VoucherConfig',
 	'oscar.apps.wishlists.apps.WishlistsConfig',
 	'oscar.apps.dashboard.reports.apps.ReportsDashboardConfig',
@@ -146,7 +146,20 @@ WSGI_APPLICATION = 'dehy.wsgi.application'
 # Parse database connection url strings
 # like psql://user:pass@127.0.0.1:8458/db
 DATABASES = {
-	'default': env.db('DATABASE_URL')
+	# 'default': env.db('DATABASE_URL'),
+	'default': {
+		'ENGINE': 'django.db.backends.postgresql',
+		'USER': env.str('DB_USER'),
+		'NAME': env.str('DB_NAME'),
+		'PASSWORD': env.str('DB_PASS'),
+		'HOST': env.str('DB_HOST'),
+		'PORT': env.str('DB_PORT'),
+		'ATOMIC_REQUESTS': True,
+		'TEST': {
+            'NAME': 'test_db',
+        },
+
+	}
 	# read os.environ['DATABASE_URL'] and raises
 	# ImproperlyConfigured exception if not found
 	#
@@ -259,7 +272,7 @@ OSCAR_MISSING_IMAGE_URL = MEDIA_ROOT / "image_not_found.jpg"  # relative path fr
 
 OSCAR_PRODUCTS_PER_PAGE = 10
 
-OSCAR_THUMBNAIL_DEBUG = True
+OSCAR_THUMBNAIL_DEBUG = False
 
 OSCAR_DASHBOARD_NAVIGATION += [
 	{
