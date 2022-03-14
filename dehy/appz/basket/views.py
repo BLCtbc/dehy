@@ -110,6 +110,7 @@ class BasketView(CoreBasketView):
 	def get_basket_voucher_form(self):
 		print(f"\n dir(request.basket): {dir(self.request.basket)}")
 
+
 		"""
 		This is a separate method so that it's easy to e.g. not return a form
 		if there are no vouchers available.
@@ -117,80 +118,12 @@ class BasketView(CoreBasketView):
 		print(f'\n self.request.resolver_match: {self.request.resolver_match}')
 
 		if self.request.resolver_match.url_name != 'checkout':
+			print(f'\n RETURNING NONE')
+
 			return None
 
 		return BasketVoucherForm()
 
-	# def formset_valid(self, formset):
-	# 	# Store offers before any changes are made so we can inform the user of
-	# 	# any changes
-	# 	offers_before = self.request.basket.applied_offers()
-	# 	save_for_later = False
-	#
-	# 	# Keep a list of messages - we don't immediately call
-	# 	# django.contrib.messages as we may be returning an AJAX response in
-	# 	# which case we pass the messages back in a JSON payload.
-	# 	flash_messages = ajax.FlashMessages()
-	#
-	# 	for form in formset:
-	# 		print(f'\ndir(form.instance): {dir(form.instance)}')
-	# 		if (hasattr(form, 'cleaned_data')
-	# 				and form.cleaned_data.get('save_for_later', False)):
-	# 			line = form.instance
-	# 			if self.request.user.is_authenticated:
-	# 				self.move_line_to_saved_basket(line)
-	#
-	# 				msg = render_to_string(
-	# 					'oscar/basket/messages/line_saved.html',
-	# 					{'line': line})
-	# 				flash_messages.info(msg)
-	#
-	# 				save_for_later = True
-	# 			else:
-	# 				msg = _("You can't save an item for later if you're "
-	# 						"not logged in!")
-	# 				flash_messages.error(msg)
-	# 				return redirect(self.get_success_url())
-	#
-	# 	if save_for_later:
-	# 		# No need to call super if we're moving lines to the saved basket
-	# 		response = redirect(self.get_success_url())
-	# 	else:
-	# 		# Save changes to basket as per normal
-	# 		response = super().formset_valid(formset)
-	#
-	# 	# If AJAX submission, don't redirect but reload the basket content HTML
-	# 	if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-	# 		# Reload basket and apply offers again
-	# 		self.request.basket = get_model('basket', 'Basket').objects.get(
-	# 			id=self.request.basket.id)
-	# 		self.request.basket.strategy = self.request.strategy
-	# 		Applicator().apply(self.request.basket, self.request.user,
-	# 						   self.request)
-	# 		offers_after = self.request.basket.applied_offers()
-	#
-	# 		for level, msg in BasketMessageGenerator().get_messages(
-	# 				self.request.basket, offers_before, offers_after, include_buttons=False):
-	# 			flash_messages.add_message(level, msg)
-	#
-	# 		# Reload formset - we have to remove the POST fields from the
-	# 		# kwargs as, if they are left in, the formset won't construct
-	# 		# correctly as there will be a state mismatch between the
-	# 		# management form and the database.
-	# 		kwargs = self.get_formset_kwargs()
-	# 		del kwargs['data']
-	# 		del kwargs['files']
-	# 		if 'queryset' in kwargs:
-	# 			del kwargs['queryset']
-	# 		formset = self.get_formset()(queryset=self.get_queryset(),
-	# 									 **kwargs)
-	# 		ctx = self.get_context_data(formset=formset,
-	# 									basket=self.request.basket)
-	# 		return self.json_response(ctx, flash_messages)
-	#
-	# 	BasketMessageGenerator().apply_messages(self.request, offers_before)
-	#
-	# 	return response
 
 	def post(self, request, *args, **kwargs):
 		print('request.POST: ', request.POST)
@@ -205,6 +138,17 @@ class BasketView(CoreBasketView):
 		# formset = self.get_formset()
 
 		num_items = request.basket.num_items
+		print(f"\ndir(line): {dir(self.object_list[0])}")
+
+		data['object_list'] = {}
+		for line in self.object_list:
+			print("\n quantity: ", line.quantity)
+			print("\n product_id: ", line.product_id)
+			print("\n price_excl_tax: ", line.price_excl_tax)
+			print("\n price_currency: ", line.price_currency)
+
+			data['object_list'][line.product_id] = {'quantity': line.quantity, 'price': line.line_price_excl_tax}
+
 
 		data['basket_num_items'] = request.basket.num_items
 		data['order_total'] = request.basket.total_excl_tax_excl_discounts

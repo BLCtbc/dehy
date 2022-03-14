@@ -22,151 +22,7 @@ const FormStructures = {
 		"classes": "required"
 		},
 	],
-	"additional_info": [
-		{
-			"tag": "div",
-			"classes": "form-container",
-			"elems": [
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_purchase_business_type"
-									},
-									"classes": "floating-label",
-									"text": "Business or Home:"
-								},
-								{
-									"tag": "select",
-									"attrs": {
-										"name": "purchase_business_type",
-										"id": "id_purchase_business_type"
-									},
-									"elems": [
-										{
-											"tag": "option",
-											"text": "Bar or Restaurant",
-											"attrs": {
-												"value": "b_r"
-											}
-										},
-										{
-											"tag": "option",
-											"text": "Home",
-											"attrs": {
-												"value": "h"
-											}
-										},
-										{
-											"tag": "option",
-											"text": "Other",
-											"attrs": {
-												"value": "o"
-											}
-										}
-									]
-								},
-								{
-									"tag": "span",
-									"attrs": {
-										"class": [
-											"helptext"
-										]
-									},
-									"text": "Is this for home or commercial use?"
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_business_name"
-									},
-									"classes": "floating-label",
-									"text": "Business name:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "business_name",
-										"maxlength": "100",
-										"required": "",
-										"id": "id_business_name"
-									},
-									"classes": "required"
-								},
-								{
-									"tag": "span",
-									"attrs": {
-										"class": [
-											"helptext"
-										]
-									},
-									"text": "What is the name of your Bar/Restaurant/Business?"
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			"tag": "div",
-			"classes": "error-container container button-container",
-			"elems": [
-				{
-					"tag": "div",
-					"classes": "form-group row hide",
-					"attrs": {
-						"id": "error_container"
-					},
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "col-12 errors",
-							"attrs": {
-								"id": "errors"
-							}
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-group row",
-					"elems": [
-						{
-							"tag": "button",
-							"text": "Continue",
-							"classes": "col-12",
-							"attrs": {
-								"type": "submit",
-								"hidden": "",
-								"aria-label": "Continue"
-							}
-						}
-					]
-				}
-			]
-		}
-	],
+	"additional_info": [{"tag": "div", "classes": "form-container", "elems": [{"tag": "div", "classes": "row", "elems": [{"tag": "div", "classes": "form-floating input-group col", "elems": [{"tag": "label", "attrs": {"for": "id_purchase_business_type"}, "text": "Business or Home:"}, {"tag": "select", "attrs": {"name": "purchase_business_type", "id": "id_purchase_business_type", "class": "form-control", "placeholder": "purchase_business_type"}, "elems": [{"tag": "option", "text": "Bar or Restaurant", "attrs": {"value": "b_r"}}, {"tag": "option", "text": "Home", "attrs": {"value": "h"}}, {"tag": "option", "text": "Other", "attrs": {"value": "o"}}]}, {"tag": "span", "attrs": {"class": "helptext"}, "text": "Is this for home or commercial use?"}]}]}, {"tag": "div", "classes": "row", "elems": [{"tag": "div", "classes": "form-floating input-group col", "elems": [{"tag": "label", "attrs": {"for": "id_business_name"}, "text": "Business name:"}, {"tag": "input", "attrs": {"type": "text", "name": "business_name", "maxlength": "100", "required": "", "id": "id_business_name", "class": "form-control required", "placeholder": "business_name", "autofill": "text"}}, {"tag": "span", "attrs": {"class": "helptext"}, "text": "What is the name of your Bar/Restaurant/Business?"}]}]}]}, {"tag": "div", "classes": "error-container button-container", "elems": [{"tag": "div", "classes": "form-group row hide", "attrs": {"id": "error_container"}, "elems": [{"tag": "div", "classes": "col-12 errors", "attrs": {"id": "errors"}}]}, {"tag": "div", "classes": "form-group row", "elems": [{"tag": "button", "text": "Continue", "classes": "col-12", "attrs": {"type": "submit", "hidden": "", "aria-label": "Continue"}}]}]}],
 	"billing": [
 		{
 			"tag": "div",
@@ -174,19 +30,18 @@ const FormStructures = {
 			"elems": [
 				{
 					"tag": "div",
-					"classes": "form-control row",
+					"classes": "row",
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "field col",
+							"classes": "input-group col",
 							"elems": [
 								{
 									"tag": "label",
 									"attrs": {
 										"for": "id_same_as_shipping"
 									},
-									"classes": "floating-label",
-									"text": "Use shipping address:"
+									"text": "Use shipping address"
 								},
 								{
 									"tag": "input",
@@ -203,65 +58,57 @@ const FormStructures = {
 				},
 				{
 					"tag": "div",
-					"classes": "form-control row",
+					"classes": "row",
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "field col",
+							"classes": "form-floating input-group col",
 							"elems": [
 								{
 									"tag": "label",
 									"attrs": {
 										"for": "id_first_name"
 									},
-									"classes": "floating-label",
-									"text": "First name:"
+									"text": "First name"
 								},
 								{
 									"tag": "input",
 									"attrs": {
 										"type": "text",
 										"name": "first_name",
-										"value": "Kenneth",
 										"maxlength": "255",
-										"placeholder": "First name",
 										"required": "",
-										"id": "id_first_name"
-									},
-									"classes": "required"
+										"id": "id_first_name",
+										"class": "form-control required",
+										"placeholder": "first_name",
+										"autofill": "given-name"
+									}
 								}
 							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
+						},
 						{
 							"tag": "div",
-							"classes": "field col",
+							"classes": "form-floating input-group col",
 							"elems": [
 								{
 									"tag": "label",
 									"attrs": {
 										"for": "id_last_name"
 									},
-									"classes": "floating-label",
-									"text": "Last name:"
+									"text": "Last name"
 								},
 								{
 									"tag": "input",
 									"attrs": {
 										"type": "text",
 										"name": "last_name",
-										"value": "Tuten",
 										"maxlength": "255",
-										"placeholder": "Last name",
 										"required": "",
-										"id": "id_last_name"
-									},
-									"classes": "required"
+										"id": "id_last_name",
+										"class": "form-control required",
+										"placeholder": "last_name",
+										"autofill": "family-name"
+									}
 								}
 							]
 						}
@@ -269,32 +116,31 @@ const FormStructures = {
 				},
 				{
 					"tag": "div",
-					"classes": "form-control row",
+					"classes": "row",
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "field col",
+							"classes": "form-floating input-group col",
 							"elems": [
 								{
 									"tag": "label",
 									"attrs": {
 										"for": "id_line1"
 									},
-									"classes": "floating-label",
-									"text": "First line of address:"
+									"text": "Address 1"
 								},
 								{
 									"tag": "input",
 									"attrs": {
 										"type": "text",
 										"name": "line1",
-										"value": "9801 STONELAKE BLVD",
 										"maxlength": "255",
-										"placeholder": "Address 1",
 										"required": "",
-										"id": "id_line1"
-									},
-									"classes": "required"
+										"id": "id_line1",
+										"class": "form-control required",
+										"placeholder": "line1",
+										"autofill": "address-line1"
+									}
 								}
 							]
 						}
@@ -302,19 +148,18 @@ const FormStructures = {
 				},
 				{
 					"tag": "div",
-					"classes": "form-control row",
+					"classes": "row",
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "field col",
+							"classes": "form-floating input-group col",
 							"elems": [
 								{
 									"tag": "label",
 									"attrs": {
 										"for": "id_line2"
 									},
-									"classes": "floating-label",
-									"text": "Second line of address:"
+									"text": "Address 2"
 								},
 								{
 									"tag": "input",
@@ -322,8 +167,10 @@ const FormStructures = {
 										"type": "text",
 										"name": "line2",
 										"maxlength": "255",
-										"placeholder": "Address 2",
-										"id": "id_line2"
+										"id": "id_line2",
+										"class": "form-control",
+										"placeholder": "line2",
+										"autofill": "address-line2"
 									}
 								}
 							]
@@ -332,108 +179,11 @@ const FormStructures = {
 				},
 				{
 					"tag": "div",
-					"classes": "form-control row",
+					"classes": "row",
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_line4"
-									},
-									"classes": "floating-label",
-									"text": "City:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "line4",
-										"value": "AUSTIN",
-										"maxlength": "255",
-										"placeholder": "City",
-										"required": "",
-										"id": "id_line4"
-									},
-									"classes": "required"
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_state"
-									},
-									"classes": "floating-label",
-									"text": "State/County:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "state",
-										"value": "TX",
-										"maxlength": "255",
-										"placeholder": "State",
-										"id": "id_state"
-									}
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_postcode"
-									},
-									"classes": "floating-label",
-									"text": "Post/Zip-code:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "postcode",
-										"value": "78759",
-										"maxlength": "64",
-										"placeholder": "ZIP Code",
-										"required": "",
-										"id": "id_postcode"
-									},
-									"classes": "required"
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
+							"classes": "input-group form-floating col",
 							"elems": [
 								{
 									"tag": "label",
@@ -2200,34 +1950,119 @@ const FormStructures = {
 							]
 						}
 					]
-				},
+				}, //country
 				{
 					"tag": "div",
-					"classes": "form-control row",
+					"classes": "row",
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "field col",
+							"classes": "form-floating input-group col",
+							"elems": [
+								{
+									"tag": "label",
+									"attrs": {
+										"for": "id_postcode"
+									},
+									"text": "ZIP Code"
+								},
+								{
+									"tag": "input",
+									"attrs": {
+										"type": "text",
+										"name": "postcode",
+										"maxlength": "64",
+										"required": "",
+										"id": "id_postcode",
+										"class": "form-control required",
+										"placeholder": "postcode",
+										"autocomplete": "postal-code"
+									}
+								}
+							]
+						},
+						{
+							"tag": "div",
+							"classes": "form-floating input-group col",
+							"elems": [
+								{
+									"tag": "label",
+									"attrs": {
+										"for": "id_line4"
+									},
+									"text": "City"
+								},
+								{
+									"tag": "input",
+									"attrs": {
+										"type": "text",
+										"name": "line4",
+										"maxlength": "255",
+										"required": "",
+										"id": "id_line4",
+										"class": "form-control required",
+										"placeholder": "line4",
+										"autofill": "address-level2"
+									}
+								}
+							]
+						},
+						{
+							"tag": "div",
+							"classes": "form-floating input-group col",
+							"elems": [
+								{
+									"tag": "label",
+									"attrs": {
+										"for": "id_state"
+									},
+									"text": "State"
+								},
+								{
+									"tag": "input",
+									"attrs": {
+										"type": "text",
+										"name": "state",
+										"maxlength": "255",
+										"id": "id_state",
+										"class": "form-control required",
+										"placeholder": "state",
+										"autofill": "address-level1",
+										"required": ""
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"tag": "div",
+					"classes": "row",
+					"elems": [
+						{
+							"tag": "div",
+							"classes": "form-floating input-group col",
 							"elems": [
 								{
 									"tag": "label",
 									"attrs": {
 										"for": "id_phone_number"
 									},
-									"classes": "floating-label",
-									"text": "Phone number:"
+									"text": "Phone number"
 								},
 								{
 									"tag": "input",
 									"attrs": {
-										"type": "text",
+										"type": "tel",
 										"name": "phone_number",
-										"value": "+13862668079",
 										"maxlength": "128",
-										"placeholder": "Phone Number",
-										"id": "id_phone_number"
+										"id": "id_phone_number",
+										"class": "form-control required",
+										"placeholder": "phone_number",
+										"autocomplete": "tel",
+										"required":""
 									}
-								}
+								},
 							]
 						}
 					]
@@ -2365,336 +2200,334 @@ const FormStructures = {
 		}
 	],
 	"shipping": [
-		{
-			"tag": "div",
-			"classes": "form-container",
-			"elems": [
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_first_name"
-									},
-									"classes": "floating-label",
-									"text": "First name:"
+	{
+		"tag": "div",
+		"classes": "form-container",
+		"elems": [
+			{
+				"tag": "div",
+				"classes": "row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_first_name"
 								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "first_name",
-										"maxlength": "255",
-										"required": "",
-										"id": "id_first_name"
-									},
-									"classes": "required"
+								"text": "First name"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "text",
+									"name": "first_name",
+									"maxlength": "255",
+									"required": "",
+									"id": "id_first_name",
+									"class": "form-control required",
+									"placeholder": "first_name",
+									"autofill": "given-name"
 								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_last_name"
-									},
-									"classes": "floating-label",
-									"text": "Last name:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "last_name",
-										"maxlength": "255",
-										"required": "",
-										"id": "id_last_name"
-									},
-									"classes": "required"
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_line1"
-									},
-									"classes": "floating-label",
-									"text": "First line of address:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "line1",
-										"maxlength": "255",
-										"required": "",
-										"id": "id_line1"
-									},
-									"classes": "required"
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_line2"
-									},
-									"classes": "floating-label",
-									"text": "Second line of address:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "line2",
-										"maxlength": "255",
-										"id": "id_line2"
-									}
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_line4"
-									},
-									"classes": "floating-label",
-									"text": "City:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "line4",
-										"maxlength": "255",
-										"required": "",
-										"id": "id_line4"
-									},
-									"classes": "required"
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_state"
-									},
-									"classes": "floating-label",
-									"text": "State/County:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "state",
-										"maxlength": "255",
-										"id": "id_state"
-									}
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_postcode"
-									},
-									"classes": "floating-label",
-									"text": "Post/Zip-code:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "postcode",
-										"maxlength": "64",
-										"required": "",
-										"id": "id_postcode"
-									},
-									"classes": "required"
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_country"
-									},
-									"classes": "floating-label",
-									"text": "Country:"
-								},
-								{
-									"tag": "select",
-									"attrs": {
-										"name": "country",
-										"id": "id_country"
-									},
-									"elems": [
-										{
-											"tag": "option",
-											"text": "United States",
-											"attrs": {
-												"value": "US"
-											}
-										},
-										{
-											"tag": "option",
-											"text": "Canada",
-											"attrs": {
-												"value": "CA"
-											}
-										}
-									]
-								}
-							]
-						}
-					]
-				},
-				{
-					"tag": "div",
-					"classes": "form-control row",
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "field col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_phone_number"
-									},
-									"classes": "floating-label",
-									"text": "Phone number:"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "text",
-										"name": "phone_number",
-										"maxlength": "128",
-										"id": "id_phone_number"
-									}
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			"tag": "div",
-			"classes": "error-container container button-container",
-			"elems": [
-				{
-					"tag": "div",
-					"classes": "form-group row hide",
-					"attrs": {
-						"id": "error_container"
+							}
+						]
 					},
-					"elems": [
-						{
-							"tag": "div",
-							"classes": "col-12 errors",
-							"attrs": {
-								"id": "errors"
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_last_name"
+								},
+								"text": "Last name"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "text",
+									"name": "last_name",
+									"maxlength": "255",
+									"required": "",
+									"id": "id_last_name",
+									"class": "form-control required",
+									"placeholder": "last_name",
+									"autofill": "family-name"
+								}
 							}
-						}
-					]
+						]
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"classes": "row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_line1"
+								},
+								"text": "Address 1"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "text",
+									"name": "line1",
+									"maxlength": "255",
+									"required": "",
+									"id": "id_line1",
+									"class": "form-control required",
+									"placeholder": "line1",
+									"autofill": "address-line1"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"classes": "row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_line2"
+								},
+								"text": "Address 2"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "text",
+									"name": "line2",
+									"maxlength": "255",
+									"id": "id_line2",
+									"class": "form-control",
+									"placeholder": "line2",
+									"autofill": "address-line2"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"classes": "row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_country"
+								},
+								"text": "Country"
+							},
+							{
+								"tag": "select",
+								"attrs": {
+									"name": "country",
+									"id": "id_country",
+									"class": "form-control required",
+									"placeholder": "country",
+									"autocomplete": "country-name",
+									"required": ""
+								},
+								"elems": [
+									{
+										"tag": "option",
+										"text": "United States",
+										"attrs": {
+											"value": "US"
+										}
+									},
+									{
+										"tag": "option",
+										"text": "Canada",
+										"attrs": {
+											"value": "CA"
+										}
+									}
+								]
+							}
+						]
+					}
+				]
+			}, // country
+			{
+				"tag": "div",
+				"classes": "row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_postcode"
+								},
+								"text": "ZIP Code"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "text",
+									"name": "postcode",
+									"maxlength": "64",
+									"required": "",
+									"id": "id_postcode",
+									"class": "form-control required",
+									"placeholder": "postcode",
+									"autocomplete": "postal-code"
+								}
+							}
+						]
+					},
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_line4"
+								},
+								"text": "City"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "text",
+									"name": "line4",
+									"maxlength": "255",
+									"required": "",
+									"id": "id_line4",
+									"class": "form-control required",
+									"placeholder": "line4",
+									"autofill": "address-level2"
+								}
+							}
+						]
+					},
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_state"
+								},
+								"text": "State"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "text",
+									"name": "state",
+									"maxlength": "255",
+									"id": "id_state",
+									"class": "form-control required",
+									"placeholder": "state",
+									"autofill": "address-level1",
+									"required": ""
+								}
+							}
+						]
+					}
+				]
+			}, //zip, city, state
+			{
+				"tag": "div",
+				"classes": "row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_phone_number"
+								},
+								"text": "Phone number"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "tel",
+									"name": "phone_number",
+									"maxlength": "128",
+									"id": "id_phone_number",
+									"class": "form-control required",
+									"placeholder": "phone_number",
+									"autocomplete": "tel",
+									"required":""
+								}
+							},
+						]
+					}
+				]
+			}
+		]
+	},
+	{
+		"tag": "div",
+		"classes": "error-container button-container",
+		"elems": [
+			{
+				"tag": "div",
+				"classes": "form-group row hide",
+				"attrs": {
+					"id": "error_container"
 				},
-				{
-					"tag": "div",
-					"classes": "form-group row",
-					"elems": [
-						{
-							"tag": "button",
-							"text": "Continue",
-							"classes": "col-12",
-							"attrs": {
-								"type": "submit",
-								"hidden": "",
-								"aria-label": "Continue"
-							}
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "col-12 errors",
+						"attrs": {
+							"id": "errors"
 						}
-					]
-				}
-			]
-		}
-	],
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"classes": "form-group row",
+				"elems": [
+					{
+						"tag": "button",
+						"text": "Continue",
+						"classes": "col-12",
+						"attrs": {
+							"type": "submit",
+							"hidden": "",
+							"aria-label": "Continue"
+						}
+					}
+				]
+			}
+		]
+	}
+],
 	"user_info": [
 	{
 		"tag": "div",
@@ -2702,19 +2535,18 @@ const FormStructures = {
 		"elems": [
 			{
 				"tag": "div",
-				"classes": "form-control row",
+				"classes": "row",
 				"elems": [
 					{
 						"tag": "div",
-						"classes": "field col",
+						"classes": "form-floating input-group col",
 						"elems": [
 							{
 								"tag": "label",
 								"attrs": {
 									"for": "id_username"
 								},
-								"classes": "floating-label",
-								"text": "Email:"
+								"text": "Email"
 							},
 							{
 								"tag": "input",
@@ -2723,53 +2555,38 @@ const FormStructures = {
 									"name": "username",
 									"maxlength": "150",
 									"required": "",
-									"id": "id_username"
-								},
-								"classes": "required"
+									"id": "id_username",
+									"class": "form-control required",
+									"placeholder": "username@example.com",
+									"autocomplete": "email"
+								}
 							},
-						]
-					}
-				]
-			},
-			{
-				"tag": "div",
-				"classes": "form-control row",
-				"elems": [
-					{
-						"tag": "div",
-						"classes": "field col",
-						"elems": [
 							{
 								"tag": "span",
 								"attrs": {
-									"class": [
-										"helptext"
-									]
+									"class": "helptext"
 								},
-								"text": "You'll receive receipts and notifications at this email address.",
+								"text": "You'll receive receipts and notifications at this email address."
+							},
+							{
+								"tag": "span",
+								"attrs": {
+									"class": "helptext"
+								},
+								"text": "Already have an account? ",
 								"elems": [
 									{
-										"tag": "br"
-									},
-									{
-										"tag":"span",
-										"text":"Already have an account?",
-									},
-									{
 										"tag": "a",
-										"classes": "signin-button",
+										"text": "Sign in",
+										"style": "text-decoration: underline;",
 										"attrs": {
-											"type":"button", "name": "sign_in_btn",
-										},
-										"elems": [
-											{
-												"tag": "span",
-												"text": "Sign in",
-												"style": "text-decoration: underline;"
-											}
-										]
+											"type": "button",
+											"role": "button",
+											"id": "signin_button"
+										}
 									}
 								]
+
 							}
 						]
 					}
@@ -2777,18 +2594,74 @@ const FormStructures = {
 			},
 			{
 				"tag": "div",
-				"classes": "form-control row",
+				"classes": "row",
 				"elems": [
 					{
 						"tag": "div",
-						"classes": "field col",
+						"classes": "form-floating input-group d-none col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_password"
+								},
+								"text": "Password:"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "password",
+									"name": "password",
+									"required": "",
+									"id": "id_password",
+									"class": "form-control",
+									"placeholder": "password",
+									"autocomplete": "current-password"
+								}
+							},
+
+						]
+					},
+
+				]
+			},
+			{
+				"tag": "div",
+				"classes": "row d-none",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "input-group col",
 						"elems": [
 							{
 								"tag": "label",
 								"attrs": {
 									"for": "id_options_0"
 								},
-								"classes": "floating-label",
+								"text": "Options:"
+							},
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_options_0"
+								},
+								"elems": [
+									{
+										"tag": "input",
+										"text": "",
+										"attrs": {
+											"type": "radio",
+											"name": "options",
+											"value": "anonymous",
+											"required": "",
+											"id": "id_options_0",
+											"checked": "true",
+											"class": "form-control required",
+											"placeholder": "options",
+										},
+										"classes": "required"
+									}
+								],
 								"text": "\n I am a new customer and want to checkout as a guest"
 							},
 							{
@@ -2799,22 +2672,32 @@ const FormStructures = {
 									"value": "anonymous",
 									"required": "",
 									"id": "id_options_0",
-									"checked": ""
-								},
-								"classes": "required"
+									"checked": "",
+									"class": "form-control required",
+									"placeholder": "options",
+								}
 							},
-						]
-					},
-					{
-						"tag": "div",
-						"classes": "field col",
-						"elems": [
 							{
 								"tag": "label",
 								"attrs": {
 									"for": "id_options_1"
 								},
-								"classes": "floating-label",
+								"elems": [
+									{
+										"tag": "input",
+										"text": "",
+										"attrs": {
+											"type": "radio",
+											"name": "options",
+											"value": "new",
+											"required": "",
+											"id": "id_options_1",
+											"class": "form-control required",
+											"placeholder": "options",
+										},
+										"classes": "required"
+									}
+								],
 								"text": "\n I am a new customer and want to create an account before checking out"
 							},
 							{
@@ -2824,22 +2707,33 @@ const FormStructures = {
 									"name": "options",
 									"value": "new",
 									"required": "",
-									"id": "id_options_1"
-								},
-								"classes": "required"
+									"id": "id_options_1",
+									"class": "form-control required",
+									"placeholder": "options",
+
+								}
 							},
-						]
-					},
-					{
-						"tag": "div",
-						"classes": "field col",
-						"elems": [
 							{
 								"tag": "label",
 								"attrs": {
 									"for": "id_options_2"
 								},
-								"classes": "floating-label",
+								"elems": [
+									{
+										"tag": "input",
+										"text": "",
+										"attrs": {
+											"type": "radio",
+											"name": "options",
+											"value": "existing",
+											"required": "",
+											"id": "id_options_2",
+											"class": "form-control required",
+											"placeholder": "options",
+										},
+										"classes": "required"
+									}
+								],
 								"text": "\n I am a returning customer, and my password is"
 							},
 							{
@@ -2849,31 +2743,28 @@ const FormStructures = {
 									"name": "options",
 									"value": "existing",
 									"required": "",
-									"id": "id_options_2"
-								},
-								"classes": "required"
+									"id": "id_options_2",
+									"class": "form-control required",
+									"placeholder": "options",
+								}
 							}
 						]
 					}
-
-
 				]
-
 			},
 			{
 				"tag": "div",
-				"classes": "form-control row",
+				"classes": "row my-3",
 				"elems": [
 					{
 						"tag": "div",
-						"classes": "field col",
+						"classes": "input-group col",
 						"elems": [
 							{
 								"tag": "label",
 								"attrs": {
 									"for": "id_signup"
 								},
-								"classes": "floating-label",
 								"text": "Subscribe to our mailing list to learn about new products and promotions!"
 							},
 							{
@@ -2882,18 +2773,18 @@ const FormStructures = {
 									"type": "checkbox",
 									"name": "signup",
 									"id": "id_signup",
-									"checked": ""
+									"checked": "",
 								}
 							}
 						]
 					}
 				]
 			}
-			]
-		},
+		]
+	},
 	{
 		"tag": "div",
-		"classes": "error-container container button-container",
+		"classes": "error-container button-container",
 		"elems": [
 			{
 				"tag": "div",

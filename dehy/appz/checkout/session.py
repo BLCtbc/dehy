@@ -93,25 +93,43 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		soup = BeautifulSoup(form.as_table(), 'html.parser')
 
 		for row in soup.find_all('tr'):
-			row_element = {'tag': 'div', 'classes':'form-control row', 'attrs': row.attrs, 'elems':[]}
+			row_element = {'tag': 'div', 'classes':'row', 'attrs': row.attrs, 'elems':[]}
 			if not row_element['attrs']: row_element.pop('attrs')
-			field_element = {'tag': 'div', 'classes':'field col', 'elems':[]}
+
+			field_element = {'tag': 'div', 'classes':'form-floating input-group col', 'elems':[]}
+			
 			for elem in row.find_all(outter_tags):
 				elem_dict = {'tag': elem.name, 'attrs': elem.attrs, 'elems':[]}
+				if 'class' not in elem_dict['attrs'].keys():
+					elem_dict['attrs']['class'] = []
 
 				if elem.name == 'label':
 					for_attr = elem.attrs['for']
-					elem_dict['classes'] = 'floating-label'
 					if use_labels or (use_labels and for_attr in label_exceptions):
 						elem_dict['text'] = elem.text
 					else:
 						continue
 
-				if elem.has_attr('required'):
-					elem_dict['classes'] = 'required'
+				else:
+					elem_dict['attrs']['class'] += ['form-control']
 
-				if use_help_text and elem.name=='span' and 'helptext' in elem['class']:
+					if 'name' in elem.attrs.keys():
+						elem_dict['attrs']['placeholder'] = elem.attrs['name']
+
+					if 'type' in elem.attrs.keys():
+						elem_dict['attrs']['autofill'] = elem.attrs['type']
+
+				if elem.has_attr('required'):
+					elem_dict['attrs']['class'] += ['required']
+
+				if use_help_text and elem.name=='span' and 'helptext' in elem.attrs['class']:
 					elem_dict.update({'text':elem.text})
+					elem_dict['attrs']['class'] = ['helptext']
+
+				if elem_dict['attrs']['class']:
+					elem_dict['attrs']['class'] = " ".join(elem_dict['attrs']['class'])
+				else:
+					elem_dict['attrs'].pop('class')
 
 				child_elems = []
 

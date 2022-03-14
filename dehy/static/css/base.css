@@ -16,10 +16,10 @@
 }
 
 
+
 button,
 .btn {
-    padding: 0 3rem;
-    line-height: 3rem;
+    padding: 0.375rem 3rem;
     font-weight: 400;
 	border-radius: 2px;
 	background-color: var(--secondary-bg-color);
@@ -364,7 +364,7 @@ nav a.nav-link.active {
 footer {
     /* width: 90% !important; */
     /* margin: 2rem auto 0 auto; */
-    padding: 2rem 0 0;
+    padding: 2rem 0 0 !important;
     /* border-top: 1px solid var(--beige); */
     text-align: center;
     /* display: block !important; */
@@ -627,14 +627,12 @@ li.breadcrumb-item {
 }
 
 footer .site-directory {
-	padding: 0;
 	font-family: Futura,serif;
 	font-weight: 400;
 	font-size: 1.2rem;
 	line-height: 1.75;
 	letter-spacing: .01em;
 	text-align: left;
-	padding-top: 2rem;
 }
 
 footer .site-directory h3 {
@@ -643,9 +641,6 @@ footer .site-directory h3 {
     color: var(--beige);
 }
 
-.about-us, footer .about-us ul, .contact-us, .contact-us ul{
-	padding: 0;
-}
 
 .contact-us p {
 	line-height: 1.5;
@@ -773,4 +768,11 @@ input, select, label {
 
 .nav-link:focus, .nav-link:hover {
 	color: inherit;
+}
+
+
+@media (max-width: 768px) {
+	.product-list {
+	    grid-template-columns: repeat(2, minmax(0,1fr));
+	}
 }

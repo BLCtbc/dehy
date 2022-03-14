@@ -26,3 +26,22 @@
 input {
 	font-weight: normal;
 }
+
+form {
+	font-size: 1rem;
+}
+
+.remove-basket-item {
+	font-size: small;
+	font-weight: 400;
+	letter-spacing: 0.01em;
+	opacity: 0.8;
+}
+
+.checkout-quantity {
+	min-width: 4em
+}
+
+.product-quantity {
+	padding: 0.25rem 0.5rem;
+}
