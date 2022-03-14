@@ -156,6 +156,7 @@ var dehy = {
 			}, 4500);
 		},
 		freeze_forms(force=true) {
+			console.log('freezing form, force = ', force);
 			var forms = document.querySelectorAll('form');
 			forms.forEach(function(form) {
 				form.querySelectorAll("input, select, button").forEach(function(elem) {
@@ -164,6 +165,7 @@ var dehy = {
 			})
 		},
 		unfreeze_forms() {
+			console.log('unfreezing form');
 			this.freeze_forms(false);
 		},
 		remove_event_listeners(elem) {

@@ -16,7 +16,7 @@
 
 
 		{% block checkout_flow %}
-		<div id="checkout_flow" class="col-6 checkout-flow">
+		<div id="checkout_flow" class="col-6 col-sm-5 offset-sm-1 card card-body checkout-flow">
 
 			{% if error %}
 				<div class="alert alert-danger">
@@ -86,61 +86,11 @@
 	{% endblock checkout_flow %}
 
 	{% block order_contents %}
-	<div class="col-6 card card-body order-contents">
-		{% include 'dehy/basket/partials/basket_content.html' with formset=basket_summary_context_data.formset object_list=basket_summary_context_data.object_list basket_warnings=basket_summary_context_data.basket_warnings %}
+	<div class="col-6 col-sm-5 offset-sm-1 card card-body order-contents">
+		{% include 'dehy/basket/partials/basket_content.html' with shipping_charge=basket_summary_context_data.shipping_charge is_shipping_method_set=is_shipping_method_set is_shipping_address_set=is_shipping_address_set formset=basket_summary_context_data.formset order_total=basket_summary_context_data.order_total object_list=basket_summary_context_data.object_list basket_warnings=basket_summary_context_data.basket_warnings voucher_form=basket_summary_context_data.voucher_form %}
 	</div>
 	{% endblock order_contents %}
 
-	{% comment %}
-	{% block order_contents %}
-	<div class="col-6 card card-body order-contents">
-			<div class="card-title">
-				<h2>{% trans "Order Summary" %}</h2>
-			</div>
-
-			{% for line in basket.all_lines %}
-				{% purchase_info_for_line request line as session %}
-				<div class="basket-items row">
-						<div class="col-sm-3">
-							<div class="image-container w-100">
-								{% with image=line.product.primary_image %}
-									{% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
-									<a href="{{ form.instance.product.get_absolute_url }}">
-										<img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail w-auto mx-auto my-0">
-									</a>
-								{% endwith %}
-							</div>
-						</div>
-						<div class="col-sm-6">
-							<span>{{ line.product.parent.title|default:line.product.title }}</span>
-							{% if line.product.is_child %}
-							<p class="size"><small>Size: {{line.description}}</small></p>
-							{% endif %}
-						</div>
-						<div class="col-sm-1 text-center">
-							{{ line.quantity }}
-						</div>
-						<div class="col-sm-2 text-right">
-							<p class="price_color">
-								{{ line.line_price_excl_tax|currency:basket.currency }}
-
-
-							</p>
-						</div>
-				</div>
-			{% endfor %}
-
-			<div class="row">
-				<div class="col-sm-12">
-					<div class="sub-header">
-						<h2>{% trans 'Totals' %}</h2>
-					</div>
-					{% include 'oscar/basket/partials/basket_totals.html' %}
-				</div>
-			</div>
-		</div>
-	{% endblock order_contents %}
-	{% endcomment %}
 
 {% include "dehy/checkout/partials/loading_modal.html" %}
 {% endblock content %}

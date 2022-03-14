@@ -29,312 +29,6 @@ dehy.ch = {
 
 	},
 	_stripe: null,
-	stripe: {
-		async confirmSetupHandler() {
-			  var stripe = dehy.ch.stripe.get();
-			  var elements = dehy.ch.stripe.elements.get();
-
-			  const {error} = await stripe.confirmSetup({
-				  //`Elements` instance that was used to create the Payment Element
-				  elements,
-				  redirect: 'if_required',
-				  confirmParams: {
-					return_url: '/checkout/thank_you/',
-				  },
-			});
-		},
-		client_secret: null,
-		pkey: null,
-		_elements: null,
-		elements: {
-			set(options=null) {
-				let stripe = dehy.ch.stripe.get();
-				dehy.ch.stripe._elements = (options) ? stripe.elements(options) : stripe.elements();
-			},
-			get(options=null) {
-				if (dehy.ch.stripe._elements) {
-					return dehy.ch.stripe._elements;
-				} else {
-					let stripe = dehy.ch.stripe.get();
-					dehy.ch.stripe._elements = (options) ? stripe.elements(options) : stripe.elements();
-				}
-				return dehy.ch.stripe._elements;
-			},
-		},
-
-		payment_element_setup(client_secret=dehy.ch.stripe.client_secret) {
-			var stripe = dehy.ch.stripe.get();
-			// Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 2
-			const elements = dehy.ch.stripe.elements.get();
-
-			// Create and mount the Payment Element
-			// const paymentElement = elements.create('payment');
-			// paymentElement.mount('#payment-element');
-
-			// Create and mount the Payment Element
-			const paymentElement = elements.create('payment');
-			var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', attrs:{'id':'stripe_payment_container'}})
-			var form = dehy.ch.forms.get();
-			var form_container = form.querySelector('.form-container');
-			form.insertBefore(stripe_payment_container, form_container)
-			paymentElement.mount(stripe_payment_container);
-		},
-		card_setup(style=null) {
-			console.log('called card setup');
-			// dehy.utils.remove_event_listeners(form);
-			var cardClasses = {
-				base: 'testicles',
-				focus: 'focused',
-				empty: 'empty',
-				invalid: 'invalid',
-			}
-			var style = style || {
-				base: {
-					color: "#32325d",
-					fontFamily: 'Consolas, Menlo, monospace',
-					fontSmoothing: "antialiased",
-					fontSize: "16px",
-					"::placeholder": {
-						color: "#aab7c4"
-					},
-					'::placeholder': {
-				        color: '#CFD7DF',
-				    },
-				    ':-webkit-autofill': {
-						color: '#e39f48',
-					},
-			},
-			invalid: {
-				color: "#fa755a",
-				iconColor: "#fa755a"
-				},
-			};
-
-			var inputs = document.querySelectorAll('input');
-			Array.prototype.forEach.call(inputs, function(input) {
-				input.addEventListener('focus', function() {
-					input.classList.add('focused');
-				});
-				input.addEventListener('blur', function() {
-					input.classList.remove('focused');
-				});
-				input.addEventListener('keyup', function() {
-					if (input.value.length === 0) {
-						input.classList.add('empty');
-					} else {
-						input.classList.remove('empty');
-					}
-				});
-			});
-
-			var options = {style: style, classes: cardClasses};
-
-			var form = dehy.ch.forms.get(),
-				stripe = dehy.ch.stripe.get(),
-				elements = dehy.ch.stripe.elements.get();
-
-			var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', classes: 'form-group row', attrs:{'id':'stripe_payment_container'}});
-			var stripe_cardNumber_container = document.getElementById("stripe_card_number") || dehy.utils.create_element({tag:'label', classes: 'col-7', text:'Card Number', attrs:{'for': 'Card Number', 'id':'stripe_card_number'}});
-			var stripe_cardExpiry_container = document.getElementById("stripe_card_expiry") || dehy.utils.create_element({tag:'label', classes: 'col-3', text:'Exp', attrs:{'id':'stripe_card_expiry'}});
-			var stripe_cardCvc_container = document.getElementById("stripe_card_cvc") || dehy.utils.create_element({tag:'label', classes: 'col-2', text:'CVC', attrs:{'id':'stripe_card_cvc'}});
-
-			stripe_payment_container.append(stripe_cardNumber_container, stripe_cardExpiry_container, stripe_cardCvc_container);
-			var form_container = form.querySelector('.form-container');
-			form.insertBefore(stripe_payment_container, form_container);
-
-			// we create the individual card elements since we'll be using our own zipcode element
-			// get or create the card element
-
-			var cardNumber = (elements.getElement('cardNumber')) ? elements.getElement('cardNumber') : elements.create('cardNumber', options);
-			var cardExpiry = (elements.getElement('cardExpiry')) ? elements.getElement('cardExpiry') : elements.create('cardExpiry', options);
-			var cardCvc = (elements.getElement('cardCvc')) ? elements.getElement('cardCvc') : elements.create('cardCvc', options);
-
-			// mount the card elements to the page
-			cardNumber.mount(stripe_cardNumber_container);
-			cardExpiry.mount(stripe_cardExpiry_container);
-			cardCvc.mount(stripe_cardCvc_container);
-
-			cardNumber.on('change', function(event) {
-				var displayError = document.getElementById('error_container');
-				if (event.error) {
-					displayError.classList.toggle('hide', false);
-					displayError.textContent = event.error.message;
-				} else {
-					displayError.classList.toggle('hide', true);
-					displayError.textContent = '';
-				}
-			});
-
-			form.removeEventListener('submit', dehy.ch.forms.submit_handler);
-
-			form.addEventListener('submit', e=> {
-				// We don't want to let default form submission happen here,
-				// which would refresh the page.
-				e.preventDefault();
-				var form_data = new FormData(form);
-				stripe.createPaymentMethod({
-					type: 'card',
-					card: cardNumber,
-					billing_details: {
-						// Include any additional collected billing details.
-						name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
-						phone: `${form_data.get('phone_number')}`,
-						address: {
-							line1: form_data.get('line1'),
-							line2: form_data.get('line2'),
-							city: form_data.get('line4'),
-							state: form_data.get('state'),
-							postal_code: form_data.get('postcode'),
-							country: form_data.get('country'),
-						}
-					},
-				}).then(dehy.ch.stripe.paymentMethodHandler);
-			});
-
-			var myPostalCodeField = document.querySelector('input[name="postcode"]');
-			myPostalCodeField.addEventListener('change', function(event) {
-				cardElement.update({value: {postalCode: event.target.value}});
-			});
-		},
-
-		paymentMethodHandler(response) {
-
-			console.log('paymentMethodHandler response: ', response);
-			if (response.error) {
-				// Show error in payment form
-				dehy.ch.forms.errors.display(response.error);
-				console.log('ERROR: ', response.error);
-  			} else {
-				var card = response.paymentMethod.card;
-				var form_data = new FormData(dehy.ch.forms.get());
-				form_data.set('payment_method_id', response.paymentMethod.id);
-
-				$.ajax({
-					method: "POST",
-					dataType: 'json',
-					url: '/checkout/billing/',
-					contentType: false,
-					processData: false,
-					data: form_data,
-					success: dehy.ch.forms.success_handler,
-					error: dehy.ch.forms.errors.display,
-					complete: function() {
-						console.log('completed!!!')
-						return
-					}
-				});
-
-
-
-			}
-		},
-		handleServerResponse(response) {
-			console.log('handleServerResponse response: ', response);
-
-			if (response.error) {
-				// Show error from server on payment form
-				dehy.ch.forms.errors.display(response.error);
-				console.log('ERROR: ', response.error);
-			} else if (response.requires_action) {
-				// Use Stripe.js to handle required card action
-				stripe.handleCardAction(
-					response.payment_intent_client_secret
-				).then(dehy.ch.stripe.handleStripeJsResult);
-			} else {
-				// Show success message
-				dehy.ch.forms.errors.display(response.error);
-				console.log('ERROR: ', response.error);
-			}
-		},
-		handleStripeJsResult(result) {
-			console.log('handleStripeJsResult result: ', result);
-
-			if (result.error) {
-				// Show error in payment form
-				console.log('ERROR: ', response.error);
-				dehy.ch.forms.errors.display(result.error);
-			} else {
-				var form_data = new FormData(dehy.ch.forms.get());
-
-				$.ajax({
-					method: "POST",
-					dataType: 'json',
-					url: '/checkout/place_order/',
-					contentType: false,
-					processData: false,
-					data: form_data,
-					success: dehy.ch.forms.success_handler,
-					error: dehy.ch.forms.errors.display,
-					complete: function() {
-						console.log('completed!!!')
-						return
-					}
-				});
-
-				form_data.set('payment_intent_id', result.paymentIntent.id);
-
-				// The card action has been handled
-				// The PaymentIntent can be confirmed again on the server
-				// fetch('/checkout/place_order/', {
-				// 	method: 'POST',
-				// 	headers: { 'Content-Type': 'application/json' },
-				// 	body: JSON.stringify({ form_data })
-				// }).then(function(confirmResult) {
-				// 	return confirmResult.json();
-				// }).then(dehy.ch.stripe.handleServerResponse);
-			}
-		},
-		set(pkey=null) {
-			if (pkey) {
-				dehy.ch.stripe.set_pkey(pkey);
-			}
-			dehy.ch._stripe = Stripe(dehy.ch.stripe.get_pkey());
-		},
-		get() {
-			return dehy.ch._stripe;
-		},
-		set_pkey(pkey) {
-			dehy.ch.stripe.pkey = pkey;
-		},
-		get_pkey() {
-			return dehy.ch.stripe.pkey;
-		},
-		init(pkey=dehy.ch.stripe.pkey, client_secret=dehy.ch.stripe.client_secret) {
-			console.log('initiating stripe');
-			if (dehy.ch.stripe.get() && dehy.ch.stripe.elements.get()) {
-				// already created, just need to unhide it
-				var stripe_payment_container = document.getElementById('stripe_payment_container');
-				stripe_payment_container.classList.toggle('display-none', false);
-				stripe_payment_container.closest('form').classList.toggle('display-none', false);
-			} else {// attempts to set the pkey and add the stripe elements to the page
-				if (pkey) {
-					dehy.ch.stripe.set_pkey(pkey)
-				}
-				if (dehy.ch.stripe.get_pkey()) {
-					dehy.ch.stripe.set();
-				}
-				// will never be true,
-				if (client_secret==false) {
-					// var appearance = {
-			  		// 	theme: 'night',
-					// 	labels: 'floating'
-					// };
-					// var options = {
-					//   clientSecret: client_secret,
-					//   // Fully customizable with appearance API.
-					//   appearance: appearance,
-					// };
-					// dehy.ch.stripe.elements.set(options)
-					// dehy.ch.stripe.client_secret = client_secret;
-					// dehy.ch.stripe.payment_element_setup(client_secret);
-
-				} else {
-					dehy.ch.stripe.elements.set()
-					dehy.ch.stripe.card_setup()
-				}
-			}
-		},
-	},
 	gateway: {
 		init: function() {
 			var form = dehy.ch.forms.get_or_create('user_info', FormStructures['user_info']);
@@ -376,7 +70,29 @@ dehy.ch = {
 			// 	dehy.ch.stripe.paymentSubmissionHandler();
 			// }
 
-			dehy.ch.forms.submit_form_info(e.target);
+			if (form.closest('section').id == "billing") {
+				var form_data = new FormData(form);
+				stripe.createPaymentMethod({
+					type: 'card',
+					card: cardNumber,
+					billing_details: {
+						// Include any additional collected billing details.
+						name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
+						phone: `${form_data.get('phone_number')}`,
+						address: {
+							line1: form_data.get('line1'),
+							line2: form_data.get('line2'),
+							city: form_data.get('line4'),
+							state: form_data.get('state'),
+							postal_code: form_data.get('postcode'),
+							country: form_data.get('country'),
+						}
+					},
+				}).then(dehy.ch.stripe.paymentMethodHandler);
+			} else {
+				dehy.ch.forms.submit_form_info(e.target);
+			}
+
 			form.reportValidity();
 		},
 		get(name) {
@@ -457,10 +173,8 @@ dehy.ch = {
 					var stripe_payment_container = document.getElementById('stripe_payment_container');
 					stripe_payment_container.classList.toggle('display-none', true);
 					stripe_payment_container.closest('form').classList.toggle('display-none', true);
-				} else {
-					dehy.ch.forms.save_and_remove(); //1
 				}
-
+				dehy.ch.forms.save_and_remove(); //1
 				var next_section = dehy.ch.utils.get_next_section(response.section);
 				// var form = dehy.ch.forms.get_or_create(next_section.id, FormStructures[next_section.id]); //2
 				var form = dehy.ch.forms.get_or_create(next_section.id, FormStructures[next_section.id]); //2
@@ -473,8 +187,6 @@ dehy.ch = {
 				dehy.ch.forms.init();
 				dehy.ch.forms.reverse_form_labels(form);
 			}
-
-
 			console.log('next_section.id', next_section.id)
 
 			if (next_section.id=="billing") {
@@ -489,7 +201,12 @@ dehy.ch = {
 		// If a form isnt saved under the section name, creates a new one from given form structure (required)
 		// If no form structure given, falls back to the current form using the get() method
 		get_or_create(section=null, form_structure=null) {
-			var form = dehy.ch.forms.create(section, form_structure);
+			var form;
+			if (section && dehy.ch.forms.saved.hasOwnProperty(section)) {
+				form = dehy.ch.forms.saved[section];
+			} else {
+				form = dehy.ch.forms.create(section, form_structure);
+			}
 			return form;
 		},
 		// get_or_create(section=null, form_structure=null) {
@@ -505,19 +222,22 @@ dehy.ch = {
 		save(form, section) {
 			dehy.ch.forms.saved[section] = form;
 		},
-		save_and_remove() {
+		save_and_remove() { //removing the form ensures no left over event handlers are attached
 			var all_checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
-
 			all_checkout_sections.forEach(function(section) {
 				if (section.querySelector('form')) {
-					let form = section.querySelector('form')
-
-					let copy = form.cloneNode(true)
-
+					var form = section.querySelector('form');
 					if (section.id=="billing") {
-
+						// need to leave the stripe form on the page
+						if (form.querySelector('.form-container')) {
+							form_container = form.querySelector('.form-container');
+							var form_copy = form_container.cloneNode(true);
+							dehy.ch.forms.save(form_copy, section.id);
+							form_container.remove();
+						}
 					} else {
-						dehy.ch.forms.save(form, section.id);
+						var form_copy = form.cloneNode(true);
+						dehy.ch.forms.save(form_copy, section.id);
 						form.remove();
 					}
 
@@ -534,24 +254,41 @@ dehy.ch = {
 					edit_btn.hidden = false;
 					edit_btn.disabled = false;
 
-
 					edit_btn.addEventListener('click', e=>{
 						var preview_container = section.querySelector('.preview_container');
 						if (preview_container) {
-							preview_container.remove()
+							preview_container.remove();
 						}
+
 						dehy.ch.forms.save_and_remove(); //1
 						var form = dehy.ch.forms.get_or_create(section.id, FormStructures[section.id]); //2
-						section.append(form); //3
+
 						if (section.id=='billing') {
 							dehy.ch.stripe.init();
+							var form_elem = section.querySelector('form'),
+								error_button_container = section.querySelector('.error-container.button-container');
+							form_elem.insertBefore(form, error_button_container);
+
+						} else {
+							section.append(form); //3
 						}
+
+						var submit_btn = form.querySelector("button[type='submit']");
+
+						if (submit_btn) {
+							submit_btn.disabled = false;
+						}
+
 						dehy.ch.forms.disable_edit_buttons(); //4
 						dehy.ch.forms.clear_previews(section.id) //5
 						// let previous_section = dehy.ch.utils.get_previous_section(section.id);
 						dehy.ch.forms.enable_edit_buttons(dehy.ch.utils.get_previous_section(section.id).id) //6
 
-						dehy.ch.forms.init();
+						if (section.id!='billing') {
+							dehy.ch.forms.init();
+						}
+
+
 						dehy.ch.forms.reverse_form_labels(form);
 						// dehy.ch.forms.init();
 					});
@@ -561,8 +298,10 @@ dehy.ch = {
 		// disables and hides all edit buttons
 		disable_edit_buttons() {
 			document.querySelectorAll("button.edit").forEach(function(elem) {
+
 				elem.hidden = true;
 				elem.disabled = true;
+				console.log('disabling: ', elem);
 				dehy.utils.remove_event_listeners(elem);
 			});
 		},
@@ -648,33 +387,11 @@ dehy.ch = {
 				dehy.ch.forms.show_submit_button();
 
 				var inputs = document.querySelectorAll('input');
-				Array.prototype.forEach.call(inputs, function(input) {
-					if (input.value.length === 0) {
-					  input.classList.add('empty');
-					} else {
-					  input.classList.remove('empty');
-					}
-
-				    input.addEventListener('focus', function() {
-				      input.classList.add('focused');
-				    });
-				    input.addEventListener('blur', function() {
-				      input.classList.remove('focused');
-				    });
-				    input.addEventListener('keyup', function() {
-				      if (input.value.length === 0) {
-				        input.classList.add('empty');
-				      } else {
-				        input.classList.remove('empty');
-				      }
-				    });
-				});
 
 				form.addEventListener('submit', dehy.ch.forms.submit_handler);
-				form.addEventListener('blur', e=> {
+				form.addEventListener('change', e=> {
 					if (form.closest('section').id == 'shipping') {
 						dehy.ch.shipping.ADDRESS.set();
-
 						if (e.target.matches('#id_postcode, #id_state, #id_city')) {
 							// get/update the shipping methods
 							var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action};
@@ -688,13 +405,15 @@ dehy.ch = {
 						dehy.ch.shipping.billing_same_as_shipping_handler(e.target.checked);
 					}
 				});
+
+				dehy.utils.unfreeze_forms();
 			}
 		},
 	},
 	shipping: {
 		billing_same_as_shipping_handler(checked=true, form=dehy.ch.forms.get()) {
 			var elems = Array.from(form.querySelector('.form-container').querySelectorAll("input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping']), select"));
-			var form_controls = [...new Set(elems.map(function(e) {return e.closest('.form-control')}))]
+			var form_controls = [...new Set(elems.map(function(e) {return e.closest('.row')}))]
 			var address = dehy.ch.shipping.ADDRESS.get();
 			form_controls.forEach(function(row) {
 				row.classList.toggle('display-none', checked);
@@ -832,22 +551,28 @@ dehy.ch = {
 				let id = `id_${prefix}method_code_${ix}`;
 				var method_structure = [{
 					'tag': 'div',
-					'classes': 'form-control row',
-					'elems': [{
-						'tag': 'input',
-						'classes':'form-check-input',
-						'attrs': {
-							'type':'radio', 'name':'method_code', 'id':id, 'value': method.code
+					'classes': 'row',
+					'elems': [
+						{
+							'tag': 'div',
+							'classes': 'input-group col',
+							'elems': [
+								{
+									'tag': 'input',
+									'attrs': {
+										'type':'radio', 'name':'method_code', 'id':id, 'value': method.code
+									}
+								},
+								{
+									'tag': 'label',
+									'text': `${method.name} — $${method.cost}`,
+									'attrs': {
+										'for': id,
+									}
+								}
+							]
 						}
-					},
-					{
-						'tag': 'label',
-						'classes': 'form-check-label',
-						'text': `${method.name} — $${method.cost}`,
-						'attrs': {
-							'for': id,
-						}
-					}]
+				]
 				}]
 				let elem = dehy.utils.create_elements(method_structure, fieldset)
 				elem.querySelector
@@ -877,3 +602,314 @@ dehy.ch = {
 	}
 }
 
+dehy.ch.stripe = {
+	async confirmSetupHandler() {
+		  var stripe = dehy.ch.stripe.get();
+		  var elements = dehy.ch.stripe.elements.get();
+
+		  const {error} = await stripe.confirmSetup({
+			  //`Elements` instance that was used to create the Payment Element
+			  elements,
+			  redirect: 'if_required',
+			  confirmParams: {
+				return_url: '/checkout/thank_you/',
+			  },
+		});
+	},
+	client_secret: null,
+	pkey: null,
+	_elements: null,
+	elements: {
+		set(options=null) {
+			let stripe = dehy.ch.stripe.get();
+			dehy.ch.stripe._elements = (options) ? stripe.elements(options) : stripe.elements();
+		},
+		get(options=null) {
+			if (dehy.ch.stripe._elements) {
+				return dehy.ch.stripe._elements;
+			} else {
+				let stripe = dehy.ch.stripe.get();
+				dehy.ch.stripe._elements = (options) ? stripe.elements(options) : stripe.elements();
+			}
+			return dehy.ch.stripe._elements;
+		},
+	},
+
+	payment_element_setup(client_secret=dehy.ch.stripe.client_secret) {
+		var stripe = dehy.ch.stripe.get();
+		// Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 2
+		const elements = dehy.ch.stripe.elements.get();
+
+		// Create and mount the Payment Element
+		// const paymentElement = elements.create('payment');
+		// paymentElement.mount('#payment-element');
+
+		// Create and mount the Payment Element
+		const paymentElement = elements.create('payment');
+		var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', attrs:{'id':'stripe_payment_container'}})
+		var form = dehy.ch.forms.get();
+		var form_container = form.querySelector('.form-container');
+		form.insertBefore(stripe_payment_container, form_container)
+		paymentElement.mount(stripe_payment_container);
+	},
+	card_setup(style=null) {
+		console.log('called card setup');
+		// dehy.utils.remove_event_listeners(form);
+		var cardClasses = {
+			base: 'testicles',
+			focus: 'focused',
+			empty: 'empty',
+			invalid: 'invalid',
+		}
+		var style = style || {
+			base: {
+				color: "#32325d",
+				fontFamily: 'Consolas, Menlo, monospace',
+				fontSmoothing: "antialiased",
+				fontSize: "16px",
+				"::placeholder": {
+					color: "#aab7c4"
+				},
+				'::placeholder': {
+					color: '#CFD7DF',
+				},
+				':-webkit-autofill': {
+					color: '#e39f48',
+				},
+		},
+		invalid: {
+			color: "#fa755a",
+			iconColor: "#fa755a"
+			},
+		};
+
+		var inputs = document.querySelectorAll('input');
+		// Array.prototype.forEach.call(inputs, function(input) {
+		// 	input.addEventListener('focus', function() {
+		// 		input.classList.add('focused');
+		// 	});
+		// 	input.addEventListener('blur', function() {
+		// 		input.classList.remove('focused');
+		// 	});
+		// 	input.addEventListener('keyup', function() {
+		// 		if (input.value.length === 0) {
+		// 			input.classList.add('empty');
+		// 		} else {
+		// 			input.classList.remove('empty');
+		// 		}
+		// 	});
+		// });
+
+		var options = {style: style, classes: cardClasses};
+
+		var form = dehy.ch.forms.get(),
+			stripe = dehy.ch.stripe.get(),
+			elements = dehy.ch.stripe.elements.get();
+
+		var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', classes: 'form-group row', attrs:{'id':'stripe_payment_container'}});
+		var stripe_cardNumber_container = document.getElementById("stripe_card_number") || dehy.utils.create_element({tag:'label', classes: 'col-7', text:'Card Number', attrs:{'for': 'Card Number', 'id':'stripe_card_number'}});
+		var stripe_cardExpiry_container = document.getElementById("stripe_card_expiry") || dehy.utils.create_element({tag:'label', classes: 'col-3', text:'Exp', attrs:{'id':'stripe_card_expiry'}});
+		var stripe_cardCvc_container = document.getElementById("stripe_card_cvc") || dehy.utils.create_element({tag:'label', classes: 'col-2', text:'CVC', attrs:{'id':'stripe_card_cvc'}});
+
+		stripe_payment_container.append(stripe_cardNumber_container, stripe_cardExpiry_container, stripe_cardCvc_container);
+		var form_container = form.querySelector('.form-container');
+		form.insertBefore(stripe_payment_container, form_container);
+
+		// we create the individual card elements since we'll be using our own zipcode element
+		// get or create the card element
+
+		var cardNumber = (elements.getElement('cardNumber')) ? elements.getElement('cardNumber') : elements.create('cardNumber', options);
+		var cardExpiry = (elements.getElement('cardExpiry')) ? elements.getElement('cardExpiry') : elements.create('cardExpiry', options);
+		var cardCvc = (elements.getElement('cardCvc')) ? elements.getElement('cardCvc') : elements.create('cardCvc', options);
+
+		// mount the card elements to the page
+		cardNumber.mount(stripe_cardNumber_container);
+		cardExpiry.mount(stripe_cardExpiry_container);
+		cardCvc.mount(stripe_cardCvc_container);
+
+		cardNumber.on('change', function(event) {
+			var displayError = document.getElementById('error_container');
+			if (event.error) {
+				displayError.classList.toggle('hide', false);
+				displayError.textContent = event.error.message;
+			} else {
+				displayError.classList.toggle('hide', true);
+				displayError.textContent = '';
+			}
+		});
+
+		// form.removeEventListener('submit', dehy.ch.forms.submit_handler);
+		//
+		// form.addEventListener('submit', e=> {
+		// 	// We don't want to let default form submission happen here,
+		// 	// which would refresh the page.
+		// 	e.preventDefault();
+		// 	var form_data = new FormData(form);
+		// 	stripe.createPaymentMethod({
+		// 		type: 'card',
+		// 		card: cardNumber,
+		// 		billing_details: {
+		// 			// Include any additional collected billing details.
+		// 			name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
+		// 			phone: `${form_data.get('phone_number')}`,
+		// 			address: {
+		// 				line1: form_data.get('line1'),
+		// 				line2: form_data.get('line2'),
+		// 				city: form_data.get('line4'),
+		// 				state: form_data.get('state'),
+		// 				postal_code: form_data.get('postcode'),
+		// 				country: form_data.get('country'),
+		// 			}
+		// 		},
+		// 	}).then(dehy.ch.stripe.paymentMethodHandler);
+		// });
+
+		var myPostalCodeField = document.querySelector('input[name="postcode"]');
+		myPostalCodeField.addEventListener('change', function(event) {
+			cardElement.update({value: {postalCode: event.target.value}});
+		});
+	},
+
+	paymentMethodHandler(response) {
+
+		console.log('paymentMethodHandler response: ', response);
+		if (response.error) {
+			// Show error in payment form
+			dehy.ch.forms.errors.display(response.error);
+			console.log('ERROR: ', response.error);
+		} else {
+			var card = response.paymentMethod.card;
+			var form_data = new FormData(dehy.ch.forms.get());
+			form_data.set('payment_method_id', response.paymentMethod.id);
+
+			$.ajax({
+				method: "POST",
+				dataType: 'json',
+				url: '/checkout/billing/',
+				contentType: false,
+				processData: false,
+				data: form_data,
+				success: dehy.ch.forms.success_handler,
+				error: dehy.ch.forms.errors.display,
+				complete: function() {
+					console.log('completed!!!')
+					return
+				}
+			});
+
+
+
+		}
+	},
+	handleServerResponse(response) {
+		console.log('handleServerResponse response: ', response);
+
+		if (response.error) {
+			// Show error from server on payment form
+			dehy.ch.forms.errors.display(response.error);
+			console.log('ERROR: ', response.error);
+		} else if (response.requires_action) {
+			// Use Stripe.js to handle required card action
+			stripe.handleCardAction(
+				response.payment_intent_client_secret
+			).then(dehy.ch.stripe.handleStripeJsResult);
+		} else {
+			// Show success message
+			dehy.ch.forms.errors.display(response.error);
+			console.log('ERROR: ', response.error);
+		}
+	},
+	handleStripeJsResult(result) {
+		console.log('handleStripeJsResult result: ', result);
+
+		if (result.error) {
+			// Show error in payment form
+			console.log('ERROR: ', response.error);
+			dehy.ch.forms.errors.display(result.error);
+		} else {
+			var form_data = new FormData(dehy.ch.forms.get());
+
+			$.ajax({
+				method: "POST",
+				dataType: 'json',
+				url: '/checkout/place_order/',
+				contentType: false,
+				processData: false,
+				data: form_data,
+				success: dehy.ch.forms.success_handler,
+				error: dehy.ch.forms.errors.display,
+				complete: function() {
+					console.log('completed!!!')
+					return
+				}
+			});
+
+			form_data.set('payment_intent_id', result.paymentIntent.id);
+
+			// The card action has been handled
+			// The PaymentIntent can be confirmed again on the server
+			// fetch('/checkout/place_order/', {
+			// 	method: 'POST',
+			// 	headers: { 'Content-Type': 'application/json' },
+			// 	body: JSON.stringify({ form_data })
+			// }).then(function(confirmResult) {
+			// 	return confirmResult.json();
+			// }).then(dehy.ch.stripe.handleServerResponse);
+		}
+	},
+	set(pkey=null) {
+		if (pkey) {
+			dehy.ch.stripe.set_pkey(pkey);
+		}
+		dehy.ch._stripe = Stripe(dehy.ch.stripe.get_pkey());
+	},
+	get() {
+		return dehy.ch._stripe;
+	},
+	set_pkey(pkey) {
+		dehy.ch.stripe.pkey = pkey;
+	},
+	get_pkey() {
+		return dehy.ch.stripe.pkey;
+	},
+	init(pkey=dehy.ch.stripe.pkey, client_secret=dehy.ch.stripe.client_secret) {
+		console.log('initiating stripe');
+
+		if (dehy.ch.stripe.get() && dehy.ch.stripe.elements.get()) {
+			// already created, just need to unhide it
+			var stripe_payment_container = document.getElementById('stripe_payment_container');
+			var form = stripe_payment_container.closest('form');
+			stripe_payment_container.classList.toggle('display-none', false);
+			form.classList.toggle('display-none', false);
+
+			// form.removeEventListener('submit', dehy.ch.forms.submit_handler);
+
+		} else {// attempts to set the pkey and add the stripe elements to the page
+			if (pkey) {
+				dehy.ch.stripe.set_pkey(pkey)
+			}
+			if (dehy.ch.stripe.get_pkey()) {
+				dehy.ch.stripe.set();
+			}
+			// will never be true,
+			if (client_secret==false) {
+				// var appearance = {
+				// 	theme: 'night',
+				// 	labels: 'floating'
+				// };
+				// var options = {
+				//   clientSecret: client_secret,
+				//   // Fully customizable with appearance API.
+				//   appearance: appearance,
+				// };
+				// dehy.ch.stripe.elements.set(options)
+				// dehy.ch.stripe.client_secret = client_secret;
+				// dehy.ch.stripe.payment_element_setup(client_secret);
+
+			} else {
+				dehy.ch.stripe.elements.set();
+				dehy.ch.stripe.card_setup();
+			}
+		}
+	},
+};

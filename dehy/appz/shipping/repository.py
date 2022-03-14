@@ -13,10 +13,10 @@ class Repository(repository.Repository):
 		if shipping_addr and shipping_addr.country.code == 'US':
 			# Express is only available in the US
 
-			#############################################################################
-			## will need to implement some sort of API here to properly configure which
-			## shipping methods are available to a user based on their geo location
-			#############################################################################
+			###############################################################################
+			## will need to implement some sort of API here to properly configure which  ##
+			## shipping methods are available to a user based on their geo location      ##
+			###############################################################################
 			methods += [_shipping_methods.TwoDayExpress(), _shipping_methods.NextDayExpress()]
 		else:
 			methods += [_shipping_methods.TwoDayExpress(), _shipping_methods.NextDayExpress()]

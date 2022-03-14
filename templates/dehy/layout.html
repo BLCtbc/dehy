@@ -23,7 +23,7 @@
     {# Top-horizontal bar with account, notifictions, dashboard links #}
     {% include "dehy/partials/nav.html" %}
 
-	<main id="main">
+	<main class="container-fluid" id="main">
 	{# splash image container #}
 	{% block splash_container %}
 	{% endblock splash_container %}
@@ -31,7 +31,7 @@
 
     {# Site logo/title, mini-basket, browse dropdown and searchbox #}
 	{% block header %}
-	<header class="header">
+	<header class="row header">
 		{% block navigation %}
 		{% include "dehy/partials/nav_search.html" %}
 		{% endblock %}

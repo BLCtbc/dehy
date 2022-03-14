@@ -47,8 +47,18 @@ logger = logging.getLogger('oscar.checkout')
 # 		if form_name:
 #
 
+from datetime import datetime
+old_print = print
+
+def timestamped_print(*args, **kwargs):
+	old_print(datetime.now(), *args, **kwargs)
+
+print = timestamped_print
+
 def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
+
+
 
 class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
@@ -106,9 +116,6 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		form = self.form_class(request, request.POST)
 		response = super().post(request, *args, **kwargs)
 
-		print(f'form.is_valid(): {form.is_valid()}')
-		print(f'request.is_ajax(): {request.is_ajax()}')
-
 		if request.is_ajax() and form.is_valid():
 			# self.pre_conditions += ['check_user_email_is_captured']
 			self.check_pre_conditions(request)
@@ -140,15 +147,25 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		print('\n*** get() index ***')
 		form_structure = self.get_form_structure(self.form_class)
 
+		print(f"\n dir(request): {dir(request)}")
+		# print(f"\n dir(request.session): {dir(request)}")
+		print(f"\n dir(self): {dir(request.basket)}")
+		print(f"\n dir(self.checkout_session): {dir(self.checkout_session)}")
+
+		print(f"\n is_shipping_method_set: {self.checkout_session.is_shipping_method_set(request.basket)}")
 
 		response = super().get(request, *args, **kwargs)
 		basket_view = BasketView.as_view()(request)
-		# basket_summary_context = basket_view.get_context_data(request, *args, **kwargs)
-		print('basket_view: ', basket_view)
-		print('\n dir(basket_view): ', dir(basket_view))
-		print('basket_view.context_data: ', basket_view.context_data)
+		print(f"\n self. basket_view.context_data: {basket_view.context_data}")
 
-		response.context_data.update({'form': self.form_class(), 'basket_summary_context_data': basket_view.context_data})
+		# basket_summary_context = basket_view.get_context_data(request, *args, **kwargs)
+
+		response.context_data.update({
+			'form': self.form_class(),
+			'basket_summary_context_data': basket_view.context_data,
+			'is_shipping_address_set': self.checkout_session.is_shipping_address_set(),
+			'is_shipping_method_set':self.checkout_session.is_shipping_method_set(request.basket)
+		})
 		return response
 
 
@@ -520,7 +537,7 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 		if not form.is_valid():
 			print('\n form not valid')
 			print('form errors: ', form.errors)
-			print('form errors: ', form.non_field_errors)
+			print('form non_field_errors: ', form.non_field_errors)
 
 		if not request.is_ajax():
 			print('\n request not ajax')
@@ -859,433 +876,3 @@ class ThankYouView(views.ThankYouView):
 	Displays the 'thank you' page which summarises the order just submitted.
 	"""
 	template_name = 'dehy/checkout/thank_you.html'
-
-# class ConfirmationView(views.PaymentDetailsView, CheckoutSessionMixin):
-# 	# form_class = SubmitOrderForm
-# 	success_url = reverse_lazy('checkout:thank_you')
-# 	form_class = PurchaseConfirmationForm
-# 	preview = True
-# 	pre_conditions = [
-# 		'check_basket_is_not_empty',
-# 		'check_basket_is_valid',
-# 		'check_user_email_is_captured',
-# 		'check_shipping_data_is_captured',
-# 		'check_payment_data_is_captured',
-# 	]
-# 	def handle_payment(self, order_number, total, *args, **kwargs):
-# 		"""
-# 		Handle any payment processing and record payment sources and events.
-# 		This method is designed to be overridden within your project.  The
-# 		default is to do nothing as payment is domain-specific.
-# 		This method is responsible for handling payment and recording the
-# 		payment sources (using the add_payment_source method) and payment
-# 		events (using add_payment_event) so they can be
-# 		linked to the order when it is saved later on.
-# 		"""
-#
-#
-# 		# self.checkout_session.set_stripe_payment_intent(intent)
-#
-# 		print('\nintent: ', intent)
-#
-# 		context = self.get_context_data(*args, **kwargs)
-# 		total = context['order_total']
-# 		payment_method_id = self.checkout_session.get_stripe_payment_method()
-# 		payment_intent_id = self.checkout_session.get_stripe_payment_intent()
-#
-# 		if payment_method_id:
-# 			intent = Facade().payment_intent_confirm(payment_intent_id, payment_method_id, total)
-# 		else:
-# 			print('\ncheckout_session.get_stripe_payment_intent() returned: ', payment_method_id)
-#
-# 		# stripe_ref = Facade().confirm_payment_intent(
-# 		# 	id=self.request.basket.payment_intent_id,
-# 		# 	card=self.request.POST[STRIPE_TOKEN],
-# 		# 	shipping=shipping, order_number=order_number,
-# 		# 	description=self.payment_description(order_number, total, **kwargs),
-# 		# 	metadata=self.payment_metadata(order_number, total, **kwargs)
-# 		# )
-#
-# 		source_type, __ = SourceType.objects.get_or_create(name=PAYMENT_METHOD_STRIPE)
-#
-# 		source = Source(
-# 			source_type=source_type,
-# 			currency=settings.STRIPE_CURRENCY,
-# 			amount_allocated=total.incl_tax,
-# 			amount_debited=total.incl_tax,
-# 			reference=intent)
-#
-# 		self.add_payment_source(source)
-#
-# 		self.add_payment_event(PAYMENT_EVENT_PURCHASE, total.incl_tax)
-#
-# 	def payment_description(self, order_number, total, **kwargs):
-# 		return self.request.POST[STRIPE_EMAIL]
-#
-# 	def payment_metadata(self, order_number, total, **kwargs):
-# 		return {'order_number': order_number}
-#
-#
-# 	def post(self, request, *args, **kwargs):
-# 		data = {}
-# 		status_code = 400
-#
-# 		response = super().post(request, *args, **kwargs)
-#
-# 		if request.is_ajax():
-# 			# do some stuff to make sure the order is legit
-# 			# verify card, etc.
-#
-# 			status_code = 200
-# 			response = self.handle_place_order_submission(request)
-#
-#
-# 		return response
-#
-#
-# 	def get(self, request, *args, **kwargs):
-# 		status_code = 302
-# 		super().get(request,*args, **kwargs)
-# 		if request.is_ajax():
-# 			status_code = 400
-# 			pass
-# 		else:
-# 			# return a redirect since none of these urls should be called directly
-# 			response = redirect(reverse_lazy('checkout:checkout'))
-#
-# 		response.status_code = status_code
-# 		return response
-#
-# 	def handle_place_order_submission(self, request):
-# 		"""
-# 		Handle a request to place an order.
-# 		This method is normally called after the customer has clicked "place
-# 		order" on the preview page. It's responsible for (re-)validating any
-# 		form information then building the submission dict to pass to the
-# 		`submit` method.
-# 		If forms are submitted on your payment details view, you should
-# 		override this method to ensure they are valid before extracting their
-# 		data into the submission dict and passing it onto `submit`.
-# 		"""
-# 		return self.submit(request, **self.build_submission())
-#
-# 	def submit(self, request, user, basket, shipping_address, shipping_method,  # noqa (too complex (10))
-# 		shipping_charge, billing_address, order_total,
-# 		payment_kwargs=None, order_kwargs=None, surcharges=None):
-# 		"""
-# 		Submit a basket for order placement.
-# 		The process runs as follows:
-# 		 * Generate an order number
-# 		 * Freeze the basket so it cannot be modified any more (important when
-# 		   redirecting the user to another site for payment as it prevents the
-# 		   basket being manipulated during the payment process).
-# 		 * Attempt to take payment for the order
-# 		   - If payment is successful, place the order
-# 		   - If a redirect is required (e.g. PayPal, 3D Secure), redirect
-# 		   - If payment is unsuccessful, show an appropriate error message
-# 		:basket: The basket to submit.
-# 		:payment_kwargs: Additional kwargs to pass to the handle_payment
-# 						 method. It normally makes sense to pass form
-# 						 instances (rather than model instances) so that the
-# 						 forms can be re-rendered correctly if payment fails.
-# 		:order_kwargs: Additional kwargs to pass to the place_order method
-# 		"""
-# 		if payment_kwargs is None:
-# 			payment_kwargs = {}
-# 		if order_kwargs is None:
-# 			order_kwargs = {}
-#
-# 		# Taxes must be known at this point
-# 		assert basket.is_tax_known, (
-# 			"Basket tax must be set before a user can place an order")
-# 		assert shipping_charge.is_tax_known, (
-# 			"Shipping charge tax must be set before a user can place an order")
-#
-# 		# We generate the order number first as this will be used
-# 		# in payment requests (ie before the order model has been
-# 		# created).  We also save it in the session for multi-stage
-# 		# checkouts (e.g. where we redirect to a 3rd party site and place
-# 		# the order on a different request).
-# 		order_number = self.generate_order_number(basket)
-# 		self.checkout_session.set_order_number(order_number)
-# 		logger.info("Order #%s: beginning submission process for basket #%d",
-# 					order_number, basket.id)
-#
-# 		# Freeze the basket so it cannot be manipulated while the customer is
-# 		# completing payment on a 3rd party site.  Also, store a reference to
-# 		# the basket in the session so that we know which basket to thaw if we
-# 		# get an unsuccessful payment response when redirecting to a 3rd party
-# 		# site.
-# 		self.freeze_basket(basket)
-# 		self.checkout_session.set_submitted_basket(basket)
-#
-# 		# We define a general error message for when an unanticipated payment
-# 		# error occurs.
-# 		error_msg = _("A problem occurred while processing payment for this "
-# 					  "order - no payment has been taken.  Please "
-# 					  "contact customer services if this problem persists")
-#
-# 		signals.pre_payment.send_robust(sender=self, view=self)
-#
-# 		try:
-# 			self.handle_payment(order_number, order_total, **payment_kwargs)
-# 		except RedirectRequired as e:
-# 			# Redirect required (e.g. PayPal, 3DS)
-# 			logger.info("Order #%s: redirecting to %s", order_number, e.url)
-# 			return http.HttpResponseRedirect(e.url)
-# 		except UnableToTakePayment as e:
-# 			# Something went wrong with payment but in an anticipated way.  Eg
-# 			# their bankcard has expired, wrong card number - that kind of
-# 			# thing. This type of exception is supposed to set a friendly error
-# 			# message that makes sense to the customer.
-# 			msg = str(e)
-# 			logger.warning(
-# 				"Order #%s: unable to take payment (%s) - restoring basket",
-# 				order_number, msg)
-# 			self.restore_frozen_basket()
-#
-# 			# We assume that the details submitted on the payment details view
-# 			# were invalid (e.g. expired bankcard).
-# 			return self.render_payment_details(
-# 				self.request, error=msg, **payment_kwargs)
-# 		except PaymentError as e:
-# 			# A general payment error - Something went wrong which wasn't
-# 			# anticipated.  Eg, the payment gateway is down (it happens), your
-# 			# credentials are wrong - that king of thing.
-# 			# It makes sense to configure the checkout logger to
-# 			# mail admins on an error as this issue warrants some further
-# 			# investigation.
-# 			msg = str(e)
-# 			logger.error("Order #%s: payment error (%s)", order_number, msg,
-# 						 exc_info=True)
-# 			self.restore_frozen_basket()
-# 			return self.render_preview(
-# 				self.request, error=error_msg, **payment_kwargs)
-# 		except Exception as e:
-# 			# Unhandled exception - hopefully, you will only ever see this in
-# 			# development...
-# 			logger.exception(
-# 				"Order #%s: unhandled exception while taking payment (%s)",
-# 				order_number, e)
-# 			self.restore_frozen_basket()
-# 			return self.render_preview(
-# 				self.request, error=error_msg, **payment_kwargs)
-#
-# 		signals.post_payment.send_robust(sender=self, view=self)
-#
-# 		# If all is ok with payment, try and place order
-# 		logger.info("Order #%s: payment successful, placing order",
-# 					order_number)
-# 		try:
-# 			return self.handle_order_placement(
-# 				order_number, user, basket, shipping_address, shipping_method,
-# 				shipping_charge, billing_address, order_total, surcharges=surcharges, **order_kwargs)
-# 		except UnableToPlaceOrder as e:
-# 			# It's possible that something will go wrong while trying to
-# 			# actually place an order.  Not a good situation to be in as a
-# 			# payment transaction may already have taken place, but needs
-# 			# to be handled gracefully.
-# 			msg = str(e)
-# 			logger.error("Order #%s: unable to place order - %s",
-# 						 order_number, msg, exc_info=True)
-# 			self.restore_frozen_basket()
-# 			return self.render_preview(
-# 				self.request, error=msg, **payment_kwargs)
-# 		except Exception as e:
-# 			# Hopefully you only ever reach this in development
-# 			logger.exception("Order #%s: unhandled exception while placing order (%s)", order_number, e)
-# 			error_msg = _("A problem occurred while placing this order. Please contact customer services.")
-# 			self.restore_frozen_basket()
-# 			return self.render_preview(self.request, error=error_msg, **payment_kwargs)
-#
-
-# class UserAddressUpdateView(views.UserAddressUpdateView):
-# 	template_name = 'dehy/checkout/user_address_form.html'
-#
-# class UserAddressDeleteView(views.UserAddressDeleteView):
-# 	template_name = 'dehy/checkout/user_address_delete.html'
-
-# class ShippingMethodView(views.ShippingMethodView):
-# 	template_name = 'dehy/checkout/shipping_methods.html'
-#
-# class PaymentDetailsView(views.PaymentDetailsView):
-# 	"""
-# 	For taking the details of payment and creating the order.
-# 	This view class is used by two separate URLs: 'payment-details' and
-# 	'preview'. The `preview` class attribute is used to distinguish which is
-# 	being used. Chronologically, `payment-details` (preview=False) comes before
-# 	`preview` (preview=True).
-# 	If sensitive details are required (e.g. a bankcard), then the payment details
-# 	view should submit to the preview URL and a custom implementation of
-# 	`validate_payment_submission` should be provided.
-# 	- If the form data is valid, then the preview template can be rendered with
-# 	  the payment-details forms re-rendered within a hidden div so they can be
-# 	  re-submitted when the 'place order' button is clicked. This avoids having
-# 	  to write sensitive data to disk anywhere during the process. This can be
-# 	  done by calling `render_preview`, passing in the extra template context
-# 	  vars.
-# 	- If the form data is invalid, then the payment details templates needs to
-# 	  be re-rendered with the relevant error messages. This can be done by
-# 	  calling `render_payment_details`, passing in the form instances to pass
-# 	  to the templates.
-# 	The class is deliberately split into fine-grained methods, responsible for
-# 	only one thing.  This is to make it easier to subclass and override just
-# 	one component of functionality.
-# 	All projects will need to subclass and customise this class as no payment
-# 	is taken by default.
-# 	"""
-# 	template_name = 'dehy/checkout/payment_details.html'
-# 	template_name_preview = 'dehy/checkout/preview.html'
-#
-# 	# These conditions are extended at runtime depending on whether we are in
-# 	# 'preview' mode or not.
-# 	pre_conditions = [
-# 		'check_basket_is_not_empty',
-# 		'check_basket_is_valid',
-# 		'check_user_email_is_captured',
-# 		'check_shipping_data_is_captured']
-#
-# 	# If preview=True, then we render a preview template that shows all order
-# 	# details ready for submission.
-# 	preview = False
-#
-# 	@method_decorator(csrf_exempt)
-# 	def dispatch(self, request, *args, **kwargs):
-# 		return super().dispatch(request, *args, **kwargs)
-#
-# 	def get_context_data(self, *args, **kwargs):
-#
-# 		context_data = super().get_context_data(*args, **kwargs)
-#
-# 		## for testing
-# 		context_data['old'] = True
-#
-# 		context_data['bankcard_form'] = kwargs.get('bankcard_form', BankcardForm())
-# 		context_data['billing_address_form'] = kwargs.get('billing_address_form', BillingAddressForm())
-# 		shipping = context_data.get('shipping_address', None)
-# 		if shipping:
-#
-# 			context_data['billing_address_form'].initial = {
-# 				'first_name':shipping.first_name, 'last_name':shipping.last_name,
-# 				'line1': shipping.line1, 'line2': shipping.line2, 'city':shipping.city,
-# 				'state':shipping.state, 'postcode':shipping.postcode,
-# 				'country':shipping.country, 'phone_number':shipping.phone_number
-# 			}
-#
-# 		context_data['stripe_data'] = {}
-#
-# 		payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
-# 		context_data['stripe_data']['client_secret'] = payment_intent.client_secret
-# 		context_data['stripe_data']['publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
-#
-# 		if self.preview:
-# 			context_data['stripe_token_form'] = StripeTokenForm(self.request.POST)
-# 			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
-# 		else:
-# 			context_data['order_total_incl_tax_cents'] = (context_data['order_total'].incl_tax * 100).to_integral_value()
-#
-# 		# payment_intent = Facade().payment_intent(total=context_data['order_total'], shipping=shipping)
-# 		context_data['stripe_data']['client_secret'] = payment_intent.client_secret
-# 		context_data['stripe_data']['publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
-#
-# 		return context_data
-#
-# 	# def get_payment_intent(self, total, shipping, *args, **kwargs):
-# 	# 	stripe_payment_intent = Facade().create_payment_intent(total, shipping=shipping)
-# 	# 	return stripe_payment_intent
-#
-#
-# 	def handle_payment(self, order_number, total, *args, **kwargs):
-#
-# 		print(f'\n dir(self): {dir(self)}')
-# 		basket = self.request.basket
-# 		cleaned_data = self.get_shipping_address(self.request.basket)
-#
-# 		shipping = {
-# 			'address': {
-# 				'city': shipping_address_obj.city,
-# 				'country': shipping_address_obj.country,
-# 				'line1': shipping_address_obj.line1,
-# 				'line2': shipping_address_obj.line2,
-# 				'postal_code': shipping_address_obj.postcode,
-# 				'state': shipping_address_obj.state,
-# 			},
-# 			'name': shipping_address_obj.name,
-# 			'phone': shipping_address_obj.phone_number
-# 		}
-#
-# 		# print('self: ', self.request.GET.get(billing_address_form))
-# 		billing_addr_form = self.request.GET.get('billing_address_form', None)
-#
-# 		if hasattr(billing_addr_form, 'same_as_shipping'):
-# 			self.checkout_session.bill_to_shipping_address()
-#
-# 		else:
-# 			## need to set the billing address elsewhere
-# 			## self.get_billing_address()
-# 			pass
-#
-#
-# 		stripe_ref = Facade().confirm_payment_intent(
-# 			id=self.request.basket.payment_intent_id,
-# 			card=self.request.POST[STRIPE_TOKEN],
-# 			shipping=shipping, order_number=order_number,
-# 			description=self.payment_description(order_number, total, **kwargs),
-# 			metadata=self.payment_metadata(order_number, total, **kwargs)
-# 		)
-#
-# 		# stripe_ref = Facade().charge(
-# 		# 	order_number,
-# 		# 	total,
-# 		# 	shipping=shipping,
-# 		# 	card=self.request.POST[STRIPE_TOKEN],
-# 		# 	description=self.payment_description(order_number, total, **kwargs),
-# 		# 	metadata=self.payment_metadata(order_number, total, **kwargs))
-#
-#
-#
-# 		source_type, __ = SourceType.objects.get_or_create(name=PAYMENT_METHOD_STRIPE)
-# 		source = Source(
-# 			source_type=source_type,
-# 			currency=settings.STRIPE_CURRENCY,
-# 			amount_allocated=total.incl_tax,
-# 			amount_debited=total.incl_tax,
-# 			reference=stripe_ref)
-#
-# 		self.add_payment_source(source)
-#
-# 		self.add_payment_event(PAYMENT_EVENT_PURCHASE, total.incl_tax)
-#
-# 	def payment_description(self, order_number, total, **kwargs):
-# 		return self.request.POST[STRIPE_EMAIL]
-#
-# 	def payment_metadata(self, order_number, total, **kwargs):
-# 		return {'order_number': order_number}
-
-#
-# class PaymentMethodView(views.PaymentMethodView):
-# 	"""
-# 	View for a user to choose which payment method(s) they want to use.
-# 	This would include setting allocations if payment is to be split
-# 	between multiple sources. It's not the place for entering sensitive details
-# 	like bankcard numbers though - that belongs on the payment details view.
-# 	"""
-# 	pre_conditions = [
-# 		'check_basket_is_not_empty',
-# 		'check_basket_is_valid',
-# 		'check_user_email_is_captured',
-# 		'check_shipping_data_is_captured']
-# 	skip_conditions = ['skip_unless_payment_is_required']
-# 	success_url = reverse_lazy('checkout:payment-details')
-#
-# 	def get(self, request, *args, **kwargs):
-# 		# By default we redirect straight onto the payment details view. Shops
-# 		# that require a choice of payment method may want to override this
-# 		# method to implement their specific logic.
-# 		return self.get_success_response()
-#
-# 	def get_success_response(self):
-# 		return redirect(self.get_success_url())
-#
-# 	def get_success_url(self):
-# 		return str(self.success_url)
