@@ -266,33 +266,44 @@ class BankcardForm(base_forms.BankcardForm):
 						ccv=self.cleaned_data['ccv'])
 
 
-class BillingAddressForm(base_forms.BillingAddressForm):
-
-	same_as_shipping = forms.BooleanField(required=False, initial=True, label='Same as shipping?')
-	city = forms.CharField(required=True, max_length=100, min_length=2)
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-
-		self.fields['first_name'].widget.attrs['placeholder'] = self.fields['first_name'].label or 'First name'
-		self.fields['last_name'].widget.attrs['placeholder'] = self.fields['last_name'].label or 'Last name'
-		self.fields['state'].widget.attrs['placeholder'] = self.fields['state'].label or 'State'
-		self.fields['line1'].widget.attrs['placeholder'] = 'Address 1'
-		self.fields['line2'].widget.attrs['placeholder'] = 'Address 2'
-		self.fields['city'].widget.attrs['placeholder'] = self.fields['city'].label or 'City'
-
-		self.fields['country'].widget.attrs['placeholder'] = self.fields['country'].label or 'country'
-		self.fields['postcode'].widget.attrs['placeholder'] = self.fields['postcode'].label or 'postcode'
-
-
-		self.set_country_queryset()
-
-	def set_country_queryset(self):
-		self.fields['country'].queryset = Country._default_manager.all()
-
-	class Meta:
-		model = BillingAddress
-		fields = [
-			'first_name', 'last_name',
-			'line1', 'line2', 'line3', 'city',
-			'state', 'postcode', 'country', 'same_as_shipping'
-		]
+# class BillingAddressForm(base_forms.BillingAddressForm):
+#
+# 	same_as_shipping = forms.BooleanField(required=False, initial=True, label='Same as shipping?')
+# 	# city = forms.CharField(required=True, max_length=100, min_length=2)
+# 	def __init__(self, *args, **kwargs):
+# 		super().__init__(*args, **kwargs)
+#
+# 		self.fields['first_name'].widget.attrs['placeholder'] = _('First name')
+# 		self.fields['last_name'].widget.attrs['placeholder'] = _('Last name')
+# 		self.fields['line1'].widget.attrs['placeholder'] = _('Address 1')
+# 		self.fields['line2'].widget.attrs['placeholder'] = _('Address 2')
+# 		self.fields['country'].widget.attrs['placeholder'] = _('Country')
+# 		self.fields['line4'].widget.attrs['placeholder'] = _('City')
+# 		self.fields['state'].widget.attrs['placeholder'] = _('State')
+# 		self.fields['postcode'].widget.attrs['placeholder'] = _('ZIP Code')
+#
+#
+# 		self.adjust_country_field()
+#
+#
+#
+# 	def adjust_country_field(self):
+# 		countries = Country._default_manager.filter(
+# 			is_shipping_country=True)
+#
+# 		# No need to show country dropdown if there is only one option
+# 		if len(countries) == 1:
+# 			self.fields.pop('country', None)
+# 			self.instance.country = countries[0]
+# 		else:
+# 			self.fields['country'].queryset = countries
+# 			self.fields['country'].empty_label = None
+#
+#
+# 	class Meta:
+# 		model = BillingAddress
+# 		fields = [
+# 			'same_as_shipping', 'first_name', 'last_name',
+# 			'line1', 'line2', 'line4',
+# 			'state', 'postcode', 'country'
+# 		]

@@ -1,0 +1,62 @@
+{% extends "dehy/layout.html" %}
+{% load i18n %}
+{% load static %}
+{% load currency_filters %}
+
+{% block title %}
+    {% trans "Basket" %} | {{ block.super }}
+{% endblock %}
+
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/basket.css' %}"/>
+{% endblock extrastyles %}
+
+{% block header %}
+<header class="navbar-padding"></header>
+{% endblock header %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{% trans "Basket" %}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{# Hide mini-basket so we don't have two baskets to keep in sync #}
+{% block mini_basket %}{% endblock %}
+
+{% block headertext %}
+    {% trans "Basket" %}
+{% endblock %}
+
+{% block content %}
+    {# Use a partial template so that AJAX can be used to re-render basket #}
+    {% include 'dehy/basket/partials/basket_content.html' %}
+{% endblock content %}
+
+{% block extra_scripts %}
+
+{% comment %}{{ stripe_data|json_script:"stripe-data" }}{% endcomment %}
+<script src="{% static "js/basket.js" %}"></script>
+
+<!-- <script>
+	const stripe = Stripe("{{stripe_data.publishable_key}}");
+</script> -->
+{% endblock extra_scripts %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    {# We pass in the URL to send AJAX requests to #}
+    var options = {
+        'basketURL': '{% url 'basket:summary' %}'
+    };
+
+
+    oscar.basket.init(options);
+
+	var currencySymbol = '{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}';
+	currencySymbol = currencySymbol.slice(0, 1);
+	dehy.basket.init(currencySymbol);
+{% endblock %}
