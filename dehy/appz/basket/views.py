@@ -61,7 +61,6 @@ class BasketAddView(FormView):
 		return redirect_to_referrer(self.request, 'basket:summary')
 
 	def form_valid(self, form):
-		print('form_valid()')
 
 		offers_before = self.request.basket.applied_offers()
 
@@ -108,25 +107,16 @@ class BasketView(CoreBasketView):
 	template_name = 'dehy/basket/basket.html'
 
 	def get_basket_voucher_form(self):
-		print(f"\n dir(request.basket): {dir(self.request.basket)}")
-
-
 		"""
 		This is a separate method so that it's easy to e.g. not return a form
 		if there are no vouchers available.
 		"""
-		print(f'\n self.request.resolver_match: {self.request.resolver_match}')
-
 		if self.request.resolver_match.url_name != 'checkout':
-			print(f'\n RETURNING NONE')
-
 			return None
-
 		return BasketVoucherForm()
 
 
 	def post(self, request, *args, **kwargs):
-		print('request.POST: ', request.POST)
 		data = {}
 		response = super().post(request, *args, **kwargs)
 
@@ -141,6 +131,7 @@ class BasketView(CoreBasketView):
 		print('dir(request.basket):\n ', dir(request.basket))
 		data['object_list'] = {}
 		print('request.basket.is_tax_known:\n ', request.basket.is_tax_known)
+		print('self.checkout_session.is_shipping_address_set():\n ', self.checkout_session.is_shipping_address_set())
 		print('request.basket.strategy:\n ', request.basket.strategy)
 		print('request.basket.strategy.pricing_policy:\n ', request.basket.strategy.pricing_policy)
 
@@ -148,10 +139,9 @@ class BasketView(CoreBasketView):
 
 		if request.basket.is_tax_known:
 			print('request.basket.total_tax:\n ', request.basket.total_tax)
+			data['total_tax'] = request.basket.total_tax
 
 		for line in self.object_list:
-
-
 			data['object_list'][line.product_id] = {'quantity': line.quantity, 'price': line.line_price_excl_tax}
 
 

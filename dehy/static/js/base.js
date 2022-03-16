@@ -28,16 +28,12 @@ var dehy = {
 		$.ajaxSetup({
 			beforeSend: function(xhr, settings) {
 
-				console.log('beforeSend xhr: ', xhr);
-				console.log('beforeSend settings: ', settings);
-
 				if (!dehy.utils.csrfSafeMethod(settings.type) && !this.crossDomain) {
 					xhr.setRequestHeader("X-CSRFToken", dehy.utils.getCookie('csrftoken'));
 				}
 			},
-			complete: function(e, xhr, status) {
+			complete: function(xhr, status) {
 				console.log('ajax complete');
-				console.log('e: ', e);
 				console.log('xhr: ', xhr);
 				console.log('status: ', status);
 
@@ -75,14 +71,8 @@ var dehy = {
 			},
 			item_added_to_cart_success(response, xhr, status) {
 				dehy.utils.update_cart_quantity(response.basket_items);
-				console.log('success response: ', response);
-				console.log('success xhr: ', xhr);
-				console.log('success status: ', status);
 			},
 			item_added_to_cart_error(error, xhr, status) {
-				console.log('error: ', error);
-				console.log('xhr: ', xhr);
-				console.log('status: ', status);
 
 				var error_container = document.querySelector('#error_container');
 				error_container.classList.toggle('hide', false);
@@ -156,16 +146,16 @@ var dehy = {
 			}, 4500);
 		},
 		freeze_forms(force=true) {
-			console.log('freezing form, force = ', force);
 			var forms = document.querySelectorAll('form');
+
 			forms.forEach(function(form) {
+
 				form.querySelectorAll("input, select, button").forEach(function(elem) {
 					elem.disabled = force
 				})
 			})
 		},
 		unfreeze_forms() {
-			console.log('unfreezing form');
 			this.freeze_forms(false);
 		},
 		remove_event_listeners(elem) {
@@ -196,7 +186,7 @@ var dehy = {
 				}, delay);
 			}
 		},
-		serialize: function(form) {
+		serialize(form) {
 
 			// Setup our serialized data
 			var serialized = [];
