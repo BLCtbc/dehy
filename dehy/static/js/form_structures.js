@@ -2820,5 +2820,13 @@ const FormStructures = {
 			}
 		]
 	}
-]
+],
+	"preview": {
+		"user_info": ["username"],
+		"shipping": true,
+		"additional_info": true,
+		"billing": true,
+
+
+	}
 }
