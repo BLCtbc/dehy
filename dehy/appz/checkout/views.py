@@ -179,13 +179,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 	template_name = "dehy/checkout/checkout_v2.html"
 	form_class = ShippingAddressForm
 
-	# def setup(self, request, *args, **kwargs):
-	# 	print(f'\n *** setup()')
-	# 	return super().setup(request, *args, **kwargs)
-	#
-	# def dispatch(self, request, *args, **kwargs):
-	# 	print(f'\n *** dispatch()')
-	# 	return super().dispatch(request, *args, **kwargs)
 
 	def get_available_addresses(self):
 		# Include only addresses where the country is flagged as valid for
@@ -257,6 +250,9 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 	def get(self, request, *args, **kwargs):
 		print('\n*** get() ShippingView ***')
 		status_code = 302
+
+		print('request.GET:\n', request.GET)
+		
 		if request.is_ajax():
 			status_code = 400
 
