@@ -1268,15 +1268,6 @@ implementing a continuous deployment workflow on Debian 10+
 	python manage.py runsslserver --certificate cert.pem --key key.pem
 	```
 
-<a name="stripe_integration"></a>
-7. ###### integrating sripe with django oscar
-
-	see: https://stackoverflow.com/questions/51243465/how-to-integrate-stripe-payments-gateway-with-django-oscar
-	and: https://groups.google.com/g/django-oscar/c/Cr8sBI0GBu0/m/PHRdXX2uFQAJ
-
-	test cc number: 4242 4242 4242 4242
-
-
 8. ###### testing
 
 	fixture used:
@@ -1298,3 +1289,130 @@ implementing a continuous deployment workflow on Debian 10+
 
 
 
+<a name='stripe_integration'></a>
+10. ###### working with stripe
+
+   ###### integrating sripe with django oscar (some useful info for starting out
+
+	see: https://stackoverflow.com/questions/51243465/how-to-integrate-stripe-payments-gateway-with-django-oscar
+	and: https://groups.google.com/g/django-oscar/c/Cr8sBI0GBu0/m/PHRdXX2uFQAJ
+
+
+	###### some stripe examples:
+
+	<a name='stripe_order_creation'></a>
+	1. stripe order creation (from django shell)
+		NOTE: the only the country and postal_code are required when supplying an address field
+
+		```py
+		from django.conf import settings
+		import stripe
+
+		stripe.api_key = settings.STRIPE_SECRET_KEY
+		stripe.pkey = settings.STRIPE_PUBLISHABLE_KEY
+		stripe.api_version = '2020-08-27; orders_beta=v2'
+
+		####################
+		## order with tax ##
+		####################
+
+		order = stripe.Order.create(
+		  currency="usd",
+		  line_items=line_items,
+		  payment={
+		    "settings": {
+		      "payment_method_types": ["card"],
+		    },
+		  },
+		  expand=["line_items"],
+		  automatic_tax={
+		    "enabled": True,
+		  },
+		  shipping_details={
+		    "address": {
+			 "city": "Austin", "country":"US", "postal_code":"78759", "state": "TX"
+			},
+			"name":"anon"
+		  }
+		)
+
+		############
+		## no tax ##
+		############
+		order = stripe.Order.create(
+		  currency="usd",
+		  line_items=line_items,
+		  payment={
+		    "settings": {
+		      "payment_method_types": ["card"],
+		    },
+		  },
+		  expand=["line_items"],
+		  automatic_tax={
+		    "enabled": True,
+		  },
+		  shipping_details={
+		    "address": {
+			  "city": "Gainesville", "country":"US", "postal_code":"32605", "state": "FL"
+			},
+			"name":"anon"
+		  }
+		)
+		```
+
+	<a name='stripe_order_update'></a>
+	2. updating a stripe order (from django shell)
+
+		```py
+
+		shipping_addr = {'first_name': 'kenneth', 'city': 'Austin', 'postcode': '78759', 'country': 'US', 'state': 'TX'}
+
+		## when creating dictionaries that will supply information to stripe, ensure all required info is supplied.
+		## For required items that are not necessarily needed to retrieve order info, such as a 'name'
+		## use a ternary operator to supply a value, example:
+
+		name = shipping_addr['first_name'] if shipping_addr.get('first_name', None) else 'anon'
+		name = f"name {shipping_addr['last_name']}" if shipping_addr.get('last_name', None) else name
+
+		shipping_details = {
+			'address': {
+				'postal_code': '78759',
+				'country': 'US',
+				'state': 'TX',
+				'city': 'Austin'
+			},
+			'name': name,
+		}
+
+		## when supplying optional information, only add it to the dict if a value is supplied
+		## as supplying blank info causes stripe to error, example:
+		if shipping_addr.get('line1', None):
+			shipping_details['address']['line1'] = shipping_addr['line1']
+
+
+		## should also ensure currency values are given in cents
+		shipping_cost = {
+			'shipping_rate_data': {
+				'display_name': 'FEDEX_GROUND',
+				'type':'fixed_amount',
+				'fixed_amount': {
+					'amount': str((D('24.49')*100).to_integral()),
+					'currency': 'usd'
+				},
+				'tax_behavior': 'exclusive'
+			}
+		}
+
+		#######################
+		## updating an order ##
+		#######################
+
+		order = stripe.Order.modify(
+			basket.stripe_order_id,
+			line_items=line_items,
+			shipping_cost=shipping_cost,
+			shipping_details=shipping_details,
+			discounts=discounts
+		)
+
+		```

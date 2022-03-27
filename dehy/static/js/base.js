@@ -33,9 +33,8 @@ var dehy = {
 				}
 			},
 			complete: function(xhr, status) {
-				console.log('ajax complete');
-				console.log('xhr: ', xhr);
-				console.log('status: ', status);
+				console.log('ajax complete, xhr: ', xhr);
+				console.log('ajax complete, status: ', status);
 
 			},
 		});
