@@ -1,6 +1,26 @@
 from oscar.apps.checkout import utils
+from phonenumber_field.phonenumber import PhoneNumber
+from oscar.core.loading import get_class
+
+BaseFedex = get_class('shipping.methods', 'BaseFedex')
 
 class CheckoutSessionData(utils.CheckoutSessionData):
+	def ship_to_new_address(self, address_fields):
+		"""
+		Use a manually entered address as the shipping address
+		"""
+		self._unset('shipping', 'new_address_fields')
+		phone_number = address_fields.get('phone_number')
+		if phone_number:
+			# Phone number is stored as a PhoneNumber instance. As we store
+			# strings in the session, we need to serialize it.
+			address_fields = address_fields.copy()
+			if isinstance(phone_number, PhoneNumber):
+				address_fields['phone_number'] = phone_number.as_international
+
+		print('\n *** SETTING ADDRESS FIELD ***')
+		self._set('shipping', 'new_address_fields', address_fields)
+
 	def set_questionnaire_response(self, additional_info):
 		self._set('questionnaire', 'purchase_business_type', additional_info.purchase_business_type)
 		self._set('questionnaire', 'business_name', additional_info.business_name)
@@ -54,5 +74,30 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 	def is_stripe_client_secret_set(self):
 		return self.get_stripe_client_secret() is not None
 
+	def get_stored_shipping_methods(self):
+		self._check_namespace('shipping_methods')
+		shipping_methods = []
+		
+		for method_code, val in self.request.session[self.SESSION_KEY]['shipping_methods'].items():
+			method = BaseFedex(code=method_code, name=val['name'], charge_excl_tax=val['cost'], charge_incl_tax=val['cost'])
+			shipping_methods.append(method)
+
+		return shipping_methods
+
+	def store_shipping_methods(self, basket, methods):
+		self._flush_namespace('shipping_methods')
+		for method in methods:
+			self.request.session[self.SESSION_KEY]['shipping_methods'][method.code] = {
+				'name': method.name, 'cost': str(method.calculate(basket).excl_tax)
+			}
+
+
+	def new_shipping_address_fields(self):
+		"""
+		Return shipping address fields
+		"""
+		return self._get('shipping', 'new_address_fields')
+
+	get_shipping_address = new_shipping_address_fields
 	is_stripe_customer_set = is_stripe_customer_field_set
 	is_stripe_customer_id_set = is_stripe_customer_field_set

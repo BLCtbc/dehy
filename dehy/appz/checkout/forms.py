@@ -31,10 +31,10 @@ class StripeTokenForm(forms.Form):
 
 class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 
-
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.adjust_country_field()
+		self.fields['phone_number'].required = False
 
 	def adjust_country_field(self):
 		countries = Country._default_manager.filter(Q(iso_3166_1_a2='US')|Q(iso_3166_1_a2='CA'))
@@ -56,6 +56,16 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 			'phone_number',
 		]
 
+class FakeShippingAddressForm(ShippingAddressForm):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		required_fields = ['country', 'postcode']
+		for field_name,field in self.fields.items():
+			self.fields[field_name].required = False
+			if field_name in required_fields:
+				self.fields[field_name].required = True
+
+
 
 class ShippingMethodForm(forms.Form):
 
@@ -64,6 +74,7 @@ class ShippingMethodForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		methods = kwargs.pop('methods', [])
 		super().__init__(*args, **kwargs)
+		print('\n methods: ', methods)
 		self.fields['method_code'].choices = ((m.code, m.name) for m in methods)
 
 
@@ -87,6 +98,7 @@ class UserInfoForm(AuthenticationForm):
 		(NEW, _('I am a new customer and want to create an account '
 				'before checking out')),
 		(EXISTING, _('I am a returning customer, and my password is')))
+
 	options = forms.ChoiceField(widget=forms.widgets.RadioSelect,
 								choices=CHOICES, initial=GUEST)
 
@@ -135,6 +147,7 @@ class BillingAddressForm(payment_forms.BillingAddressForm):
 		self.fields['country'].widget.attrs['placeholder'] = _('Country')
 		self.fields['postcode'].widget.attrs['placeholder'] = _('ZIP Code')
 		self.fields['phone_number'].widget.attrs['placeholder'] = _('Phone Number')
+		self.fields['phone_number'].required = False
 
 
 	def adjust_country_field(self):

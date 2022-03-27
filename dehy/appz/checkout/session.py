@@ -1,5 +1,5 @@
 from oscar.apps.checkout import exceptions, session
-from oscar.core.loading import get_class, get_model
+from oscar.core.loading import get_class
 from django import http
 from django.conf import settings
 from django.contrib import messages
@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse, reverse_lazy
 from bs4 import BeautifulSoup
+# from dehy.appz.shipping.methods import BaseFedex
 
 import json
 
@@ -14,14 +15,34 @@ from dehy.appz.checkout import utils, tax
 from . import FormStructure
 
 CheckoutSessionData = utils.CheckoutSessionData
+Repository = get_class('shipping.repository', 'Repository')
+BaseFedex = get_class('shipping.methods', 'BaseFedex')
+
 
 class CheckoutSessionMixin(session.CheckoutSessionMixin):
 
+	def get_shipping_method(self, basket, shipping_address=None, **kwargs):
+		"""
+		Return the selected shipping method instance from this checkout session
+		The shipping address is passed as we need to check that the method
+		stored in the session is still valid for the shipping address.
+		"""
+		code = self.checkout_session.shipping_method_code(basket)
+
+		# methods,status_code = Repository().get_shipping_methods(
+		# 	basket=basket, user=self.request.user,
+		# 	shipping_addr=shipping_address, request=self.request)
+
+		methods = self.checkout_session.get_stored_shipping_methods()
+
+		for method in methods:
+			if method.code == code:
+				return method
 
 	def get_context_data(self, **kwargs):
 		ctx = super().get_context_data(**kwargs)
 		ctx['stripe_pkey'] = settings.STRIPE_PUBLISHABLE_KEY
-		ctx['basket'] = self.request.basket
+		# ctx['basket'] = self.request.basket
 		return ctx
 
 	def dispatch(self, request, *args, **kwargs):
@@ -63,18 +84,72 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 					"Please either sign in or enter your email address")
 			)
 
-	def build_submission(self, **kwargs):
-		submission = super().build_submission(**kwargs)
-
-		if submission['shipping_address'] and submission['shipping_method']:
-			tax.apply_to(submission)
-
-			# Recalculate order total to ensure we have a tax-inclusive total
-			submission['order_total'] = self.get_order_totals(
-				submission['basket'],
-				submission['shipping_charge'])
-
-		return submission
+	# def build_submission(self, **kwargs):
+	# 	"""
+	# 	Return a dict of data that contains everything required for an order
+	# 	submission.  This includes payment details (if any).
+	# 	This can be the right place to perform tax lookups and apply them to
+	# 	the basket.
+	# 	"""
+	# 	# Pop the basket if there is one, because we pass it as a positional
+	# 	# argument to methods below
+	# 	basket = kwargs.pop('basket', self.request.basket)
+	# 	shipping_address = self.get_shipping_address(basket)
+	# 	shipping_method = self.get_shipping_method(
+	# 		basket, shipping_address)
+	# 	billing_address = self.get_billing_address(shipping_address)
+	# 	submission = {
+	# 		'user': self.request.user,
+	# 		'basket': basket,
+	# 		'shipping_address': shipping_address,
+	# 		'shipping_method': shipping_method,
+	# 		'billing_address': billing_address,
+	# 		'order_kwargs': {},
+	# 		'payment_kwargs': {}
+	# 	}
+	#
+	# 	if not shipping_method:
+	# 		total = shipping_charge = surcharges = None
+	# 	else:
+	# 		shipping_charge = shipping_method.calculate(basket)
+	# 		surcharges = SurchargeApplicator(self.request, submission).get_applicable_surcharges(
+	# 			self.request.basket, shipping_charge=shipping_charge
+	# 		)
+	# 		total = self.get_order_totals(
+	# 			basket, shipping_charge=shipping_charge, surcharges=surcharges, **kwargs)
+	#
+	# 	submission["shipping_charge"] = shipping_charge
+	# 	submission["order_total"] = total
+	# 	submission['surcharges'] = surcharges
+	#
+	# 	# If there is a billing address, add it to the payment kwargs as calls
+	# 	# to payment gateways generally require the billing address. Note, that
+	# 	# it normally makes sense to pass the form instance that captures the
+	# 	# billing address information. That way, if payment fails, you can
+	# 	# render bound forms in the template to make re-submission easier.
+	# 	if billing_address:
+	# 		submission['payment_kwargs']['billing_address'] = billing_address
+	#
+	# 	# Allow overrides to be passed in
+	# 	submission.update(kwargs)
+	#
+	# 	# Set guest email after overrides as we need to update the order_kwargs
+	# 	# entry.
+	# 	user = submission['user']
+	# 	if (not user.is_authenticated
+	# 			and 'guest_email' not in submission['order_kwargs']):
+	# 		email = self.checkout_session.get_guest_email()
+	# 		submission['order_kwargs']['guest_email'] = email
+	#
+	# 	# if submission['shipping_address'] and submission['shipping_method']:
+	# 	# 	# tax.apply_to(submission)
+	# 	#
+	# 	# 	# Recalculate order total to ensure we have a tax-inclusive total
+	# 	# 	submission['order_total'] = self.get_order_totals(
+	# 	# 		submission['basket'],
+	# 	# 		submission['shipping_charge'])
+	#
+	# 	return submission
 
 	def get_form_structure(self, form, use_placeholders=False, use_labels=True, use_help_text=True,
 		label_exceptions=[], initial={}, submit_text='Continue'):
@@ -150,7 +225,7 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 
 
 		form_structure.append(FormStructure().get_submit_button_error_container())
-		print(f"\n form structure for {self.form_class} : {json.dumps(form_structure)}")
+		# print(f"\n form structure for {self.form_class} : {json.dumps(form_structure)}")
 
 		return form_structure
 

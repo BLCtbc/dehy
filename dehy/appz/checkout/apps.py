@@ -13,15 +13,18 @@ class CheckoutConfig(apps.CheckoutConfig):
 	def ready(self):
 		self.checkout_view = get_class('checkout.views', 'CheckoutIndexView')
 		self.user_info_view = get_class('checkout.views', 'CheckoutIndexView')
+		self.checkout_basket_view = get_class('checkout.views', 'ShippingView')
 		self.shipping_view = get_class('checkout.views', 'ShippingView')
 		self.additional_info_view = get_class('checkout.views', 'AdditionalInfoView')
 		self.billing_view = get_class('checkout.views', 'BillingView')
 		self.thankyou_view = get_class('checkout.views', 'ThankYouView')
 
+
 	def get_urls(self):
 		urls = [
 			path('', self.checkout_view.as_view(), name='checkout'),
 			path('', self.checkout_view.as_view(), name='index'),
+			path('basket/', self.checkout_basket_view.as_view(), name='basket'),
 			path('user_info/', self.user_info_view.as_view(), name='user_info'),
 			path('shipping/', self.shipping_view.as_view(), name='shipping'),
 			path('additional_info/', self.additional_info_view.as_view(), name='additional_info'),

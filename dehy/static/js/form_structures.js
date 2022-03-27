@@ -1,3 +1,428 @@
+const US_States =
+	[
+	{
+		"tag": "option",
+		"text": "--",
+		"attrs": {
+			"value": ""
+		}
+	},
+	{
+		"tag": "option",
+		"text": "ALABAMA",
+		"attrs": {
+			"value": "AL"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "ALASKA",
+		"attrs": {
+			"value": "AK"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "AMERICAN SAMOA",
+		"attrs": {
+			"value": "AS"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "ARIZONA",
+		"attrs": {
+			"value": "AZ"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "ARKANSAS",
+		"attrs": {
+			"value": "AR"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "CALIFORNIA",
+		"attrs": {
+			"value": "CA"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "COLORADO",
+		"attrs": {
+			"value": "CO"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "CONNECTICUT",
+		"attrs": {
+			"value": "CT"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "DELAWARE",
+		"attrs": {
+			"value": "DE"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "DISTRICT OF COLUMBIA",
+		"attrs": {
+			"value": "DC"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "FEDERATED STATES OF MICRONESIA",
+		"attrs": {
+			"value": "FM"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "FLORIDA",
+		"attrs": {
+			"value": "FL"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "GEORGIA",
+		"attrs": {
+			"value": "GA"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "GUAM",
+		"attrs": {
+			"value": "GU"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "HAWAII",
+		"attrs": {
+			"value": "HI"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "IDAHO",
+		"attrs": {
+			"value": "ID"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "ILLINOIS",
+		"attrs": {
+			"value": "IL"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "INDIANA",
+		"attrs": {
+			"value": "IN"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "IOWA",
+		"attrs": {
+			"value": "IA"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "KANSAS",
+		"attrs": {
+			"value": "KS"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "KENTUCKY",
+		"attrs": {
+			"value": "KY"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "LOUISIANA",
+		"attrs": {
+			"value": "LA"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MAINE",
+		"attrs": {
+			"value": "ME"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MARSHALL ISLANDS",
+		"attrs": {
+			"value": "MH"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MARYLAND",
+		"attrs": {
+			"value": "MD"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MASSACHUSETTS",
+		"attrs": {
+			"value": "MA"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MICHIGAN",
+		"attrs": {
+			"value": "MI"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MINNESOTA",
+		"attrs": {
+			"value": "MN"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MISSISSIPPI",
+		"attrs": {
+			"value": "MS"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MISSOURI",
+		"attrs": {
+			"value": "MO"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "MONTANA",
+		"attrs": {
+			"value": "MT"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NEBRASKA",
+		"attrs": {
+			"value": "NE"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NEVADA",
+		"attrs": {
+			"value": "NV"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NEW HAMPSHIRE",
+		"attrs": {
+			"value": "NH"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NEW JERSEY",
+		"attrs": {
+			"value": "NJ"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NEW MEXICO",
+		"attrs": {
+			"value": "NM"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NEW YORK",
+		"attrs": {
+			"value": "NY"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NORTH CAROLINA",
+		"attrs": {
+			"value": "NC"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NORTH DAKOTA",
+		"attrs": {
+			"value": "ND"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "NORTHERN MARIANA ISLANDS",
+		"attrs": {
+			"value": "MP"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "OHIO",
+		"attrs": {
+			"value": "OH"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "OKLAHOMA",
+		"attrs": {
+			"value": "OK"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "OREGON",
+		"attrs": {
+			"value": "OR"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "PALAU",
+		"attrs": {
+			"value": "PW"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "PENNSYLVANIA",
+		"attrs": {
+			"value": "PA"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "PUERTO RICO",
+		"attrs": {
+			"value": "PR"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "RHODE ISLAND",
+		"attrs": {
+			"value": "RI"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "SOUTH CAROLINA",
+		"attrs": {
+			"value": "SC"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "SOUTH DAKOTA",
+		"attrs": {
+			"value": "SD"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "TENNESSEE",
+		"attrs": {
+			"value": "TN"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "TEXAS",
+		"attrs": {
+			"value": "TX"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "UTAH",
+		"attrs": {
+			"value": "UT"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "VERMONT",
+		"attrs": {
+			"value": "VT"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "VIRGIN ISLANDS",
+		"attrs": {
+			"value": "VI"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "VIRGINIA",
+		"attrs": {
+			"value": "VA"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "WASHINGTON",
+		"attrs": {
+			"value": "WA"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "WEST VIRGINIA",
+		"attrs": {
+			"value": "WV"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "WISCONSIN",
+		"attrs": {
+			"value": "WI"
+		}
+	},
+	{
+		"tag": "option",
+		"text": "WYOMING",
+		"attrs": {
+			"value": "WY"
+		}
+	}
+]
+
+
 const FormStructures = {
 	"password": [
 		{
@@ -22,7 +447,7 @@ const FormStructures = {
 		"classes": "required"
 		},
 	],
-	"additional_info": [{"tag": "div", "classes": "form-container", "elems": [{"tag": "div", "classes": "row", "elems": [{"tag": "div", "classes": "form-floating input-group col", "elems": [{"tag": "label", "attrs": {"for": "id_purchase_business_type"}, "text": "Business or Home:"}, {"tag": "select", "attrs": {"name": "purchase_business_type", "id": "id_purchase_business_type", "class": "form-control", "placeholder": "purchase_business_type"}, "elems": [{"tag": "option", "text": "Bar or Restaurant", "attrs": {"value": "b_r"}}, {"tag": "option", "text": "Home", "attrs": {"value": "h"}}, {"tag": "option", "text": "Other", "attrs": {"value": "o"}}]}, {"tag": "span", "attrs": {"class": "helptext"}, "text": "Is this for home or commercial use?"}]}]}, {"tag": "div", "classes": "row", "elems": [{"tag": "div", "classes": "form-floating input-group col", "elems": [{"tag": "label", "attrs": {"for": "id_business_name"}, "text": "Business name:"}, {"tag": "input", "attrs": {"type": "text", "name": "business_name", "maxlength": "100", "required": "", "id": "id_business_name", "class": "form-control required", "placeholder": "business_name", "autofill": "text"}}, {"tag": "span", "attrs": {"class": "helptext"}, "text": "What is the name of your Bar/Restaurant/Business?"}]}]}]}, {"tag": "div", "classes": "error-container button-container", "elems": [{"tag": "div", "classes": "form-group row hide", "attrs": {"id": "error_container"}, "elems": [{"tag": "div", "classes": "col-12 errors", "attrs": {"id": "errors"}}]}, {"tag": "div", "classes": "form-group row", "elems": [{"tag": "button", "text": "Continue", "classes": "col-12", "attrs": {"type": "submit", "hidden": "", "aria-label": "Continue"}}]}]}],
+	"additional_info": [{"tag": "div", "classes": "form-container", "elems": [{"tag": "div", "classes": "row", "elems": [{"tag": "div", "classes": "form-floating input-group col", "elems": [{"tag": "label", "attrs": {"for": "id_purchase_business_type"}, "text": "Business or Home:"}, {"tag": "select", "attrs": {"name": "purchase_business_type", "id": "id_purchase_business_type", "class": "form-control", "placeholder": "purchase_business_type"}, "elems": [{"tag": "option", "text": "Bar or Restaurant", "attrs": {"value": "b_r"}}, {"tag": "option", "text": "Home", "attrs": {"value": "h"}}, {"tag": "option", "text": "Other", "attrs": {"value": "o"}}]}, {"tag": "span", "attrs": {"class": "helptext"}, "text": "Is this for home or commercial use?"}]}]}, {"tag": "div", "classes": "row", "elems": [{"tag": "div", "classes": "form-floating input-group col", "elems": [{"tag": "label", "attrs": {"for": "id_business_name"}, "text": "Business name:"}, {"tag": "input", "attrs": {"type": "text", "name": "business_name", "maxlength": "100", "required": "", "id": "id_business_name", "class": "form-control required", "placeholder": "business_name", "autofill": "text"}}, {"tag": "span", "attrs": {"class": "helptext"}, "text": "What is the name of your Bar/Restaurant/Business?"}]}]}]}, {"tag": "div", "classes": "error-container button-container", "elems": [{"tag": "div", "classes": "form-group row hidden", "attrs": {"id": "error_container"}, "elems": [{"tag": "div", "classes": "col-12 errors", "attrs": {"id": "errors"}}]}, {"tag": "div", "classes": "form-group row", "elems": [{"tag": "button", "text": "Continue", "classes": "col-12", "attrs": {"type": "submit", "hidden": "", "aria-label": "Continue"}}]}]}],
 	"billing": [
 		{
 			"tag": "div",
@@ -190,15 +615,17 @@ const FormStructures = {
 									"attrs": {
 										"for": "id_country"
 									},
-									"classes": "floating-label",
-									"text": "Country:"
+									"text": "Country"
 								},
 								{
 									"tag": "select",
 									"attrs": {
 										"name": "country",
-										"placeholder": "Country",
-										"id": "id_country"
+										"id": "id_country",
+										"class": "form-control required",
+										"placeholder": "country",
+										"autocomplete": "country-name",
+										"required": ""
 									},
 									"elems": [
 										{
@@ -1976,7 +2403,8 @@ const FormStructures = {
 										"id": "id_postcode",
 										"class": "form-control required",
 										"placeholder": "postcode",
-										"autocomplete": "postal-code"
+										"autocomplete": "postal-code",
+										"pattern": "(^[0-9]{5}$)|(^[0-9]{5}-[0-9]{4}$)"
 									}
 								}
 							]
@@ -2019,17 +2447,16 @@ const FormStructures = {
 									"text": "State"
 								},
 								{
-									"tag": "input",
+									"tag": "select",
 									"attrs": {
-										"type": "text",
 										"name": "state",
-										"maxlength": "255",
 										"id": "id_state",
 										"class": "form-control required",
 										"placeholder": "state",
 										"autofill": "address-level1",
 										"required": ""
-									}
+									},
+									"elems": US_States
 								}
 							]
 						}
@@ -2075,7 +2502,7 @@ const FormStructures = {
 			"elems": [
 				{
 					"tag": "div",
-					"classes": "form-group row hide",
+					"classes": "form-group row hidden",
 					"attrs": {
 						"id": "error_container"
 					},
@@ -2370,7 +2797,7 @@ const FormStructures = {
 						]
 					}
 				]
-			}, // country
+			},
 			{
 				"tag": "div",
 				"classes": "row",
@@ -2396,7 +2823,8 @@ const FormStructures = {
 									"id": "id_postcode",
 									"class": "form-control required",
 									"placeholder": "postcode",
-									"autocomplete": "postal-code"
+									"autocomplete": "postal-code",
+									"pattern": '(^[0-9]{5}$)|(^[0-9]{5}-[0-9]{4}$)'
 								}
 							}
 						]
@@ -2439,17 +2867,16 @@ const FormStructures = {
 								"text": "State"
 							},
 							{
-								"tag": "input",
+								"tag": "select",
 								"attrs": {
-									"type": "text",
 									"name": "state",
-									"maxlength": "255",
 									"id": "id_state",
 									"class": "form-control required",
 									"placeholder": "state",
 									"autofill": "address-level1",
 									"required": ""
-								}
+								},
+								"elems": US_States
 							}
 						]
 					}
@@ -2495,7 +2922,7 @@ const FormStructures = {
 		"elems": [
 			{
 				"tag": "div",
-				"classes": "form-group row hide",
+				"classes": "form-group row hidden",
 				"attrs": {
 					"id": "error_container"
 				},
@@ -2788,7 +3215,7 @@ const FormStructures = {
 		"elems": [
 			{
 				"tag": "div",
-				"classes": "form-group row hide",
+				"classes": "form-group row hidden",
 				"attrs": {
 					"id": "error_container"
 				},
