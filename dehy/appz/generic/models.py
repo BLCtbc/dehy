@@ -1,8 +1,13 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-# Create your models here.
-import datetime
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from oscar.apps.customer.abstract_models import AbstractUser
+
+import datetime
+
+
+class User(AbstractUser):
+	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
 
 class FedexAuthToken(models.Model):
 	access_token = models.CharField(_("Token"), max_length=2000, default="")
