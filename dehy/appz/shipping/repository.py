@@ -103,6 +103,10 @@ class Repository(repository.Repository):
 			response_list = json.loads(response.text)
 
 			for rate in response_list['output']['rateReplyDetails']:
+
+				if len(rate['ratedShipmentDetails']) < 1:
+					continue
+
 				cost = rate['ratedShipmentDetails'][0]['totalNetCharge']
 
 				methods.append(

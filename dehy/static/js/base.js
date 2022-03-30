@@ -8,6 +8,7 @@ var dehy = {
 			if (modal_text) {
 				modal_text.textContent = dehy.loading_message
 			}
+			dehy.utils.freeze_submissions = true;
 			$( "#loading_modal" ).show();
 			dehy.utils.freeze_forms();
 			dehy.loadStart = window.performance.now();
@@ -23,6 +24,7 @@ var dehy = {
 				dehy.utils.unfreeze_forms();
 				$( "#loading_modal" ).hide();
 			}
+
 		});
 
 		$.ajaxSetup({
@@ -121,6 +123,7 @@ var dehy = {
 		},
 	},
 	utils: {
+		freeze_submissions: false,
 		update_cart_quantity(basket_items=0) {
 
 			var cart_container = document.querySelector('.cart-container');
@@ -156,6 +159,7 @@ var dehy = {
 		},
 		unfreeze_forms() {
 			this.freeze_forms(false);
+			dehy.utils.freeze_submissions = false;
 		},
 		remove_event_listeners(elem) {
 			var copy = elem.cloneNode(true);

@@ -451,36 +451,36 @@ const FormStructures = {
 	"billing": [
 		{
 			"tag": "div",
-			"classes": "form-container",
+			"classes": "row",
 			"elems": [
 				{
 					"tag": "div",
-					"classes": "row",
+					"classes": "input-group col",
 					"elems": [
 						{
-							"tag": "div",
-							"classes": "input-group col",
-							"elems": [
-								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_same_as_shipping"
-									},
-									"text": "Use shipping address"
-								},
-								{
-									"tag": "input",
-									"attrs": {
-										"type": "checkbox",
-										"name": "same_as_shipping",
-										"id": "id_same_as_shipping",
-										"checked": ""
-									}
-								}
-							]
+							"tag": "label",
+							"attrs": {
+								"for": "id_same_as_shipping"
+							},
+							"text": "Use shipping address"
+						},
+						{
+							"tag": "input",
+							"attrs": {
+								"type": "checkbox",
+								"name": "same_as_shipping",
+								"id": "id_same_as_shipping",
+								"checked": ""
+							}
 						}
 					]
-				},
+				}
+			]
+		},
+		{
+			"tag": "div",
+			"classes": "form-container",
+			"elems": [
 				{
 					"tag": "div",
 					"classes": "row",
@@ -3039,7 +3039,6 @@ const FormStructures = {
 								"attrs": {
 									"type": "password",
 									"name": "password",
-									"required": "",
 									"id": "id_password",
 									"class": "form-control",
 									"placeholder": "password",
