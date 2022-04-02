@@ -34,7 +34,7 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.adjust_country_field()
-		self.fields['phone_number'].required = False
+		# self.fields['phone_number'].required = False
 
 	def adjust_country_field(self):
 		countries = Country._default_manager.filter(Q(iso_3166_1_a2='US')|Q(iso_3166_1_a2='CA'))
@@ -61,11 +61,7 @@ class FakeShippingAddressForm(ShippingAddressForm):
 		super().__init__(*args, **kwargs)
 		required_fields = ['country', 'postcode']
 		for field_name,field in self.fields.items():
-			self.fields[field_name].required = False
-			if field_name in required_fields:
-				self.fields[field_name].required = True
-
-
+			self.fields[field_name].required = True if field_name in required_fields else False
 
 class ShippingMethodForm(forms.Form):
 

@@ -447,7 +447,146 @@ const FormStructures = {
 		"classes": "required"
 		},
 	],
-	"additional_info": [{"tag": "div", "classes": "form-container", "elems": [{"tag": "div", "classes": "row", "elems": [{"tag": "div", "classes": "form-floating input-group col", "elems": [{"tag": "label", "attrs": {"for": "id_purchase_business_type"}, "text": "Business or Home:"}, {"tag": "select", "attrs": {"name": "purchase_business_type", "id": "id_purchase_business_type", "class": "form-control", "placeholder": "purchase_business_type"}, "elems": [{"tag": "option", "text": "Bar or Restaurant", "attrs": {"value": "b_r"}}, {"tag": "option", "text": "Home", "attrs": {"value": "h"}}, {"tag": "option", "text": "Other", "attrs": {"value": "o"}}]}, {"tag": "span", "attrs": {"class": "helptext"}, "text": "Is this for home or commercial use?"}]}]}, {"tag": "div", "classes": "row", "elems": [{"tag": "div", "classes": "form-floating input-group col", "elems": [{"tag": "label", "attrs": {"for": "id_business_name"}, "text": "Business name:"}, {"tag": "input", "attrs": {"type": "text", "name": "business_name", "maxlength": "100", "required": "", "id": "id_business_name", "class": "form-control required", "placeholder": "business_name", "autofill": "text"}}, {"tag": "span", "attrs": {"class": "helptext"}, "text": "What is the name of your Bar/Restaurant/Business?"}]}]}]}, {"tag": "div", "classes": "error-container button-container", "elems": [{"tag": "div", "classes": "form-group row hidden", "attrs": {"id": "error_container"}, "elems": [{"tag": "div", "classes": "col-12 errors", "attrs": {"id": "errors"}}]}, {"tag": "div", "classes": "form-group row", "elems": [{"tag": "button", "text": "Continue", "classes": "col-12", "attrs": {"type": "submit", "hidden": "", "aria-label": "Continue"}}]}]}],
+	"additional_info": [
+	{
+		"tag": "div",
+		"classes": "form-container",
+		"elems": [
+			{
+				"tag": "div",
+				"classes": "row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_purchase_business_type"
+								},
+								"text": "Business or Home:"
+							},
+							{
+								"tag": "select",
+								"attrs": {
+									"name": "purchase_business_type",
+									"id": "id_purchase_business_type",
+									"class": "form-control",
+									"placeholder": "purchase_business_type"
+								},
+								"elems": [
+									{
+										"tag": "option",
+										"text": "Bar or Restaurant",
+										"attrs": {
+											"value": "b_r"
+										}
+									},
+									{
+										"tag": "option",
+										"text": "Home",
+										"attrs": {
+											"value": "h"
+										}
+									},
+									{
+										"tag": "option",
+										"text": "Other",
+										"attrs": {
+											"value": "o"
+										}
+									}
+								]
+							},
+							{
+								"tag": "span",
+								"attrs": {
+									"class": "helptext"
+								},
+								"text": "Is this for home or commercial use?"
+							}
+						]
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"classes": "row",
+				"elems": [
+					{
+						"tag": "div",
+						"classes": "form-floating input-group col",
+						"elems": [
+							{
+								"tag": "label",
+								"attrs": {
+									"for": "id_business_name"
+								},
+								"text": "Business name:"
+							},
+							{
+								"tag": "input",
+								"attrs": {
+									"type": "text",
+									"name": "business_name",
+									"maxlength": "100",
+									"required": "",
+									"id": "id_business_name",
+									"class": "form-control required",
+									"placeholder": "business_name",
+									"autofill": "text"
+								}
+							},
+							{
+								"tag": "span",
+								"attrs": {
+									"class": "helptext"
+								},
+								"text": "What is the name of your Bar/Restaurant/Business?"
+							}
+						]
+					}
+				]
+			}
+		]
+	},
+	{
+		"tag": "div",
+		"classes": "error-container button-container",
+		"elems": [
+			{
+				"tag": "div",
+				"classes": "form-group row hidden",
+				"attrs": {
+					"id": "error_container"
+				},
+				"elems": [
+					{
+						"tag": "span",
+						"classes": "col-12 errors",
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"classes": "form-group row",
+				"elems": [
+					{
+						"tag": "button",
+						"text": "Continue",
+						"classes": "col-12",
+						"attrs": {
+							"type": "submit",
+							"hidden": "",
+							"aria-label": "Continue"
+						}
+					}
+				]
+			}
+		]
+	}
+],
 	"billing": [
 		{
 			"tag": "div",
@@ -2508,11 +2647,8 @@ const FormStructures = {
 					},
 					"elems": [
 						{
-							"tag": "div",
+							"tag": "span",
 							"classes": "col-12 errors",
-							"attrs": {
-								"id": "errors"
-							}
 						}
 					]
 				},
@@ -2597,11 +2733,8 @@ const FormStructures = {
 					"classes": "form-group row",
 					"elems": [
 						{
-							"attrs": {
-								"id": "errors"
-							},
 							"classes": "col-12 errors",
-							"tag": "div"
+							"tag": "span"
 						}
 					],
 					"tag": "div"
@@ -2928,11 +3061,8 @@ const FormStructures = {
 				},
 				"elems": [
 					{
-						"tag": "div",
+						"tag": "span",
 						"classes": "col-12 errors",
-						"attrs": {
-							"id": "errors"
-						}
 					}
 				]
 			},
@@ -3220,11 +3350,8 @@ const FormStructures = {
 				},
 				"elems": [
 					{
-						"tag": "div",
+						"tag": "span",
 						"classes": "col-12 errors",
-						"attrs": {
-							"id": "errors"
-						}
 					}
 				]
 			},

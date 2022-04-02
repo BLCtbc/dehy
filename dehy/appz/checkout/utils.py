@@ -77,7 +77,7 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 	def get_stored_shipping_methods(self):
 		self._check_namespace('shipping_methods')
 		shipping_methods = []
-		
+
 		for method_code, val in self.request.session[self.SESSION_KEY]['shipping_methods'].items():
 			method = BaseFedex(code=method_code, name=val['name'], charge_excl_tax=val['cost'], charge_incl_tax=val['cost'])
 			shipping_methods.append(method)
@@ -97,6 +97,38 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		Return shipping address fields
 		"""
 		return self._get('shipping', 'new_address_fields')
+
+	# def get_shipping_address(self):
+	# 	"""
+	# 	Return shipping address fields
+	# 	"""
+	# 	address_fields = self.new_shipping_address_fields()
+	#
+	# 	return self._get('shipping', 'new_address_fields')
+	#
+	# 	 if not basket.is_shipping_required():
+	#             return None
+	#
+	#         addr_data = self.checkout_session.new_shipping_address_fields()
+	#         if addr_data:
+	#             # Load address data into a blank shipping address model
+	#             return ShippingAddress(**addr_data)
+	#         addr_id = self.checkout_session.shipping_user_address_id()
+	#         if addr_id:
+	#             try:
+	#                 address = UserAddress._default_manager.get(pk=addr_id)
+	#             except UserAddress.DoesNotExist:
+	#                 # An address was selected but now it has disappeared.  This can
+	#                 # happen if the customer flushes their address book midway
+	#                 # through checkout.  No idea why they would do this but it can
+	#                 # happen.  Checkouts are highly vulnerable to race conditions
+	#                 # like this.
+	#                 return None
+	#             else:
+	#                 # Copy user address data into a blank shipping address instance
+	#                 shipping_addr = ShippingAddress()
+	#                 address.populate_alternative_model(shipping_addr)
+	#                 return shipping_addr
 
 	get_shipping_address = new_shipping_address_fields
 	is_stripe_customer_set = is_stripe_customer_field_set

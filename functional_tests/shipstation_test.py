@@ -40,7 +40,7 @@ print(response.text)
 response_dict = json.loads(response.text)
 
 response_dict = [
-	{'serviceName': 'FedEx Ground®', 'serviceCode': 'fedex_ground', 'shipmentCost': 9.11, 'otherCost': 4.85}, 
+	{'serviceName': 'FedEx Ground®', 'serviceCode': 'fedex_ground', 'shipmentCost': 9.11, 'otherCost': 4.85},
 	{'serviceName': 'FedEx Priority Overnight®', 'serviceCode': 'fedex_priority_overnight', 'shipmentCost': 20.39, 'otherCost': 3.52},
 	{'serviceName': 'FedEx Express Saver®', 'serviceCode': 'fedex_express_saver', 'shipmentCost': 14.77, 'otherCost': 2.55},
 	{'serviceName': 'FedEx 2Day® A.M.', 'serviceCode': 'fedex_2day_am', 'shipmentCost': 17.22, 'otherCost': 2.97},

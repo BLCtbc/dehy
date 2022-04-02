@@ -1,4 +1,7 @@
-import os
+
+
+import os, sys
+# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
@@ -7,6 +10,7 @@ from pathlib import Path
 
 MAX_WAIT = 10
 BASE_DIR = Path(__file__).resolve().parent
+
 
 from django.core.management import call_command
 from django.test import TestCase as BaseTestCase
@@ -23,7 +27,7 @@ from django.test import TestCase as BaseTestCase
 
 
 class FunctionalTest(StaticLiveServerTestCase):
-	fixtures = [BASE_DIR / 'fixtures.json']
+	fixtures = [BASE_DIR / 'fixtures2.json']
 	# @classmethod
 	# def setUpTestData(cls):
 	#
@@ -42,7 +46,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 		print('setUp')
 		self.browser = webdriver.Chrome(BASE_DIR / 'chromedriver')
 		self.browser.maximize_window()
-		
+
 		staging_server = os.environ.get('STAGING_SERVER')
 		if staging_server:
 			self.live_server_url = 'http://' + staging_server
@@ -76,3 +80,5 @@ class FunctionalTest(StaticLiveServerTestCase):
 				if time.time() - start_time > MAX_WAIT:
 					raise e
 				time.sleep(0.5)
+
+

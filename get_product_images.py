@@ -53,10 +53,11 @@ def main():
 				print(f'image: {img_name} not found at: {image_path}')
 				continue
 
-			elif os.path.exists(media_img_path):
-				## need to add another check here for seeing if the image exists in the database also
-				print(f'file path: {media_img_path} already exists')
-				continue
+			# elif os.path.exists(media_img_path):
+			# 	## need to add another check here for seeing if the image exists in the database also
+			#
+			# 	print(f'file path: {media_img_path} already exists')
+			# 	continue
 
 			lf = tempfile.NamedTemporaryFile(dir='media/images')
 			f = open(image_path, 'rb')

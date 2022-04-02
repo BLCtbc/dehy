@@ -31,6 +31,8 @@ class CheckoutConfig(apps.CheckoutConfig):
 			path('additional_info/', self.additional_info_view.as_view(), name='additional_info'),
 			path('billing/', self.billing_view.as_view(), name='billing'),
 			path('place_order/', self.place_order_view.as_view(preview=True), name='place_order'),
+			# path('preview/', self.place_order_view.as_view(preview=True), name='preview'),
+
 			path('thank_you/', self.thankyou_view.as_view(), name='thank_you'),
 			path('thank-you/', self.thankyou_view.as_view(), name='thank_you'),
 		]

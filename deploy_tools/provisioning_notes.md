@@ -22,6 +22,7 @@
 	- [authenticating github][#git_authentication]
 7. [troubleshooting](#troubleshooting)
 	- [postgres issues](#postgresql)
+	- [issues with using custom User model](#custom_user_model)
 8. [clearing sorl thumbnail media cache](#clear_sorl_image_cache)
 9. [running local django server over https](#local_django_https)
 10. [integrating stripe with django-oscar](#stripe_integration)
@@ -1210,6 +1211,55 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		`$ sudo pkill -u postgres` That kills all processes running as user `postgres`
 			or
 		`$ pkill postgres` That kills all processes named 'postgres'
+
+	<a name="custom_user_model"></a>
+	- using a custom user model with django oscar
+
+		follow the steps listed here:
+		https://stackoverflow.com/a/53936097/6158303
+
+		- step 1:
+
+			```py
+			# settings.py
+			...
+			AUTH_USER_MODEL = "generic.User"
+			...
+
+			# dehy/appz/generic.models
+
+			...
+			from oscar.apps.customer.abstract_models import AbstractUser
+			...
+			class User(AbstractUser):
+				stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
+
+			```
+
+		- step 2:`python manage.py makemigrations`
+
+		- step 3: undo step 1
+			```py
+			# settings.py
+			...
+			# AUTH_USER_MODEL = "generic.User"
+			...
+
+			# dehy/appz/generic.models
+
+			...
+			from oscar.apps.customer.abstract_models import AbstractUser
+			...
+			#class User(AbstractUser):
+			#	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
+
+			```
+			
+		- step 4: `python manage.py migrate`
+
+		- step 5: redo step 1
+
+
 
 
 implementing a continuous deployment workflow on Debian 10+

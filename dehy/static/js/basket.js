@@ -11,16 +11,19 @@ dehy.basket = {
 		dehy.basket.remove_oscar_basket_event_listeners();
 		var basket_formset = document.querySelector('.basket_summary');
 
-		basket_formset.querySelectorAll('.product-quantity').forEach(function(elem) {
-			dehy.basket.utils.set_product_quantity_width(elem);
-		    elem.addEventListener('change', dehy.basket.update_product_quantity_handler);
-		});
-		basket_formset.querySelectorAll('.remove-basket-item').forEach(function(elem) {
-		    elem.addEventListener('click', e=>{dehy.basket.update_product_quantity_handler(e, 0)});
-		});
-		basket_formset.addEventListener('submit', e=>{
-			e.preventDefault();
-		});
+		if (basket_formset) {
+			basket_formset.querySelectorAll('.product-quantity').forEach(function(elem) {
+				dehy.basket.utils.set_product_quantity_width(elem);
+				elem.addEventListener('change', dehy.basket.update_product_quantity_handler);
+			});
+			basket_formset.querySelectorAll('.remove-basket-item').forEach(function(elem) {
+				elem.addEventListener('click', e=>{dehy.basket.update_product_quantity_handler(e, 0)});
+			});
+			basket_formset.addEventListener('submit', e=>{
+				e.preventDefault();
+			});
+		}
+
 	},
 	remove_oscar_basket_event_listeners() {
 		document.querySelectorAll("#content_inner, .order-contents").forEach(function(elem) {
@@ -55,7 +58,7 @@ dehy.basket = {
 				dehy.basket.basket_updated_handlers.success(data);
 				if (data.hasOwnProperty('shipping_methods') && window.location.pathname.includes("checkout")) {
 					// update shipping methods
-					dehy.ch.shipping.display_shipping_methods(data);
+					dehy.ch.shipping.update_shipping_methods(data);
 				}
 			},
 			error: dehy.basket.basket_updated_handlers.error
@@ -103,7 +106,7 @@ dehy.basket = {
 					if (response.hasOwnProperty('shipping_postcode')) {
 						var shipping_postcode_container = document.querySelector('#shipping_postcode');
 						if (shipping_postcode_container) {
-							shipping_postcode_container.textContent = `(${response.shipping_postcode})`
+							shipping_postcode_container.textContent = ` (${response.shipping_postcode})`
 						}
 					}
 				};

@@ -5,7 +5,6 @@ from oscar.apps.customer.abstract_models import AbstractUser
 
 import datetime
 
-
 class User(AbstractUser):
 	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
 

@@ -1,6 +1,13 @@
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY, SESSION_KEY, get_user_model
 from django.contrib.sessions.backends.db import SessionStore
+
+
+# import os
+# import django
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dehy.settings")
+# django.setup()
+
 from .base import FunctionalTest
 User = get_user_model()
 
