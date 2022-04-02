@@ -11,10 +11,10 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 # settings.configure()
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dehy.settings")
-django.setup()
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dehy.settings")
+# django.setup()
 
-from deploy_tools.fixture_creator import FixtureCreator
+from fixture_creator import FixtureCreator
 
 Product = get_model('catalogue', 'Product')
 ProductImage = get_model('catalogue', 'ProductImage')
