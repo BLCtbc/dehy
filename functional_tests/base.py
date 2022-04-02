@@ -27,7 +27,7 @@ from django.test import TestCase as BaseTestCase
 
 
 class FunctionalTest(StaticLiveServerTestCase):
-	fixtures = [BASE_DIR / 'fixtures2.json']
+	fixtures = [BASE_DIR / 'fixtures.json']
 	# @classmethod
 	# def setUpTestData(cls):
 	#
@@ -43,7 +43,6 @@ class FunctionalTest(StaticLiveServerTestCase):
 
 
 	def setUp(self):
-		print('setUp')
 		self.browser = webdriver.Chrome(BASE_DIR / 'chromedriver')
 		self.browser.maximize_window()
 

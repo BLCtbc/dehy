@@ -106,6 +106,8 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		* grant permissions, then quit
 			```sql
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy TO dehydevuser;
+			-- grant permissions on the default database also, for testing
+			postgres=# GRANT ALL PRIVILEGES ON DATABASE postgres TO dehydevuser;
 			postgres=# \q
 			```
 
@@ -115,14 +117,83 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy_staging TO dehydevuser;
 			```
 
+		<a name="re_instantiate_database"></a>
+		* If you need to first delete an existing database... re-instantiating postgresql database
+			steps 1 and 2 from [here](https://www.postgresqltutorial.com/postgresql-administration/postgresql-drop-database/)
+			1. dropping database with no connections
+
+				```sql
+				postgres=# DROP DATABASE dehy;
+				```
+
+			2. dropping database WITH active connections
+
+				```sql
+				-- the output from this command is much easier to read within pgadmin, although not relaly necessary
+				postgres=# SELECT * FROM pg_stat_activity WHERE datname = 'dehy_staging';
+
+				-- if you run this command within pgadmin you will lose connection
+				SELECT pg_terminate_backend (pg_stat_activity.pid)
+				FROM pg_stat_activity
+				WHERE pg_stat_activity.datname = 'dehy_staging';
+
+				--
+				DROP DATABASE dehy_staging;
+				```
+
+			3. delete all migration files:
+				test the pattern:
+					`ls -la ./dehy/appz/*/migrations/*.py`
+
+				remove migration files:
+					`rm -r ./dehy/appz/*/migrations/*.py`
+					<!-- `rm -rf ./dehy*/__pycache__` -->
+
+			4. remove references to models within files (since the model instances no longer exist, and will cause errors)
+
+				i commented this whole file out:
+				```py
+				# appz/shipping/repository.py
+				...
+				# from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
+				...
+				```
+
+			5. replace the oscar migration files
+
+				```sh
+				# repeat this for all forked oscar apps...
+				# current list: address, basket, catalogue, customer, order, partner, payment, shipping
+				export APP_NAME=basket
+				cp -R venv/lib/python3.7/site-packages/oscar/apps/$APP_NAME/migrations dehy/appz/$APP_NAME
+				```
+
+			6. makemigrations:
+				```sh
+				python manage.py makemigrations
+
+				# need to specify the app name for any custom (non-oscar) apps
+				python manage.py makemigrations generic
+				python manage.py makemigrations recipes
+				```
+
+			7. migrate:
+				`python manage.py migrate`
+
+
+			8. load the fixtures (see below)
+
+			9. populate the country objects `python manage.py oscar_populate_countries`
+
+
 		- loading fixtures:
 			```sh
-			python fixture_creator.py # file must be placed called in same directory as manage.py
+			python fixture_creator.py # file must be placed+called in same directory as manage.py
 			```
 
 		- loading images into database:
 			```sh
-			python get_product_images.py # file must be placed called in same directory as manage.py
+			python get_product_images.py # file must be placed+called in same directory as manage.py
 			```
 
 	- create and setup the `.env` file:
@@ -1254,7 +1325,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			#	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
 
 			```
-			
+
 		- step 4: `python manage.py migrate`
 
 		- step 5: redo step 1
@@ -1320,9 +1391,24 @@ implementing a continuous deployment workflow on Debian 10+
 
 8. ###### testing
 
+		if you continuously get `ModuleNotFoundError: No module named 'dehy.functional_tests'`
+		even though the modules are clearly visible and discoverable, the issue could be resolved
+		by renaming the project folder, as suggested [here](https://stackoverflow.com/a/28476388/6158303)
+
+		the actual command:
+		`./manage.py test functional_tests --keepdb -v 3`
+
+		additionally, you should make sure you have
+		```sql
+		postgres=# GRANT ALL PRIVILEGES ON DATABASE postgres TO dehydevuser;
+		postgres=# \q
+		```
+
 	fixture used:
 
 		`python manage.py dumpdata --exclude=auth --exclude=address --exclude=contenttypes --indent=4 --exclude='admin.logentry' --exclude='sessions.session' --exclude=analytics --exclude=thumbnail --exclude=basket --exclude=order --exclude=payment --output='fixtures.json'`
+
+
 
 <a name='django_view_inserted_into_another_view'></a>
 9. ###### insert a django view (child) into another view (parent)
