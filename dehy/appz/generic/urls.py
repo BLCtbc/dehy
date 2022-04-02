@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from dehy.appz.checkout.views import ajax_get_shipping_methods, ajax_set_shipping_method
+from dehy.appz.checkout.views import ajax_get_shipping_methods, ajax_set_shipping_method, webhook_submit_order
 
 urlpatterns = [
 	path('', views.HomeView.as_view(), name='home'),
@@ -14,6 +14,7 @@ urlpatterns = [
 	path('ajax/create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
 	path('shipping/location/', ajax_get_shipping_methods, name='get_shipping_methods'),
 	path('shipping/set_method/', ajax_set_shipping_method, name='set_shipping_method'),
+	path('webhooks/order_submitted/', webhook_submit_order, name='webhook_submit_order'),
 
 ]
 

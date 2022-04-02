@@ -6,11 +6,12 @@ from oscar.core.loading import get_class
 Unavailable = get_class('partner.availability', 'Unavailable')
 
 class Basket(AbstractBasket):
-	payment_intent_id = models.CharField(max_length=100, help_text='Payment Intent ID(Stripe)', blank=True, null=True)
-	stripe_customer_id = models.CharField(max_length=100, help_text='Stripe Customer ID', blank=True, null=True)
-	stripe_order_id = models.CharField(max_length=120, help_text='Stripe Order ID', blank=True, null=True)
+	payment_intent_id = models.CharField(max_length=255, help_text='Payment Intent ID(Stripe)', blank=True, null=True)
+	stripe_customer_id = models.CharField(max_length=255, help_text='Stripe Customer ID', blank=True, null=True)
+	stripe_order_id = models.CharField(max_length=255, help_text='Stripe Order ID', blank=True, null=True)
 	stripe_order_status = models.CharField(max_length=50, help_text='Stripe Order Status', blank=True, null=True)
-	payment_intent_client_secret = models.CharField(max_length=150, help_text='Payment Intent Client Secret(Stripe)', blank=True, null=True)
+	payment_intent_client_secret = models.CharField(max_length=255, help_text='Payment Intent Client Secret (Stripe)', blank=True, null=True)
+	stripe_order_client_secret = models.CharField(max_length=255, help_text='Order Client Secret (Stripe)', blank=True, null=True)
 
 	@property
 	def total_weight(self):

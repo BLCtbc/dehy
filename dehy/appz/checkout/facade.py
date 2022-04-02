@@ -22,9 +22,7 @@ class Facade(object):
 		return 'An error occurred when communicating with the payment gateway.'
 
 	def error_handler(self, error):
-		print('\n ** error handler ** \n')
-		print(f'\n ** error: {error}')
-
+		print(f'\n ** Facade error: {error}')
 		message = "Something else happened, completely unrelated to Stripe"
 		print('Code is: %s' % error.code)
 		# param is '' in this case
@@ -56,9 +54,67 @@ class Facade(object):
 
 		return message
 
-	def update_and_process_order(self, basket, shipping_cost={}, shipping_details={}, discounts=[], billing_details={}):
+	def get_or_create_customer(self, email):
 		try:
-			order = self.update_order(basket, shipping_cost={}, shipping_details={}, discounts=[], billing_details=self.coerce_address_object(billing_details))
+
+			customers = stripe.Customer.list(limit=1, email=email)
+			if customers.data:
+				customer = customers.data[0]
+				return customer
+
+			# create the customer
+			else:
+				customer = stripe.Customer.create(email=email)
+				return customer
+
+		except Exception as e:
+			return self.error_handler(e)
+
+
+	def update_or_create_customer(self, checkout_session, payment_method=None, name=None, email=None, description=None, metadata=None, customer=None):
+
+		# see if the customer id exists in the checkout_session first
+		try:
+			created = False
+
+
+			if checkout_session.is_stripe_customer_id_set():
+				customer = stripe.Customer.retrieve(
+					id=checkout_session.get_stripe_customer_id(),
+					payment_method=payment_method,
+					email=email,
+					name=name,
+					description=description,
+					metadata=metadata,
+				)
+			else:
+				print('\n creating new customer \n')
+				customer = stripe.Customer.create(
+					email=email,
+					payment_method=payment_method,
+					name=name,
+					description=description,
+					metadata=metadata
+				)
+
+
+			if payment_method:
+				stripe.PaymentMethod.attach(
+					payment_method,
+					customer=customer['id'],
+				)
+
+			checkout_session.set_stripe_customer(customer)
+
+			return customer
+
+		except Exception as e:
+			return self.error_handler(e)
+
+
+	def update_and_process_order(self, basket, **order_details):
+		try:
+			order = self.update_or_create_order(basket, **order_details)
 			payment = self.set_order_to_processing(basket, order)
 			return payment
 
@@ -71,7 +127,7 @@ class Facade(object):
 
 		try:
 			if not order:
-				order = self.stripe.Order.retrieve(basket.stripe_order_id)
+				order = self.stripe.Order.retrieve(f"order_{basket.stripe_order_id}")
 
 			if order.status != 'processing':
 				order = self.stripe.stripe_object.StripeObject().request('post', f"/v1/orders/{order.id}/submit", {
@@ -79,46 +135,63 @@ class Facade(object):
 					'expand': ['payment.payment_intent'],
 				})
 
+
 				payment = order.payment
 				basket.payment_intent_client_secret = payment.payment_intent.client_secret
 				basket.payment_intent_id = payment.payment_intent.id
 				basket.stripe_order_status = order.status
+				basket.stripe_order_client_secret = order.client_secret
+
 				basket.save()
 
+				# we add a reference to the order ID so we have a way to look up the order given a payment_intent.success webhook
 				self.stripe.PaymentIntent.modify(payment.payment_intent.id, metadata={"order_id": order.id})
 
-				return payment
+				return order
 
 		except Exception as e:
 			return self.error_handler(e)
 
-	def update_or_create_order(self, basket, shipping_details={}, shipping_cost={}, discounts=[], billing_details={}, metadata={}):
+	def update_or_create_order(self, basket, shipping_fields={}, shipping_method={}, discounts=[], billing_fields={}, metadata={}, **kwargs):
 
 		order = ''
-		order_details = {
-			'shipping_cost': self.coerce_shipping_cost_object(shipping_cost),
-		}
+		shipping_cost = self.coerce_shipping_cost_object(shipping_method)
+
 		metadata.update({'basket_id': basket.id})
+		order_details = kwargs
+		order_details.update({'metadata': metadata})
 
-		if metadata:
-			order_details.update({'metadata':metadata})
+		if shipping_cost:
+			metadata.update({
+				'shipping_code': shipping_cost['shipping_rate_data']['metadata']['method_code'],
+				'shipping_name': shipping_cost['shipping_rate_data']['display_name']
+			})
 
-		if shipping_details:
-			order_details.update({'shipping_details':self.coerce_address_object(shipping_details)})
+			order_details = {
+				'shipping_cost': shipping_cost,
+			}
+
+
+		if basket.stripe_customer_id:
+			order_details.update({'customer': basket.stripe_customer_id})
+
+		print('\n ---- shipping_fields: ', shipping_fields)
+		if shipping_fields:
+			shipping_details = self.coerce_to_address_object(shipping_fields)
+			if shipping_details:
+
+				order_details.update({'shipping_details':shipping_details})
 
 		if discounts:
 			order_details.update({'discounts':discounts})
 
-		if billing_details:
-			order_details.update({'billing_details':self.coerce_address_object(billing_details)})
-			print('\n billing_details: ', order_details['billing_details'])
+		if billing_fields:
+			billing_details = self.coerce_to_address_object(billing_fields)
+			if billing_details:
+				order_details.update({'billing_details':billing_details})
 
 		try:
-			### try to retrieve the order
-			### this is good for not wasting api calls, but might cause slow client response times due to latency
-			# order = stripe.Order.retrieve(basket.stripe_order_id)
-
-			# since no exception occurred, the order exists...update it
+			### try to update the order
 			order = self.update_order(basket, **order_details)
 
 		except:
@@ -129,14 +202,14 @@ class Facade(object):
 
 
 	def update_order(self, basket, **order_details):
-
+		stripe_order_id = f"order_{basket.stripe_order_id}"
 		try:
-			order = self.stripe.Order.retrieve(basket.stripe_order_id)
+			order = self.stripe.Order.retrieve(stripe_order_id)
 
 			if order.status == 'processing':
-				order = self.stripe.stripe_object.StripeObject().request('post', f'/v1/orders/{basket.stripe_order_id}/reopen', {})
+				order = self.stripe.stripe_object.StripeObject().request('post', f'/v1/orders/{stripe_order_id}/reopen', {})
 
-			order = self.stripe.Order.modify(basket.stripe_order_id, line_items=self.get_line_items(basket), **order_details)
+			order = self.stripe.Order.modify(stripe_order_id, line_items=self.get_line_items(basket), **order_details)
 
 			print('order updated: ', order)
 			basket.stripe_order_status = order.status
@@ -165,7 +238,7 @@ class Facade(object):
 
 		try:
 			order = self.stripe.Order.create(line_items=self.get_line_items(basket), **order_details)
-			basket.stripe_order_id = order.id
+			basket.stripe_order_id = str(order.id).replace("order_", "")
 			basket.stripe_order_status = order.status
 			basket.save()
 
@@ -186,99 +259,80 @@ class Facade(object):
 
 	## expects a 'cost' in decimal form, and a 'code' or 'name'
 	def coerce_shipping_cost_object(self, shipping_method_data):
-
+		shipping_cost = {}
 		amount = shipping_method_data['cost'] if shipping_method_data.get('cost', None) else shipping_method_data.get('amount', None)
-		amount = str((D(amount)*100).to_integral())
-		display_name = shipping_method_data.get('code', None)
+		if amount:
 
-		shipping_cost = {
-			'shipping_rate_data': {
-				'display_name': display_name,
-				'type':'fixed_amount',
-				'fixed_amount': {
-					'amount': amount,
-					'currency': 'usd'
-				},
-				'tax_behavior': 'exclusive',
-				'metadata': {
-					'method_code':display_name,
+			amount = str((D(amount)*100).to_integral())
+
+		display_name = shipping_method_data.get('name', None)
+		method_code = shipping_method_data.get('code', None)
+
+		if amount and display_name and method_code:
+
+			shipping_cost = {
+				'shipping_rate_data': {
+					'display_name': display_name,
+					'type':'fixed_amount',
+					'fixed_amount': {
+						'amount': amount,
+						'currency': 'usd'
+					},
+					'tax_behavior': 'exclusive',
+					'metadata': {
+						'method_code':method_code,
+					}
 				}
 			}
-		}
-		
-		if shipping_method_data.get('name', None):
-			shipping_cost['metadata'].update({'name':shipping_method_data.get('name')})
 
+			if shipping_method_data.get('name', None):
+				shipping_cost['shipping_rate_data']['metadata'].update({'name':shipping_method_data.get('name')})
 
 		return shipping_cost
 
 	## turns shipping/billing address fields into stripe's expected form
-	def coerce_address_object(self, address_fields):
+	def coerce_to_address_object(self, address_fields):
+		address_details = {}
 		name = address_fields.get('first_name', 'anon')
 		name = f"{name} {address_fields['last_name']}" if address_fields.get('last_name', None) else name
 		country = address_fields['country'] if address_fields.get('country', None) else address_fields.get('country_id')
 
-		address_details = {
-			'address': {
-				'postal_code':address_fields['postcode'],
-				'country':country
-			},
-			'name': name
-		}
+		if address_fields.get('postcode', None) and country and name:
 
+			address_details = {
+				'address': {
+					'postal_code':address_fields['postcode'],
+					'country':country
+				},
+				'name': name
+			}
 
-		if address_fields.get('state', None):
-			address_details['address']['state'] = address_fields.get('state')
+			if address_fields.get('state', None):
+				address_details['address']['state'] = address_fields.get('state')
 
-		if address_fields.get('line1', None):
-			address_details['address']['line1'] = address_fields.get('line1')
+			if address_fields.get('line1', None):
+				address_details['address']['line1'] = address_fields.get('line1')
 
-		if address_fields.get('line2', None):
-			address_details['address']['line2'] = address_fields.get('line2')
+			if address_fields.get('line2', None):
+				address_details['address']['line2'] = address_fields.get('line2')
 
-		if address_fields.get('line3', None):
-			address_details['address']['line3'] = address_fields.get('line3')
+			if address_fields.get('line3', None):
+				address_details['address']['line3'] = address_fields.get('line3')
 
-		city = address_fields['city'] if address_fields.get('city', None) else address_fields.get('line4', None)
-		if city:
-			address_details['address']['city'] = city
+			city = address_fields['city'] if address_fields.get('city', None) else address_fields.get('line4', None)
+			if city:
+				address_details['address']['city'] = city
 
-		phone = address_fields.get('phone_number', None)
-		if phone:
-			address_details['phone'] = phone
+			phone = address_fields.get('phone_number', None)
+			if phone:
+				address_details['phone'] = phone
 
-		email = address_fields.get('email', None)
-		if email:
-			address_details['email'] = email
+			email = address_fields.get('email', None)
+			if email:
+				address_details['email'] = email
 
 		return address_details
 
-
-
-
-	def charge(self,
-		order_number,
-		total,
-		card,
-		currency=settings.STRIPE_CURRENCY,
-		description=None,
-		metadata=None,
-		shipping=None,
-		**kwargs):
-		try:
-			return self.stripe.Charge.create(
-				amount=(total.incl_tax * 100).to_integral_value(),
-				shipping=shipping,
-				currency=currency,
-				card=card,
-				description=description,
-				metadata=(metadata or {'order_number': order_number}),
-				**kwargs).id
-
-		except self.stripe.error.CardError as e:
-			raise UnableToTakePayment(self.get_friendly_decline_message(e))
-		except self.stripe.error.StripeError as e:
-			raise InvalidGatewayRequestError(self.get_friendly_error_message(e))
 
 	def payment_intent_update_or_create(self, checkout_session, total, payment_method=None, capture_method='automatic',
 			confirm=False, confirmation_method='automatic', customer=None, email=None, name=None,
@@ -401,47 +455,32 @@ class Facade(object):
 			# Invalid status
 			return json.dumps({'error': 'Invalid PaymentIntent status'}), 500
 
-	def update_or_create_customer(self, checkout_session, payment_method=None, name=None, email=None, description=None, metadata=None, customer=None):
 
-		# see if the customer id exists in the checkout_session first
+
+	def charge(self,
+		order_number,
+		total,
+		card,
+		currency=settings.STRIPE_CURRENCY,
+		description=None,
+		metadata=None,
+		shipping=None,
+		**kwargs):
 		try:
-			created = False
+			return self.stripe.Charge.create(
+				amount=(total.incl_tax * 100).to_integral_value(),
+				shipping=shipping,
+				currency=currency,
+				card=card,
+				description=description,
+				metadata=(metadata or {'order_number': order_number}),
+				**kwargs).id
 
+		except self.stripe.error.CardError as e:
+			raise UnableToTakePayment(self.get_friendly_decline_message(e))
+		except self.stripe.error.StripeError as e:
+			raise InvalidGatewayRequestError(self.get_friendly_error_message(e))
 
-			if checkout_session.is_stripe_customer_id_set():
-
-				print('\n retrieving customer \n')
-				customer = stripe.Customer.retrieve(
-					id=checkout_session.get_stripe_customer_id(),
-					payment_method=payment_method,
-					email=email,
-					name=name,
-					description=description,
-					metadata=metadata,
-				)
-			else:
-				print('\n creating new customer \n')
-				customer = stripe.Customer.create(
-					email=email,
-					payment_method=payment_method,
-					name=name,
-					description=description,
-					metadata=metadata
-				)
-
-
-			if payment_method:
-				stripe.PaymentMethod.attach(
-					payment_method,
-					customer=customer['id'],
-				)
-
-			checkout_session.set_stripe_customer(customer)
-
-			return customer
-
-		except Exception as e:
-			return self.error_handler(e)
 
 
 

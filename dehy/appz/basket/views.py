@@ -2,7 +2,6 @@ from oscar.apps.basket.views import BasketAddView as CoreBasketAddView
 from oscar.apps.basket.views import BasketView as CoreBasketView
 from oscar.core.loading import get_class, get_classes, get_model
 from oscar.apps.basket.signals import (basket_addition, voucher_addition, voucher_removal)
-from oscar.core import ajax
 from oscar.core.loading import get_class, get_classes, get_model
 from oscar.core.utils import redirect_to_referrer, safe_referrer
 
@@ -15,9 +14,10 @@ from django import shortcuts
 from django.shortcuts import redirect
 
 from decimal import Decimal as D
-TWOPLACES = D(10)**-2
+TWO_PLACES = D(10)**-2
 
 from dehy.appz.checkout.facade import Facade
+Facade = Facade()
 from dehy.appz.checkout.views import get_shipping_methods
 
 import json
@@ -144,37 +144,34 @@ class BasketView(CoreBasketView):
 		data['object_list'] = {}
 
 		data['basket_num_items'] = request.basket.num_items
-		data['subtotal'] = request.basket.total_excl_tax_excl_discounts
+		data['subtotal'] = D(request.basket.total_excl_tax_excl_discounts).quantize(TWO_PLACES)
 
-		data['total_tax'] = str(D(0.00).quantize(TWOPLACES))
+		data['total_tax'] = D(0.00).quantize(TWO_PLACES)
 		data['order_total'] = data['subtotal']
-
-		if request.basket.is_tax_known:
-			data['total_tax'] = request.basket.total_tax
-			data['order_total'] = request.basket.total_incl_tax
 
 		order_data = {'basket': request.basket}
 
-		print(f'\n dir(request): {dir(self.request)}')
-		print(f'\n request.headers: {self.request.headers}')
 		shipping_addr = request.POST.get('shipping_addr', None)
 		shipping_addr = json.loads(shipping_addr) if shipping_addr else self.checkout_session.get_shipping_address()
-
 		if self.checkout_session.is_shipping_address_set() and self.checkout_session.is_shipping_method_set(request.basket):
 
+			print('\n shipping_addr: ', shipping_addr)
 			data['shipping_methods'] = get_shipping_methods(request, shipping_addr, True)
-			method_code = self.checkout_session.shipping_method_code(request.basket)
-			data['method_code'] = method_code
+			data['method_code'] = self.checkout_session.shipping_method_code(request.basket)
 
-			shipping_method = next(filter(lambda x: x['code'] == method_code, data['shipping_methods']), None)
+			shipping_method = next(filter(lambda x: x['code'] == data['method_code'], data['shipping_methods']), None)
+
 			if shipping_method:
 				data['shipping_charge'] = shipping_method['cost']
-
 				if 'Referer' in self.request.headers.keys() and 'checkout' in self.request.headers['Referer']:
-					shipping_method = {'code':method_code, 'cost':data['shipping_charge']}
-					order = Facade().update_or_create_order(request.basket, shipping_addr, shipping_method)
-					data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWOPLACES))
+					order = Facade.update_or_create_order(request.basket, shipping_fields=shipping_addr, shipping_method=shipping_method)
+					data['total_tax'] = D(order.total_details.amount_tax/100).quantize(TWO_PLACES)
+					print('type(total_tax): ', type(data['total_tax']))
+					print('type(order_total): ', type(data['order_total']))
 
+					data['order_total'] += (D(data['shipping_charge']).quantize(TWO_PLACES) + data['total_tax'])
+					# data['order_total'] = str(data['order_total'])
+					data['total_tax'] = data['total_tax']
 
 		for line in self.object_list:
 			data['object_list'][line.product_id] = {'quantity': line.quantity, 'price': line.line_price_excl_tax}
