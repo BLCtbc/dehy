@@ -7,6 +7,8 @@ from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 import time
 from pathlib import Path
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 MAX_WAIT = 10
 BASE_DIR = Path(__file__).resolve().parent
@@ -45,6 +47,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 	def setUp(self):
 		self.browser = webdriver.Chrome(BASE_DIR / 'chromedriver')
 		self.browser.maximize_window()
+		self.wait = WebDriverWait(self.browser, 10)
 
 		staging_server = os.environ.get('STAGING_SERVER')
 		if staging_server:
@@ -53,7 +56,6 @@ class FunctionalTest(StaticLiveServerTestCase):
 
 	def tearDown(self):
 		self.browser.quit()
-
 
 	def wait_for(self, fn):
 		start_time = time.time()
