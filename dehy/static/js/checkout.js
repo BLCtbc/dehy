@@ -87,9 +87,7 @@ dehy.ch = {
 							console.log('select-one');
 							var options = Array.from(elem.options);
 							var selected_index = options.findIndex(ele=>ele.textContent==address[elem.name]);
-
 							elem.selectedIndex = (checked) ? selected_index : 0;
-							console.log('selected_index: ', selected_index);
 						} else {
 							elem.value = (checked) ? address[elem.name] : '';
 						}
@@ -113,6 +111,7 @@ dehy.ch = {
 				// processData: false,
 				success: function(data) {
 					console.log('get_shipping_methods data: ', data);
+					dehy.ch.forms.errors.hide();
 					if (data.order_client_secret) {
 						dehy.ch.stripe.order_client_secret = data.order_client_secret;
 					}
@@ -187,6 +186,7 @@ dehy.ch = {
 
 				var radio_elem = {
 					'tag': 'input',
+					'classes': 'shipping-method-option',
 					'attrs': {
 						'type':'radio', 'name':'method_code', 'id':id, 'value': method.code, 'data-cost':cost
 					}
@@ -326,7 +326,8 @@ dehy.ch.stripe = {
 		dehy.ch.stripe.elements = elements;
 		var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', classes: 'form-group row', attrs:{'id':'stripe_payment_container'}});
 		var form_container = form.querySelector('.form-container');
-		form.insertBefore(stripe_payment_container, form_container);
+		// form.insertBefore(stripe_payment_container, form_container);
+
 		var payment_element = elements.create('payment', {
 			fields: {
 				billingDetails: {
@@ -369,7 +370,6 @@ dehy.ch.stripe = {
 				place_order_form.removeEventListener('submit', dehy.ch.forms.submit_handler);
 				place_order_form.addEventListener('submit', async (e) => {
 					dehy.utils.freeze_forms();
-					$("#loading_modal").show();
 
 					e.preventDefault()
 					stripe.processOrder({
@@ -393,7 +393,6 @@ dehy.ch.stripe = {
 					})
 					.finally(()=> {
 						dehy.utils.unfreeze_forms();
-						$("#loading_modal").hide();
 					})
 				})
 
@@ -403,9 +402,11 @@ dehy.ch.stripe = {
 			if (e.error) {
 				dehy.ch.forms.errors.display(e.error);
 			} else {
-				dehy.ch.forms.errors.hide(e.error);
+				dehy.ch.forms.errors.hide(form);
 			}
 		});
+		form.prepend(stripe_payment_container)
+		dehy.utils.unfreeze_forms();
 	},
 	card_setup(style=null) {
 		console.log('called card setup');
@@ -447,7 +448,8 @@ dehy.ch.stripe = {
 
 		var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', classes: 'form-group row', attrs:{'id':'stripe_payment_container'}});
 		var form_container = form.querySelector('.form-container');
-		form.insertBefore(stripe_payment_container, form_container);
+		form.prepend(stripe_payment_container)
+		// form.insertBefore(stripe_payment_container, form_container);
 
 		var cardElement = (elements.getElement('card')) ? elements.getElement('card') : elements.create('card', options);
 		cardElement.mount(stripe_payment_container)
@@ -488,89 +490,6 @@ dehy.ch.stripe = {
 			cardElement.update({value: {postalCode: event.target.value}});
 		});
 	},
-
-	paymentMethodHandler(response) {
-		console.log('paymentMethodHandler response: ', response);
-		if (response.error) {
-			// Show error in payment form
-			dehy.ch.forms.errors.display(response.error);
-			console.log('ERROR: ', response.error);
-		} else {
-
-			// save the billing info
-			var billing_data = {
-				'address': {},
-				'card':{
-					'last4':response.paymentMethod.card.last4,
-					'brand':response.paymentMethod.card.brand,
-					'country':response.paymentMethod.card.country,
-					'exp': `${response.paymentMethod.card.exp_month}/${response.paymentMethod.card.exp_year}`,
-				},
-				'name': response.paymentMethod.billing_details.name,
-				'phone': response.paymentMethod.billing_details.phone
-
-			};
-
-			billing_data.address = response.paymentMethod.billing_details.address;
-			dehy.ch.forms.saved_info.billing = billing_data;
-
-			var form_data = new FormData(dehy.ch.forms.get());
-			form_data.set('payment_method_id', response.paymentMethod.id);
-
-			$.ajax({
-				method: "POST",
-				dataType: 'json',
-				url: '/checkout/billing/',
-				contentType: false,
-				processData: false,
-				data: form_data,
-				success: dehy.ch.stripe.payment_intent_created,
-				error: dehy.ch.forms.errors.display,
-			});
-		}
-	},
-	handleServerResponse(response) {
-		console.log('handleServerResponse response: ', response);
-
-		if (response.error) {
-			// Show error from server on payment form
-			dehy.ch.forms.errors.display(response.error);
-			console.log('ERROR: ', response.error);
-		} else if (response.requires_action) {
-			// Use Stripe.js to handle required card action
-			stripe.handleCardAction(
-				response.payment_intent_client_secret
-			).then(dehy.ch.stripe.handleStripeJsResult);
-		} else {
-			// Show success message
-			dehy.ch.forms.errors.display(response.error);
-			console.log('ERROR: ', response.error);
-		}
-	},
-	handleStripeJsResult(result) {
-		console.log('handleStripeJsResult result: ', result);
-
-		if (result.error) {
-			// Show error in payment form
-			console.log('ERROR: ', response.error);
-			dehy.ch.forms.errors.display(result.error);
-		} else {
-			var form_data = new FormData(dehy.ch.forms.get());
-
-			$.ajax({
-				method: "POST",
-				dataType: 'json',
-				url: '/checkout/place_order/',
-				contentType: false,
-				processData: false,
-				data: form_data,
-				success: dehy.ch.forms.success_handler,
-				error: dehy.ch.forms.errors.display,
-			});
-
-			form_data.set('payment_intent_id', result.paymentIntent.id);
-		}
-	},
 	set(pkey=null) {
 		if (pkey) {
 			dehy.ch.stripe.set_pkey(pkey);
@@ -587,7 +506,6 @@ dehy.ch.stripe = {
 		return dehy.ch.stripe.pkey;
 	},
 	init(pkey=dehy.ch.stripe.pkey, client_secret=dehy.ch.stripe.client_secret, data={}) {
-		console.log('initiating stripe');
 
 		if (dehy.ch.stripe.get() && document.querySelector("#stripe_payment_container")) {
 			// already created, just need to unhide it
@@ -598,6 +516,8 @@ dehy.ch.stripe = {
 			form.classList.toggle('display-none', false);
 
 		} else {// attempts to set the pkey and add the stripe elements to the page
+			dehy.utils.freeze_forms();
+
 			if (pkey) {
 				dehy.ch.stripe.set_pkey(pkey)
 			}
@@ -765,7 +685,7 @@ dehy.ch.forms = {
 		}
 		var form = dehy.ch.forms.get();
 		dehy.ch.forms.save_info(form, response.section);
-		dehy.ch.forms.errors.hide();
+		dehy.ch.forms.errors.hide(form);
 
 		if (response.section=='billing') {
 			var stripe_payment_container = document.getElementById('stripe_payment_container');
@@ -800,9 +720,7 @@ dehy.ch.forms = {
 				form_elem.classList.toggle('display-none', false);
 			}
 			dehy.ch.shipping.billing_same_as_shipping_handler();
-			if (response.stripe_pkey) {
-				dehy.ch.stripe.init(response.stripe_pkey, response.client_secret, response);
-			}
+			dehy.ch.stripe.init(response.stripe_pkey, response.client_secret, response);
 		}
 
 		dehy.utils.unfreeze_forms();
@@ -996,8 +914,7 @@ dehy.ch.forms = {
 			error_container.querySelector('span').textContent = error_message
 			// error_container.append(dehy.utils.create_element({tag:'div', classes:'error', text: error_message, attrs:{'id':'errors'}}));
 		},
-		hide() {
-			var form = dehy.ch.forms.get();
+		hide(form=dehy.ch.forms.get()) {
 			var error_container = form.querySelector('#error_container');
 			error_container.classList.toggle('hidden', true);
 			error_container.querySelector('span').textContent = ''

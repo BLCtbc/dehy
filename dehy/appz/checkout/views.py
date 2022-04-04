@@ -24,7 +24,7 @@ from .facade import Facade
 Facade = Facade()
 
 from urllib.parse import quote
-import datetime, json, logging, requests, sys, xmltodict
+import datetime, json, logging, requests, sys, xmltodict, time
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
 
@@ -56,8 +56,8 @@ from dehy.appz.order.models import BillingAddress
 logger = logging.getLogger('oscar.checkout')
 
 def calculate_tax(price, rate):
-	tax = price * rate
-	return tax.quantize(D('0.01'))
+	tax = D(price*rate)+D(price)
+	return tax.quantize(FOUR_PLACES)
 
 def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
@@ -88,10 +88,9 @@ def get_city_and_state(postcode=None):
 # stripe webhook handler
 @csrf_exempt
 def webhook_submit_order(request):
-	print('\n --- webhook_submit_order() --- ', datetime.datetime.now())
+	print('\n --- caught a webhook --- ', datetime.datetime.now())
 
 	place_order_view = PlaceOrderView(request=request)
-	print('\n --- dir(place_order_view): ', dir(place_order_view))
 
 	payload = request.body
 	json_payload = json.loads(payload)
@@ -118,14 +117,16 @@ def webhook_submit_order(request):
 	if event['type'] == 'payment_intent.succeeded':
 		status_code = 200
 		payment_intent = event['data']['object']
-		print('\n payment_intent (as created by stripe): ', payment_intent)
+		# print('\n payment_intent (as created by stripe): ', payment_intent)
 
 		basket = Basket.objects.get(id=payment_intent.metadata['basket_id'])
 		order_id = payment_intent.metadata['order_id']
-
 		order = Facade.stripe.Order.retrieve(order_id, expand=['customer', 'payment.payment_intent', 'line_items'])
+		place_order_view.handle_place_order_submission(basket, order)
 
-		response = place_order_view.handle_place_order_submission(basket, order)
+		response = JsonResponse({})
+		response.status_code = 200
+		return response
 
 	# if event['type'] == 'order.payment_succeeded':
 	# 	order = event['data']['object']
@@ -207,8 +208,6 @@ def get_shipping_methods(request, shipping_fields, frontend_formatted=False, ret
 
 # also 'corrects' city and state based on postcode
 def ajax_get_shipping_methods(request):
-	for item in request.session.items():
-		print('\n -- session item -- \n', item)
 
 	data = {}
 	post_data = request.POST.copy()
@@ -219,11 +218,18 @@ def ajax_get_shipping_methods(request):
 		post_data.update(city_and_state_data)
 		data.update(city_and_state_data)
 
+
 	checkout_session = CheckoutSessionData(request)
 	shipping_address_form = CountryAndPostcodeForm(post_data)
 
 	if not shipping_address_form.is_valid():
+		print('dir(shipping_address_form.errors): ', dir(shipping_address_form.errors))
 		print(f'\n form.errors: {shipping_address_form.errors}')
+		print('shipping_address_form.errors.as_text: ', shipping_address_form.errors.as_text())
+		print('shipping_address_form.errors.as_data: ', shipping_address_form.errors.as_data())
+		print('shipping_address_form.errors.as_json: ', shipping_address_form.errors.as_json())
+		data['errors'] = shipping_address_form.errors.as_json()
+
 
 	else:
 		status_code = 200
@@ -304,8 +310,6 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 			customer = Facade.get_or_create_customer(email)
 			request.basket.stripe_customer_id = customer.id
 			request.basket.save()
-
-			print('dir(request.user): ', dir(request.user))
 
 			if request.user.is_authenticated:
 				request.user.stripe_customer_id = customer.id
@@ -429,7 +433,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 			if not hasattr(self, '_methods'):
 				shipping_methods = self.get_available_shipping_methods()
-				print('shipping_methods: ', shipping_methods, '\n')
 				if not shipping_methods:
 					shipping_methods = self.checkout_session.get_stored_shipping_methods()
 
@@ -533,7 +536,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			'-is_default_for_shipping')
 
 	def get_form_kwargs(self):
-		print("\n *** get_form_kwargs() ShippingView *** \n")
 		kwargs = super().get_form_kwargs()
 		# kwargs.update({'methods':self._methods})
 		return kwargs
@@ -838,17 +840,24 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			incl_tax=D(order.amount_total/100).quantize(TWO_PLACES)
 		)
 
-		tax_rate = D(order.shipping_cost.amount_tax/order.shipping_cost.amount_subtotal).quantize(FOUR_PLACES, rounding='ROUND_UP')
 
-		print('\n --tax rate: ', tax_rate)
+
+		# for line in order.line_items.data:
+		# 	unit_tax = D((line['amount_tax']/line['quantity'])/100).quantize(FOUR_PLACES)
+		# 	basket_line = basket.all_lines().filter(product__upc=line['product']).first()
+		# 	basket_line.purchase_info.price.tax = unit_tax
+
 
 		for line in basket.all_lines():
-			line_tax = calculate_tax(
-				line.line_price_excl_tax_incl_discounts, tax_rate)
-			unit_tax = (line_tax / line.quantity).quantize(D('0.01'))
-			line.purchase_info.price.tax = unit_tax
 
+			stripe_line = list(filter(lambda x: x['product']==line.product.upc, order.line_items.data))[0]
+			tax_rate = D(stripe_line['amount_tax']/stripe_line['amount_subtotal']).quantize(FOUR_PLACES)
+			price_incl_tax = calculate_tax(line.price_excl_tax, tax_rate)
+			# unit_tax = (price_incl_tax / line.quantity).quantize(FOUR_PLACES)
 
+			line.price_incl_tax = price_incl_tax
+			line.purchase_info.price.incl_tax = price_incl_tax
+			line.save()
 		# Need to put card info on the order info and then pass it along on
 		# the order receipt + order receipt email
 		payment_kwargs = {
@@ -1066,6 +1075,7 @@ class ThankYouView(views.ThankYouView):
 	Displays the 'thank you' page which summarises the order just submitted.
 	"""
 	template_name = 'dehy/checkout/thank_you.html'
+	max_wait = 10
 	def get(self, request, *args, **kwargs):
 		self.object = self.get_object()
 		if self.object is None:
@@ -1076,16 +1086,6 @@ class ThankYouView(views.ThankYouView):
 	def get_object(self, queryset=None):
 
 		order = None
-		print(f'\n dir(self.request): {dir(self.request)}')
-		print(f'\n dir(self.request.session): {dir(self.request.session)}')
-		print(f'\n self.request.session: {self.request.session}')
-		print(f'\n self.request.session.keys(): {self.request.session.keys()}')
-		print(f'\n self.request.session.get(checkout_data): {self.request.session.get("checkout_data", None)}')
-
-
-		print(f'\n self.request.basket.is_submitted: {self.request.basket.is_submitted}')
-		print(f'\n self.request.basket.status: {self.request.basket.status}')
-
 		# We allow superusers to force an order thank-you page for testing
 		if self.request.user.is_superuser:
 			kwargs = {}
@@ -1095,26 +1095,43 @@ class ThankYouView(views.ThankYouView):
 				kwargs['id'] = self.request.GET['order_id']
 			order = Order._default_manager.filter(**kwargs).first()
 
-		print('\n self.request.GET', self.request.GET)
-		print('\n basket.id: ', self.request.basket.id)
-		print('\n basket.stripe_order_id: ', self.request.basket.stripe_order_id)
+		# print(f'\n self.request.session.keys(): {self.request.session.keys()}')
+		# print(f'\n self.request.session.get(checkout_data): {self.request.session.get("checkout_data", None)}')
+		#
+		# print(f'\n self.request.basket.is_submitted: {self.request.basket.is_submitted}')
+		# print(f'\n self.request.basket.status: {self.request.basket.status}')
+		#
+		# print('\n self.request.GET', self.request.GET)
+		# print('\n basket.id: ', self.request.basket.id)
+		# print(f'\n self.request.basket.is_submitted: {self.request.basket.is_submitted}')
+		stripe_order_id = self.request.GET.get('order', None)
+		order_client_secret = self.request.GET.get('order_client_secret', None)
+		order_id = ''
+		if stripe_order_id and order_client_secret:
+			order_id = stripe_order_id.replace("order_", "")
+			basket = Basket._default_manager.filter(stripe_order_client_secret=order_client_secret, stripe_order_id=order_id)
 
-		if not order:
+			if basket:
+				basket = basket.first()
+				submitted = basket.is_submitted
+				# print(f'\n basket.is_submitted: {submitted}')
+				start_time = time.time()
+				while not submitted:
+					time.sleep(0.5)
+					basket.refresh_from_db(fields=['status'])
+					submitted = basket.is_submitted
 
-			stripe_order_id = self.request.GET.get('order', None)
-			order_client_secret = self.request.GET.get('order_client_secret', None)
+					print(f'\n basket.is_submitted: {submitted}')
+
+					if time.time() - start_time > self.max_wait:
+						print('\n *** max wait time exceeded: ', time.time() - start_time)
+						return order
 
 
-			if stripe_order_id and order_client_secret:
-				order_id = stripe_order_id.replace("order_", "")
-				# lookup by basket
-				basket = Basket._default_manager.filter(stripe_order_client_secret=order_client_secret, stripe_order_id=order_id).first()
-				print('basket: ', basket)
-				# lookup by order
 				order = Order._default_manager.filter(number=order_id).first()
-				print('order: ', order)
-
-				if basket and order and order.basket == basket:
+				if order and order.basket==basket:
 					print('\n **** found order: ', order, '\n')
+					return order
+
 
 		return order

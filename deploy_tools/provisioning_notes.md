@@ -1408,6 +1408,22 @@ implementing a continuous deployment workflow on Debian 10+
 
 		`python manage.py dumpdata --exclude=auth --exclude=address --exclude=contenttypes --indent=4 --exclude='admin.logentry' --exclude='sessions.session' --exclude=analytics --exclude=thumbnail --exclude=basket --exclude=order --exclude=payment --output='fixtures.json'`
 
+		fixing shipping countries:
+			```py
+			from oscar.core.loading import get_model
+			Country = get_model('address', 'Country')
+			country_objects = Country.objects.all()
+			shippable_countries = ['US', 'CA']
+			for country in country_objects:
+				if country.iso_3166_1_a2 not in shippable_countries:
+					country.is_shipping_country = False
+					country.save()
+			```
+
+		dumping all:
+		`python manage.py dumpdata --all --indent=4 --output='fixtures_all.json'`
+
+
 
 
 <a name='django_view_inserted_into_another_view'></a>

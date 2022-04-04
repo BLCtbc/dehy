@@ -7,10 +7,6 @@ import base64, json, requests
 from oscar.core.loading import get_class
 from django.conf import settings
 
-SHIPSTATION_AUTH_STR = bytes(f"{settings.SHIPSTATION_API_KEY}:{settings.SHIPSTATION_SECRET_KEY}", encoding='utf-8')
-SHIPSTATION_AUTH_KEY = base64.b64encode(SHIPSTATION_AUTH_STR)
-AUTH_TOKEN = f"Basic {SHIPSTATION_AUTH_KEY.decode()}"
-
 # https://django-oscar.readthedocs.io/en/latest/howto/how_to_configure_shipping.html?highlight=shipping%20method#shipping-methods
 
 # class Repository(repository.Repository):
@@ -22,9 +18,6 @@ class Repository(repository.Repository):
 		methods = [_shipping_methods.FreeShipping()]
 		status_code = 200
 		# print('repository: get_available_shipping_methods \n ')
-
-		if shipping_addr:
-			print('\n *** shipping_addr: ', shipping_addr)
 
 		if shipping_addr and shipping_addr.country.code in ['US', 'CA', 'MX']:
 
@@ -96,8 +89,8 @@ class Repository(repository.Repository):
 		url = settings.FEDEX_API_URL + "rate/v1/rates/quotes"
 		response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
 
-		print('response.status_code: ', response.status_code)
-		if response.status_code == 200:
+		status_code = response.status_code
+		if status_code == 200:
 
 			## do something with the response text
 			response_list = json.loads(response.text)
@@ -113,34 +106,36 @@ class Repository(repository.Repository):
 					BaseFedex(code=rate['serviceType'], name=rate['serviceName'], charge_excl_tax=cost, charge_incl_tax=cost)
 				)
 		else:
-
 			response_text = json.loads(response.text)
 			error = response_text['errors'][0]
 			# error_code = errors[0]['code']
 			print('Error message: ', error['message'])
 			print('Error code: ', error['code'])
 
-			if response.status_code == 400:
+			if status_code == 400:
 				print('\n BAD REQUEST')
 
-			if response.status_code == 403:
+			if status_code == 403:
 				print('\n FORBIDDEN')
 
-			if response.status_code == 404:
+			if status_code == 404:
 				print('\n NOT FOUND')
 
-			elif response.status_code == 429:
+			elif status_code == 429:
 				print('\n RATE LIMITED')
 
-			elif response.status_code == 500:
+			elif status_code == 500:
 				print('\n FAILURE')
 
-			elif response.status_code == 503:
+			elif status_code == 503:
 				print('\n SERVICE UNAVAILABLE')
 
+				print(' *** ATTEMPTING TO GET METHODS FROM SHIPSTATION ***')
+				methods, status_code = self.get_shipstation_shipping_methods(basket, weight, shipping_addr)
 
 
-		return methods, response.status_code
+
+		return methods, status_code
 
 
 
@@ -164,18 +159,26 @@ class Repository(repository.Repository):
 			FedexAuthToken.expires_in = response_text["expires_in"]
 			FedexAuthToken.save()
 
+		if response.status_code == 400:
+			print('\n BAD REQUEST')
+
 		elif response.status_code == 401:
-			print('Unauthorized')
+			print('\n UNAUTHORIZED')
+
+		elif response.status_code == 403:
+			print('\n FORBIDDEN')
+
+		elif response.status_code == 404:
+			print('\n NOT FOUND')
 
 		elif response.status_code == 429:
-			print('rate limited')
+			print('\n RATE LIMITED')
 
 		elif response.status_code == 500:
-			print('INTERNAL.SERVER.ERROR')
+			print('\n INTERNAL.SERVER.ERROR')
 
 		elif response.status_code == 503:
-			print('INTERNAL.SERVER.ERROR')
-
+			print('\n SERVICE UNAVAILABLE')
 
 		return FedexAuthToken
 
@@ -196,17 +199,19 @@ class Repository(repository.Repository):
 
 
 
-	def get_shipstation_shipping_methods(self, basket, weight):
+	def get_shipstation_shipping_methods(self, basket, weight, shipping_addr):
+
+		# documentation: https://www.shipstation.com/docs/api/shipments/get-rates/
 		methods = []
 		payload = {
 			"carrierCode":"fedex",
 			"serviceCode": None,
 			"packageCode": None,
 			"fromPostalCode": settings.HOME_POSTCODE,
-			"toState":"TX",
-			"toCountry":"US",
-			"toPostalCode":"78701",
-			"toCity": "Austin",
+			"toState": shipping_addr.state,
+			"toCountry":shipping_addr.country.code,
+			"toPostalCode":shipping_addr.postcode,
+			"toCity": shipping_addr.line4,
 			"weight": {
 				"value": weight,
 				"units":"lbs"
@@ -215,18 +220,24 @@ class Repository(repository.Repository):
 			"residential": False
 		}
 
+		SHIPSTATION_AUTH_STR = bytes(f"{settings.SHIPSTATION_API_KEY}:{settings.SHIPSTATION_SECRET_KEY}", encoding='utf-8')
+		SHIPSTATION_AUTH_KEY = base64.b64encode(SHIPSTATION_AUTH_STR)
+		AUTH_TOKEN = f"Basic {SHIPSTATION_AUTH_KEY.decode()}"
+
 		shipstation_headers = {
 		  'Host': 'ssapi.shipstation.com',
 		  'Authorization': AUTH_TOKEN,
 		  'Content-Type': 'application/json'
 		}
 
+
 		url = "https://ssapi.shipstation.com/shipments/getrates"
 
 		shipstation_response = requests.request("POST", url, headers=shipstation_headers, data=json.dumps(payload))
 
-		# request was good, return
-		if shipstation_response.status_code == 200:
+		status_code = shipstation_response.status_code
+		# request was good, create the methods
+		if status_code == 200:
 
 			response_list = json.loads(shipstation_response.text)
 			for item in response_list:
@@ -235,4 +246,4 @@ class Repository(repository.Repository):
 					BaseFedex(item['serviceCode'], item['serviceName'], item['shipmentCost'], item['shipmentCost'])
 				)
 
-		return methods
+		return methods, status_code

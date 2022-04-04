@@ -162,10 +162,16 @@ class Facade(object):
 		order_details.update({'metadata': metadata})
 
 		if shipping_cost:
-			metadata.update({
-				'shipping_code': shipping_cost['shipping_rate_data']['metadata']['method_code'],
-				'shipping_name': shipping_cost['shipping_rate_data']['display_name']
-			})
+			if shipping_cost['shipping_rate_data']['metadata'].get('method_code', None):
+				metadata.update({
+					'shipping_code': shipping_cost['shipping_rate_data']['metadata']['method_code']
+				})
+
+			if shipping_cost['shipping_rate_data'].get('display_name', None):
+				metadata.update({
+					'shipping_name': shipping_cost['shipping_rate_data']['display_name']
+				})
+
 
 			order_details = {
 				'shipping_cost': shipping_cost,
@@ -175,7 +181,6 @@ class Facade(object):
 		if basket.stripe_customer_id:
 			order_details.update({'customer': basket.stripe_customer_id})
 
-		print('\n ---- shipping_fields: ', shipping_fields)
 		if shipping_fields:
 			shipping_details = self.coerce_to_address_object(shipping_fields)
 			if shipping_details:
