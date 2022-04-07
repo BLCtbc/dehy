@@ -58,7 +58,9 @@ def main():
 				# delete it locally
 				os.remove(media_img_path)
 				# product.images.all().delete()
-				existing_product_image = ProductImage.objects.filter(product_id=product.id, original__contains=img_name)
+
+				existing_product_image = ProductImage.objects.filter(product_id=product.id, original__contains=img_name.replace(".jpg", ""))
+
 				if existing_product_image:
 					existing_product_image.all().delete()
 					print(f'Deleting ({existing_product_image.count()}) existing images containing: {img_name}')
