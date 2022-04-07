@@ -1,5 +1,4 @@
-from .base import FunctionalTest
-from .test_shopping_cart import BasketTestingMixin
+from .base import BasketTestingMixin, FunctionalTest
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -9,12 +8,27 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 
+from unittest import skip
 
-
-class CheckoutTest(FunctionalTest, BasketTestingMixin):
+class CheckoutTest(BasketTestingMixin):
 
 	shipping = subtotal = tax = total = 0.00
 
+	@skip
+	def test_user_can_change_basket_item_quantity_after_billing_details_entered(self):
+		# the shipping address (as it exists in the session) can sometimes contain a Country object
+		# instead of just a country code -- this should not be the case and will cause step 4 to error out
+		# replicate the behavior where it sometimes errors out, that is:
+		# 1. self.test_user_can_checkout_as_guest()
+		# 2. proceed to, and complete step 4 -- self.enter_billing_details()
+		# 3. edit basket content quantity
+		# 4. go back to step 3
+		# 5. repeat #2 in this process (proceed to, and complete step 4 -- self.enter_billing_details())
+		# 6. confirm you proceeded past step 4.
+		pass
+
+
+	@skip
 	def test_user_cannot_checkout_using_other_users_email(self):
 		self.add_random_items_to_basket()
 
@@ -105,7 +119,6 @@ class CheckoutTest(FunctionalTest, BasketTestingMixin):
 				load_start = datetime.datetime.now()
 				# time.sleep(1.5)
 				self.wait_for(lambda: self.assertNotEqual(self.loading_modal_displayed(), True))
-				print(f'\n load time --- {datetime.datetime.now() - load_start}')
 				# add a small buffer
 				time.sleep(0.2)
 
@@ -257,7 +270,9 @@ class CheckoutTest(FunctionalTest, BasketTestingMixin):
 
 		url = self.browser.current_url
 		self.wait.until(EC.url_changes(url))
+		print('url changed\n from: ', url, '\n to: ', self.browser.current_url)
 		self.wait.until(EC.url_contains('thank_you'))
+		print('url changed again\n from: ', url, '\n to: ', self.browser.current_url)
 
 
 

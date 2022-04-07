@@ -53,25 +53,25 @@
 							{% with image=product.primary_image %}
 							{{ form.id }}
 							{% if request.resolver_match.url_name != 'checkout' %}
-                            <div class="col-md-3">
+                            <div class="col-3">
 							{% oscar_thumbnail image.original "200x" upscale=False as thumb %}
                             <a href="{{ product.get_absolute_url }}">
                                 <img class="img-thumbnail w-auto mx-auto my-0 p-0" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
                             </a>
 							{% else %}
 							{% oscar_thumbnail image.original "100x" upscale=False as thumb %}
-							<div class="col-md-3">
+							<div class="col-3 pr-0">
 								<img class="img-thumbnail w-auto mx-auto my-0 p-0" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
 							{% endif %}
                             {% endwith %}
                             </div>
 
 								{% if request.resolver_match.url_name != 'checkout' %}
-                            	<div class="col-md-5">
+                            	<div class="col-5">
 
                                 <h3><a href="{{ product.get_absolute_url }}">{{ product.parent.title|default:product.title }}</a></h3>
 								{% else %}
-								<div class="col-md-6">
+								<div class="col-6">
 								<h4>{{ product.parent.title|default:product.title }}</h4>
 								{% endif %}
 
@@ -82,7 +82,7 @@
                             	</div>
 
 							{% if request.resolver_match.url_name != 'checkout' %}
-                            <div class="col-md-2">
+                            <div class="col-2">
                                 <div class="checkout-quantity">
                                     <div class="input-group {% if form.errors %}error{% endif %}">
                                         {% render_field form.quantity pattern="[0-9]*" type="text" class+="product-quantity" %}
@@ -91,19 +91,20 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-2">
+                            <div class="col-2">
                                 <p class="price-text text-right">
                                     {{ line.line_price_excl_tax|currency:line.price_currency }}
                                 </p>
                             </div>
 
 							{% else %}
-							<div class="col-md-3">
+							<div class="col-3">
 								<p class="price-text text-right">
 									{{ line.line_price_excl_tax|currency:line.price_currency }}
 								</p>
 								<div class="checkout-quantity text-right">
 									<div class="input-group justify-content-end{% if form.errors %} error{% endif %}">
+										<span class="input-group-text">Qty</span>
 										{% render_field form.quantity pattern="[0-9]*" type="text" class+="product-quantity" %}
 									</div>
 									<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
@@ -184,13 +185,7 @@
 								<span>{% trans "Shipping" %}</span><span id="shipping_postcode"></span>
 							</div>
 							<div class="col text-right">
-								<span id="shipping_charge" class="price-text">
-									{% if is_shipping_address_set and is_shipping_method_set and shipping_method %}
-										{{ shipping_charge.incl_tax|currency:basket.currency }}
-									{% else %}
-										--
-									{% endif %}
-								</span>
+								<span id="shipping_charge" class="price-text">--</span>
 							</div>
 						</div>
 						{% endblock shipping_charges %}
@@ -311,7 +306,4 @@
             </form>
         </div>
     {% endif %}
-
-	{% include 'dehy/basket/partials/confirm_item_removal_modal.html' %}
-
 {% endblock %}

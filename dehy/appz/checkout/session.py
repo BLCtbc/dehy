@@ -29,15 +29,14 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		if not basket.is_shipping_required():
 			return None
 
-
-
 		addr_data = self.checkout_session.new_shipping_address_fields()
 
 		if addr_data:
+
 			# Load address data into a blank shipping address model
 			if addr_data.get('country', None) and not isinstance(addr_data['country'], Country):
 				addr_data['country'] = Country.objects.get(iso_3166_1_a2=addr_data['country'])
-				
+
 			return ShippingAddress(**addr_data)
 
 		addr_id = self.checkout_session.shipping_user_address_id()

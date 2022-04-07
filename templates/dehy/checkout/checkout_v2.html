@@ -14,72 +14,75 @@
 
 {% block content %}
 
+	{% include 'dehy/basket/partials/confirm_item_removal_modal.html' %}
+	
+	{% block checkout_flow %}
+	<div class="col-12 col-sm-6 col-lg-4 checkout-flow" id="checkout_flow" >
 
-		{% block checkout_flow %}
-		<div id="checkout_flow" class="col-5 col-sm-4 card card-body checkout-flow">
+		{% if error %}
+			<div class="alert alert-danger">
+				{{ error }}
+			</div>
+		{% endif %}
 
-			{% if error %}
-				<div class="alert alert-danger">
-					{{ error }}
-				</div>
-			{% endif %}
+		<section id="user_info" class="card card-body mb-lg-4 mb-sm-2 col-12 customer-info">
+			<div class="section-header">
+				<h2>{% trans "1. Your Email" %}</h2>
+				<button class="edit" disabled hidden aria-label="Edit Customer Information"><span>Edit</span></button>
+			</div>
 
-			<section id="user_info" class="card card-body col-12 customer-info">
-				<div class="section-header">
-					<h2>{% trans "1. Your Email" %}</h2>
-					<button class="edit" disabled hidden aria-label="Edit Customer Information"><span>Edit</span></button>
-				</div>
+			{% block user_info %}
+			{% endblock user_info %}
+		</section>
 
-				{% block user_info %}
-				{% endblock user_info %}
+		<section id="shipping" class="card card-body mb-lg-4 mb-sm-2 col-12 shipping">
+			<div class="section-header">
+				<h2>{% trans "2. Shipping" %}</h2>
+				<button class="edit" disabled hidden aria-label="Edit Shipping Information"><span>Edit</span></button>
+			</div>
+
+
+			{% block shipping %}
+			{% endblock shipping %}
+		</section>
+
+		<section id="additional_info" class="card card-body mb-lg-4 mb-sm-2 col-12 additional-info">
+			<div class="section-header">
+				<h2>{% trans "3. Additional Info" %}</h2>
+				<button class="edit" disabled hidden aria-label="Edit Additional Information"><span>Edit</span></button>
+			</div>
+
+			{% block additional_info %}
+			{% endblock additional_info %}
 			</section>
 
-			<section id="shipping" class="card card-body col-12 shipping">
-				<div class="section-header">
-					<h2>{% trans "2. Shipping" %}</h2>
-					<button class="edit" disabled hidden aria-label="Edit Shipping Information"><span>Edit</span></button>
-				</div>
+		<section id="billing" class="card card-body mb-lg-4 mb-sm-2 col-12 billing">
+			<div class="section-header">
+				<h2>{% trans "4. Billing" %}</h2>
+				<button class="edit" disabled hidden aria-label="Edit Billing Information"><span>Edit</span></button>
+			</div>
+
+			{% block billing %}
+			{% endblock billing %}
+		</section>
 
 
-				{% block shipping %}
-				{% endblock shipping %}
-			</section>
-
-			<section id="additional_info" class="card card-body col-12 additional-info">
-				<div class="section-header">
-					<h2>{% trans "3. Additional Info" %}</h2>
-					<button class="edit" disabled hidden aria-label="Edit Additional Information"><span>Edit</span></button>
-				</div>
-
-				{% block additional_info %}
-				{% endblock additional_info %}
-				</section>
-
-			<section id="billing" class="card card-body col-12 billing">
-				<div class="section-header">
-					<h2>{% trans "4. Billing" %}</h2>
-					<button class="edit" disabled hidden aria-label="Edit Billing Information"><span>Edit</span></button>
-				</div>
-
-				{% block billing %}
-				{% endblock billing %}
-			</section>
-
-
-			<section id="place_order" class="card card-body col-12 place-order">
-				<div class="section-header">
-					<h2>{% trans "5. Review & Purchase" %}</h2>
-				</div>
-				{% block place_order %}
-				{% endblock place_order %}
-			</section>
-	    </div>
+		<section id="place_order" class="card card-body mb-lg-4 mb-sm-2 col-12 place-order">
+			<div class="section-header">
+				<h2>{% trans "5. Review & Purchase" %}</h2>
+			</div>
+			{% block place_order %}
+			{% endblock place_order %}
+		</section>
+    </div>
 
 	{% endblock checkout_flow %}
 
 	{% block order_contents %}
-	<div class="col-5 col-sm-4 ml-5 card card-body order-contents">
+	<div class="col-12 col-sm-6 col-lg-4 order-contents">
+		<div class="card card-body">
 		{% include 'dehy/basket/partials/basket_content.html' with shipping_charge=basket_summary_context_data.shipping_charge is_shipping_method_set=is_shipping_method_set is_shipping_address_set=is_shipping_address_set formset=basket_summary_context_data.formset order_total=basket_summary_context_data.order_total object_list=basket_summary_context_data.object_list basket_warnings=basket_summary_context_data.basket_warnings voucher_form=basket_summary_context_data.voucher_form %}
+		</div>
 	</div>
 	{% endblock order_contents %}
 

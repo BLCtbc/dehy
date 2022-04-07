@@ -1,14 +1,25 @@
 from oscar.apps.checkout import utils
 from phonenumber_field.phonenumber import PhoneNumber
-from oscar.core.loading import get_class
+from oscar.core.loading import get_class, get_model
 
 BaseFedex = get_class('shipping.methods', 'BaseFedex')
+Country = get_model('address', 'Country')
 
 class CheckoutSessionData(utils.CheckoutSessionData):
+	def _set(self, namespace, key, value):
+		print(f'\n _set() called with namespace={namespace}, key={key}, value={value}')
+		"""
+		Set a namespaced value
+		"""
+		self._check_namespace(namespace)
+		self.request.session[self.SESSION_KEY][namespace][key] = value
+		self.request.session.modified = True
+
 	def ship_to_new_address(self, address_fields):
 		"""
 		Use a manually entered address as the shipping address
 		"""
+		print('\n ship_to_new_address \n')
 		self._unset('shipping', 'new_address_fields')
 		phone_number = address_fields.get('phone_number')
 		if phone_number:
@@ -18,7 +29,14 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 			if isinstance(phone_number, PhoneNumber):
 				address_fields['phone_number'] = phone_number.as_international
 
+		country = address_fields.get('country', None)
+		if country:
+			address_fields = address_fields.copy()
+			if isinstance(country, Country):
+				address_fields['country'] = address_fields['country'].iso_3166_1_a2
+
 		print('\n *** SETTING ADDRESS FIELD ***')
+		print(address_fields)
 		self._set('shipping', 'new_address_fields', address_fields)
 
 	def set_questionnaire_response(self, additional_info):
@@ -97,6 +115,15 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		Return shipping address fields
 		"""
 		return self._get('shipping', 'new_address_fields')
+
+	def bill_to_shipping_address(self):
+		"""
+		Record fact that the billing address is to be the same as
+		the shipping address.
+		"""
+		print('\n bill_to_shipping_address \n')
+		self._flush_namespace('billing')
+		self._set('billing', 'billing_address_same_as_shipping', True)
 
 	# def get_shipping_address(self):
 	# 	"""

@@ -246,4 +246,31 @@ class Repository(repository.Repository):
 					BaseFedex(item['serviceCode'], item['serviceName'], item['shipmentCost'], item['shipmentCost'])
 				)
 
+		else:
+
+			response_text = json.loads(response.text)
+			error = response_text['errors'][0]
+			# error_code = errors[0]['code']
+			print('Error retrieving shipping methods from shipstation')
+			print('Error message: ', error['message'])
+			print('Error code: ', error['code'])
+
+			if status_code == 400:
+				print('\n BAD REQUEST')
+
+			if status_code == 403:
+				print('\n FORBIDDEN')
+
+			if status_code == 404:
+				print('\n NOT FOUND')
+
+			elif status_code == 429:
+				print('\n RATE LIMITED')
+
+			elif status_code == 500:
+				print('\n FAILURE')
+
+			elif status_code == 503:
+				print('\n SERVICE UNAVAILABLE')
+
 		return methods, status_code
