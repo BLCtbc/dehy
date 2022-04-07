@@ -1,6 +1,44 @@
 from oscar.apps.checkout import utils
+from phonenumber_field.phonenumber import PhoneNumber
+from oscar.core.loading import get_class, get_model
+
+BaseFedex = get_class('shipping.methods', 'BaseFedex')
+Country = get_model('address', 'Country')
 
 class CheckoutSessionData(utils.CheckoutSessionData):
+	def _set(self, namespace, key, value):
+		print(f'\n _set() called with namespace={namespace}, key={key}, value={value}')
+		"""
+		Set a namespaced value
+		"""
+		self._check_namespace(namespace)
+		self.request.session[self.SESSION_KEY][namespace][key] = value
+		self.request.session.modified = True
+
+	def ship_to_new_address(self, address_fields):
+		"""
+		Use a manually entered address as the shipping address
+		"""
+		print('\n ship_to_new_address \n')
+		self._unset('shipping', 'new_address_fields')
+		phone_number = address_fields.get('phone_number')
+		if phone_number:
+			# Phone number is stored as a PhoneNumber instance. As we store
+			# strings in the session, we need to serialize it.
+			address_fields = address_fields.copy()
+			if isinstance(phone_number, PhoneNumber):
+				address_fields['phone_number'] = phone_number.as_international
+
+		country = address_fields.get('country', None)
+		if country:
+			address_fields = address_fields.copy()
+			if isinstance(country, Country):
+				address_fields['country'] = address_fields['country'].iso_3166_1_a2
+
+		print('\n *** SETTING ADDRESS FIELD ***')
+		print(address_fields)
+		self._set('shipping', 'new_address_fields', address_fields)
+
 	def set_questionnaire_response(self, additional_info):
 		self._set('questionnaire', 'purchase_business_type', additional_info.purchase_business_type)
 		self._set('questionnaire', 'business_name', additional_info.business_name)
@@ -54,5 +92,71 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 	def is_stripe_client_secret_set(self):
 		return self.get_stripe_client_secret() is not None
 
+	def get_stored_shipping_methods(self):
+		self._check_namespace('shipping_methods')
+		shipping_methods = []
+
+		for method_code, val in self.request.session[self.SESSION_KEY]['shipping_methods'].items():
+			method = BaseFedex(code=method_code, name=val['name'], charge_excl_tax=val['cost'], charge_incl_tax=val['cost'])
+			shipping_methods.append(method)
+
+		return shipping_methods
+
+	def store_shipping_methods(self, basket, methods):
+		self._flush_namespace('shipping_methods')
+		for method in methods:
+			self.request.session[self.SESSION_KEY]['shipping_methods'][method.code] = {
+				'name': method.name, 'cost': str(method.calculate(basket).excl_tax)
+			}
+
+
+	def new_shipping_address_fields(self):
+		"""
+		Return shipping address fields
+		"""
+		return self._get('shipping', 'new_address_fields')
+
+	def bill_to_shipping_address(self):
+		"""
+		Record fact that the billing address is to be the same as
+		the shipping address.
+		"""
+		print('\n bill_to_shipping_address \n')
+		self._flush_namespace('billing')
+		self._set('billing', 'billing_address_same_as_shipping', True)
+
+	# def get_shipping_address(self):
+	# 	"""
+	# 	Return shipping address fields
+	# 	"""
+	# 	address_fields = self.new_shipping_address_fields()
+	#
+	# 	return self._get('shipping', 'new_address_fields')
+	#
+	# 	 if not basket.is_shipping_required():
+	#             return None
+	#
+	#         addr_data = self.checkout_session.new_shipping_address_fields()
+	#         if addr_data:
+	#             # Load address data into a blank shipping address model
+	#             return ShippingAddress(**addr_data)
+	#         addr_id = self.checkout_session.shipping_user_address_id()
+	#         if addr_id:
+	#             try:
+	#                 address = UserAddress._default_manager.get(pk=addr_id)
+	#             except UserAddress.DoesNotExist:
+	#                 # An address was selected but now it has disappeared.  This can
+	#                 # happen if the customer flushes their address book midway
+	#                 # through checkout.  No idea why they would do this but it can
+	#                 # happen.  Checkouts are highly vulnerable to race conditions
+	#                 # like this.
+	#                 return None
+	#             else:
+	#                 # Copy user address data into a blank shipping address instance
+	#                 shipping_addr = ShippingAddress()
+	#                 address.populate_alternative_model(shipping_addr)
+	#                 return shipping_addr
+
+	get_shipping_address = new_shipping_address_fields
 	is_stripe_customer_set = is_stripe_customer_field_set
 	is_stripe_customer_id_set = is_stripe_customer_field_set

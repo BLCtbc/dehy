@@ -26,8 +26,17 @@
     {% block customer_information %}
     <table class="table table-bordered table-hover">
         <caption><i class="fas fa-user"></i> {% trans "Customer Information" %}</caption>
-        {% if order.guest_email %}
-            <tr>
+        {% if order.user %}
+			<tr>
+				<th>{% trans "Name" %}</th>
+				<th>{% trans "Email address" %}</th>
+			</tr>
+			<tr>
+				<td>{{ order.user.get_full_name|default:"-" }}</td>
+				<td>{{ order.user.email|default:"-" }}</td>
+			</tr>
+        {% elif order.guest_email %}
+			<tr>
                 <th>{% trans "Name" %}</th>
                 <th>{% trans "Email address" %}</th>
             </tr>
@@ -36,15 +45,6 @@
                     {% trans "Customer checked out as a guest." %}
                 </td>
                 <td>{{ order.email }}</td>
-            </tr>
-        {% elif order.user %}
-            <tr>
-                <th>{% trans "Name" %}</th>
-                <th>{% trans "Email address" %}</th>
-            </tr>
-            <tr>
-                <td>{{ order.user.get_full_name|default:"-" }}</td>
-                <td>{{ order.user.email|default:"-" }}</td>
             </tr>
         {% else %}
             <tr><td>{% trans "Customer has deleted their account." %}</td></tr>

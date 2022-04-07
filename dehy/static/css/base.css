@@ -764,6 +764,7 @@ input, select, label {
 
 .modal {
 	background-color: #fdfdfd2e;
+	z-index: 1200;
 }
 
 .nav-link:focus, .nav-link:hover {

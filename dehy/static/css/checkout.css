@@ -45,6 +45,7 @@
 
 body {
 	font-size: 20px;
+    background-color: var(--dark-hg);
 }
 
 form.preview {
@@ -58,7 +59,7 @@ form.preview {
 
 form, .billing-card {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
-	background-color: rgb(26,31,54);
+	background-color: var(--hunter-green);
 }
 .form-control {
 	background-color: inherit;
@@ -69,9 +70,20 @@ form, .billing-card {
 	display: none;
 }
 
+.header {
+	border-bottom: 1px solid #00000057;
+	background-color: var(--hunter-green);
+}
+
 
 input, select, label, div, h1,h2,h3,h4,h5 {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
+}
+
+h2 {
+	font-weight: 400;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 #checkout_flow input:not([type=radio], [type="checkbox"]),
@@ -116,25 +128,10 @@ input:not([type="radio"], [type="checkbox"]), button, select {
   transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-/* button {
-  display: block;
-  width: calc(100% - 30px);
-  height: 40px;
-  margin: 40px 15px 0;
-  background-color: #24b47e;
-  border-radius: 4px;
-  color: #fff;
-  text-transform: uppercase;
-  font-weight: 600;
-  cursor: pointer;
-} */
-
-/* .field {
-	display: block !important;
-	position: relative;
-	width: 100%;
-	height: 100%;
-} */
+.section-header {
+	display: flex;
+	justify-content: space-between;
+}
 
 .error svg {
   margin-top: 0 !important;
@@ -174,16 +171,17 @@ input:not([type="radio"], [type="checkbox"]), button, select {
   fill: #24b47e;
 }
 
-.checkout-flow section {
-	margin-bottom: 2rem;
-	padding: 0;
+.checkout-flow section,
+.order-contents > .card {
 	border: none;
+	border-bottom: 1px solid #00000057;
 }
+
 .card-title * {
 	font-weight: 400;
 }
 
-.size {
+.size-variant {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell !important;
 }
 
@@ -192,13 +190,19 @@ button.edit {
 	color: grey;
 }
 
+button.edit span {
+	font-size: 15px;
+    font-weight: 500;
+}
+
 .card-header {
 	display: flex;
 	justify-content: space-between;
 }
 
 .card-body {
-	background-color: rgb(26,31,54);
+	background-color: var(--hunter-green);
+
 }
 .required:after {
     color: #dc3545;
@@ -216,19 +220,22 @@ button.edit {
 
 .helptext {
 	font-size: smaller;
-	color: darkolivegreen;
 	font-size: 12px;
-	line-height: 16px;
+	line-height: 20px;
 	letter-spacing: 0.01em;
-	margin-bottom: 0.5rem;
+	margin-left: 0.5rem !important;
 }
 
-/*
-.floating-label.resting {
-	-webkit-transform: var(--c-labelRestingTransform)!important;
-	-ms-transform: var(--c-labelRestingTransform)!important;
-	transform: var(--c-labelRestingTransform)!important;
-} */
+.basket-items {
+	padding: unset;
+	margin-bottom: unset;
+}
+
+.basket_summary p,
+.basket_summary h4
+ {
+	margin-bottom: 0;
+}
 
 input:not([type="radio"], [type="checkbox"]):focus, .form-control:not([type="radio"], [type="checkbox"]):focus {
 	outline: var(--focusOutline);
@@ -249,10 +256,6 @@ input:not([type="radio"], [type="checkbox"]):focus, .form-control:not([type="rad
 .total {
 	background-color: inherit;
 }
-
-/* label {
-	font-size: smaller;
-} */
 
 .radio {
 	position: relative;
@@ -277,30 +280,6 @@ input:-webkit-autofill:focus {
 input[data-autocompleted] {
     background-color: transparent !important;
 }
-
-/*
-input:-webkit-autofill,
-input:autofill,
-select:-webkit-autofill,
-select:autofill {
-  -webkit-text-fill-color: #e39f48;
-  background-color: inherit;
-  transition: background-color 100000000s;
-  -webkit-animation: 1ms void-animation-out;
-}
-
-input:autofill,
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active,
-select:autofill,
-select:-webkit-autofill,
-select:-webkit-autofill:hover,
-select:-webkit-autofill:focus,
-select:-webkit-autofill:active  {
-    transition: background-color 600000s 0s, color 600000s 0s;
-} */
 
 
 
@@ -331,10 +310,206 @@ input[type="checkbox"] + label{
 	z-index: 1090;
 }
 
-.input-group {
+/* .input-group {
 	padding: 0;
-}
+} */
 
 input:focus {
 	outline-offset: 0;
+}
+
+input.invalid {
+	border-color: #CE2C30 !important;
+}
+
+.product-quantity {
+	line-height: 1rem;
+}
+
+.order-contents .price-text,
+.order-contents h4,
+#basket_totals span
+ {
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 22px;
+}
+
+#basket_totals .row {
+    line-height: 22px;
+}
+
+#voucher_form {
+	margin-top: 1rem;
+}
+
+.order-contents {
+	height: 100%;
+	position: sticky;
+	top: 0.5rem;
+}
+
+.form-floating>label {
+	left: unset;
+}
+
+#promo_code_btn {
+	padding: 0 0.75rem;
+	border-radius: 0 var(--borderRadius) var(--borderRadius) 0;
+}
+
+#gift_and_promo_code_input {
+    border-radius: var(--borderRadius) 0 0 var(--borderRadius) !important;
+}
+
+#stripe_payment_container {
+	margin: unset;
+	margin-bottom: 1rem;
+}
+
+form .input-group:first-child input,
+form .input-group:first-child select {
+	margin-left: 0 !important;
+}
+
+form .input-group:last-child input,
+form .input-group:last-child select
+ {
+    margin-right: 0 !important;
+}
+
+.error-container.button-container {
+	margin-top: 1rem;
+}
+
+.basket-items {
+    border-bottom: none;
+}
+.basket-items:last-child {
+    border-bottom: 1px solid #ced4da;
+}
+
+.preview_container {
+	font-size: 0.9rem;
+	letter-spacing: 0.01em;
+	line-height: 1.3rem;
+}
+
+.preview_container span:not(.bold) {
+	opacity: 0.8;
+}
+
+.preview_container .left-side,
+.preview_container .right-side,
+{
+	padding-left: 0;
+}
+
+section {
+	border-radius: 2px;
+	border: 1px solid #00000042;
+}
+
+
+.basket_summary input {
+    font-size: 14px;
+    width: 100% !important;
+    position: relative;
+    text-align: right;
+}
+
+
+span.input-group-text {
+	position: absolute;
+    left: 0;
+    height: 100%;
+    z-index: 2;
+    background-color: unset;
+    font-size: 1rem;
+    border: 0;
+	font-variant-caps: all-petite-caps;
+	font-family: 'itc-avant-garde-gothic-pro';
+}
+
+img.img-thumbnail {
+    border-radius: 0;
+    border: 1px solid;
+}
+
+
+@media (max-width: 576px)
+{
+	.checkout-flow,
+	.order-contents {
+    	padding: 0 !important;
+	}
+}
+
+#order_contents_table {
+	table-layout: fixed;
+}
+
+#order_receipt_table td,
+#order_contents_table td{
+	padding: 0 0 0 0.75rem;
+	vertical-align: middle;
+	border: 1px solid #bca26387;
+}
+
+#order_receipt_table tr,
+#order_contents_table tr{
+    height: 50px;
+}
+
+#order_receipt_table,
+#order_contents_table {
+    font-size: 12px;
+    line-height: 1.1rem;
+	word-break: break-all;
+}
+
+#order_receipt_table a,
+#order_contents_table a, {
+	text-decoration: underline;
+}
+
+#order_receipt_table .cell-title {
+	color: rgb(102 102 102);
+	font-size: 14px;
+	font-variant-caps: all-petite-caps;
+	font-family: 'itc-avant-garde-gothic-pro';
+}
+
+.product-td {
+	padding-left: 0;
+}
+
+#order_contents_table thead {
+	background-color: var(--hunter-green);
+	border-right: 1px solid;
+	border-left: 1px solid;
+}
+
+#order_contents_table th {
+	border-color: unset;
+}
+
+#order_contents_table td {
+	max-width: 150px;
+}
+
+.image-container {
+	height: 100px;
+	padding: unset;
+}
+.product-img {
+	padding: 0;
+}
+
+
+.table-hover tbody tr:hover {
+	color: inherit;
+}
+.table-hover>tbody>tr:hover>* {
+	color: inherit
 }

@@ -19,3 +19,4 @@ class USStrategy(strategy.UseFirstStockRecord, strategy.DeferredTax, strategy.St
     - Enforce stock level
     - Taxes aren't known for prices at this stage
     """
+	

@@ -108,7 +108,7 @@
 					<div class="d-flex justify-content-between">
 						<div class="variant-option col-8">
 							<div class="variant-select-container" data-text="Select Size">
-								<select id="size_selector" class="custom-select variant-size-selector" aria-label="Select Size" data-variant-option-name="Size">
+								<select required id="size_selector" class="custom-select variant-size-selector" aria-label="Select Size" data-variant-option-name="Size">
 							        <option value>Select Size</option>
 									{% for child in product.children.public %}
 									  {% purchase_info_for_product request child as child_session %}
@@ -121,7 +121,7 @@
 						  </div>
 
 						  <div class="quantity-select-container col-4">
-							  <input type="number" name="quantity" value="1" id="id_quantity">
+							  <input required type="number" name="quantity" value="1" id="id_quantity" min="1" max="99">
 	  					  </div>
 					  </div>
 					  <div class="row mt-4">
