@@ -15,6 +15,7 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views import generic
 from decimal import Decimal as D
 TWO_PLACES = D(10)**-2
@@ -56,7 +57,7 @@ from dehy.appz.order.models import BillingAddress
 logger = logging.getLogger('oscar.checkout')
 
 def calculate_tax(price, rate):
-	tax = D(price*rate)+D(price)
+	tax = D(price*rate)
 	return tax.quantize(FOUR_PLACES)
 
 def Deb(msg=''):
@@ -87,16 +88,14 @@ def get_city_and_state(postcode=None):
 
 # stripe webhook handler
 @csrf_exempt
+@require_POST
 def webhook_submit_order(request):
 	print('\n --- caught a webhook --- ', datetime.datetime.now())
 
 	place_order_view = PlaceOrderView(request=request)
 
 	payload = request.body
-	json_payload = json.loads(payload)
-	data = json_payload.get('data', {})
 	endpoint_secret = 'whsec_63c2ac70680ad9eb9ceddd981cb1be311fbd0ab114767d63c69c28f0374d8b42'
-	# if we have the payment_intent then we can create the payment source
 
 	event = None
 	sig_header = request.headers['STRIPE_SIGNATURE']
@@ -115,12 +114,17 @@ def webhook_submit_order(request):
 
 	# Handle the event
 	if event['type'] == 'payment_intent.succeeded':
+		print('Event type {}'.format(event['type']))
+
 		status_code = 200
 		payment_intent = event['data']['object']
 		# print('\n payment_intent (as created by stripe): ', payment_intent)
 
 		basket = Basket.objects.get(id=payment_intent.metadata['basket_id'])
-		order_id = payment_intent.metadata['order_id']
+		order_id = payment_intent.metadata.get('order_id', None)
+		if not order_id:
+			order_id = f"order_{basket.stripe_order_id}"
+
 		order = Facade.stripe.Order.retrieve(order_id, expand=['customer', 'payment.payment_intent', 'line_items'])
 		place_order_view.handle_place_order_submission(basket, order)
 
@@ -225,18 +229,18 @@ def ajax_get_shipping_methods(request):
 	if not shipping_address_form.is_valid():
 		print('dir(shipping_address_form.errors): ', dir(shipping_address_form.errors))
 		print(f'\n form.errors: {shipping_address_form.errors}')
-		print('shipping_address_form.errors.as_text: ', shipping_address_form.errors.as_text())
-		print('shipping_address_form.errors.as_data: ', shipping_address_form.errors.as_data())
-		print('shipping_address_form.errors.as_json: ', shipping_address_form.errors.as_json())
 		data['errors'] = shipping_address_form.errors.as_json()
 
 
 	else:
 		status_code = 200
 		address_fields = dict((k, v) for (k, v) in shipping_address_form.instance.__dict__.items() if not k.startswith('_'))
+
 		country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
 
 		shipping_address = ShippingAddress(**address_fields)
+		print('\n ajax_get_shipping_methods: address_fields: ', address_fields)
+
 		checkout_session.ship_to_new_address(address_fields)
 		methods, status_code = get_shipping_methods(request, post_data, True, True)
 		data['shipping_methods'] = []
@@ -282,8 +286,12 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 	def get(self, request, *args, **kwargs):
 		# for item in request.session.items():
 		# 	print('\n -- session item -- \n', item)
+		print('checkout shipping address set: ', self.checkout_session.is_shipping_address_set())
+		print('checkout shipping method set: ', self.checkout_session.is_shipping_method_set(request.basket))
 
 		response = super().get(request, *args, **kwargs)
+		self.checkout_session.reset_shipping_data()
+
 		basket_view = BasketView.as_view()(request)
 
 		order = Facade.update_or_create_order(request.basket)
@@ -451,9 +459,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 				context_data = self.get_context_data(*args, **kwargs)
 				shipping_address_obj = self.get_shipping_address(self.request.basket)
-
-				# full_name = f"{shipping_address_form.cleaned_data['first_name']} {shipping_address_form.cleaned_data['last_name']}"
-
 				data['shipping_charge'] = context_data['shipping_charge'].incl_tax
 
 			response = JsonResponse(data)
@@ -493,6 +498,7 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 	def get_initial(self):
 		initial = self.checkout_session.new_shipping_address_fields()
+		print('ShippingView.get_initial called')
 		if initial:
 			initial = initial.copy()
 			# Convert the primary key stored in the session into a Country
@@ -520,6 +526,8 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 		# Store the address details in the session and redirect to next step
 		address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
+		print('\n ShippingView: address_fields: ', address_fields)
+
 		self.checkout_session.ship_to_new_address(address_fields)
 		return super().form_valid(form)
 
@@ -639,13 +647,12 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 		return response
 
 	def post(self, request, *args, **kwargs):
-		data = {}
+		data = {'section': 'billing'}
 		status_code = 400
 
 		response = super().post(request, *args, **kwargs)
 		context = self.get_context_data(*args, **kwargs)
 		total = context['order_total']
-		section = 'billing'
 		form = self.form_class(request.POST)
 
 		if not form.is_valid():
@@ -659,18 +666,24 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 		if request.is_ajax() and form.is_valid():
 			status_code = 200
 			cleaned_data = form.cleaned_data
-			data['section'] = section
 
 			if cleaned_data['same_as_shipping']:
+				print('BillingView shipping_fields: ', self.checkout_session.new_shipping_address_fields())
+				self.checkout_session.ship_to_new_address(self.checkout_session.new_shipping_address_fields())
 				self.checkout_session.bill_to_shipping_address()
 
 			address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
+			print('BillingView: address_fields: ', address_fields)
 
 			phone_number = address_fields.get('phone_number').as_international if address_fields.get('phone_number', None) else None
 			address_fields.update({'email': self.checkout_session.get_guest_email()})
+			print('test1')
 
 			if phone_number:
 				address_fields.update({'phone':phone_number})
+
+			if isinstance(address_fields.get('country', None), Country):
+				address_fields['country'] = address_fields['country'].iso_3166_1_a2
 
 			order = Facade.update_and_process_order(request.basket, billing_fields=address_fields)
 			payment = order.payment
@@ -679,10 +692,11 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			data['order_client_secret'] = order.client_secret
 			data['payment_intent_client_secret'] = request.basket.payment_intent_client_secret
 			data['stripe_pkey'] = Facade.stripe.pkey
-
 			response = JsonResponse(data)
 
 		response.status_code = status_code
+
+
 		return response
 
 class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
@@ -852,11 +866,16 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 
 			stripe_line = list(filter(lambda x: x['product']==line.product.upc, order.line_items.data))[0]
 			tax_rate = D(stripe_line['amount_tax']/stripe_line['amount_subtotal']).quantize(FOUR_PLACES)
-			price_incl_tax = calculate_tax(line.price_excl_tax, tax_rate)
-			# unit_tax = (price_incl_tax / line.quantity).quantize(FOUR_PLACES)
+			price_incl_tax = line.price_excl_tax + calculate_tax(line.price_excl_tax, tax_rate)
+			print('stripe_line: ', stripe_line)
+			print('tax_rate: ', tax_rate)
+			print('price_incl_tax: ', price_incl_tax)
 
-			line.price_incl_tax = price_incl_tax
-			line.purchase_info.price.incl_tax = price_incl_tax
+			# unit_tax = (price_incl_tax / line.quantity).quantize(FOUR_PLACES)
+			# line.price_incl_tax = price_incl_tax
+
+			line.purchase_info.price.tax = calculate_tax(line.price_excl_tax, tax_rate)
+
 			line.save()
 		# Need to put card info on the order info and then pass it along on
 		# the order receipt + order receipt email
@@ -995,7 +1014,8 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			currency=settings.STRIPE_CURRENCY,
 			amount_allocated=total.incl_tax,
 			amount_debited=total.incl_tax,
-			reference=kwargs.get('payment_intent_id', None)
+			reference=kwargs.get('payment_intent_id', None),
+			label=f"{kwargs['card']['brand']} ending in: {kwargs['card']['last4']}"
 		)
 
 		self.add_payment_source(source)
@@ -1075,7 +1095,7 @@ class ThankYouView(views.ThankYouView):
 	Displays the 'thank you' page which summarises the order just submitted.
 	"""
 	template_name = 'dehy/checkout/thank_you.html'
-	max_wait = 10
+	max_wait = 15
 	def get(self, request, *args, **kwargs):
 		self.object = self.get_object()
 		if self.object is None:
@@ -1094,16 +1114,8 @@ class ThankYouView(views.ThankYouView):
 			elif 'order_id' in self.request.GET:
 				kwargs['id'] = self.request.GET['order_id']
 			order = Order._default_manager.filter(**kwargs).first()
+			print('super user order found: ', order)
 
-		# print(f'\n self.request.session.keys(): {self.request.session.keys()}')
-		# print(f'\n self.request.session.get(checkout_data): {self.request.session.get("checkout_data", None)}')
-		#
-		# print(f'\n self.request.basket.is_submitted: {self.request.basket.is_submitted}')
-		# print(f'\n self.request.basket.status: {self.request.basket.status}')
-		#
-		# print('\n self.request.GET', self.request.GET)
-		# print('\n basket.id: ', self.request.basket.id)
-		# print(f'\n self.request.basket.is_submitted: {self.request.basket.is_submitted}')
 		stripe_order_id = self.request.GET.get('order', None)
 		order_client_secret = self.request.GET.get('order_client_secret', None)
 		order_id = ''
@@ -1113,6 +1125,7 @@ class ThankYouView(views.ThankYouView):
 
 			if basket:
 				basket = basket.first()
+
 				submitted = basket.is_submitted
 				# print(f'\n basket.is_submitted: {submitted}')
 				start_time = time.time()
@@ -1128,10 +1141,9 @@ class ThankYouView(views.ThankYouView):
 						return order
 
 
-				order = Order._default_manager.filter(number=order_id).first()
-				if order and order.basket==basket:
-					print('\n **** found order: ', order, '\n')
-					return order
+				order_ = Order._default_manager.filter(number=order_id, basket=basket)
+				if order_:
+					order = order_.first()
 
 
 		return order

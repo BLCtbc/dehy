@@ -2,6 +2,8 @@ from django.conf import settings
 from oscar.apps.payment.exceptions import UnableToTakePayment, InvalidGatewayRequestError
 import stripe, json
 from decimal import Decimal as D
+from oscar.core.loading import get_model
+Country = get_model('address', 'Country')
 
 stripe.api_version = '2020-08-27; orders_beta=v2'
 
@@ -216,7 +218,7 @@ class Facade(object):
 
 			order = self.stripe.Order.modify(stripe_order_id, line_items=self.get_line_items(basket), **order_details)
 
-			print('order updated: ', order)
+			# print('order updated: ', order)
 			basket.stripe_order_status = order.status
 			basket.save()
 
@@ -300,14 +302,18 @@ class Facade(object):
 		address_details = {}
 		name = address_fields.get('first_name', 'anon')
 		name = f"{name} {address_fields['last_name']}" if address_fields.get('last_name', None) else name
+
 		country = address_fields['country'] if address_fields.get('country', None) else address_fields.get('country_id')
+
+		if isinstance(country, Country):
+			country = country.iso_3166_1_a2
 
 		if address_fields.get('postcode', None) and country and name:
 
 			address_details = {
 				'address': {
 					'postal_code':address_fields['postcode'],
-					'country':country
+					'country': country
 				},
 				'name': name
 			}

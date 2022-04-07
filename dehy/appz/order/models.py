@@ -9,6 +9,10 @@ class Order(AbstractOrder):
 	additional_info_questionnaire = models.ForeignKey('generic.AdditionalInfoQuestionnaire',
 		on_delete=models.SET_NULL, null=True, blank=True)
 
+	@property
+	def total_tax(self):
+		return self.total_incl_tax - (self.total_excl_tax + self.shipping_excl_tax)
+
 class BillingAddress(AbstractBillingAddress):
 	phone_number = PhoneNumberField(_("Phone number"), blank=True)
 

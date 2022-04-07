@@ -18,7 +18,8 @@ TWO_PLACES = D(10)**-2
 
 from dehy.appz.checkout.facade import Facade
 Facade = Facade()
-from dehy.appz.checkout.views import get_shipping_methods
+
+from dehy.appz.checkout import views as checkout_views
 
 import json
 
@@ -140,6 +141,9 @@ class BasketView(CoreBasketView):
 		data = {}
 		response = super().post(request, *args, **kwargs)
 
+		print('basket shipping address set: ', self.checkout_session.is_shipping_address_set())
+		print('basket shipping method set: ', self.checkout_session.is_shipping_method_set(request.basket))
+
 		num_items = request.basket.num_items
 		data['object_list'] = {}
 
@@ -153,10 +157,11 @@ class BasketView(CoreBasketView):
 
 		shipping_addr = request.POST.get('shipping_addr', None)
 		shipping_addr = json.loads(shipping_addr) if shipping_addr else self.checkout_session.get_shipping_address()
+		print('\n BasketView shipping_addr: ', shipping_addr)
+
 		if self.checkout_session.is_shipping_address_set() and self.checkout_session.is_shipping_method_set(request.basket):
 
-			print('\n shipping_addr: ', shipping_addr)
-			data['shipping_methods'] = get_shipping_methods(request, shipping_addr, True)
+			data['shipping_methods'] = checkout_views.get_shipping_methods(request, shipping_addr, True)
 			data['method_code'] = self.checkout_session.shipping_method_code(request.basket)
 
 			shipping_method = next(filter(lambda x: x['code'] == data['method_code'], data['shipping_methods']), None)

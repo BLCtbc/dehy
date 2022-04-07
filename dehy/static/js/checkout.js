@@ -289,24 +289,25 @@ dehy.ch.stripe = {
 				processData: false,
 				data: form_data,
 				success: function(data) {
-					console.log('resolved, data: ', data);
 					resolve(data)
 				},
 				error: function(error) {
-					reject(error)
+					reject(dehy.ch.forms.errors.display)
 				},
 			});
 		});
 	},
 	payment_element_setup(client_secret, data){
-		console.log('data: ', data);
 
-		console.log('client_secret: ', client_secret);
+		const appearance = {
+			theme: 'night',
+			labels: 'floating'
+		};
 
 		var options = {
 			clientSecret: client_secret,
 			// Fully customizable with appearance API.
-			appearance: {/*...*/},
+			appearance: appearance,
 		};
 
 
@@ -391,12 +392,15 @@ dehy.ch.stripe = {
 							// success, do stuff
 						}
 					})
+					.catch(()=>{
+						dehy.ch.forms.errors.display(data);
+					})
 					.finally(()=> {
 						dehy.utils.unfreeze_forms();
 					})
 				})
 
-			});
+			}, dehy.ch.forms.errors.display);
 		});
 		payment_element.on('change', function(e) {
 			if (e.error) {
@@ -643,7 +647,7 @@ dehy.ch.forms = {
 	},
 	create(section, form_structure) {
 		// create the form
-		var form = dehy.utils.create_element({tag:'form', classes: 'card card-body checkout-form', attrs:{'method':"post", 'id':`${section}_form`, 'action': `/checkout/${section}/`}});
+		var form = dehy.utils.create_element({tag:'form', classes: 'checkout-form', attrs:{'method':"post", 'id':`${section}_form`, 'action': `/checkout/${section}/`}});
 		let csrftoken_elem = dehy.utils.create_element({tag:'input', attrs:{'name':'csrfmiddlewaretoken', 'type': 'hidden', 'value':dehy.utils.getCookie('csrftoken')}})
 		form.append(csrftoken_elem)
 		form.append(dehy.utils.create_elements(form_structure))
@@ -877,21 +881,43 @@ dehy.ch.forms = {
 			}
 		}
 		var preview_container = dehy.utils.create_element({tag:'div', classes:'preview_container'});
-		// get the object and compare it to
-		var preview_elems = FormStructures.preview[section];
+		var preview_elems = FormStructures.previews[section];
+		var elem = dehy.utils.create_elements(preview_elems, preview_container);
+
+
 		var form_data_obj = dehy.ch.forms.get_saved_info(section);
-		if (Array.prototype.isPrototypeOf(preview_elems)) {
-			preview_elems.forEach(function(ele) {
-				preview_container.append(dehy.utils.create_element({tag: 'div', classes: 'preview-item', text: form_data_obj[ele]}))
-			});
-		} else {
-			for (let [key, val] of Object.entries(form_data_obj)) {
-				let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
-				preview_container.append(elem)
+
+		console.log('form_data_obj: ', form_data_obj);
+		for (let [key, val] of Object.entries(form_data_obj)) {
+			var elem = preview_container.querySelector(`span[data-preview=${key}]`);
+			if (elem) {
+				elem.textContent = val;
 			}
 		}
+		if (section=='shipping') {
+			var shipping_form = dehy.ch.forms.saved.shipping;
+			// shipping_form.querySelector(`.shipping-method-container input[value='${form_data_obj.method_code}']`)
+			var label_text = shipping_form.querySelector(`.shipping-method-container input[value='${form_data_obj.method_code}']`).parentNode.querySelector('label').textContent
+
+			var method_name = `${label_text.split('®')[0]}®`,
+				method_cost = `$${label_text.split('®')[1].split("$")[1]}`;
+
+			preview_container.querySelector(`span[data-preview='shipping_method']`).textContent = method_name;
+			preview_container.querySelector(`span[data-preview='shipping_cost']`).textContent = method_cost;
+		}
+		// if (Array.prototype.isPrototypeOf(preview_elems)) {
+		// 	preview_elems.forEach(function(ele) {
+		// 		preview_container.append(dehy.utils.create_element({tag: 'div', classes: 'preview-item', text: form_data_obj[ele]}))
+		// 	});
+		// } else {
+		// 	for (let [key, val] of Object.entries(form_data_obj)) {
+		// 		let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
+		// 		preview_container.append(elem)
+		// 	}
+		// }
 
 		// preview_container.append(get_preview_section(elems, section));
+
 		document.getElementById(section).append(preview_container);
 	},
 
