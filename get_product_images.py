@@ -61,6 +61,7 @@ def main():
 				existing_product_image = ProductImage.objects.filter(product_id=product.id, original__contains=img_name)
 				if existing_product_image:
 					existing_product_image.all().delete()
+					print(f'Deleting ({existing_product_image.count()}) existing images containing: {img_name}')
 				# delete it from the database
 
 
