@@ -227,7 +227,6 @@ def ajax_get_shipping_methods(request):
 	shipping_address_form = CountryAndPostcodeForm(post_data)
 
 	if not shipping_address_form.is_valid():
-		print('dir(shipping_address_form.errors): ', dir(shipping_address_form.errors))
 		print(f'\n form.errors: {shipping_address_form.errors}')
 		data['errors'] = shipping_address_form.errors.as_json()
 
@@ -239,7 +238,6 @@ def ajax_get_shipping_methods(request):
 		country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
 
 		shipping_address = ShippingAddress(**address_fields)
-		print('\n ajax_get_shipping_methods: address_fields: ', address_fields)
 
 		checkout_session.ship_to_new_address(address_fields)
 		methods, status_code = get_shipping_methods(request, post_data, True, True)
@@ -284,10 +282,6 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		return context_data
 
 	def get(self, request, *args, **kwargs):
-		# for item in request.session.items():
-		# 	print('\n -- session item -- \n', item)
-		print(request.resolver_match)
-		print(request.resolver_match.url_name)
 
 		response = super().get(request, *args, **kwargs)
 		self.checkout_session.reset_shipping_data()
@@ -903,7 +897,6 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 						 forms can be re-rendered correctly if payment fails.
 		:order_kwargs: Additional kwargs to pass to the place_order method
 		"""
-		print('\n --- PlaceOrderView.submit() --- ', datetime.datetime.now())
 
 		if payment_kwargs is None:
 			payment_kwargs = {}
