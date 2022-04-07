@@ -286,8 +286,8 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 	def get(self, request, *args, **kwargs):
 		# for item in request.session.items():
 		# 	print('\n -- session item -- \n', item)
-		print('checkout shipping address set: ', self.checkout_session.is_shipping_address_set())
-		print('checkout shipping method set: ', self.checkout_session.is_shipping_method_set(request.basket))
+		print(request.resolver_match)
+		print(request.resolver_match.url_name)
 
 		response = super().get(request, *args, **kwargs)
 		self.checkout_session.reset_shipping_data()
@@ -660,7 +660,6 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			print('form non_field_errors: ', form.non_field_errors)
 
 		if not request.is_ajax():
-			print('\n request not ajax')
 			print('form errors: ', form.errors)
 
 		if request.is_ajax() and form.is_valid():
@@ -668,16 +667,13 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			cleaned_data = form.cleaned_data
 
 			if cleaned_data['same_as_shipping']:
-				print('BillingView shipping_fields: ', self.checkout_session.new_shipping_address_fields())
 				self.checkout_session.ship_to_new_address(self.checkout_session.new_shipping_address_fields())
 				self.checkout_session.bill_to_shipping_address()
 
 			address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
-			print('BillingView: address_fields: ', address_fields)
 
 			phone_number = address_fields.get('phone_number').as_international if address_fields.get('phone_number', None) else None
 			address_fields.update({'email': self.checkout_session.get_guest_email()})
-			print('test1')
 
 			if phone_number:
 				address_fields.update({'phone':phone_number})
@@ -724,7 +720,6 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		# views.
 		self.checkout_session = CheckoutSessionData(request)
 
-		print('\n --- PlaceOrderView.dispatch() --- ', datetime.datetime.now())
 		# Check if this view should be skipped
 		try:
 			self.check_skip_conditions(request)
@@ -756,14 +751,11 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		return response
 
 	def post(self, request, *args, **kwargs):
-		print('\n --- PlaceOrderView.post() --- ', datetime.datetime.now())
 		data = {}
 		# request came from client callback, handle it accordingly
 		if request.is_ajax():
 
 			basket_id = self.get_submitted_basket_id()
-			print('\n basket_id', basket_id)
-			print('\n request.basket.is_submitted: ', request.basket.is_submitted())
 
 			# order successfully placed
 			if request.basket.is_submitted():
@@ -812,19 +804,9 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		return address
 
 	def handle_place_order_submission(self, basket, order):
-		print('\n --- PlaceOrderView.handle_place_order_submission() --- ', datetime.datetime.now())
 
-		########################
-		## list of stuff needed: user, basket, shipping_address, shipping_method, shipping_charge, billing_address, order_total
-		########################
-
-		# basket
-		# basket = Basket.objects.get(id=event.metadata['basket_id'])
 		basket._set_strategy(self.request.strategy)
 
-
-		# user
-		# attempt to lookup the user based on basket owner
 		user = User.objects.get(id=basket.owner_id) if basket.owner_id else AnonymousUser()
 
 		print('-- associated order: ', order)
@@ -854,31 +836,19 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			incl_tax=D(order.amount_total/100).quantize(TWO_PLACES)
 		)
 
-
-
-		# for line in order.line_items.data:
-		# 	unit_tax = D((line['amount_tax']/line['quantity'])/100).quantize(FOUR_PLACES)
-		# 	basket_line = basket.all_lines().filter(product__upc=line['product']).first()
-		# 	basket_line.purchase_info.price.tax = unit_tax
-
-
 		for line in basket.all_lines():
 
 			stripe_line = list(filter(lambda x: x['product']==line.product.upc, order.line_items.data))[0]
 			tax_rate = D(stripe_line['amount_tax']/stripe_line['amount_subtotal']).quantize(FOUR_PLACES)
 			price_incl_tax = line.price_excl_tax + calculate_tax(line.price_excl_tax, tax_rate)
-			print('stripe_line: ', stripe_line)
-			print('tax_rate: ', tax_rate)
-			print('price_incl_tax: ', price_incl_tax)
 
-			# unit_tax = (price_incl_tax / line.quantity).quantize(FOUR_PLACES)
-			# line.price_incl_tax = price_incl_tax
 
 			line.purchase_info.price.tax = calculate_tax(line.price_excl_tax, tax_rate)
 
 			line.save()
 		# Need to put card info on the order info and then pass it along on
 		# the order receipt + order receipt email
+
 		payment_kwargs = {
 			'total_tax': D(order.total_details.amount_tax/100).quantize(TWO_PLACES),
 			'payment_intent_id': order.payment.payment_intent.id,
@@ -1015,7 +985,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			amount_allocated=total.incl_tax,
 			amount_debited=total.incl_tax,
 			reference=kwargs.get('payment_intent_id', None),
-			label=f"{kwargs['card']['brand']} ending in: {kwargs['card']['last4']}"
+			label=f"{kwargs['card']['brand']} XXXX-{kwargs['card']['last4']}"
 		)
 
 		self.add_payment_source(source)
@@ -1101,6 +1071,7 @@ class ThankYouView(views.ThankYouView):
 		if self.object is None:
 			return redirect(settings.OSCAR_HOMEPAGE)
 		context = self.get_context_data(object=self.object)
+		context.update({'lg_col_size': 10, 'md_col_size':"col-md-11"})
 		return self.render_to_response(context)
 
 	def get_object(self, queryset=None):
