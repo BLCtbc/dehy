@@ -1,15 +1,31 @@
 from oscar.apps.basket.abstract_models import AbstractBasket, AbstractLine
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from oscar.core.loading import get_class
 
 Unavailable = get_class('partner.availability', 'Unavailable')
 
 class Basket(AbstractBasket):
-	payment_intent_id = models.CharField(max_length=100, help_text='Payment Intent ID(Stripe)', blank=True, null=True)
-	stripe_customer_id = models.CharField(max_length=100, help_text='Stripe Customer ID', blank=True, null=True)
+	payment_intent_id = models.CharField(max_length=255, help_text='Payment Intent ID(Stripe)', blank=True, null=True)
+	stripe_customer_id = models.CharField(max_length=255, help_text='Stripe Customer ID', blank=True, null=True)
+	stripe_order_id = models.CharField(max_length=255, help_text='Stripe Order ID', blank=True, null=True)
+	stripe_order_status = models.CharField(max_length=50, help_text='Stripe Order Status', blank=True, null=True)
+	payment_intent_client_secret = models.CharField(max_length=255, help_text='Payment Intent Client Secret (Stripe)', blank=True, null=True)
+	stripe_order_client_secret = models.CharField(max_length=255, help_text='Order Client Secret (Stripe)', blank=True, null=True)
+
+	@property
+	def total_weight(self):
+		return sum([line.get_weight for line in self.lines.all()])
 
 class Line(AbstractLine):
+
+
+	price_incl_tax = models.DecimalField(_('Price incl. Tax'), decimal_places=5, max_digits=12, null=True)
+
+	@property
+	def get_weight(self):
+		return self.product.weight*self.quantity
 
 	def get_warning(self):
 		"""
@@ -29,7 +45,7 @@ class Line(AbstractLine):
 
 		############################
 		### This part of the function is generating "price increased" warnings after tax is calculated,
-		### which seems erroneous. Informing the customer of price increases seems like poor business practice.
+		### likely erroneous. Informing the customer of price increases seems like poor business practice.
 		############################
 
 		# Compare current price to price when added to basket

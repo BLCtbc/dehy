@@ -15,7 +15,7 @@
 }
 
 .basket-items:nth-child(even) {
-    background: var(--dark-hg);
+    background: transparent;
 }
 
 .price-text {
@@ -44,4 +44,10 @@ form {
 
 .product-quantity {
 	padding: 0.25rem 0.5rem;
+}
+
+.size-variant {
+	font-size: smaller;
+	opacity: 0.75;
+	line-height: 20px;
 }

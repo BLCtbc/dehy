@@ -1,6 +1,36 @@
 from django.db import models
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-# Create your models here.
+from oscar.apps.customer.abstract_models import AbstractUser
+
+import datetime
+
+class User(AbstractUser):
+	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
+
+class FedexAuthToken(models.Model):
+	access_token = models.CharField(_("Token"), max_length=2000, default="")
+	expires_in = models.IntegerField(_("Expires in"), default=0, help_text=_("Seconds"))
+	date_created = models.DateTimeField(auto_now=True, editable=False)
+	scope = models.CharField(_("Scope"), max_length=20, default="")
+
+	def __str__(self):
+		return f"Token: {self.access_token}, created: {self.date_created}"
+
+	@property
+	def expiration(self):
+		return self.date_created + datetime.timedelta(seconds=self.expires_in)
+
+	@property
+	def expired(self):
+		return datetime.datetime.now().astimezone() > self.expiration
+
+	def save(self, *args, **kwargs):
+		if not self.pk and FedexAuthToken.objects.exists():
+			raise ValidationError('There is can be only one FedexAuthToken instance')
+
+		return super().save(*args, **kwargs)
+
 
 class FAQ(models.Model):
 	"""

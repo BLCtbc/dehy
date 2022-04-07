@@ -22,6 +22,7 @@
 	- [authenticating github][#git_authentication]
 7. [troubleshooting](#troubleshooting)
 	- [postgres issues](#postgresql)
+	- [issues with using custom User model](#custom_user_model)
 8. [clearing sorl thumbnail media cache](#clear_sorl_image_cache)
 9. [running local django server over https](#local_django_https)
 10. [integrating stripe with django-oscar](#stripe_integration)
@@ -105,6 +106,8 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		* grant permissions, then quit
 			```sql
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy TO dehydevuser;
+			-- grant permissions on the default database also, for testing
+			postgres=# GRANT ALL PRIVILEGES ON DATABASE postgres TO dehydevuser;
 			postgres=# \q
 			```
 
@@ -114,14 +117,83 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			postgres=# GRANT ALL PRIVILEGES ON DATABASE dehy_staging TO dehydevuser;
 			```
 
+		<a name="re_instantiate_database"></a>
+		* If you need to first delete an existing database... re-instantiating postgresql database
+			steps 1 and 2 from [here](https://www.postgresqltutorial.com/postgresql-administration/postgresql-drop-database/)
+			1. dropping database with no connections
+
+				```sql
+				postgres=# DROP DATABASE dehy;
+				```
+
+			2. dropping database WITH active connections
+
+				```sql
+				-- the output from this command is much easier to read within pgadmin, although not relaly necessary
+				postgres=# SELECT * FROM pg_stat_activity WHERE datname = 'dehy_staging';
+
+				-- if you run this command within pgadmin you will lose connection
+				SELECT pg_terminate_backend (pg_stat_activity.pid)
+				FROM pg_stat_activity
+				WHERE pg_stat_activity.datname = 'dehy_staging';
+
+				--
+				DROP DATABASE dehy_staging;
+				```
+
+			3. delete all migration files:
+				test the pattern:
+					`ls -la ./dehy/appz/*/migrations/*.py`
+
+				remove migration files:
+					`rm -r ./dehy/appz/*/migrations/*.py`
+					<!-- `rm -rf ./dehy*/__pycache__` -->
+
+			4. remove references to models within files (since the model instances no longer exist, and will cause errors)
+
+				i commented this whole file out:
+				```py
+				# appz/shipping/repository.py
+				...
+				# from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
+				...
+				```
+
+			5. replace the oscar migration files
+
+				```sh
+				# repeat this for all forked oscar apps...
+				# current list: address, basket, catalogue, customer, order, partner, payment, shipping
+				export APP_NAME=basket
+				cp -R venv/lib/python3.7/site-packages/oscar/apps/$APP_NAME/migrations dehy/appz/$APP_NAME
+				```
+
+			6. makemigrations:
+				```sh
+				python manage.py makemigrations
+
+				# need to specify the app name for any custom (non-oscar) apps
+				python manage.py makemigrations generic
+				python manage.py makemigrations recipes
+				```
+
+			7. migrate:
+				`python manage.py migrate`
+
+
+			8. load the fixtures (see below)
+
+			9. populate the country objects `python manage.py oscar_populate_countries`
+
+
 		- loading fixtures:
 			```sh
-			python fixture_creator.py # file must be placed called in same directory as manage.py
+			python fixture_creator.py # file must be placed+called in same directory as manage.py
 			```
 
 		- loading images into database:
 			```sh
-			python get_product_images.py # file must be placed called in same directory as manage.py
+			python get_product_images.py # file must be placed+called in same directory as manage.py
 			```
 
 	- create and setup the `.env` file:
@@ -1211,6 +1283,55 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			or
 		`$ pkill postgres` That kills all processes named 'postgres'
 
+	<a name="custom_user_model"></a>
+	- using a custom user model with django oscar
+
+		follow the steps listed here:
+		https://stackoverflow.com/a/53936097/6158303
+
+		- step 1:
+
+			```py
+			# settings.py
+			...
+			AUTH_USER_MODEL = "generic.User"
+			...
+
+			# dehy/appz/generic.models
+
+			...
+			from oscar.apps.customer.abstract_models import AbstractUser
+			...
+			class User(AbstractUser):
+				stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
+
+			```
+
+		- step 2:`python manage.py makemigrations`
+
+		- step 3: undo step 1
+			```py
+			# settings.py
+			...
+			# AUTH_USER_MODEL = "generic.User"
+			...
+
+			# dehy/appz/generic.models
+
+			...
+			from oscar.apps.customer.abstract_models import AbstractUser
+			...
+			#class User(AbstractUser):
+			#	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
+
+			```
+
+		- step 4: `python manage.py migrate`
+
+		- step 5: redo step 1
+
+
+
 
 implementing a continuous deployment workflow on Debian 10+
 [adding a self-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners)
@@ -1268,20 +1389,42 @@ implementing a continuous deployment workflow on Debian 10+
 	python manage.py runsslserver --certificate cert.pem --key key.pem
 	```
 
-<a name="stripe_integration"></a>
-7. ###### integrating sripe with django oscar
-
-	see: https://stackoverflow.com/questions/51243465/how-to-integrate-stripe-payments-gateway-with-django-oscar
-	and: https://groups.google.com/g/django-oscar/c/Cr8sBI0GBu0/m/PHRdXX2uFQAJ
-
-	test cc number: 4242 4242 4242 4242
-
-
 8. ###### testing
+
+		if you continuously get `ModuleNotFoundError: No module named 'dehy.functional_tests'`
+		even though the modules are clearly visible and discoverable, the issue could be resolved
+		by renaming the project folder, as suggested [here](https://stackoverflow.com/a/28476388/6158303)
+
+		the actual command:
+		`./manage.py test functional_tests --keepdb -v 3`
+
+		additionally, you should make sure you have
+		```sql
+		postgres=# GRANT ALL PRIVILEGES ON DATABASE postgres TO dehydevuser;
+		postgres=# \q
+		```
 
 	fixture used:
 
 		`python manage.py dumpdata --exclude=auth --exclude=address --exclude=contenttypes --indent=4 --exclude='admin.logentry' --exclude='sessions.session' --exclude=analytics --exclude=thumbnail --exclude=basket --exclude=order --exclude=payment --output='fixtures.json'`
+
+		fixing shipping countries:
+			```py
+			from oscar.core.loading import get_model
+			Country = get_model('address', 'Country')
+			country_objects = Country.objects.all()
+			shippable_countries = ['US', 'CA']
+			for country in country_objects:
+				if country.iso_3166_1_a2 not in shippable_countries:
+					country.is_shipping_country = False
+					country.save()
+			```
+
+		dumping all:
+		`python manage.py dumpdata --all --indent=4 --output='fixtures_all.json'`
+
+
+
 
 <a name='django_view_inserted_into_another_view'></a>
 9. ###### insert a django view (child) into another view (parent)
@@ -1298,3 +1441,130 @@ implementing a continuous deployment workflow on Debian 10+
 
 
 
+<a name='stripe_integration'></a>
+10. ###### working with stripe
+
+   ###### integrating sripe with django oscar (some useful info for starting out
+
+	see: https://stackoverflow.com/questions/51243465/how-to-integrate-stripe-payments-gateway-with-django-oscar
+	and: https://groups.google.com/g/django-oscar/c/Cr8sBI0GBu0/m/PHRdXX2uFQAJ
+
+
+	###### some stripe examples:
+
+	<a name='stripe_order_creation'></a>
+	1. stripe order creation (from django shell)
+		NOTE: the only the country and postal_code are required when supplying an address field
+
+		```py
+		from django.conf import settings
+		import stripe
+
+		stripe.api_key = settings.STRIPE_SECRET_KEY
+		stripe.pkey = settings.STRIPE_PUBLISHABLE_KEY
+		stripe.api_version = '2020-08-27; orders_beta=v2'
+
+		####################
+		## order with tax ##
+		####################
+
+		order = stripe.Order.create(
+		  currency="usd",
+		  line_items=line_items,
+		  payment={
+		    "settings": {
+		      "payment_method_types": ["card"],
+		    },
+		  },
+		  expand=["line_items"],
+		  automatic_tax={
+		    "enabled": True,
+		  },
+		  shipping_details={
+		    "address": {
+			 "city": "Austin", "country":"US", "postal_code":"78759", "state": "TX"
+			},
+			"name":"anon"
+		  }
+		)
+
+		############
+		## no tax ##
+		############
+		order = stripe.Order.create(
+		  currency="usd",
+		  line_items=line_items,
+		  payment={
+		    "settings": {
+		      "payment_method_types": ["card"],
+		    },
+		  },
+		  expand=["line_items"],
+		  automatic_tax={
+		    "enabled": True,
+		  },
+		  shipping_details={
+		    "address": {
+			  "city": "Gainesville", "country":"US", "postal_code":"32605", "state": "FL"
+			},
+			"name":"anon"
+		  }
+		)
+		```
+
+	<a name='stripe_order_update'></a>
+	2. updating a stripe order (from django shell)
+
+		```py
+
+		shipping_addr = {'first_name': 'kenneth', 'city': 'Austin', 'postcode': '78759', 'country': 'US', 'state': 'TX'}
+
+		## when creating dictionaries that will supply information to stripe, ensure all required info is supplied.
+		## For required items that are not necessarily needed to retrieve order info, such as a 'name'
+		## use a ternary operator to supply a value, example:
+
+		name = shipping_addr['first_name'] if shipping_addr.get('first_name', None) else 'anon'
+		name = f"name {shipping_addr['last_name']}" if shipping_addr.get('last_name', None) else name
+
+		shipping_details = {
+			'address': {
+				'postal_code': '78759',
+				'country': 'US',
+				'state': 'TX',
+				'city': 'Austin'
+			},
+			'name': name,
+		}
+
+		## when supplying optional information, only add it to the dict if a value is supplied
+		## as supplying blank info causes stripe to error, example:
+		if shipping_addr.get('line1', None):
+			shipping_details['address']['line1'] = shipping_addr['line1']
+
+
+		## should also ensure currency values are given in cents
+		shipping_cost = {
+			'shipping_rate_data': {
+				'display_name': 'FEDEX_GROUND',
+				'type':'fixed_amount',
+				'fixed_amount': {
+					'amount': str((D('24.49')*100).to_integral()),
+					'currency': 'usd'
+				},
+				'tax_behavior': 'exclusive'
+			}
+		}
+
+		#######################
+		## updating an order ##
+		#######################
+
+		order = stripe.Order.modify(
+			basket.stripe_order_id,
+			line_items=line_items,
+			shipping_cost=shipping_cost,
+			shipping_details=shipping_details,
+			discounts=discounts
+		)
+
+		```

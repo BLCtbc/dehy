@@ -35,4 +35,19 @@ headers = {
 
 response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
 
-print(response.text.encode('utf8'))
+print(response.text)
+
+response_dict = json.loads(response.text)
+
+response_dict = [
+	{'serviceName': 'FedEx Ground®', 'serviceCode': 'fedex_ground', 'shipmentCost': 9.11, 'otherCost': 4.85},
+	{'serviceName': 'FedEx Priority Overnight®', 'serviceCode': 'fedex_priority_overnight', 'shipmentCost': 20.39, 'otherCost': 3.52},
+	{'serviceName': 'FedEx Express Saver®', 'serviceCode': 'fedex_express_saver', 'shipmentCost': 14.77, 'otherCost': 2.55},
+	{'serviceName': 'FedEx 2Day® A.M.', 'serviceCode': 'fedex_2day_am', 'shipmentCost': 17.22, 'otherCost': 2.97},
+	{'serviceName': 'FedEx First Overnight®', 'serviceCode': 'fedex_first_overnight', 'shipmentCost': 65.14, 'otherCost': 11.24},
+	{'serviceName': 'FedEx Standard Overnight®', 'serviceCode': 'fedex_standard_overnight', 'shipmentCost': 19.32, 'otherCost': 3.33},
+	{'serviceName': 'FedEx 2Day®', 'serviceCode': 'fedex_2day', 'shipmentCost': 15.57, 'otherCost': 2.69},
+	{'serviceName': 'FedEx Home Delivery®', 'serviceCode': 'fedex_home_delivery', 'shipmentCost': 9.11, 'otherCost': 7.59}
+]
+
+'[{"serviceName":"FedEx Ground®","serviceCode":"fedex_ground","shipmentCost":9.11,"otherCost":4.85},{"serviceName":"FedEx Priority Overnight®","serviceCode":"fedex_priority_overnight","shipmentCost":20.39,"otherCost":3.52},{"serviceName":"FedEx Express Saver®","serviceCode":"fedex_express_saver","shipmentCost":14.77,"otherCost":2.55},{"serviceName":"FedEx 2Day® A.M.","serviceCode":"fedex_2day_am","shipmentCost":17.22,"otherCost":2.97},{"serviceName":"FedEx First Overnight®","serviceCode":"fedex_first_overnight","shipmentCost":65.14,"otherCost":11.24},{"serviceName":"FedEx Standard Overnight®","serviceCode":"fedex_standard_overnight","shipmentCost":19.32,"otherCost":3.33},{"serviceName":"FedEx 2Day®","serviceCode":"fedex_2day","shipmentCost":15.57,"otherCost":2.69},{"serviceName":"FedEx Home Delivery®","serviceCode":"fedex_home_delivery","shipmentCost":9.11,"otherCost":7.59}]'
