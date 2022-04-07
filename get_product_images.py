@@ -60,7 +60,7 @@ def main():
 				# product.images.all().delete()
 				existing_product_image = ProductImage.objects.filter(product_id=product.id, original__contains=img_name)
 				if existing_product_image:
-					existing_product_image.first().delete()
+					existing_product_image.all().delete()
 				# delete it from the database
 
 
