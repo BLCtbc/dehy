@@ -26,6 +26,9 @@ fc = FixtureCreator(os.path.abspath(os.path.join(os.path.dirname("__file__"), 'd
 df = fc.get_dataframe()
 
 def main():
+	print(f'Deleting all ({ProductImage.objects.all().count()}) product images')
+	ProductImage.objects.all().delete()
+
 	for ix, row in df.iterrows():
 		product_image_folder_path = settings.BASE_DIR / 'dehy/static/img/p' / row['group_id']
 
@@ -43,8 +46,8 @@ def main():
 
 		image_links = df.at[ix, "all_image_links"]
 		alt_images = [df.at[ix, x] for x in ['alt_image1', 'alt_image2', 'alt_image3'] if df.at[ix, x]]
-		print(f'\n number of images: {len(alt_images)}')
-		print(f'\n alt_images: {alt_images}')
+		# print(f'\n number of images: {len(alt_images)}')
+		# print(f'\n alt_images: {alt_images}')
 		for index, img_name in enumerate(alt_images):
 			image_path = product_image_folder_path / img_name
 			media_img_path = settings.BASE_DIR / 'media/images/products' / row['group_id'] / img_name
@@ -58,12 +61,12 @@ def main():
 				# delete it locally
 				os.remove(media_img_path)
 				# product.images.all().delete()
-
-				existing_product_image = ProductImage.objects.filter(product_id=product.id, original__contains=img_name.replace(".jpg", ""))
+				name_minus_jpg = img_name.replace(".jpg", "")
+				existing_product_image = ProductImage.objects.filter(product_id=product.id, original__contains=name_minus_jpg)
 
 				if existing_product_image:
 					existing_product_image.all().delete()
-					print(f'Deleting ({existing_product_image.count()}) existing images containing: {img_name}')
+					print(f'Deleting ({existing_product_image.count()}) existing images containing: {name_minus_jpg}')
 				# delete it from the database
 
 
