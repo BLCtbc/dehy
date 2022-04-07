@@ -3,3 +3,16 @@ venv
 */__pycache__/*
 *.pyc
 static/*
+dehy/fixtures/
+dehy/logfile
+geckodriver.log
+key.pem
+cert.pem
+logfile
+deploy_tools/~$DEHY_productlist.xlsx
+media/cache/
+fixtures_all.json
+functional_tests/fixtures2.json
+functional_tests/service-availability.json
+functional_tests/stripe_payment_success_fixture.json
+deploy_tools/stripe_catalogue_creator.py
