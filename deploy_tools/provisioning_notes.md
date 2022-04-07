@@ -1371,9 +1371,14 @@ implementing a continuous deployment workflow on Debian 10+
 <a name="clear_sorl_image_cache"></a>
 6. ###### clearing out django oscar's thumbnail/sorl's media cache of thumbnails
 
-	```sh
-	$ python manage.py thumbnail cleanup && python manage.py thumbnail clear
-	```
+		```sh
+		$ python manage.py thumbnail cleanup && python manage.py thumbnail clear
+
+		```
+	after that, restart the server:
+
+		`sudo systemctl daemon-reload && sudo systemctl restart nginx && sudo systemctl restart gunicorn`
+		
 
 <a name="local_django_https"></a>
 6. ###### running local django server over https
@@ -1568,3 +1573,4 @@ implementing a continuous deployment workflow on Debian 10+
 		)
 
 		```
+
