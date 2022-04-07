@@ -33,9 +33,9 @@ def main():
 			continue
 
 		title = df.at[ix,'title']
-		product_entry = Product.objects.exclude(structure='child').filter(title=title).first()
+		product = Product.objects.exclude(structure='child').filter(title=title).first()
 
-		if not product_entry:
+		if not product:
 			print(f'no product found with title: {title}')
 			continue
 
@@ -53,11 +53,16 @@ def main():
 				print(f'image: {img_name} not found at: {image_path}')
 				continue
 
-			# elif os.path.exists(media_img_path):
-			# 	## need to add another check here for seeing if the image exists in the database also
-			#
-			# 	print(f'file path: {media_img_path} already exists')
-			# 	continue
+			elif os.path.exists(media_img_path):
+				## need to add another check here for seeing if the image exists in the database also
+				# delete it locally
+				os.remove(media_img_path)
+				# product.images.all().delete()
+				existing_product_image = ProductImage.objects.filter(product_id=product.id, original__contains=img_name)
+				if existing_product_image:
+					existing_product_image.first().delete()
+				# delete it from the database
+
 
 			lf = tempfile.NamedTemporaryFile(dir='media/images')
 			f = open(image_path, 'rb')
@@ -68,7 +73,7 @@ def main():
 
 			product_image = ProductImage()
 			product_image.caption = get_image_caption(image_link)
-			product_image.product = product_entry
+			product_image.product = product
 			product_image.original = image
 			product_image.display_order = index
 			product_image.original.save(name=img_name, content=image)
@@ -76,8 +81,8 @@ def main():
 
 			if index == 0:
 
-				product_entry.primary_image = product_image
-				product_entry.save()
+				product.primary_image = product_image
+				product.save()
 
 			lf.close()
 			print(f'saved image: {img_name}')
