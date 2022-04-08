@@ -156,9 +156,8 @@ DATABASES = {
 		'PORT': env.str('DB_PORT'),
 		'ATOMIC_REQUESTS': True,
 		'TEST': {
-            'NAME': 'test_db',
-        },
-
+			'NAME': 'test_db',
+		},
 	}
 	# read os.environ['DATABASE_URL'] and raises
 	# ImproperlyConfigured exception if not found
@@ -210,7 +209,29 @@ AUTH_PASSWORD_VALIDATORS = [
 	},
 ]
 
-
+LOGGING = {
+	'version': 1,
+	'disable_existing_loggers': False,
+	'handlers': {
+		'file': {
+			'level': 'WARNING',
+			'class': 'logging.FileHandler',
+			'filename': 'django.log',
+		},
+	},
+	'loggers': {
+		'django': {
+			'handlers': ['file'],
+			'level': 'WARNING',
+			'propagate': True,
+		},
+		'django.request': {
+			'handlers': ['file'],
+			'level': 'WARNING',
+			'propagate': True,
+		}
+	},
+}
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 

@@ -1568,3 +1568,10 @@ implementing a continuous deployment workflow on Debian 10+
 		)
 
 		```
+
+##### enabling remote access to postgresql database
+1. follow steps 1 - 4 here: https://www.cyberciti.biz/tips/postgres-allow-remote-access-tcp-connection.html
+2. find your ip address
+3. add firewall rule: `sudo ufw allow from 104.14.25.32 to any port 5432`
+
+sudo ufw allow from 104.14.25.32

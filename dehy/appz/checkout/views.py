@@ -11,7 +11,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict, JsonResponse, HttpResponseRedirect
 from django.forms.models import model_to_dict
 from django.urls import reverse, reverse_lazy
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
@@ -64,27 +64,32 @@ def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
 
 def get_city_and_state(postcode=None):
-	data = {}
-	BASE_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=CityStateLookup'
+	try:
+		logger.debug(f'USPS API: Attempting to retrieve city/state information ({postcode})')
+		data = {}
+		BASE_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=CityStateLookup'
 
-	if not postcode:
-		data['error'] = 'Bad Request'
-
-	else:
-		xml = f'<CityStateLookupRequest USERID="{settings.USPS_USERNAME}"><ZipCode ID= "0"><Zip5>{postcode}</Zip5></ZipCode></CityStateLookupRequest>'
-		url = f"{BASE_URL}&XML={xml}"
-		xml_response = requests.get(url).content
-		usps_response = json.loads(json.dumps(xmltodict.parse(xml_response)))['CityStateLookupResponse']
-		if 'Error' in usps_response['ZipCode'].keys():
-			data['error'] = usps_response['ZipCode']['Error']
+		if not postcode:
+			data['error'] = 'Bad Request'
 
 		else:
-			data['city'] = usps_response['ZipCode']['City']
-			data['line4'] = usps_response['ZipCode']['City']
-			data['state'] = usps_response['ZipCode']['State']
+			xml = f'<CityStateLookupRequest USERID="{settings.USPS_USERNAME}"><ZipCode ID= "0"><Zip5>{postcode}</Zip5></ZipCode></CityStateLookupRequest>'
+			url = f"{BASE_URL}&XML={xml}"
+			xml_response = requests.get(url).content
+			usps_response = json.loads(json.dumps(xmltodict.parse(xml_response)))['CityStateLookupResponse']
+			if 'Error' in usps_response['ZipCode'].keys():
+				data['error'] = usps_response['ZipCode']['Error']
+				logger.debug(f"USPS API [Error]: ({postcode}) {usps_response['ZipCode']['Error']}")
 
-	return data
+			else:
+				data['city'] = usps_response['ZipCode']['City']
+				data['line4'] = usps_response['ZipCode']['City']
+				data['state'] = usps_response['ZipCode']['State']
 
+		return data
+	except Exception as e:
+		msg = "Error retreiving city/state"
+		logger.debug(msg)
 
 # stripe webhook handler
 @csrf_exempt
@@ -104,26 +109,32 @@ def webhook_submit_order(request):
 		event = Facade.stripe.Webhook.construct_event(
 			payload, sig_header, endpoint_secret
 		)
+
 	except ValueError as e:
 		# Invalid payload
+		msg = 'Stripe webhook: Invalid payload' + str(e)
+		logger.error(msg)
 		raise e
 
 	except Facade.stripe.error.SignatureVerificationError as e:
-			print('⚠️  Webhook signature verification failed.' + str(e))
-			return JsonResponse({}, status_code=400)
+		msg = 'Stripe webhook: ⚠️  Webhook signature verification failed.' + str(e)
+		logger.error(msg)
+
+		print(msg)
+		response = JsonResponse({})
+		response.status_code = 400
+		return response
 
 	# Handle the event
+
 	if event['type'] == 'payment_intent.succeeded':
+
 		print('Event type {}'.format(event['type']))
 
-		status_code = 200
 		payment_intent = event['data']['object']
-		# print('\n payment_intent (as created by stripe): ', payment_intent)
 
-		basket = Basket.objects.get(id=payment_intent.metadata['basket_id'])
-		order_id = payment_intent.metadata.get('order_id', None)
-		if not order_id:
-			order_id = f"order_{basket.stripe_order_id}"
+		basket = get_object_or_404(Basket, id=payment_intent.metadata.get('basket_id'))
+		order_id = payment_intent.metadata.get('order_id', None) or f"order_{basket.stripe_order_id}"
 
 		order = Facade.stripe.Order.retrieve(order_id, expand=['customer', 'payment.payment_intent', 'line_items'])
 		place_order_view.handle_place_order_submission(basket, order)
@@ -138,8 +149,10 @@ def webhook_submit_order(request):
 
 	# ... handle other event types
 	else:
+		msg = f"Unhandled event type {event['type']}"
+		logger.warning(msg)
+		print(msg)
 		status_code = 400
-		print('Unhandled event type {}'.format(event['type']))
 
 	response = JsonResponse({})
 	response.status_code = status_code
@@ -148,6 +161,7 @@ def webhook_submit_order(request):
 
 
 def ajax_set_shipping_method(request):
+
 	data = {}
 	status_code = 400
 
@@ -212,59 +226,66 @@ def get_shipping_methods(request, shipping_fields, frontend_formatted=False, ret
 
 # also 'corrects' city and state based on postcode
 def ajax_get_shipping_methods(request):
-
 	data = {}
-	post_data = request.POST.copy()
 	status_code = 400
 
-	if post_data.get('postcode', None):
-		city_and_state_data = get_city_and_state(request.POST.get('postcode'))
-		post_data.update(city_and_state_data)
-		data.update(city_and_state_data)
+	try:
+		post_data = request.POST.copy()
+
+		if post_data.get('postcode', None):
+			city_and_state_data = get_city_and_state(request.POST.get('postcode'))
+			post_data.update(city_and_state_data)
+			data.update(city_and_state_data)
 
 
-	checkout_session = CheckoutSessionData(request)
-	shipping_address_form = CountryAndPostcodeForm(post_data)
+		checkout_session = CheckoutSessionData(request)
+		shipping_address_form = CountryAndPostcodeForm(post_data)
 
-	if not shipping_address_form.is_valid():
-		print(f'\n form.errors: {shipping_address_form.errors}')
-		data['errors'] = shipping_address_form.errors.as_json()
-
-
-	else:
-		status_code = 200
-		address_fields = dict((k, v) for (k, v) in shipping_address_form.instance.__dict__.items() if not k.startswith('_'))
-
-		country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
-
-		shipping_address = ShippingAddress(**address_fields)
-
-		checkout_session.ship_to_new_address(address_fields)
-		methods, status_code = get_shipping_methods(request, post_data, True, True)
-		data['shipping_methods'] = []
-
-		if methods:
-
-			data['shipping_methods'] = methods
-			data['shipping_postcode'] = address_fields['postcode']
-			checkout_session = CheckoutSessionData(request)
-
-			data['shipping_charge'] = data['shipping_methods'][0]['cost']
-			checkout_session.use_shipping_method(data['shipping_methods'][0]['code'])
+		if not shipping_address_form.is_valid():
+			print(f'\n form.errors: {shipping_address_form.errors}')
+			data['errors'] = shipping_address_form.errors.as_json()
 
 
-			order = Facade.update_or_create_order(request.basket, shipping_fields=address_fields, shipping_method={'cost':data['shipping_charge'], 'code':data['shipping_methods'][0]['code'], 'name':data['shipping_methods'][0]['name']})
+		else:
+			status_code = 200
+			address_fields = dict((k, v) for (k, v) in shipping_address_form.instance.__dict__.items() if not k.startswith('_'))
 
-			checkout_session.set_order_number(str(order.id).replace("order_", ""))
-			data['order_client_secret'] = order.client_secret
+			country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
 
-			data['order_total'] = str(D(order.amount_total/100).quantize(TWO_PLACES))
-			data['subtotal'] = str(D(order.amount_subtotal/100).quantize(TWO_PLACES))
-			data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWO_PLACES))
+			shipping_address = ShippingAddress(**address_fields)
 
-	response = JsonResponse(data)
-	response.status_code = status_code
-	return response
+			checkout_session.ship_to_new_address(address_fields)
+			methods, status_code = get_shipping_methods(request, post_data, True, True)
+			data['shipping_methods'] = []
+
+			if methods:
+
+				data['shipping_methods'] = methods
+				data['shipping_postcode'] = address_fields['postcode']
+				checkout_session = CheckoutSessionData(request)
+
+				data['shipping_charge'] = data['shipping_methods'][0]['cost']
+				checkout_session.use_shipping_method(data['shipping_methods'][0]['code'])
+
+
+				order = Facade.update_or_create_order(request.basket, shipping_fields=address_fields, shipping_method={'cost':data['shipping_charge'], 'code':data['shipping_methods'][0]['code'], 'name':data['shipping_methods'][0]['name']})
+
+				checkout_session.set_order_number(str(order.id).replace("order_", ""))
+				data['order_client_secret'] = order.client_secret
+
+				data['order_total'] = str(D(order.amount_total/100).quantize(TWO_PLACES))
+				data['subtotal'] = str(D(order.amount_subtotal/100).quantize(TWO_PLACES))
+				data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWO_PLACES))
+
+	except Exception as e:
+		msg = 'Error retrieving shipping methods: ' + str(e)
+		logger.error(msg)
+
+	finally:
+
+		response = JsonResponse(data)
+		response.status_code = status_code
+		return response
 
 
 class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
