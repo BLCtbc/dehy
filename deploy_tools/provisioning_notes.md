@@ -1371,9 +1371,14 @@ implementing a continuous deployment workflow on Debian 10+
 <a name="clear_sorl_image_cache"></a>
 6. ###### clearing out django oscar's thumbnail/sorl's media cache of thumbnails
 
-	```sh
-	$ python manage.py thumbnail cleanup && python manage.py thumbnail clear
-	```
+		```sh
+		$ python manage.py thumbnail cleanup && python manage.py thumbnail clear
+
+		```
+	after that, restart the server:
+
+		`sudo systemctl daemon-reload && sudo systemctl restart nginx && sudo systemctl restart gunicorn`
+		
 
 <a name="local_django_https"></a>
 6. ###### running local django server over https
@@ -1569,7 +1574,7 @@ implementing a continuous deployment workflow on Debian 10+
 
 		```
 
-##### enabling remote access to postgresql database
+
 1. follow steps 1 - 4 here: https://www.cyberciti.biz/tips/postgres-allow-remote-access-tcp-connection.html
 2. find your ip address
 3. add firewall rule: `sudo ufw allow from 104.14.25.32 to any port 5432`
