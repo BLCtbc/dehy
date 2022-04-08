@@ -7,7 +7,6 @@ Country = get_model('address', 'Country')
 
 class CheckoutSessionData(utils.CheckoutSessionData):
 	def _set(self, namespace, key, value):
-		print(f'\n _set() called with namespace={namespace}, key={key}, value={value}')
 		"""
 		Set a namespaced value
 		"""
@@ -19,7 +18,6 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		"""
 		Use a manually entered address as the shipping address
 		"""
-		print('\n ship_to_new_address \n')
 		self._unset('shipping', 'new_address_fields')
 		phone_number = address_fields.get('phone_number')
 		if phone_number:
@@ -35,8 +33,6 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 			if isinstance(country, Country):
 				address_fields['country'] = address_fields['country'].iso_3166_1_a2
 
-		print('\n *** SETTING ADDRESS FIELD ***')
-		print(address_fields)
 		self._set('shipping', 'new_address_fields', address_fields)
 
 	def set_questionnaire_response(self, additional_info):
@@ -121,41 +117,8 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		Record fact that the billing address is to be the same as
 		the shipping address.
 		"""
-		print('\n bill_to_shipping_address \n')
 		self._flush_namespace('billing')
 		self._set('billing', 'billing_address_same_as_shipping', True)
-
-	# def get_shipping_address(self):
-	# 	"""
-	# 	Return shipping address fields
-	# 	"""
-	# 	address_fields = self.new_shipping_address_fields()
-	#
-	# 	return self._get('shipping', 'new_address_fields')
-	#
-	# 	 if not basket.is_shipping_required():
-	#             return None
-	#
-	#         addr_data = self.checkout_session.new_shipping_address_fields()
-	#         if addr_data:
-	#             # Load address data into a blank shipping address model
-	#             return ShippingAddress(**addr_data)
-	#         addr_id = self.checkout_session.shipping_user_address_id()
-	#         if addr_id:
-	#             try:
-	#                 address = UserAddress._default_manager.get(pk=addr_id)
-	#             except UserAddress.DoesNotExist:
-	#                 # An address was selected but now it has disappeared.  This can
-	#                 # happen if the customer flushes their address book midway
-	#                 # through checkout.  No idea why they would do this but it can
-	#                 # happen.  Checkouts are highly vulnerable to race conditions
-	#                 # like this.
-	#                 return None
-	#             else:
-	#                 # Copy user address data into a blank shipping address instance
-	#                 shipping_addr = ShippingAddress()
-	#                 address.populate_alternative_model(shipping_addr)
-	#                 return shipping_addr
 
 	get_shipping_address = new_shipping_address_fields
 	is_stripe_customer_set = is_stripe_customer_field_set
