@@ -12,4 +12,6 @@ ExecStart=/home/admin/dehy/venv/bin/gunicorn \
 --error-logfile error.log \
 --workers 3 \
 --bind unix:/run/gunicorn.sock \
+--capture_output \
+--log-level debug \
 dehy.wsgi:application

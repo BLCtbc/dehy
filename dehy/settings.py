@@ -209,29 +209,29 @@ AUTH_PASSWORD_VALIDATORS = [
 	},
 ]
 
-LOGGING = {
-	'version': 1,
-	'disable_existing_loggers': False,
-	'handlers': {
-		'file': {
-			'level': 'WARNING',
-			'class': 'logging.FileHandler',
-			'filename': 'django.log',
-		},
-	},
-	'loggers': {
-		'django': {
-			'handlers': ['file'],
-			'level': 'WARNING',
-			'propagate': True,
-		},
-		'django.request': {
-			'handlers': ['file'],
-			'level': 'WARNING',
-			'propagate': True,
-		}
-	},
-}
+# LOGGING = {
+# 	'version': 1,
+# 	'disable_existing_loggers': False,
+# 	'handlers': {
+# 		'file': {
+# 			'level': 'WARNING',
+# 			'class': 'logging.FileHandler',
+# 			'filename': '/var/log/django.log',
+# 		},
+# 	},
+# 	'loggers': {
+# 		'django': {
+# 			'handlers': ['file'],
+# 			'level': 'WARNING',
+# 			'propagate': True,
+# 		},
+# 		'django.request': {
+# 			'handlers': ['file'],
+# 			'level': 'WARNING',
+# 			'propagate': True,
+# 		}
+# 	},
+# }
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
