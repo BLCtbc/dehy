@@ -97,9 +97,11 @@
 					<td style="padding-left:0;" colspan="1">
 					{% with image=line.product.primary_image %}
 						{% oscar_thumbnail image.original "300x" as thumb %}
-						<a class="image-link" href="{{ line.product.get_absolute_url }}">
-							<img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
-						</a>
+						<div class="image-container">
+							<a class="image-link" href="{{ line.product.get_absolute_url }}">
+								<img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
+							</a>
+						</div>
 					{% endwith %}
 					</td>
 					<td colspan="4">

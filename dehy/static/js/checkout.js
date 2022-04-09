@@ -51,45 +51,31 @@ dehy.ch = {
 			document.querySelector('section#user_info').append(form);
 			dehy.ch.forms.init();
 			dehy.ch.forms.reverse_form_labels(form);
-			// dehy.ch.forms.signin_button_handler();
 		}
 	},
 	shipping: {
 		billing_same_as_shipping_handler(checked=true, form=dehy.ch.forms.get()) {
-			// var billing_section = document.querySelector('section#billing');
-			//
 			if (checked) {
-				// save it
-				// var form_container = form.querySelector('.form-container');
-				// dehy.ch.forms.save(form_container, 'billing');
-				// // remove it from the page
-				// form_container.remove();
-				dehy.ch.forms.saved_info.billing = dehy.ch.forms.saved_info.shipping;
-
+				dehy.ch.forms.saved_form_data.billing = dehy.ch.forms.saved_form_data.shipping;
 			}
-			// else {
-			// 	// add an empty billing form to the page
-			// 	var error_button_container = billing_section.querySelector('.error-container.button-container');
-			// 	var form_container = dehy.ch.forms.saved.billing;
-			// 	form.insertBefore(form_container, error_button_container);
-			// 	dehy.ch.forms.init();
-			// }
-
 			var elems = Array.from(form.querySelector('.form-container').querySelectorAll("input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping']), select"));
 			var form_controls = [...new Set(elems.map(function(e) {return e.closest('.row')}))]
-			var address = dehy.ch.forms.saved_info.billing
+			var address = dehy.ch.forms.saved_form_data.billing
 			form_controls.forEach(function(row) {
 				row.classList.toggle('display-none', checked);
 				var inputs_and_labels = row.querySelectorAll("input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping']), select")
 				inputs_and_labels.forEach(function(elem) {
 					if (elem.name && address.hasOwnProperty(elem.name)) {
 						if (elem.type=='select-one') {
-							console.log('select-one');
 							var options = Array.from(elem.options);
 							var selected_index = options.findIndex(ele=>ele.textContent==address[elem.name]);
-							elem.selectedIndex = (checked) ? selected_index : 0;
+							// elem.selectedIndex = (checked) ? selected_index : 0;
+							elem.selectedIndex = selected_index;
+
 						} else {
-							elem.value = (checked) ? address[elem.name] : '';
+							// elem.value = (checked) ? address[elem.name] : '';
+							elem.value = address[elem.name];
+
 						}
 					}
 				});
@@ -102,7 +88,7 @@ dehy.ch = {
 					data[k] = val;
 				}
 			};
-			console.log('data: ', data);
+			console.log('get_shipping_methods: ', data);
 			$.ajax({
 				method: "POST",
 				url: '/shipping/location/',
@@ -281,20 +267,29 @@ dehy.ch.stripe = {
 	pkey: null,
 	elements: null,
 	submit_billing_info(form_data) {
+
+		console.log('form_data: ', form_data);
+
 		return new Promise((resolve, reject) => {
-			$.ajax({
-				method: "POST",
-				url: "/checkout/billing/",
-				contentType: false,
-				processData: false,
-				data: form_data,
-				success: function(data) {
-					resolve(data)
-				},
-				error: function(error) {
-					reject(dehy.ch.forms.errors.display)
-				},
-			});
+
+			if (dehy.ch.forms.has_changed('billing')) {
+
+				$.ajax({
+					method: "POST",
+					url: "/checkout/billing/",
+					contentType: false,
+					processData: false,
+					data: form_data,
+					success: function(data) {
+						resolve(data)
+					},
+					error: function(error) {
+						reject(error)
+					},
+				});
+			} else {
+				resolve(form_data)
+			}
 		});
 	},
 	payment_element_setup(client_secret, data){
@@ -342,37 +337,35 @@ dehy.ch.stripe = {
 		payment_element.mount(stripe_payment_container);
 
 		form.removeEventListener('submit', dehy.ch.forms.submit_handler);
+
+		// New
 		form.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			var form_data = new FormData(form);
-			dehy.ch.stripe.submit_billing_info(form_data).then((data) =>{
+			var address = {
+				line1: form_data.get('line1'),
+				line2: form_data.get('line2'),
+				city: form_data.get('line4'),
+				state: form_data.get('state'),
+				country: form_data.get('country'),
+				postal_code: form_data.get('postcode'),
+			};
+			var billing_details = {
+				name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
+				email: dehy.ch.forms.saved_form_data.user_info.username,
+				phone: form_data.get('phone_number'),
+				address: address
+			};
+
+			dehy.ch.stripe.submit_billing_info(form_data)
+			.then((data) =>{
 				dehy.ch.forms.success_handler({'section': 'billing'});
-				// hide stripe element
-				// create preview for billing form
-				// create place_order form
-				// add form to page
-				// add event handler that processes order to the form
-				var address = {
-					line1: form_data.get('line1'),
-					line2: form_data.get('line2'),
-					city: form_data.get('line4'),
-					state: form_data.get('state'),
-					country: form_data.get('country'),
-					postal_code: form_data.get('postcode'),
-				};
-				var billing_details = {
-					name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
-					email: dehy.ch.forms.saved_info.user_info.username,
-					phone: form_data.get('phone_number'),
-					address: address
-				};
 
 				var place_order_form = document.querySelector('#place_order_form') || dehy.ch.forms.get();
 				place_order_form.removeEventListener('submit', dehy.ch.forms.submit_handler);
 				place_order_form.addEventListener('submit', async (e) => {
 					dehy.utils.freeze_forms();
-
-					e.preventDefault()
+					e.preventDefault();
 					stripe.processOrder({
 						elements,
 						confirmParams: {
@@ -400,8 +393,83 @@ dehy.ch.stripe = {
 					})
 				})
 
-			}, dehy.ch.forms.errors.display);
+			}, dehy.ch.forms.errors.display)
 		});
+
+
+		// stripe.retrievePaymentIntent('{PAYMENT_INTENT_CLIENT_SECRET}').then(function(result) {
+		//
+		// 	// Handle result.error or result.paymentIntent
+		// })
+
+		// old
+		// form.addEventListener('submit', async (e) => {
+		// 	e.preventDefault();
+		// 	var form_data = new FormData(form);
+		//
+		// 	// if it hasn't changed, skip submitting the billing info to the server
+		// 	// if (!dehy.ch.forms.has_changed(form, 'billing')) {
+		// 	// 	dehy.ch.forms.success_handler({'section': 'billing'});
+		// 	// 	return false
+		// 	// }
+		//
+		// 	dehy.ch.stripe.submit_billing_info(form_data, ).then((data) =>{
+		// 		dehy.ch.forms.success_handler({'section': 'billing'});
+		// 		// hide stripe element
+		// 		// create preview for billing form
+		// 		// create place_order form
+		// 		// add form to page
+		// 		// add event handler that processes order to the form
+		// 		var address = {
+		// 			line1: form_data.get('line1'),
+		// 			line2: form_data.get('line2'),
+		// 			city: form_data.get('line4'),
+		// 			state: form_data.get('state'),
+		// 			country: form_data.get('country'),
+		// 			postal_code: form_data.get('postcode'),
+		// 		};
+		// 		var billing_details = {
+		// 			name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
+		// 			email: dehy.ch.forms.saved_form_data.user_info.username,
+		// 			phone: form_data.get('phone_number'),
+		// 			address: address
+		// 		};
+		//
+		// 		var place_order_form = document.querySelector('#place_order_form') || dehy.ch.forms.get();
+		// 		place_order_form.removeEventListener('submit', dehy.ch.forms.submit_handler);
+		// 		place_order_form.addEventListener('submit', async (e) => {
+		// 			dehy.utils.freeze_forms();
+		//
+		// 			e.preventDefault()
+		// 			stripe.processOrder({
+		// 				elements,
+		// 				confirmParams: {
+		// 				// Return URL where the customer should be redirected after the Order's payment is confirmed.
+		// 					return_url: new URL('checkout/thank_you/', window.location.origin).toString(),
+		// 					payment_method_data: {
+		// 						billing_details: billing_details,
+		// 					},
+		// 				},
+		// 			})
+		// 			.then(function(result) {
+		// 				console.log('stripe.processOrder result: ', result);
+		// 				if (result.error) {
+		// 				// Inform the customer that there was an error.
+		// 				dehy.ch.forms.errors.display(result.error);
+		// 				} else {
+		// 					// success, do stuff
+		// 				}
+		// 			})
+		// 			.catch(()=>{
+		// 				dehy.ch.forms.errors.display(data);
+		// 			})
+		// 			.finally(()=> {
+		// 				dehy.utils.unfreeze_forms();
+		// 			})
+		// 		})
+		//
+		// 	}, dehy.ch.forms.errors.display);
+		// });
 		payment_element.on('change', function(e) {
 			if (e.error) {
 				dehy.ch.forms.errors.display(e.error);
@@ -476,7 +544,7 @@ dehy.ch.stripe = {
 			e.preventDefault();
 
 			var form_data = new FormData(form);
-			dehy.ch.forms.saved_info.billing = dehy.ch.forms.get_form_data_as_object(form);
+			dehy.ch.forms.saved_form_data.billing = dehy.ch.forms.get_form_data_as_object(form);
 
 			$.ajax({
 				method: "POST",
@@ -565,26 +633,39 @@ dehy.ch.forms = {
 		return data;
 
 	},
-	save_info(form, section) {
+	save_form_data(form, section) {
 		var data = dehy.ch.forms.get_form_data_as_object(form);
 		if (data.hasOwnProperty('csrfmiddlewaretoken')) {
 			delete data.csrfmiddlewaretoken;
 		}
-		dehy.ch.forms.saved_info[section] = data;
+		dehy.ch.forms.saved_form_data[section] = data;
 	},
-	get_saved_info(section) {
-		return (dehy.ch.forms.saved_info.hasOwnProperty(section)) ? dehy.ch.forms.saved_info[section] : null;
+	save_submitted_form_data(form, section) {
+		var data = dehy.ch.forms.get_form_data_as_object(form);
+		if (data.hasOwnProperty('csrfmiddlewaretoken')) {
+			delete data.csrfmiddlewaretoken;
+		}
+		dehy.ch.forms.submitted_form_data[section] = data;
 	},
-	saved_info: {},
-	has_changed(form=dehy.ch.forms.get(), section) {
+	get_saved_form_data(section) {
+		return (dehy.ch.forms.saved_form_data.hasOwnProperty(section)) ? dehy.ch.forms.saved_form_data[section] : null;
+	},
+	get_submitted_form_data(section) {
+		return (dehy.ch.forms.submitted_form_data.hasOwnProperty(section)) ? dehy.ch.forms.submitted_form_data[section] : null;
+	},
+	saved_form_data: {},
+	submitted_form_data: {},
+	has_changed(section=null, form=dehy.ch.forms.get()) {
 		var changed = false;
-		var current_saved_form_data = dehy.ch.forms.get_saved_info(section);
+		var submitted_form_data = dehy.ch.forms.get_submitted_form_data(section);
+
 		// compare current form data with saved info
-		if (current_saved_form_data) {
+		if (submitted_form_data) {
 			var new_form_data = dehy.ch.forms.get_form_data_as_object(form);
 			for (let [key, val] of Object.entries(new_form_data)) {
-				if (current_saved_form_data.hasOwnProperty(key)) {
-					if (current_saved_form_data[key] != val) {
+				if (submitted_form_data.hasOwnProperty(key)) {
+					if (submitted_form_data[key] != val) {
+						console.log(`${submitted_form_data[key]} != ${val}`);
 						changed = true;
 						return changed;
 					}
@@ -594,6 +675,8 @@ dehy.ch.forms = {
 			changed = true;
 		}
 		// if its the same, skip the ajax call and move to the next section
+		console.log('has_changed: ', changed);
+
 		return changed
 
 	},
@@ -628,8 +711,7 @@ dehy.ch.forms = {
 			dehy.ch.forms.errors.hide();
 		}
 
-
-		if (dehy.ch.forms.has_changed(form, section_name)) {
+		if (dehy.ch.forms.has_changed(section_name, form)) {
 			dehy.ch.forms.submit_form_info(e.target);
 
 		} else {
@@ -688,7 +770,8 @@ dehy.ch.forms = {
 			dehy.ch.stripe.order_client_secret = response.order_client_secret;
 		}
 		var form = dehy.ch.forms.get();
-		dehy.ch.forms.save_info(form, response.section);
+		dehy.ch.forms.save_submitted_form_data(form, response.section);
+		dehy.ch.forms.save_form_data(form, response.section);
 		dehy.ch.forms.errors.hide(form);
 
 		if (response.section=='billing') {
@@ -714,16 +797,23 @@ dehy.ch.forms = {
 		dehy.ch.forms.reverse_form_labels(form);
 
 		if (next_section.id=="billing") {
+			var checked = true;
 			form.classList.toggle('display-none', false);
+			// indicates form previously on page
 			if (!form.querySelector('.form-container')) {
+
 				var form_elem = next_section.querySelector('form'),
 					error_button_container = next_section.querySelector('.error-container.button-container');
 
 				var form_container = next_section.removeChild(next_section.querySelector('.form-container'));
 				form_elem.insertBefore(form_container, error_button_container);
 				form_elem.classList.toggle('display-none', false);
+
+				checked = form_elem.querySelector('#id_same_as_shipping').checked
 			}
-			dehy.ch.shipping.billing_same_as_shipping_handler();
+			console.log('repaint');
+
+			dehy.ch.shipping.billing_same_as_shipping_handler(checked);
 			dehy.ch.stripe.init(response.stripe_pkey, response.client_secret, response);
 		}
 
@@ -792,18 +882,18 @@ dehy.ch.forms = {
 						var form_elem = section.querySelector('form'),
 							error_button_container = section.querySelector('.error-container.button-container');
 
-							if (dehy.ch.forms.saved_info.hasOwnProperty(section.id)){
+							if (dehy.ch.forms.saved_form_data.hasOwnProperty(section.id)){
 								var country_selector = form.querySelector("select[name='country']");
-								if (country_selector && dehy.ch.forms.saved_info[section.id].hasOwnProperty('country')) {
+								if (country_selector && dehy.ch.forms.saved_form_data[section.id].hasOwnProperty('country')) {
 									let options = Array.from(country_selector.options);
-									let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_info[section.id].country);
+									let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_form_data[section.id].country);
 									country_selector.selectedIndex = selected_index;
 								}
 								var state_selector = form.querySelector("select[name='state']");
 
-								if (state_selector && dehy.ch.forms.saved_info[section.id].hasOwnProperty('state')) {
+								if (state_selector && dehy.ch.forms.saved_form_data[section.id].hasOwnProperty('state')) {
 									let options = Array.from(state_selector.options);
-									let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_info[section.id].state);
+									let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_form_data[section.id].state);
 									state_selector.selectedIndex = selected_index;
 								}
 							}
@@ -848,44 +938,13 @@ dehy.ch.forms = {
 
 	// create a preview of a section form and append it to that section
 	create_preview(section, elems=null) {
-		function get_preview_section(elems, section) {
-			switch(section) {
-				case 'user_info':
-					console.log('user_info');
-					let elem = dehy.utils.create_element({tag:'div', classes:'email', text:elems['email']})
-					return elem;
-				case 'shipping':
-					// do stuff
-					for (let [key, val] of Object.entries(elems)) {
-						let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
-						preview_container.append(elem)
-					}
-					return ;
-				case 'additional_info':
 
-					for (let [key, val] of Object.entries(elems)) {
-						let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
-						preview_container.append(elem)
-					}
-				case 'billing':
-					for (let [key, val] of Object.entries(elems)) {
-						let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
-						preview_container.append(elem)
-					}
-					return ;
-				case 'place_order':
-					return ;
-
-				default:
-					console.log(`no match for switch statement found with section=${section}.`);
-			}
-		}
 		var preview_container = dehy.utils.create_element({tag:'div', classes:'preview_container'});
 		var preview_elems = FormStructures.previews[section];
 		var elem = dehy.utils.create_elements(preview_elems, preview_container);
 
 
-		var form_data_obj = dehy.ch.forms.get_saved_info(section);
+		var form_data_obj = dehy.ch.forms.get_saved_form_data(section);
 
 		console.log('form_data_obj: ', form_data_obj);
 		for (let [key, val] of Object.entries(form_data_obj)) {
@@ -905,18 +964,7 @@ dehy.ch.forms = {
 			preview_container.querySelector(`span[data-preview='shipping_method']`).textContent = method_name;
 			preview_container.querySelector(`span[data-preview='shipping_cost']`).textContent = method_cost;
 		}
-		// if (Array.prototype.isPrototypeOf(preview_elems)) {
-		// 	preview_elems.forEach(function(ele) {
-		// 		preview_container.append(dehy.utils.create_element({tag: 'div', classes: 'preview-item', text: form_data_obj[ele]}))
-		// 	});
-		// } else {
-		// 	for (let [key, val] of Object.entries(form_data_obj)) {
-		// 		let elem = dehy.utils.create_element({tag:'div', classes:key, text:val})
-		// 		preview_container.append(elem)
-		// 	}
-		// }
 
-		// preview_container.append(get_preview_section(elems, section));
 
 		document.getElementById(section).append(preview_container);
 	},
@@ -948,22 +996,21 @@ dehy.ch.forms = {
 	},
 	// dehy.ch.forms.init()
 	init() {
-		console.log('init forms');
 		var form = dehy.ch.forms.get();
 
 		if (form) {
 			var section = form.closest('section');
-			if (dehy.ch.forms.saved_info.hasOwnProperty(section.id)){
+			if (dehy.ch.forms.saved_form_data.hasOwnProperty(section.id)){
 				var country_selector = form.querySelector("select[name='country']");
-				if (country_selector && dehy.ch.forms.saved_info[section.id].hasOwnProperty('country')) {
+				if (country_selector && dehy.ch.forms.saved_form_data[section.id].hasOwnProperty('country')) {
 					let options = Array.from(country_selector.options);
-					let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_info[section.id].country);
+					let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_form_data[section.id].country);
 					country_selector.selectedIndex = selected_index;
 				}
 				var state_selector = form.querySelector("select[name='state']");
-				if (state_selector && dehy.ch.forms.saved_info[section.id].hasOwnProperty('state')) {
+				if (state_selector && dehy.ch.forms.saved_form_data[section.id].hasOwnProperty('state')) {
 					let options = Array.from(state_selector.options);
-					let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_info[section.id].state);
+					let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_form_data[section.id].state);
 					state_selector.selectedIndex = selected_index;
 				}
 			}
@@ -985,13 +1032,15 @@ dehy.ch.forms = {
 
 			form.addEventListener('submit', dehy.ch.forms.submit_handler);
 			form.addEventListener('change', e=> {
-				console.log('form changed');
+				var section_name = form.closest('section').id;
+				dehy.ch.forms.save_form_data(form, section_name);
+
 				// should prevent race conditions and spam requests
 				if (dehy.utils.freeze_submissions) {
 					return false;
 				}
 				// postcode_input.setCustomValidity(validity_message)
-				if (form.closest('section').id == 'shipping' || form.closest('section').id == 'billing') {
+				if (section_name == 'shipping' || section_name == 'billing') {
 					if (e.target.hasAttribute('name') && e.target.name=='method_code') {
 						dehy.ch.shipping.update_shipping_method(e.target);
 						return false
@@ -1004,7 +1053,7 @@ dehy.ch.forms = {
 						var state_selector = document.querySelector('#id_state');
 
 						if (country == 'ca') {
-							validity_message= 'Please enter a proper Canadian postal code';
+							validity_message = 'Please enter a proper Canadian postal code';
 							state_selector.required = false;
 							state_selector.disabled = true;
 							state_selector.selectedIndex = 0;
@@ -1027,13 +1076,8 @@ dehy.ch.forms = {
 							postcode_input.classList.toggle('invalid', true);
 							return false
 						}
-
-						// do input validation here
-
 						// get/update the shipping methods
-
-						// var data = {[`${e.target.id}`]: e.target.value, 'action': e.target.closest('form').action};
-						if (form.closest('section').id == 'shipping') {
+						if (section_name == 'shipping') {
 							var data = new FormData(e.target.closest('form'));
 							dehy.ch.shipping.get_shipping_methods(data);
 							console.log('getting shipping methods');
@@ -1046,8 +1090,15 @@ dehy.ch.forms = {
 				}
 				if (e.target.matches("input#id_same_as_shipping")) {
 					// set or reset the address elements
-					dehy.ch.shipping.billing_same_as_shipping_handler(e.target.checked);
-					return false
+					var checked = e.target.checked;
+
+					if (!checked) {
+						// clear the form
+						form.reset();
+						dehy.ch.forms.save_form_data(form, section_name);
+						e.target.checked = false;
+					}
+					dehy.ch.shipping.billing_same_as_shipping_handler(checked);
 				}
 			});
 

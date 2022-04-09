@@ -36,6 +36,17 @@ span.variant_price {
     /* font-size: calc(1.1 * 1rem); */
 }
 
+.quantity-select-container {
+    border: 1px solid grey;
+    display: flex;
+    justify-content: space-around;
+}
+
+.quantity-select-container.active {
+	outline-width: 2px !important;
+	outline-style: solid !important;
+	outline-offset: 4px !important;
+}
 
 .variant-select-container, input#id_quantity{
 	padding: var(--shop-input-padding);
@@ -48,13 +59,15 @@ span.variant_price {
 
 input#id_quantity {
 	color: inherit;
-	width: 80%;
+	width: 100%;
+	text-align: center;
+	border: none;
 }
 
 .variant-option select, input#id_quantity {
 
     height: 100%;
-    font-size: 1.5rem;
+    font-size: var(--shop-input-padding);
 	background: transparent;
 	-webkit-appearance: none;
     -moz-appearance: none;
@@ -144,4 +157,71 @@ input#id_quantity {
 .product-info {
 	display: flex;
 	flex-direction: column;
+}
+
+.a-label {
+	position: absolute;
+	font-family: 'itc-avant-garde-gothic-pro' !important;
+	line-height: 2rem;
+	left: 0;
+	padding: var(--shop-input-padding);
+}
+
+.add-item-to-cart-btn,
+#size_selector {
+	outline-color: var(--gold) !important;
+	border-radius: 0;
+}
+
+#size_selector:focus,
+.add-item-to-cart-btn:focus {
+	outline-width: 2px !important;
+	outline-style: solid !important;
+	outline-offset: 4px !important;
+}
+
+.add-item-to-cart-btn {
+    background-color: var(--beige);
+    color: var(--hunter-green);
+    border: 1px solid var(--gold);
+}
+
+.plus-minus-btn {
+	padding: calc(var(--shop-input-padding) - 1rem);
+	background-color: transparent;
+	border-radius: 50%;
+	border-color: var(--gold);
+	/* line-height: 1rem; */
+	/* font-size: calc(var(--shop-input-padding) - 0.5rem);
+	position: absolute;
+	top: calc(var(--shop-input-padding) - 0.5rem); */
+}
+
+.plus-btn {
+	right: calc(var(--shop-input-padding) - 1rem);
+}
+.minus-btn {
+	left: calc(var(--shop-input-padding) - 1rem);
+}
+
+.plus-minus-btn svg {
+	height: var(--shop-input-padding);
+	width: var(--shop-input-padding);
+	pointer-events: none;
+}
+
+.plus-minus-container {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.input-quantity-container {
+    display: inline-flex;
+    justify-content: center;
+}
+
+input[name='quantity']:focus {
+	outline: none
 }

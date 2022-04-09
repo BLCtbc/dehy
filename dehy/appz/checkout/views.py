@@ -591,6 +591,7 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 		return response
 
 	def post(self, request, *args, **kwargs):
+		print("HELLOOOOOOOOOOOOOO")
 		status_code = 400
 		response = super().post(request,*args, **kwargs)
 		data = {'section': 'additional_info'}
@@ -620,7 +621,7 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 				# data['order_client_secret'] = order.client_secret
 				# data['payment_intent_client_secret'] = request.basket.payment_intent_client_secret
 
-				data['section'] = 'additional_info'
+				print('Facade.stripe.pkey: ', Facade.stripe.pkey)
 				data['stripe_pkey'] = Facade.stripe.pkey
 
 				status_code = 200
@@ -696,12 +697,13 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			if isinstance(address_fields.get('country', None), Country):
 				address_fields['country'] = address_fields['country'].iso_3166_1_a2
 
-			order = Facade.update_and_process_order(request.basket, billing_fields=address_fields)
+			# order = Facade.update_and_process_order(request.basket, billing_fields=address_fields)
+			billing_details = Facade.coerce_to_address_object(address_fields)
+			stripe_order_id = f"order_{request.basket.stripe_order_id}"
+			order = Facade.stripe.Order.modify(stripe_order_id, billing_details=billing_details)
 			payment = order.payment
 
-			data['payment_intent_id'] = payment.payment_intent if type(payment.payment_intent) is str else payment.payment_intent.id
 			data['order_client_secret'] = order.client_secret
-			data['payment_intent_client_secret'] = request.basket.payment_intent_client_secret
 			data['stripe_pkey'] = Facade.stripe.pkey
 			response = JsonResponse(data)
 
@@ -1039,7 +1041,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			self.send_order_placed_email(order)
 
 		except Exception as e:
-			print('Error sending order placed email')
+			print('Error sending order placed email: ', str(e))
 
 		# Flush all session data
 		try:
