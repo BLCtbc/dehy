@@ -18,15 +18,27 @@ FAQ
 
 {% block header %}{% endblock header %}
 {% block content_wrapper %}
-<section class="container">
-	
+<section class="container-fluid">
+
 	{% for faq in faq_list %}
-		<section class="row">
+		<section class="row faq-item-container">
 			<article class="col-10">
-				<span class='question-span'>Question: {{faq.question}}</span>
-				<br>
-				<span class='answer-span'>Answer: {{faq.answer}}</span>
-				<br>
+				<div class="row">
+					<div class="col-6">
+						<div class="image-container">
+							{% with image_name=image_list|random %}
+							<img class="w-100 h-auto question-img" src="{% static 'img/faq/'|add:image_name %}" ></img>
+							<span class='question-span'><span>Q</span>uestion: {{faq.question}}</span>
+							{% endwith %}
+						</div>
+					</div>
+					<div class="col-6">
+						<div class="image-container">
+							<img class="answer-img"></img>
+							<span class='answer-span'><span>A</span>nswer: {{faq.answer}}</span>
+						</div>
+					</div>
+				</div>
 			</article>
 		</section>
 

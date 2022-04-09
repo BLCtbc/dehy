@@ -1,12 +1,19 @@
 from django.views.generic import ListView, TemplateView
-from django.http import JsonResponse
-from oscar.core.loading import get_class, get_model
-from dehy.appz.checkout import facade
+from django.views.generic.edit import FormView
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.conf import settings
+
+from pathlib import Path
+
+from oscar.core.loading import get_class, get_model
+
+from dehy.appz.checkout import facade
 from dehy.appz.generic import forms
-from django.views.generic.edit import FormView
+
+import os
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
@@ -61,6 +68,15 @@ class FAQView(ListView):
 	model = FAQ
 	context_object_name = "faq_list"
 	template_name = "dehy/generic/faq.html"
+
+	def get_context_data(self, *args, **kwargs):
+
+		context_data = super().get_context_data(*args, **kwargs)
+		faq_image_folder = Path(settings.BASE_DIR) / 'dehy/static/img/faq/'
+		image_list = os.listdir(faq_image_folder)
+		context_data.update({'image_list': image_list})
+		return context_data
+
 
 @method_decorator(csrf_exempt)
 def create_checkout_session(request):
