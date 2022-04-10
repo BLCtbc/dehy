@@ -324,12 +324,12 @@ nav .nav-item:not(:first-child) {
 }
 
 svg.icon:hover {
-	stroke: var(--secondary-accent-color);
-	fill: var(--secondary-accent-color);
+	stroke: var(--secondary-accent-color) !important;
+	fill: var(--secondary-accent-color) !important;
 }
 
 nav a.nav-link:hover, .fa:hover {
-	color: var(--secondary-accent-color);
+	color: var(--secondary-accent-color) !important;
 }
 
 nav a.nav-link.active {
@@ -352,8 +352,11 @@ nav a.nav-link.active {
 }
 
 .scrolled-up .nav-link,
-.scrolled-up .socials a {
+.scrolled-up .socials a,
+.scrolled-up .icon-container a.icon svg
+ {
 	color: var(--gold);
+	stroke: var(--gold);
 }
 
 .scrolled-top {
@@ -807,6 +810,10 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+.dotted-image-filter * {
+	z-index: 3
 }
 
 .dotted-image-filter:before {
