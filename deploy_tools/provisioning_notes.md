@@ -1226,7 +1226,20 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			Please make sure you have the correct access rights
 			and the repository exists.
 			```
+	<a name="restore_deleted_files_after_commit"></a>
+	3. restoring files after committing to git
 
+		First find the commit id of the commit that deleted your file(s)
+
+			```sh
+			git log --diff-filter=D --summary
+			```
+
+		Then proceed to restore the file(s) by running the following command (note: also works on folders if multiple files need restoring)
+
+			```sh
+			git checkout 81eeccf~1 <your-lost-file-name>
+			```
 ---
 
 <a name="server_cli"></a>
@@ -1343,6 +1356,8 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		go to the directory `cd /path/to/static/folder/`
 		change the owner:group -> is you aren't sure, check the media file owner first and just use those settings:
 			`sudo chown -R admin:www-data static/`
+
+
 
 
 implementing a continuous deployment workflow on Debian 10+

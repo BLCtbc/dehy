@@ -1,3 +1,88 @@
-section {
+/* section {
 	margin-top: 1rem !important;
+} */
+
+.faq-item-container * {
+    position: relative;
+}
+
+.faq-page-inner {
+	background-color: var(--dark-hg);
+	background-image: url("/static/img/custom/dehy_hero_rotated.jpeg");
+}
+
+.faq-page-inner > * {
+	background-color: var(--hunter-green);
+}
+
+.outer-image-container {
+	min-height: 1px;
+	overflow: hidden;
+	margin: 0;
+	line-height: 0;
+}
+
+.faq-item-container:not(:last-child){
+	border-bottom: 12px solid var(--beige)
+}
+
+.answer-img {
+	right: 0;
+}
+
+.question-text-container,
+.answer-text-container {
+	line-height: normal;
+	z-index: 3;
+	border-left: 4px solid;
+}
+
+.question-text-container > .col-11,
+.answer-text-container > .col-11{
+	align-self: center;
+}
+
+.question-text-container {
+	border-color: var(--beige);
+}
+
+header.faq {
+	color: var(--gold) !important;
+	background-color: var(--beige);
+	margin-top: var(--main-navbar-height);
+	padding-top: 0;
+}
+
+.faq-A,
+.faq-Q,
+.faq-title {
+	font-family: 'itc-avant-garde-gothic-pro';
+}
+
+.faq-A,
+.faq-Q {
+	font-size: calc(2.5 * 1rem);
+}
+
+.faq-Q {
+	color: var(--beige);
+}
+/* .faq-A {
+	color:
+} */
+
+.faq-title {
+    min-height: calc(var(--main-navbar-height)*0.75);
+    color: var(--gold);
+}
+
+.answer-span,
+.question-span {
+	letter-spacing: 0.01em;
+	font-size: 1.2rem;
+	font-weight: 300;
+}
+
+.faq-item {
+	margin: 1.5rem 0;
 }

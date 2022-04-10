@@ -1,7 +1,11 @@
 {% extends "dehy/layout_2_col.html" %}
 {% load static %}
+
 {% load i18n %}
 {% load product_tags %}
+{% load thumbnail %}
+{% load image_tags %}
+
 
 {% block title %}
 {{ block.super }} | {% trans "FAQ" %}
@@ -11,38 +15,117 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/faq.css' %}"/>
 {% endblock extrastyles %}
 
-{% block header_title %}
-FAQ
-<p style='font-size: 1.75rem; letter-spacing: 0.15em'>Frequently Asked Questions</p>
-{% endblock header_title %}
+{% block splash_container %}
+<header class="faq navbar-padding justify-content-center row">
+	<div class="col-10">
+			{% block header_title %}
+
+			<h1 class="faq-title splash-header">Frequently Asked FAQs</h1>
+
+			{% endblock header_title %}
+	</div>
+
+</header>
+{% endblock splash_container %}
 
 {% block header %}{% endblock header %}
 {% block content_wrapper %}
-<section class="container-fluid">
 
+{% get_static_prefix as STATIC_PREFIX %}
+{% get_media_prefix as MEDIA_PREFIX %}
+
+<div class="row justify-content-center faq-page-inner">
 	{% for faq in faq_list %}
-		<section class="row faq-item-container">
-			<article class="col-10">
-				<div class="row">
-					<div class="col-6">
-						<div class="image-container">
-							{% with image_name=image_list|random %}
-							<img class="w-100 h-auto question-img" src="{% static 'img/faq/'|add:image_name %}" ></img>
-							<span class='question-span'><span>Q</span>uestion: {{faq.question}}</span>
-							{% endwith %}
+		<section class="col-10">
+			<div class="row">
+				<figure class="col-12 faq-item">
+
+					<div class="row question-text-container">
+						<div class="col-1 pr-0">
+							<h2 class="faq-Q">Q.</h2>
+						</div>
+						<div class="pl-0 col-11">
+							<span class='question-span'>{{faq.question}}</span>
 						</div>
 					</div>
-					<div class="col-6">
-						<div class="image-container">
-							<img class="answer-img"></img>
-							<span class='answer-span'><span>A</span>nswer: {{faq.answer}}</span>
+
+					<div class="row answer-text-container">
+						<div class="col-1 pr-0">
+							<h2 class="faq-A">A.</h2>
+						</div>
+						<div class="pl-0 col-11">
+							<span class='answer-span'>{{faq.answer}}</span>
 						</div>
 					</div>
-				</div>
-			</article>
+
+					{% comment %}
+					<div class="question-text-container">
+						<h2 class="d-inline-block">Q.</h2>
+						<span class='question-span'>{{faq.question}}</span>
+					</div>
+					<div class="answer-text-container">
+						<h2 class="d-inline-block">A.</h2>
+						<span class='answer-span'>{{faq.answer}}</span>
+					</div>
+					{% endcomment %}
+				</figure>
+			</div>
 		</section>
 
 	{% endfor %}
-</section>
+</div>
+
+<div class="navbar-padding justify-content-center row">
+	<div class="col-10">
+			<p>version 2</p>
+
+	</div>
+</div>
+<div class="row justify-content-center faq-page-inner">
+	{% for faq in faq_list %}
+		<section class="faq-item-container col-10">
+			<div class="row">
+
+
+				<figure class="col-12 outer-image-container px-0">
+					<div class="image-container dotted-image-filter">
+
+							{% with image_name=image_list|random %}
+							{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/faq/'|add:image_name %}
+
+							{% oscar_thumbnail image_url "1000x1000" as thumb %}
+							<img class="question-img" src="{{ thumb.url }}">
+
+							{% endwith %}
+							{% endwith %}
+
+							<div class="question-text-container">
+								<h2 class="d-inline-block">Q.</h2>
+								<span class='question-span'>{{faq.question}}</span>
+							</div>
+							<div class="answer-text-container">
+								<h2 class="d-inline-block">A.</h2>
+								<span class='answer-span'>{{faq.answer}}</span>
+							</div>
+					</div>
+				</figure>
+
+
+				{% comment %}
+
+				<figure class="col-6 outer-image-container px-0">
+					<div class="image-container dotted-image-filter">
+
+						<img class="answer-img" src="{{ image_url }}" ></img>
+
+					</div>
+				</figure>
+				{% endcomment %}
+
+			</div>
+		</section>
+
+	{% endfor %}
+</div>
 
 {% endblock content_wrapper %}

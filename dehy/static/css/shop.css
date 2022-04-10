@@ -145,15 +145,6 @@ input#id_quantity {
 	margin-right: 0.6em;
 }
 
-.image-container {
-	display: flex;
-	padding-bottom: 70%;
-	position: relative;
-	height: 0;
-	margin: 0;
-	overflow: hidden;
-}
-
 .product-info {
 	display: flex;
 	flex-direction: column;

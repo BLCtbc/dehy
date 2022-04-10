@@ -39,7 +39,9 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
-
+INTERNAL_IPS = [
+	"127.0.0.1"
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -99,6 +101,7 @@ INSTALLED_APPS = [
 	# other 3rd-party apps
 	'django_better_admin_arrayfield',
 ]
+
 
 SITE_ID = 1
 
@@ -171,19 +174,21 @@ DATABASES = {
 	#     default='sqlite:////tmp/my-tmp-sqlite.db'
 	# )
 }
+
 if DEBUG:
-	# CORS_REPLACE_HTTPS_REFERER      = False
-	# HOST_SCHEME                     = "http://"
-	# SECURE_PROXY_SSL_HEADER         = None
-	# SECURE_SSL_REDIRECT             = False
-	# SESSION_COOKIE_SECURE           = False
-	# CSRF_COOKIE_SECURE              = False
-	# SECURE_HSTS_SECONDS             = None
-	# SECURE_HSTS_INCLUDE_SUBDOMAINS  = False
-	# SECURE_FRAME_DENY               = False
+
 	INSTALLED_APPS += [
-		'sslserver'
+		'sslserver',
+		'debug_toolbar'
 	]
+
+	MIDDLEWARE += [
+		"debug_toolbar.middleware.DebugToolbarMiddleware",
+	]
+	DEBUG_TOOLBAR_CONFIG = {
+    	'SHOW_TEMPLATE_CONTEXT': True,
+	}
+
 	# CACHES = {
 	#     'default': {
 	#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
@@ -193,7 +198,6 @@ if DEBUG:
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
 	{
 		'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -236,13 +240,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'America/Chicago'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -294,7 +294,7 @@ OSCAR_MISSING_IMAGE_URL = MEDIA_ROOT / "image_not_found.jpg"  # relative path fr
 
 OSCAR_PRODUCTS_PER_PAGE = 10
 
-OSCAR_THUMBNAIL_DEBUG = THUMBNAIL_DEBUG = False
+OSCAR_THUMBNAIL_DEBUG = THUMBNAIL_DEBUG = DEBUG
 
 OSCAR_DASHBOARD_NAVIGATION += [
 	{

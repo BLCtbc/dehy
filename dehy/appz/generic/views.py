@@ -72,7 +72,7 @@ class FAQView(ListView):
 	def get_context_data(self, *args, **kwargs):
 
 		context_data = super().get_context_data(*args, **kwargs)
-		faq_image_folder = Path(settings.BASE_DIR) / 'dehy/static/img/faq/'
+		faq_image_folder = Path(settings.BASE_DIR) / 'media/images/faq/'
 		image_list = os.listdir(faq_image_folder)
 		context_data.update({'image_list': image_list})
 		return context_data
