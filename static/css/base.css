@@ -2,6 +2,7 @@
     --gold: #bca263;
 	--hunter-green: #224431;
 	--beige: #f4ecdc;
+	--orange-accent-color: #faa61c;
 	--avant-garde: 'itc-avant-garde-gothic-pro';
 	--dark-hg: rgba(28, 54, 39, 1);
 	--dark-gray: rgba(0,0,0,0.8);
@@ -12,7 +13,41 @@
 	--main-accent-color: var(--gold);
 	--secondary-accent-color: darkred;
 	--main-bg-color: var(--hunter-green);
-	--secondary-bg-color: var(beige);
+	--secondary-bg-color: var(--beige);
+}
+
+
+
+button,
+.btn {
+    padding: 0.375rem 3rem;
+    font-weight: 400;
+	border-radius: 2px;
+	background-color: var(--secondary-bg-color);
+	color: black;
+	transition: all 300ms ease;
+}
+
+button:hover,
+.btn:hover {
+	opacity: 0.8;
+}
+
+.btn-bg-transparent {
+	border: 2px solid var(--secondary-bg-color);
+	color: var(--secondary-bg-color);
+}
+
+.btn-bg-transparent:hover {
+    background-color: var(--secondary-bg-color);
+    color: var(--main-bg-color);
+}
+
+input:focus {
+	outline-width: 2px;
+	outline-style: solid;
+	outline-color: var(--gold);
+	outline-offset: 4px;
 }
 
 @font-face {
@@ -102,6 +137,9 @@ a.navbar-brand {
 	position: relative;
 }
 
+.display-none {
+	display: none !important;
+}
 .product-category-link::after,
 .navbar-brand::after
  {
@@ -150,7 +188,7 @@ h1, h2, h3, h4 {
     text-transform: none;
 }
 
-h1, h3, p, p2 {
+h1, h3 {
 	font-family:'lydiacondensed-bold';
 }
 
@@ -303,11 +341,19 @@ nav a.nav-link.active {
 	transform:translateY(-100%);
 	transition: all 0.3s ease-in-out;
 }
+
 .scrolled-up {
 	transform:translateY(0);
 	transition: all 0.3s ease-in-out;
-	background-color: rgba(0, 0, 0, 0.4);
+	/* background-color: rgba(0, 0, 0, 0.4); */
 	border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+	background-color: var(--beige);
+
+}
+
+.scrolled-up .nav-link,
+.scrolled-up .socials a {
+	color: var(--gold);
 }
 
 .scrolled-top {
@@ -327,7 +373,7 @@ nav a.nav-link.active {
 footer {
     /* width: 90% !important; */
     /* margin: 2rem auto 0 auto; */
-    padding: 2rem 0 0;
+    padding: 2rem 0 0 !important;
     /* border-top: 1px solid var(--beige); */
     text-align: center;
     /* display: block !important; */
@@ -529,7 +575,17 @@ li.breadcrumb-item {
     grid-row-gap: 2vw;
 }
 
-.product-img, .recipe-preview .card-img {
+.image-container {
+	display: flex;
+	padding-bottom: 66.66%;
+	position: relative;
+	height: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.product-img, .recipe-preview .card-img,
+.image-container > img {
 	width: 100%;
     height: 100%;
     top: 0;
@@ -590,14 +646,12 @@ li.breadcrumb-item {
 }
 
 footer .site-directory {
-	padding: 0;
 	font-family: Futura,serif;
 	font-weight: 400;
 	font-size: 1.2rem;
 	line-height: 1.75;
 	letter-spacing: .01em;
 	text-align: left;
-	padding-top: 2rem;
 }
 
 footer .site-directory h3 {
@@ -606,9 +660,6 @@ footer .site-directory h3 {
     color: var(--beige);
 }
 
-.about-us, footer .about-us ul, .contact-us, .contact-us ul{
-	padding: 0;
-}
 
 .contact-us p {
 	line-height: 1.5;
@@ -648,26 +699,11 @@ footer .site-directory h3 {
 	justify-content: space-evenly;
 }
 
-.basket_summary, .basket_summary h3, .basket_summary p {
-	font-family: var(--avant-garde);
-}
-
-.basket_summary h3 {
-	font-size: 1.25rem;
-	font-weight: 400;
-}
-
-.basket-items:nth-child(even) {
-    background: var(--dark-hg);
-}
-
 small {
 	font-weight: 200;
-}
-
-.basket-items .price_color {
-	color: inherit;
-	font-weight: normal;
+	font-size: 75%;
+	letter-spacing: 0.01em;
+	opacity: 0.8;
 }
 
 .ig-img-grid {
@@ -744,3 +780,46 @@ input, select, label {
 .hidden {
 	display: none;
 }
+
+.modal {
+	background-color: #fdfdfd2e;
+	z-index: 1200;
+}
+
+.nav-link:focus, .nav-link:hover {
+	color: inherit;
+}
+
+
+@media (max-width: 768px) {
+	.product-list {
+	    grid-template-columns: repeat(2, minmax(0,1fr));
+	}
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.dotted-image-filter:before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(127, 127, 127, 0.5);
+    background-image: radial-gradient(black 33%, transparent 33%);
+    background-size: 2px 2px;
+	z-index: 2;
+}
+

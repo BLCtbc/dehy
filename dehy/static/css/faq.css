@@ -1,6 +1,3 @@
-/* section {
-	margin-top: 1rem !important;
-} */
 
 .faq-item-container * {
     position: relative;
@@ -8,11 +5,15 @@
 
 .faq-page-inner {
 	background-color: var(--dark-hg);
-	background-image: url("/static/img/custom/dehy_hero_rotated.jpeg");
+	background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-blend-mode: soft-light;
 }
 
 .faq-page-inner > * {
-	background-color: var(--hunter-green);
+	border: 1px solid #00000050;
+	background-color: rgb(28 54 39 / 75%);
 }
 
 .outer-image-container {
@@ -35,15 +36,17 @@
 	line-height: normal;
 	z-index: 3;
 	border-left: 4px solid;
+    min-height: 75px;
 }
 
-.question-text-container > .col-11,
-.answer-text-container > .col-11{
+.question-text-container > .col,
+.answer-text-container > .col{
 	align-self: center;
 }
 
 .question-text-container {
 	border-color: var(--beige);
+    background-color: #00000030;
 }
 
 header.faq {
@@ -79,10 +82,14 @@ header.faq {
 .answer-span,
 .question-span {
 	letter-spacing: 0.01em;
-	font-size: 1.2rem;
+	font-size: 1rem;
 	font-weight: 300;
 }
 
 .faq-item {
-	margin: 1.5rem 0;
+	margin: 0.25rem 0;
 }
+/* 
+.faq-page-inner > .faq-item:last-of-type {
+	background: linear-gradient(var(--hunter-green), transparent);
+} */
