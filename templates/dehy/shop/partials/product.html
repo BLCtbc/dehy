@@ -46,7 +46,7 @@
 						{{ product.parent.get_title }}
 						<br>
 					{% endif %}
-                    {{ product.get_title|truncatewords:4 }}
+                    {{ product.get_title }}
                 </a>
             </h3>
         {% endblock product_title %}
@@ -97,7 +97,7 @@
 						<br>
 					{% endif %}
 
-                    {{ product.get_title|truncatewords:4 }}
+                    {{ product.get_title }}
 
                 </a>
             </h3>
