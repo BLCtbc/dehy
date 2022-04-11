@@ -10,7 +10,7 @@ class ContactForm(forms.Form):
 
 	class Meta:
 		fields = [
-			'first_name', 'last_name', 'email',
+			'first_name', 'last_name', 'email', 'subject',
 			'message',
 		]
 

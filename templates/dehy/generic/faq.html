@@ -17,11 +17,9 @@
 
 {% block splash_container %}
 <header class="faq navbar-padding justify-content-center row">
-	<div class="col-10">
+	<div class="col-10 section-divider">
 			{% block header_title %}
-
-			<h1 class="faq-title splash-header">Frequently Asked FAQs</h1>
-
+			<h1 class="faq-title">Frequently Asked FAQs <a class="headerlink" href="#" title="FAQ section permalink">¶</a></h1>
 			{% endblock header_title %}
 	</div>
 
@@ -71,17 +69,21 @@
 	{% endfor %}
 </div>
 <div class="row justify-content-center">
-	<div style="min-height: calc(var(--main-navbar-height)*0.75);" class="col-10">
-		<h2>Have other questions? Drop us a line! <a class="headerlink" href="#contact" title="Contact form permalink">¶</a></h2>
+	<div class="col-10 section-divider">
+		<h3>Have other questions? Drop us a line! <a class="headerlink" href="#contact" title="Contact form permalink">¶</a></h3>
 	</div>
 </div>
-<section id="contact_section" class="row justify-content-center contact" style="background-image: url({{ MEDIA_PREFIX|add:'images/faq/Dehy2-091.jpg' }})">
+
+{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/faq/dehy2-091.jpg' %}
+{% oscar_thumbnail image_url "1500x1500" as thumb %}
+<section id="contact_section" class="row justify-content-center contact" style="background-image: url({{ thumb.url }})">
+{% endwith %}
 	<div class="container">
 		<div class="row justify-content-center">
 			<div class="col-lg-7">
-				<form class="p-4 card card-body" id="contact" method="post">
-					<h3>Waddup!</h3
+				<form class="p-4 card card-body" id="contact" method="post" action="{% url 'faq' %}">
 					{% csrf_token %}
+					<h3>Waddup!</h3>
 					<div class="form-row">
 						<div class="input-group col">
 							<label class="col-form-label required" for="{{ form.first_name.id_for_label }}"></label>
@@ -118,7 +120,7 @@
 					</div>
 					<div class="form-row">
 						<div class="input-group justify-content-end col">
-							<button name="contact" type="submit" value="contact" class="btn btn-primary btn-lg" data-loading-text="{%trans 'Sending Message...' %}">{% trans 'Send' %}</button>
+							<button name="contact" type="submit" value="contact" class="btn btn-lg" data-loading-text="{%trans 'Sending Message...' %}">{% trans 'Send' %}</button>
 						</div>
 					</div>
 
@@ -127,7 +129,6 @@
 		</div>
 
 	</div>
-
 </section>
 
 {% comment %}
