@@ -359,6 +359,22 @@ nav a.nav-link.active {
 	stroke: var(--gold);
 }
 
+.scrolled-up .cart-quantity-container {
+	color: black;
+}
+
+.scrolled-top .nav-link,
+.scrolled-top .socials a,
+.scrolled-top .icon-container a.icon svg
+ {
+	color: var(--beige);
+	stroke: var(--beige);
+}
+
+.scrolled-top .cart-quantity-container {
+	color: var(--gold);
+}
+
 .scrolled-top {
 	background-color: transparent;
 	border-bottom: none;
@@ -657,6 +673,11 @@ footer .site-directory {
 	text-align: left;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+footer .site-directory * {
+    text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 footer .site-directory h3 {

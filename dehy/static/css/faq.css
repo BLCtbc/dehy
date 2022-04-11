@@ -75,7 +75,6 @@ header.faq {
 } */
 
 .faq-title {
-    min-height: calc(var(--main-navbar-height)*0.75);
     color: var(--gold);
 }
 
@@ -119,7 +118,7 @@ header.faq {
 .faq-page-inner > .faq-item:last-of-type {
 	background: linear-gradient(var(--hunter-green), transparent);
 } */
-.section-divider > div {
+.section-divider {
 	min-height: calc(var(--main-navbar-height)*0.75);
     display: inline-flex;
     flex-direction: column;

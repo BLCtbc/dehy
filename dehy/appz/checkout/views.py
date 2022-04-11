@@ -87,9 +87,6 @@ def get_city_and_state(postcode=None):
 			data['state'] = usps_response['ZipCode']['State']
 
 		return data
-	# except Exception as e:
-	# 	msg = "Error retreiving city/state"
-	# 	logger.debug(msg)
 
 # stripe webhook handler
 @csrf_exempt
@@ -120,17 +117,13 @@ def webhook_submit_order(request):
 		msg = 'Stripe webhook: ⚠️  Webhook signature verification failed.' + str(e)
 		logger.error(msg)
 
-		print(msg)
 		response = JsonResponse({})
 		response.status_code = 400
 		return response
 
 	# Handle the event
-
 	if event['type'] == 'payment_intent.succeeded':
-
 		print('Event type {}'.format(event['type']))
-
 		payment_intent = event['data']['object']
 
 		basket = get_object_or_404(Basket, id=payment_intent.metadata.get('basket_id'))
@@ -151,13 +144,11 @@ def webhook_submit_order(request):
 	else:
 		msg = f"Unhandled event type {event['type']}"
 		logger.debug(msg)
-		print(msg)
 		status_code = 400
 
 	response = JsonResponse({})
 	response.status_code = status_code
 	return response
-
 
 
 def ajax_set_shipping_method(request):
@@ -249,11 +240,8 @@ def ajax_get_shipping_methods(request):
 	else:
 		status_code = 200
 		address_fields = dict((k, v) for (k, v) in shipping_address_form.instance.__dict__.items() if not k.startswith('_'))
-
 		country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
-
 		shipping_address = ShippingAddress(**address_fields)
-
 		checkout_session.ship_to_new_address(address_fields)
 		methods, status_code = get_shipping_methods(request, post_data, True, True)
 		data['shipping_methods'] = []
@@ -277,11 +265,6 @@ def ajax_get_shipping_methods(request):
 			data['subtotal'] = str(D(order.amount_subtotal/100).quantize(TWO_PLACES))
 			data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWO_PLACES))
 
-	# except Exception as e:
-	# 	msg = 'Error retrieving shipping methods: ' + str(e)
-	# 	logger.error(msg)
-
-	# finally:
 
 	response = JsonResponse(data)
 	response.status_code = status_code
@@ -615,13 +598,6 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 				self.checkout_session.set_questionnaire_response(additional_info_object)
 				additional_info_object.save()
 
-				# order = Facade.update_and_process_order(request.basket)
-				# payment = order.payment
-				# data['payment_intent_id'] = payment.payment_intent if type(payment.payment_intent) is str else payment.payment_intent.id
-				# data['order_client_secret'] = order.client_secret
-				# data['payment_intent_client_secret'] = request.basket.payment_intent_client_secret
-
-				print('Facade.stripe.pkey: ', Facade.stripe.pkey)
 				data['stripe_pkey'] = Facade.stripe.pkey
 
 				status_code = 200
@@ -776,7 +752,6 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 
 			# order successfully placed
 			if request.basket.is_submitted():
-				data['redirect'] = self.get_success_url()
 				data['order_number'] = self.get_order_number() or request.basket.stripe_order_id
 				pass
 			# uh oh...
@@ -991,7 +966,6 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		events (using add_payment_event) so they can be
 		linked to the order when it is saved later on.
 		"""
-		print('\n --- PlaceOrderView.handle_payment() --- ', datetime.datetime.now())
 
 		source_type,__ = SourceType.objects.get_or_create(name=PAYMENT_METHOD_STRIPE)
 

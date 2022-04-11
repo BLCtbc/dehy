@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.conf import settings
+from django.urls import reverse_lazy
 
 from pathlib import Path
 
@@ -46,6 +47,7 @@ class FAQView(ListView, FormView):
 	form_class = forms.ContactForm
 	context_object_name = "faq_list"
 	template_name = "dehy/generic/faq.html"
+	success_url = reverse_lazy('catalogue:index')
 
 	def get_context_data(self, *args, **kwargs):
 
