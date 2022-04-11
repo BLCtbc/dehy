@@ -353,14 +353,21 @@ nav a.nav-link.active {
 
 .scrolled-up .nav-link,
 .scrolled-up .socials a,
-.scrolled-up .icon-container a.icon svg
- {
+.scrolled-up .icon-container a.icon svg {
 	color: var(--gold);
 	stroke: var(--gold);
 }
 
+nav.scrolled-up a.nav-link.active {
+	border-color: var(--gold);
+}
+
 .scrolled-up .cart-quantity-container {
 	color: black;
+}
+
+nav.scrolled-top a.nav-link.active {
+	border-color: var(--beige);
 }
 
 .scrolled-top .nav-link,
@@ -369,6 +376,8 @@ nav a.nav-link.active {
  {
 	color: var(--beige);
 	stroke: var(--beige);
+	/* border-color: var(--beige); */
+
 }
 
 .scrolled-top .cart-quantity-container {
