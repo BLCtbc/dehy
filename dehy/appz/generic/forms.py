@@ -3,9 +3,10 @@ from django.utils.translation import gettext_lazy as _
 
 class ContactForm(forms.Form):
 	email = forms.EmailField(required=True, label=_("Email"))
+	subject = forms.CharField(required=False, label=_('Subject'), help_text=_("What is the nature if your inquiry?"))
 	first_name = forms.CharField(required=False, label=_('First Name'))
 	last_name = forms.CharField(required=False, label=_('Last Name'))
-	message = forms.CharField(required=True, label=_('Message'), widget=forms.Textarea(attrs={'cols': 40, 'rows': 10}))
+	message = forms.CharField(required=True, label=_('Message'), widget=forms.Textarea(attrs={'cols': 30, 'rows': 4}))
 
 	class Meta:
 		fields = [
@@ -15,12 +16,16 @@ class ContactForm(forms.Form):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		print(dir(self))
 		# for field in self.fields:
 		# 	field.widget.attrs.update()
 		#
 		# 	self.fields['ingredients'].widget.attrs.update({'placeholder': 'special'})
+		for visible in self.visible_fields():
+			visible.field.widget.attrs['class'] = 'form-control'
+
 		self.fields['email'].widget.attrs.update({'placeholder': 'Email'})
+		self.fields['subject'].widget.attrs.update({'placeholder': 'Subject'})
+
 		self.fields['first_name'].widget.attrs.update({'placeholder': 'First Name'})
 		self.fields['last_name'].widget.attrs.update({'placeholder': 'Last Name'})
 		self.fields['message'].widget.attrs.update({'placeholder': 'Message'})

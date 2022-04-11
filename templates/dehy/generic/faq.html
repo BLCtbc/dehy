@@ -72,42 +72,62 @@
 </div>
 <div class="row justify-content-center">
 	<div style="min-height: calc(var(--main-navbar-height)*0.75);" class="col-10">
-		<h1 class="">Have other questions? Drop us a line!</h1>
+		<h2>Have other questions? Drop us a line! <a class="headerlink" href="#contact" title="Contact form permalink">¶</a></h2>
 	</div>
 </div>
-<section id="contact" class="row justify-content-center contact">
-	<div class="col-lg-6 card card-body">
-		<form id="contact" method="post" action="">
-			{% csrf_token %}
-			<div class="row">
-				<div class="input-group col">
-					{{ form.first_name.errors }}
-					{{ form.first_name }}
-					<label class="col-form-label" for="{{ form.first_name.id_for_label }}"></label>
-				</div>
-				<div class="input-group col">
-					{{ form.last_name.errors }}
-					{{ form.last_name }}
-					<label class="col-form-label" for="{{ form.last_name.id_for_label }}"></label>
-				</div>
+<section id="contact_section" class="row justify-content-center contact" style="background-image: url({{ MEDIA_PREFIX|add:'images/faq/Dehy2-091.jpg' }})">
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-lg-7">
+				<form class="p-4 card card-body" id="contact" method="post">
+					<h3>Waddup!</h3
+					{% csrf_token %}
+					<div class="form-row">
+						<div class="input-group col">
+							<label class="col-form-label required" for="{{ form.first_name.id_for_label }}"></label>
+							{{ form.first_name.errors }}
+							{{ form.first_name }}
+						</div>
+						<div class="input-group col">
+							<label class="col-form-label required" for="{{ form.last_name.id_for_label }}"></label>
+
+							{{ form.last_name.errors }}
+							{{ form.last_name }}
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="input-group col">
+							{{ form.email.errors }}
+							{{ form.email }}
+							<label class="col-form-label required" for="{{ form.email.id_for_label }}"></label>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="input-group col">
+							{{ form.subject.errors }}
+							{{ form.subject }}
+							<label class="col-form-label required" for="{{ form.subject.id_for_label }}"></label>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="input-group col">
+							{{ form.message.errors }}
+							{{ form.message }}
+							<label class="col-form-label required" for="{{ form.message.id_for_label }}"></label>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="input-group justify-content-end col">
+							<button name="contact" type="submit" value="contact" class="btn btn-primary btn-lg" data-loading-text="{%trans 'Sending Message...' %}">{% trans 'Send' %}</button>
+						</div>
+					</div>
+
+				</form>
 			</div>
-			<div class="row">
-				<div class="input-group col">
-					{{ form.email.errors }}
-					{{ form.email }}
-					<label class="col-form-label required" for="{{ form.email.id_for_label }}"></label>
-				</div>
-			</div>
-			<div class="row">
-				<div class="input-group col">
-					{{ form.message.errors }}
-					{{ form.message }}
-					<label class="col-form-label required" for="{{ form.message.id_for_label }}"></label>
-				</div>
-			</div>
-			<button name="contact" type="submit" value="contact" class="btn btn-primary btn-lg" data-loading-text="{%trans 'Sending Message...' %}">{% trans 'Send' %}</button>
-		</form>
+		</div>
+
 	</div>
+
 </section>
 
 {% comment %}

@@ -89,7 +89,40 @@ header.faq {
 .faq-item {
 	margin: 0.25rem 0;
 }
-/* 
+
+.row {
+	justify-content: center !important;
+}
+
+#contact_section {
+	background-size: cover;
+	background-position: center;
+	border-bottom: 5px solid #ffffff40;
+	border-top: 5px solid #ffffff40;
+	margin-bottom: 2rem;
+	padding-top: 100px;
+	padding-bottom: 20px;
+}
+
+#contact_section * {
+	border-radius: 0
+}
+
+
+.form-row {
+	padding: 3px 5px;
+}
+#contact {
+	background-color: rgba(0, 0, 0, 0.4);
+}
+/*
 .faq-page-inner > .faq-item:last-of-type {
 	background: linear-gradient(var(--hunter-green), transparent);
 } */
+.section-divider > div {
+	min-height: calc(var(--main-navbar-height)*0.75);
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}

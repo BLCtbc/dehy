@@ -41,29 +41,6 @@ class HomeView(TemplateView):
 class ReturnsRefundsView(TemplateView):
 	template_name = "dehy/generic/returns.html"
 
-class ContactView(FormView):
-	template_name = "dehy/generic/contact.html"
-	form_class = forms.ContactForm
-
-	def get_context_data(self, *args, **kwargs):
-		context_data = super().get_context_data(*args, **kwargs)
-		context_data['contact_form'] = kwargs.get('contact_form', self.form_class)
-		return context_data
-
-	# def post(self, request, *args, **kwargs):
-	# 	form = self.form_class(request.POST)
-	# 	if form.is_valid():
-	# 		pass
-
-			# email_user = MessageUser.objects.get_or_create()
-			# add some kind of rate limiting here
-
-	def form_valid(self, form):
-		# This method is called when valid form data has been POSTed.
-		# It should return an HttpResponse.
-		form.send_email()
-		return super().form_valid(form)
-
 class FAQView(ListView, FormView):
 	model = FAQ
 	form_class = forms.ContactForm
@@ -77,6 +54,20 @@ class FAQView(ListView, FormView):
 		image_list = os.listdir(faq_image_folder)
 		context_data.update({'image_list': image_list})
 		return context_data
+
+
+	# def post(self, request, *args, **kwargs):
+	# 	form = self.form_class(request.POST)
+	# 	if form.is_valid():
+	# 		pass
+
+			# email_user = MessageUser.objects.get_or_create()
+			# add some kind of rate limiting here
+
+
+	def form_valid(self, form):
+		form.send_email()
+		return super().form_valid(form)
 
 
 @method_decorator(csrf_exempt)

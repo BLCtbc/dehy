@@ -1240,6 +1240,16 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			```sh
 			git checkout 81eeccf~1 <your-lost-file-name>
 			```
+
+	4. (re)adding ssh version of remote url
+		[check the ssh keys exist](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/checking-for-existing-ssh-keys):
+			```sh
+			ls -al ~/.ssh
+			```
+
+			```sh
+			git remote set-url origin git@github.com:blctbc/dehy.git
+			```
 ---
 
 <a name="server_cli"></a>
