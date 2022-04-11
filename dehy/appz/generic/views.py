@@ -64,8 +64,9 @@ class ContactView(FormView):
 		form.send_email()
 		return super().form_valid(form)
 
-class FAQView(ListView):
+class FAQView(ListView, FormView):
 	model = FAQ
+	form_class = forms.ContactForm
 	context_object_name = "faq_list"
 	template_name = "dehy/generic/faq.html"
 

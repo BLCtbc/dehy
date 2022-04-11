@@ -70,6 +70,45 @@
 
 	{% endfor %}
 </div>
+<div class="row justify-content-center">
+	<div style="min-height: calc(var(--main-navbar-height)*0.75);" class="col-10">
+		<h1 class="">Have other questions? Drop us a line!</h1>
+	</div>
+</div>
+<section id="contact" class="row justify-content-center contact">
+	<div class="col-lg-6 card card-body">
+		<form id="contact" method="post" action="">
+			{% csrf_token %}
+			<div class="row">
+				<div class="input-group col">
+					{{ form.first_name.errors }}
+					{{ form.first_name }}
+					<label class="col-form-label" for="{{ form.first_name.id_for_label }}"></label>
+				</div>
+				<div class="input-group col">
+					{{ form.last_name.errors }}
+					{{ form.last_name }}
+					<label class="col-form-label" for="{{ form.last_name.id_for_label }}"></label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-group col">
+					{{ form.email.errors }}
+					{{ form.email }}
+					<label class="col-form-label required" for="{{ form.email.id_for_label }}"></label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-group col">
+					{{ form.message.errors }}
+					{{ form.message }}
+					<label class="col-form-label required" for="{{ form.message.id_for_label }}"></label>
+				</div>
+			</div>
+			<button name="contact" type="submit" value="contact" class="btn btn-primary btn-lg" data-loading-text="{%trans 'Sending Message...' %}">{% trans 'Send' %}</button>
+		</form>
+	</div>
+</section>
 
 {% comment %}
 <div class="row justify-content-center faq-page-inner">
