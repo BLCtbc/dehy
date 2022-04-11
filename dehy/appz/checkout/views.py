@@ -434,8 +434,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			# shipping_address_form = ShippingAddressForm(shipping_address_data, *args, **kwargs)
 			shipping_address_form = ShippingAddressForm(request.POST)
 
-			# for item in request.session.items():
-			# 	print('session item: ', item)
 
 			if not hasattr(self, '_methods'):
 				shipping_methods = self.get_available_shipping_methods()
@@ -496,7 +494,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 	def get_initial(self):
 		initial = self.checkout_session.new_shipping_address_fields()
-		print('ShippingView.get_initial called')
 		if initial:
 			initial = initial.copy()
 			# Convert the primary key stored in the session into a Country
@@ -524,7 +521,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 		# Store the address details in the session and redirect to next step
 		address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
-		print('\n ShippingView: address_fields: ', address_fields)
 
 		self.checkout_session.ship_to_new_address(address_fields)
 		return super().form_valid(form)
@@ -574,7 +570,6 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 		return response
 
 	def post(self, request, *args, **kwargs):
-		print("HELLOOOOOOOOOOOOOO")
 		status_code = 400
 		response = super().post(request,*args, **kwargs)
 		data = {'section': 'additional_info'}
@@ -1080,9 +1075,10 @@ class ThankYouView(views.ThankYouView):
 		stripe_order_id = self.request.GET.get('order', None)
 		order_client_secret = self.request.GET.get('order_client_secret', None)
 		order_id = ''
+
 		if stripe_order_id and order_client_secret:
 			order_id = stripe_order_id.replace("order_", "")
-			basket = Basket._default_manager.filter(stripe_order_client_secret=order_client_secret, stripe_order_id=order_id)
+			basket = Basket._default_manager.filter(stripe_order_id=order_id)
 
 			if basket:
 				basket = basket.first()
@@ -1092,7 +1088,7 @@ class ThankYouView(views.ThankYouView):
 				start_time = time.time()
 				while not submitted:
 					time.sleep(0.5)
-					basket.refresh_from_db(fields=['status'])
+					basket.refresh_from_db()
 					submitted = basket.is_submitted
 
 					print(f'\n basket.is_submitted: {submitted}')

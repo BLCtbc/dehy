@@ -161,7 +161,9 @@ class Facade(object):
 	def update_or_create_order(self, basket, shipping_fields={}, shipping_method={}, discounts=[], billing_fields={}, metadata={}, **kwargs):
 
 		order = ''
+		print('shipping_method: ', shipping_method)
 		shipping_cost = self.coerce_shipping_cost_object(shipping_method)
+		print('coerced shipping_cost: ', shipping_cost)
 
 		metadata.update({'basket_id': basket.id})
 		order_details = kwargs
@@ -179,9 +181,9 @@ class Facade(object):
 				})
 
 
-			order_details = {
-				'shipping_cost': shipping_cost,
-			}
+			order_details.update({'shipping_cost': shipping_cost, 'metadata': metadata})
+
+
 
 
 		if basket.stripe_customer_id:
