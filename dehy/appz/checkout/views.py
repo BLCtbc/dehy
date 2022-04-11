@@ -11,7 +11,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict, JsonResponse, HttpResponseRedirect
 from django.forms.models import model_to_dict
 from django.urls import reverse, reverse_lazy
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
@@ -64,6 +64,8 @@ def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
 
 def get_city_and_state(postcode=None):
+	# try:
+	logger.debug(f'USPS API: Attempting to retrieve city/state information ({postcode})')
 	data = {}
 	BASE_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=CityStateLookup'
 
@@ -77,14 +79,17 @@ def get_city_and_state(postcode=None):
 		usps_response = json.loads(json.dumps(xmltodict.parse(xml_response)))['CityStateLookupResponse']
 		if 'Error' in usps_response['ZipCode'].keys():
 			data['error'] = usps_response['ZipCode']['Error']
+			logger.debug(f"USPS API [Error]: ({postcode}) {usps_response['ZipCode']['Error']}")
 
 		else:
 			data['city'] = usps_response['ZipCode']['City']
 			data['line4'] = usps_response['ZipCode']['City']
 			data['state'] = usps_response['ZipCode']['State']
 
-	return data
-
+		return data
+	# except Exception as e:
+	# 	msg = "Error retreiving city/state"
+	# 	logger.debug(msg)
 
 # stripe webhook handler
 @csrf_exempt
@@ -104,26 +109,32 @@ def webhook_submit_order(request):
 		event = Facade.stripe.Webhook.construct_event(
 			payload, sig_header, endpoint_secret
 		)
+
 	except ValueError as e:
 		# Invalid payload
+		msg = 'Stripe webhook: Invalid payload' + str(e)
+		logger.error(msg)
 		raise e
 
 	except Facade.stripe.error.SignatureVerificationError as e:
-			print('⚠️  Webhook signature verification failed.' + str(e))
-			return JsonResponse({}, status_code=400)
+		msg = 'Stripe webhook: ⚠️  Webhook signature verification failed.' + str(e)
+		logger.error(msg)
+
+		print(msg)
+		response = JsonResponse({})
+		response.status_code = 400
+		return response
 
 	# Handle the event
+
 	if event['type'] == 'payment_intent.succeeded':
+
 		print('Event type {}'.format(event['type']))
 
-		status_code = 200
 		payment_intent = event['data']['object']
-		# print('\n payment_intent (as created by stripe): ', payment_intent)
 
-		basket = Basket.objects.get(id=payment_intent.metadata['basket_id'])
-		order_id = payment_intent.metadata.get('order_id', None)
-		if not order_id:
-			order_id = f"order_{basket.stripe_order_id}"
+		basket = get_object_or_404(Basket, id=payment_intent.metadata.get('basket_id'))
+		order_id = payment_intent.metadata.get('order_id', None) or f"order_{basket.stripe_order_id}"
 
 		order = Facade.stripe.Order.retrieve(order_id, expand=['customer', 'payment.payment_intent', 'line_items'])
 		place_order_view.handle_place_order_submission(basket, order)
@@ -138,8 +149,10 @@ def webhook_submit_order(request):
 
 	# ... handle other event types
 	else:
+		msg = f"Unhandled event type {event['type']}"
+		logger.debug(msg)
+		print(msg)
 		status_code = 400
-		print('Unhandled event type {}'.format(event['type']))
 
 	response = JsonResponse({})
 	response.status_code = status_code
@@ -148,6 +161,7 @@ def webhook_submit_order(request):
 
 
 def ajax_set_shipping_method(request):
+
 	data = {}
 	status_code = 400
 
@@ -212,10 +226,11 @@ def get_shipping_methods(request, shipping_fields, frontend_formatted=False, ret
 
 # also 'corrects' city and state based on postcode
 def ajax_get_shipping_methods(request):
-
 	data = {}
-	post_data = request.POST.copy()
 	status_code = 400
+
+	# try:
+	post_data = request.POST.copy()
 
 	if post_data.get('postcode', None):
 		city_and_state_data = get_city_and_state(request.POST.get('postcode'))
@@ -261,6 +276,12 @@ def ajax_get_shipping_methods(request):
 			data['order_total'] = str(D(order.amount_total/100).quantize(TWO_PLACES))
 			data['subtotal'] = str(D(order.amount_subtotal/100).quantize(TWO_PLACES))
 			data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWO_PLACES))
+
+	# except Exception as e:
+	# 	msg = 'Error retrieving shipping methods: ' + str(e)
+	# 	logger.error(msg)
+
+	# finally:
 
 	response = JsonResponse(data)
 	response.status_code = status_code
@@ -570,6 +591,7 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 		return response
 
 	def post(self, request, *args, **kwargs):
+		print("HELLOOOOOOOOOOOOOO")
 		status_code = 400
 		response = super().post(request,*args, **kwargs)
 		data = {'section': 'additional_info'}
@@ -599,7 +621,7 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 				# data['order_client_secret'] = order.client_secret
 				# data['payment_intent_client_secret'] = request.basket.payment_intent_client_secret
 
-				data['section'] = 'additional_info'
+				print('Facade.stripe.pkey: ', Facade.stripe.pkey)
 				data['stripe_pkey'] = Facade.stripe.pkey
 
 				status_code = 200
@@ -675,12 +697,13 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			if isinstance(address_fields.get('country', None), Country):
 				address_fields['country'] = address_fields['country'].iso_3166_1_a2
 
-			order = Facade.update_and_process_order(request.basket, billing_fields=address_fields)
+			# order = Facade.update_and_process_order(request.basket, billing_fields=address_fields)
+			billing_details = Facade.coerce_to_address_object(address_fields)
+			stripe_order_id = f"order_{request.basket.stripe_order_id}"
+			order = Facade.stripe.Order.modify(stripe_order_id, billing_details=billing_details)
 			payment = order.payment
 
-			data['payment_intent_id'] = payment.payment_intent if type(payment.payment_intent) is str else payment.payment_intent.id
 			data['order_client_secret'] = order.client_secret
-			data['payment_intent_client_secret'] = request.basket.payment_intent_client_secret
 			data['stripe_pkey'] = Facade.stripe.pkey
 			response = JsonResponse(data)
 
@@ -1018,7 +1041,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			self.send_order_placed_email(order)
 
 		except Exception as e:
-			print('Error sending order placed email')
+			print('Error sending order placed email: ', str(e))
 
 		# Flush all session data
 		try:

@@ -97,9 +97,11 @@
 					<td style="padding-left:0;" colspan="1">
 					{% with image=line.product.primary_image %}
 						{% oscar_thumbnail image.original "300x" as thumb %}
-						<a class="image-link" href="{{ line.product.get_absolute_url }}">
-							<img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
-						</a>
+						<div class="image-container">
+							<a class="image-link" href="{{ line.product.get_absolute_url }}">
+								<img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
+							</a>
+						</div>
 					{% endwith %}
 					</td>
 					<td colspan="4">
@@ -148,7 +150,7 @@
 
 	<div class="col-12 col-md-11 col-lg-10">
 		<div class="row justify-content-end">
-			<div class="col-6 col-lg-3 text-right"><a rule="button" href="{{ homepage_url }}" class="btn">{% trans "Continue shopping" %}</a></div>
+			<div class="col-6 col-lg-3 text-right"><a role="button" href="{{ homepage_url }}" class="btn">{% trans "Continue shopping" %}</a></div>
 			<div class="col-6 col-lg-2 text-right"><a role="button" onclick="window.print()" href="" class="btn">{% trans "Print" %}</a></div>
 
 		</div>

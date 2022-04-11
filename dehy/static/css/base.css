@@ -2,6 +2,7 @@
     --gold: #bca263;
 	--hunter-green: #224431;
 	--beige: #f4ecdc;
+	--orange-accent-color: #faa61c;
 	--avant-garde: 'itc-avant-garde-gothic-pro';
 	--dark-hg: rgba(28, 54, 39, 1);
 	--dark-gray: rgba(0,0,0,0.8);
@@ -323,12 +324,12 @@ nav .nav-item:not(:first-child) {
 }
 
 svg.icon:hover {
-	stroke: var(--secondary-accent-color);
-	fill: var(--secondary-accent-color);
+	stroke: var(--secondary-accent-color) !important;
+	fill: var(--secondary-accent-color) !important;
 }
 
 nav a.nav-link:hover, .fa:hover {
-	color: var(--secondary-accent-color);
+	color: var(--secondary-accent-color) !important;
 }
 
 nav a.nav-link.active {
@@ -340,11 +341,22 @@ nav a.nav-link.active {
 	transform:translateY(-100%);
 	transition: all 0.3s ease-in-out;
 }
+
 .scrolled-up {
 	transform:translateY(0);
 	transition: all 0.3s ease-in-out;
-	background-color: rgba(0, 0, 0, 0.4);
+	/* background-color: rgba(0, 0, 0, 0.4); */
 	border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+	background-color: var(--beige);
+
+}
+
+.scrolled-up .nav-link,
+.scrolled-up .socials a,
+.scrolled-up .icon-container a.icon svg
+ {
+	color: var(--gold);
+	stroke: var(--gold);
 }
 
 .scrolled-top {
@@ -566,7 +578,17 @@ li.breadcrumb-item {
     grid-row-gap: 2vw;
 }
 
-.product-img, .recipe-preview .card-img {
+.image-container {
+	display: flex;
+	padding-bottom: 66.66%;
+	position: relative;
+	height: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.product-img, .recipe-preview .card-img,
+.image-container > img {
 	width: 100%;
     height: 100%;
     top: 0;
@@ -633,6 +655,8 @@ footer .site-directory {
 	line-height: 1.75;
 	letter-spacing: .01em;
 	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 footer .site-directory h3 {
@@ -776,4 +800,54 @@ input, select, label {
 	.product-list {
 	    grid-template-columns: repeat(2, minmax(0,1fr));
 	}
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.dotted-image-filter * {
+	z-index: 3
+}
+
+.dotted-image-filter:before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(127, 127, 127, 0.5);
+    background-image: radial-gradient(black 33%, transparent 33%);
+    background-size: 2px 2px;
+	z-index: 2;
+}
+
+a.headerlink {
+    font-size: 0.7em;
+    position: relative;
+    top: -0.25em;
+    opacity: 0;
+}
+
+*:hover > .headerlink {
+	opacity: 1;
+}
+
+.required:after {
+    color: #dc3545;
+    content: "*";
+    display: inline-block;
+	position: absolute;
+	top: 0;
+	right: -3px;
 }

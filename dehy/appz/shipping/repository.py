@@ -6,7 +6,9 @@ from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 import base64, json, requests
 from oscar.core.loading import get_class
 from django.conf import settings
+import logging
 
+logger = logging.getLogger(__name__)
 # https://django-oscar.readthedocs.io/en/latest/howto/how_to_configure_shipping.html?highlight=shipping%20method#shipping-methods
 
 # class Repository(repository.Repository):
@@ -33,7 +35,6 @@ class Repository(repository.Repository):
 		return methods
 
 	def fedex_get_rates_and_transit_times(self, basket, weight, shipping_addr):
-		print('\n **** GETTING FEDEX RATES **** ')
 		methods = []
 		street_lines = [x for x in [shipping_addr.line1, shipping_addr.line2, shipping_addr.line3] if x]
 		payload={
@@ -112,6 +113,7 @@ class Repository(repository.Repository):
 			print('Error message: ', error['message'])
 			print('Error code: ', error['code'])
 
+			logger.error(f'Fedex API error with status code: {status_code}. \n{error["message"]}')
 			if status_code == 400:
 				print('\n BAD REQUEST')
 
@@ -151,34 +153,37 @@ class Repository(repository.Repository):
 		response = requests.request("POST", url, data=payload, headers=headers)
 		response_text = json.loads(response.text)
 
-
-		if response.status_code == 200:
+		status_code = response.status_code
+		if status_code == 200:
 
 			FedexAuthToken.access_token = response_text["access_token"]
 			FedexAuthToken.scope = response_text["scope"]
 			FedexAuthToken.expires_in = response_text["expires_in"]
 			FedexAuthToken.save()
 
-		if response.status_code == 400:
-			print('\n BAD REQUEST')
+		else:
+			logger.error(f'Fedex API: Error authorizing ({status_code}). \n{error["message"]}')
 
-		elif response.status_code == 401:
-			print('\n UNAUTHORIZED')
+			if status_code == 400:
+				print('\n BAD REQUEST')
 
-		elif response.status_code == 403:
-			print('\n FORBIDDEN')
+			elif status_code == 401:
+				print('\n UNAUTHORIZED')
 
-		elif response.status_code == 404:
-			print('\n NOT FOUND')
+			elif status_code == 403:
+				print('\n FORBIDDEN')
 
-		elif response.status_code == 429:
-			print('\n RATE LIMITED')
+			elif status_code == 404:
+				print('\n NOT FOUND')
 
-		elif response.status_code == 500:
-			print('\n INTERNAL.SERVER.ERROR')
+			elif status_code == 429:
+				print('\n RATE LIMITED')
 
-		elif response.status_code == 503:
-			print('\n SERVICE UNAVAILABLE')
+			elif status_code == 500:
+				print('\n INTERNAL.SERVER.ERROR')
+
+			elif status_code == 503:
+				print('\n SERVICE UNAVAILABLE')
 
 		return FedexAuthToken
 
@@ -247,7 +252,7 @@ class Repository(repository.Repository):
 				)
 
 		else:
-
+			logger.error(f'Shipstation API: Error retrieving shipping methods ({status_code}). \n{error["message"]}')
 			response_text = json.loads(response.text)
 			error = response_text['errors'][0]
 			# error_code = errors[0]['code']

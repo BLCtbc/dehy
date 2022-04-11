@@ -1,12 +1,19 @@
 from django.views.generic import ListView, TemplateView
-from django.http import JsonResponse
-from oscar.core.loading import get_class, get_model
-from dehy.appz.checkout import facade
+from django.views.generic.edit import FormView
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.conf import settings
+
+from pathlib import Path
+
+from oscar.core.loading import get_class, get_model
+
+from dehy.appz.checkout import facade
 from dehy.appz.generic import forms
-from django.views.generic.edit import FormView
+
+import os
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
@@ -34,14 +41,20 @@ class HomeView(TemplateView):
 class ReturnsRefundsView(TemplateView):
 	template_name = "dehy/generic/returns.html"
 
-class ContactView(FormView):
-	template_name = "dehy/generic/contact.html"
+class FAQView(ListView, FormView):
+	model = FAQ
 	form_class = forms.ContactForm
+	context_object_name = "faq_list"
+	template_name = "dehy/generic/faq.html"
 
 	def get_context_data(self, *args, **kwargs):
+
 		context_data = super().get_context_data(*args, **kwargs)
-		context_data['contact_form'] = kwargs.get('contact_form', self.form_class)
+		faq_image_folder = Path(settings.BASE_DIR) / 'media/images/faq/'
+		image_list = os.listdir(faq_image_folder)
+		context_data.update({'image_list': image_list})
 		return context_data
+
 
 	# def post(self, request, *args, **kwargs):
 	# 	form = self.form_class(request.POST)
@@ -51,16 +64,11 @@ class ContactView(FormView):
 			# email_user = MessageUser.objects.get_or_create()
 			# add some kind of rate limiting here
 
+
 	def form_valid(self, form):
-		# This method is called when valid form data has been POSTed.
-		# It should return an HttpResponse.
 		form.send_email()
 		return super().form_valid(form)
 
-class FAQView(ListView):
-	model = FAQ
-	context_object_name = "faq_list"
-	template_name = "dehy/generic/faq.html"
 
 @method_decorator(csrf_exempt)
 def create_checkout_session(request):

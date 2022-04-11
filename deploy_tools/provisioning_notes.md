@@ -26,6 +26,7 @@
 8. [clearing sorl thumbnail media cache](#clear_sorl_image_cache)
 9. [running local django server over https](#local_django_https)
 10. [integrating stripe with django-oscar](#stripe_integration)
+11. [downloading and installing a package on debian](#debian_package_install)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1225,7 +1226,30 @@ Note, any changes made to `settings.py` might require restarting the server in o
 			Please make sure you have the correct access rights
 			and the repository exists.
 			```
+	<a name="restore_deleted_files_after_commit"></a>
+	3. restoring files after committing to git
 
+		First find the commit id of the commit that deleted your file(s)
+
+			```sh
+			git log --diff-filter=D --summary
+			```
+
+		Then proceed to restore the file(s) by running the following command (note: also works on folders if multiple files need restoring)
+
+			```sh
+			git checkout 81eeccf~1 <your-lost-file-name>
+			```
+
+	4. (re)adding ssh version of remote url
+		[check the ssh keys exist](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/checking-for-existing-ssh-keys):
+			```sh
+			ls -al ~/.ssh
+			```
+
+			```sh
+			git remote set-url origin git@github.com:blctbc/dehy.git
+			```
 ---
 
 <a name="server_cli"></a>
@@ -1240,48 +1264,53 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		for this project:
 		`$ ssh -i DEHY.cer admin@3.135.111.34`
 
+	2. downloading a package
+		```sh
+		wget
+		```
+
 <a name="troubleshooting"></a>
 6. ###### troubleshooting
 
 	<a name="postgresql"></a>
-	- troubleshooting fresh install:
+		- troubleshooting fresh install:
 
-		```sh
-		brew services stop postgresql
-		rm -rf "$(brew --prefix)/var/postgres"
-		initdb --locale=C -E UTF-8 "$(brew --prefix)/var/postgres"
-		brew services start postgresql
-		```
+			```sh
+			brew services stop postgresql
+			rm -rf "$(brew --prefix)/var/postgres"
+			initdb --locale=C -E UTF-8 "$(brew --prefix)/var/postgres"
+			brew services start postgresql
+			```
 
-	- To check what is running on port 5432, issue the following command on your terminal.
-		`$ sudo lsof -i :5432`
+		- To check what is running on port 5432, issue the following command on your terminal.
+			`$ sudo lsof -i :5432`
 
-	- finding all postgres processes
-		`$ ps -ef | grep postgresp`
+		- finding all postgres processes
+			`$ ps -ef | grep postgresp`
 
-		output might look something like:
+			output might look something like:
 
-		uid   pid  ppid   C  STIME TTY         TIME    CMD
-		```
-		504   511   147   0  1:23PM ??         0:00.00 postgres: logger
-		504   535   147   0  1:23PM ??         0:00.01 postgres: checkpointer
-		504   539   147   0  1:23PM ??         0:00.01 postgres: stats collector
-		504  2796   147   0  1:29PM ??         0:00.03 postgres: background writer
-		504  3032   147   0  1:30PM ??         0:00.01 postgres: walwriter
-		504  3033   147   0  1:30PM ??         0:00.01 postgres: autovacuum launcher
-		504  3034   147   0  1:30PM ??         0:00.00 postgres: logical replication launcher
-		501  3971   853   0  1:36PM ttys001    0:00.00 grep postgres
-		```
+			uid   pid  ppid   C  STIME TTY         TIME    CMD
+			```
+			504   511   147   0  1:23PM ??         0:00.00 postgres: logger
+			504   535   147   0  1:23PM ??         0:00.01 postgres: checkpointer
+			504   539   147   0  1:23PM ??         0:00.01 postgres: stats collector
+			504  2796   147   0  1:29PM ??         0:00.03 postgres: background writer
+			504  3032   147   0  1:30PM ??         0:00.01 postgres: walwriter
+			504  3033   147   0  1:30PM ??         0:00.01 postgres: autovacuum launcher
+			504  3034   147   0  1:30PM ??         0:00.00 postgres: logical replication launcher
+			501  3971   853   0  1:36PM ttys001    0:00.00 grep postgres
+			```
 
-		NOTE: the postmaster PID in this case 147, which is the parent pid of most the processes listed
+			NOTE: the postmaster PID in this case 147, which is the parent pid of most the processes listed
 
-	- stop all postgres processes (requires having postgres installed)
-		`$ pg_ctl -D $(psql -Xtc 'show data_directory') stop`
+		- stop all postgres processes (requires having postgres installed)
+			`$ pg_ctl -D $(psql -Xtc 'show data_directory') stop`
 
-	- kill all postgres processes
-		`$ sudo pkill -u postgres` That kills all processes running as user `postgres`
-			or
-		`$ pkill postgres` That kills all processes named 'postgres'
+		- kill all postgres processes
+			`$ sudo pkill -u postgres` That kills all processes running as user `postgres`
+				or
+			`$ pkill postgres` That kills all processes named 'postgres'
 
 	<a name="custom_user_model"></a>
 	- using a custom user model with django oscar
@@ -1331,6 +1360,14 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		- step 5: redo step 1
 
 
+	<a name="collecstatic_permissions_errors">
+	- permission denied error when running `python manage.py collectstatic --noinput --clear`
+
+		go to the directory `cd /path/to/static/folder/`
+		change the owner:group -> is you aren't sure, check the media file owner first and just use those settings:
+			`sudo chown -R admin:www-data static/`
+
+
 
 
 implementing a continuous deployment workflow on Debian 10+
@@ -1378,7 +1415,7 @@ implementing a continuous deployment workflow on Debian 10+
 	after that, restart the server:
 
 		`sudo systemctl daemon-reload && sudo systemctl restart nginx && sudo systemctl restart gunicorn`
-		
+
 
 <a name="local_django_https"></a>
 6. ###### running local django server over https
@@ -1574,3 +1611,18 @@ implementing a continuous deployment workflow on Debian 10+
 
 		```
 
+
+1. follow steps 1 - 4 here: https://www.cyberciti.biz/tips/postgres-allow-remote-access-tcp-connection.html
+2. find your ip address
+3. add firewall rule: `sudo ufw allow from 104.14.25.32 to any port 5432`
+
+sudo ufw allow from 104.14.25.32
+
+<a name="debian_package_install"></a>
+10. ###### downloading and installing a package on debian 10 (example)
+
+	```sh
+	wget https://github.com/stripe/stripe-cli/releases/download/v1.8.6/stripe_1.8.6_linux_amd64.deb
+	head stripe_1.8.6_linux_x86_64.tar.gz # test contents of file
+	sudo dpkg -i stripe_1.8.6_linux_amd64.deb
+	```

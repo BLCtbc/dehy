@@ -5,15 +5,17 @@ from decimal import Decimal as D
 from oscar.core.loading import get_model
 Country = get_model('address', 'Country')
 
+# stripe.api_version = '2020-08-27; orders_beta=v2'
+stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.pkey = settings.STRIPE_PUBLISHABLE_KEY
 stripe.api_version = '2020-08-27; orders_beta=v2'
 
 class Facade(object):
+
 	def __init__(self):
 		print("\n --- Facade instantiated --- \n")
 		self.stripe = stripe
-		self.stripe.api_key = settings.STRIPE_SECRET_KEY
-		self.stripe.pkey = settings.STRIPE_PUBLISHABLE_KEY
-		self.stripe.api_version = '2020-08-27; orders_beta=v2'
+
 
 	@staticmethod
 	def get_friendly_decline_message(error):
@@ -59,7 +61,7 @@ class Facade(object):
 	def get_or_create_customer(self, email):
 		try:
 
-			customers = stripe.Customer.list(limit=1, email=email)
+			customers = self.stripe.Customer.list(limit=1, email=email)
 			if customers.data:
 				customer = customers.data[0]
 				return customer
@@ -81,7 +83,7 @@ class Facade(object):
 
 
 			if checkout_session.is_stripe_customer_id_set():
-				customer = stripe.Customer.retrieve(
+				customer = self.stripe.Customer.retrieve(
 					id=checkout_session.get_stripe_customer_id(),
 					payment_method=payment_method,
 					email=email,
@@ -91,7 +93,7 @@ class Facade(object):
 				)
 			else:
 				print('\n creating new customer \n')
-				customer = stripe.Customer.create(
+				customer = self.stripe.Customer.create(
 					email=email,
 					payment_method=payment_method,
 					name=name,
@@ -101,7 +103,7 @@ class Facade(object):
 
 
 			if payment_method:
-				stripe.PaymentMethod.attach(
+				self.stripe.PaymentMethod.attach(
 					payment_method,
 					customer=customer['id'],
 				)
@@ -113,10 +115,10 @@ class Facade(object):
 		except Exception as e:
 			return self.error_handler(e)
 
-
+	# 4 - 6 requests
 	def update_and_process_order(self, basket, **order_details):
 		try:
-			order = self.update_or_create_order(basket, **order_details)
+			order = self.update_or_create_order(basket, **order_details) # 2 - 3 requests
 			payment = self.set_order_to_processing(basket, order)
 			return payment
 
@@ -124,7 +126,7 @@ class Facade(object):
 			return self.error_handler(e)
 
 	# sets the order's status to processing, returns a payment intent
-	# currently done in step 4 of checkout process (billing view)
+	# 2 - 3 requests
 	def set_order_to_processing(self, basket, order=None):
 
 		try:
@@ -154,6 +156,8 @@ class Facade(object):
 		except Exception as e:
 			return self.error_handler(e)
 
+	# update: 2 - 3 requests
+	# create: 2 requests
 	def update_or_create_order(self, basket, shipping_fields={}, shipping_method={}, discounts=[], billing_fields={}, metadata={}, **kwargs):
 
 		order = ''
@@ -207,16 +211,16 @@ class Facade(object):
 
 		return order
 
-
+	# 1 - 3 requests
 	def update_order(self, basket, **order_details):
 		stripe_order_id = f"order_{basket.stripe_order_id}"
 		try:
-			order = self.stripe.Order.retrieve(stripe_order_id)
+			order = self.stripe.Order.retrieve(stripe_order_id) # 1
 
 			if order.status == 'processing':
-				order = self.stripe.stripe_object.StripeObject().request('post', f'/v1/orders/{stripe_order_id}/reopen', {})
+				order = self.stripe.stripe_object.StripeObject().request('post', f'/v1/orders/{stripe_order_id}/reopen', {}) # 2
 
-			order = self.stripe.Order.modify(stripe_order_id, line_items=self.get_line_items(basket), **order_details)
+			order = self.stripe.Order.modify(stripe_order_id, line_items=self.get_line_items(basket), **order_details) # 3
 
 			# print('order updated: ', order)
 			basket.stripe_order_status = order.status
@@ -345,109 +349,6 @@ class Facade(object):
 		return address_details
 
 
-	def payment_intent_update_or_create(self, checkout_session, total, payment_method=None, capture_method='automatic',
-			confirm=False, confirmation_method='automatic', customer=None, email=None, name=None,
-			client_secret=None, currency=settings.STRIPE_CURRENCY, description=None, metadata=None,
-			shipping=None, setup_future_usage='off_session', **kwargs):
-
-		try:
-			# Create or update a PaymentIntent with the order amount
-			if not customer:
-				print('\n getting customer \n')
-				customer = self.update_or_create_customer(checkout_session, payment_method=payment_method, email=email, description=description, metadata=metadata)
-
-			intent = ''
-
-			if client_secret:
-				print('\n retrieving the paymentintent using client_secret: ', client_secret)
-				intent = self.stripe.PaymentIntent.retrieve(client_secret)
-				if intent['amount'] != (total.incl_tax * 100).to_integral_value():
-					print('\n updating the paymentintent ')
-					intent = self.stripe.PaymentIntent.modify(
-						client_secret,
-						payment_method=payment_method,
-						confirmation_method=confirmation_method,
-						customer=customer['id'],
-						amount=(total.incl_tax * 100).to_integral_value(),
-						currency=currency,
-						shipping=shipping,
-						description=description,
-						metadata=metadata,
-						confirm=confirm,
-						setup_future_usage=setup_future_usage
-					)
-
-
-			else:
-				print('\n creating paymentintent ')
-
-				intent = self.stripe.PaymentIntent.create(
-					customer=customer,
-					payment_method=payment_method,
-					confirmation_method=confirmation_method,
-					amount=(total.incl_tax * 100).to_integral_value(),
-					capture_method=capture_method,
-					currency=currency,
-					shipping=shipping,
-					description=description,
-					metadata=metadata,
-					confirm=confirm,
-					setup_future_usage=setup_future_usage
-				)
-
-			checkout_session.set_stripe_payment_intent(intent)
-			checkout_session.set_stripe_client_secret(intent.client_secret)
-
-			print('\n intent: ', intent)
-			return intent
-
-		except Exception as e:
-			return self.error_handler(e)
-
-	def payment_intent_confirm(self, payment_intent_id, payment_method_id, total, client_secret=None,
-		setup_future_usage='off_session', shipping=None, **kwargs):
-
-		print('\n *** confirming payment intent')
-		try:
-			# print('retrieving payment intent')
-			# intent = stripe.PaymentIntent.retrieve(
-			# 	"pi_3KTcllLpSVHc8H4y0aWYEIeO",
-			# )
-			print('payment_intent_id: ', payment_intent_id)
-			print('payment_method_id: ', payment_method_id)
-			print('client_secret: ', client_secret)
-
-			intent = stripe.PaymentIntent.confirm(
-				payment_intent_id,
-				# client_secret=client_secret,
-				# payment_method=payment_method_id,
-				# setup_future_usage=setup_future_usage,
-				# payment_method=payment_method_id
-			)
-
-			print(f'\n *** payment intent confirmed: {intent}')
-
-			return intent
-
-		except Exception as e:
-			return self.error_handler(e)
-
-	def payment_intent_capture(self, payment_intent_id, **kwargs):
-
-		print('\n *** capturing payment intent')
-		try:
-
-			intent = stripe.PaymentIntent.capture(
-				payment_intent_id,
-			)
-
-			print(f'\n *** payment intent captured: {intent}')
-
-			return intent
-
-		except Exception as e:
-			return self.error_handler(e)
-
 	def generate_response(self, intent):
 		# Note that if your API version is before 2019-02-11, 'requires_action'
 		# appears as 'requires_source_action'.
@@ -465,8 +366,6 @@ class Facade(object):
 		else:
 			# Invalid status
 			return json.dumps({'error': 'Invalid PaymentIntent status'}), 500
-
-
 
 	def charge(self,
 		order_number,

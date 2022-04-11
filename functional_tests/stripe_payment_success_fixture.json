@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "template_version": 0
+  },
+  "fixtures": [
+    {
+      "name": "payment_intent",
+      "path": "/v1/payment_intents",
+      "method": "post",
+      "params": {
+        "amount": 2327,
+        "confirm": "true",
+        "currency": "usd",
+		"customer": "cus_LQJHflz2GjX56a",
+        "description": "(created by Stripe CLI)",
+		"metadata": {
+            "basket_id": "1",
+            "shipping_code": "FEDEX_STANDARD_OVERNIGHT_EXTRA_HOURS",
+            "shipping_name": "FedEx Standard Overnight\u00ae EH",
+            "order_id": "order_1Kj4brLpSVHc8H4ypsDFzmMO"
+          },
+        "payment_method": "pm_card_visa",
+        "payment_method_types": ["card"],
+        "shipping": {
+          "name": "Dookie Shoes",
+		  "address": {
+		      "city": "AUSTIN",
+		      "country": "US",
+		      "line1": "11112 Furrow Hill Dr",
+		      "postal_code": "78758",
+		      "state": "TX"
+		    },
+		"phone": "13862668079"
+        }
+      }
+    }
+  ]
+}

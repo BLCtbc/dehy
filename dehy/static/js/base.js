@@ -46,6 +46,8 @@ var dehy = {
 			all() {
 				dehy.handlers.shop.add_item_to_cart_handler();
 				dehy.handlers.shop.variant_size_selection_handler();
+				dehy.handlers.shop.plus_minus_button_handler();
+				dehy.handlers.shop.show_active_input_handler();
 			},
 			add_item_to_cart_handler() {
 				var forms = document.querySelectorAll('form.add-to-basket');
@@ -102,6 +104,44 @@ var dehy = {
 							}
 
 					})
+				})
+			},
+			show_active_input_handler() {
+				var quantity_inputs = document.querySelectorAll("input[name='quantity']");
+				quantity_inputs.forEach(elem=>{
+					elem.addEventListener('focus', e=>{
+						var qty_select_container = e.target.closest('.quantity-select-container');
+						if (qty_select_container) {
+							qty_select_container.classList.toggle('active', true);
+						}
+					})
+					elem.addEventListener('blur', e=>{
+						var qty_select_container = e.target.closest('.quantity-select-container');
+						if (qty_select_container) {
+							qty_select_container.classList.toggle('active', false);
+						}
+					})
+				})
+			},
+			increment_input_quantity(elem, n=1) {
+				var input = document.querySelector(`input[data-product_id='${elem.dataset.product_id}']`);
+				let v = parseInt(input.value) + n
+
+				input.value = (n < 0) ? Math.max(v, input.min) : Math.min(v, input.max);
+
+				// input.value = (n < 0) ? Math.max((input.value - n), input.min) : Math.min((input.value + n), input.max);
+			},
+			plus_minus_button_handler() {
+				var plus_minus_buttons = document.querySelectorAll('.plus-minus-btn');
+				plus_minus_buttons.forEach(elem=>{
+					var n = 1;
+					if (elem.matches('.minus-btn')) {
+						n *= -1;
+					}
+					elem.addEventListener('click', e=>{
+						e.preventDefault();
+						dehy.handlers.shop.increment_input_quantity(e.target, n);
+					});
 				})
 			},
 		},
