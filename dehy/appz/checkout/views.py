@@ -110,13 +110,14 @@ def webhook_submit_order(request):
 	except ValueError as e:
 		# Invalid payload
 		msg = 'Stripe webhook: Invalid payload' + str(e)
+		print(msg)
 		logger.error(msg)
 		raise e
 
 	except Facade.stripe.error.SignatureVerificationError as e:
 		msg = 'Stripe webhook: ⚠️  Webhook signature verification failed.' + str(e)
 		logger.error(msg)
-
+		print(msg)
 		response = JsonResponse({})
 		response.status_code = 400
 		return response
