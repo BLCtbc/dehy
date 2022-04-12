@@ -498,10 +498,11 @@ img.img-thumbnail {
 	max-width: 150px;
 }
 
-.image-container {
-	height: 100px;
-	padding: unset;
+.order-contents .image-container > img {
+	width: 100% !important;
+    height: 100% !important;
 }
+
 .product-img {
 	padding: 0;
 }
@@ -513,3 +514,4 @@ img.img-thumbnail {
 .table-hover>tbody>tr:hover>* {
 	color: inherit
 }
+

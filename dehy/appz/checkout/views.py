@@ -828,10 +828,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			stripe_line = list(filter(lambda x: x['product']==line.product.upc, order.line_items.data))[0]
 			tax_rate = D(stripe_line['amount_tax']/stripe_line['amount_subtotal']).quantize(FOUR_PLACES)
 			price_incl_tax = line.price_excl_tax + calculate_tax(line.price_excl_tax, tax_rate)
-
-
 			line.purchase_info.price.tax = calculate_tax(line.price_excl_tax, tax_rate)
-
 			line.save()
 		# Need to put card info on the order info and then pass it along on
 		# the order receipt + order receipt email

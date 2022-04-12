@@ -621,10 +621,12 @@ li.breadcrumb-item {
 	object-position: 50% 50%;
 	object-fit: cover;
 	position: absolute;
+	border-radius: 0;
+	border: 1px solid;
 }
 
 .product-img {
-	border: 2px inset rgba(188,162,99,.62);
+	border: 2px inset rgba(188,162,99,.62) !important;
 	transition: opacity 1s ease,transform 1s ease;
 	transition-property: opacity, transform;
 	transition-duration: 1s, 1s;

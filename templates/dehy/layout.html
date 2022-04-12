@@ -42,16 +42,28 @@
 
     {# Main content of page - other layout templates may override this block #}
     {% block content_wrapper %}
-        <div class="container-fluid">
-            <div class="page_inner">
-                {% block breadcrumbs %}{% endblock %}
-                <div class="content">
-                    {# Div exists for AJAX updates to entire content section #}
-                    <div id="content_inner">{% block content %}{% endblock content %}</div>
-                </div>
+            {% block breadcrumbs %}{% endblock %}
+            <div class="content justify-content-center row">
+                {# Div exists for AJAX updates to entire content section #}
+                {% block content %}{% endblock content %}
             </div>
-        </div>
     {% endblock content_wrapper %}
+
+	{# old #}
+	{% comment %}
+	{% block content_wrapper %}
+		<div class="container-fluid">
+			<div class="page_inner">
+				{% block breadcrumbs %}{% endblock %}
+				<div class="content">
+					{# Div exists for AJAX updates to entire content section #}
+					<div id="content_inner">{% block content %}{% endblock content %}</div>
+				</div>
+			</div>
+		</div>
+	{% endblock content_wrapper %}
+	{% endcomment %}
+
 	</main>
 
     {% include "dehy/partials/footer.html" %}
