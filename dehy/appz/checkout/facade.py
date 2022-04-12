@@ -9,7 +9,7 @@ Country = get_model('address', 'Country')
 # stripe.api_version = '2020-08-27; orders_beta=v2'
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.pkey = settings.STRIPE_PUBLISHABLE_KEY
-stripe.api_version = '2020-08-27; orders_beta=v2'
+stripe.api_version = '2020-08-27; orders_beta=v3'
 
 class Facade(object):
 
