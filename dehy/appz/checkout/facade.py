@@ -3,6 +3,7 @@ from oscar.apps.payment.exceptions import UnableToTakePayment, InvalidGatewayReq
 import stripe, json
 from decimal import Decimal as D
 from oscar.core.loading import get_model
+
 Country = get_model('address', 'Country')
 
 # stripe.api_version = '2020-08-27; orders_beta=v2'
@@ -15,7 +16,7 @@ class Facade(object):
 	def __init__(self):
 		print("\n --- Facade instantiated --- \n")
 		self.stripe = stripe
-
+		self.ORDER_SUBMITTED_SIGNING_SECRET = settings.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
 
 	@staticmethod
 	def get_friendly_decline_message(error):

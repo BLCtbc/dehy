@@ -1380,7 +1380,7 @@ implementing a continuous deployment workflow on Debian 10+
 	```
 [installing ssm agent on debian running](https://docs.aws.amazon.com/systems-manager/latest/userguide/agent-install-deb.html)
 
-<a name="runner_config_rest"></a>
+<a name="runner_config_reset"></a>
 6. ###### resetting the self-hosted runner config
 
 	1. follow the steps given here
@@ -1639,4 +1639,23 @@ sudo ufw allow from 104.14.25.32
 	this guide: https://medium.com/hackernoon/the-easiest-way-to-send-emails-with-django-using-ses-from-aws-62f3d3d33efd
 	this library: https://github.com/django-ses/django-ses
 
-	using DKIM
+	2. after configuring a domain identity [here](https://us-east-2.console.aws.amazon.com/ses/home?region=us-east-2#/verified-identities), you will be sent to edit your DNS records [here](https://domains.google.com/registrar/dehygarnish.net/dns)
+
+	the instructions given by amazon say to add 3 CNAME DNS records in the following format:
+	type  name													         value
+	```
+	CNAME 76you5sp74ywmnfhmt5qenbei6xykhrl._domainkey.dehygarnish.net     76you5sp74ywmnfhmt5qenbei6xykhrl.dkim.amazonses.com
+	```
+
+	in all 3 of the `name` fields, chop of everything after `._domainkey`, as this is already added automatically by google domains...
+	so your DNS record should look like this:
+	type  name										   value
+	```
+	CNAME 76you5sp74ywmnfhmt5qenbei6xykhrl._domainkey  76you5sp74ywmnfhmt5qenbei6xykhrl.dkim.amazonses.com
+	```
+	
+
+< name="certbot_integration"></a>
+12. ###### installing and setting up certbot (SSL cert)
+
+	follow the instructions here: https://certbot.eff.org/instructions?ws=nginx&os=debianbuster

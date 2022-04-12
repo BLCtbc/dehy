@@ -58,18 +58,18 @@ class FAQView(ListView, FormView):
 		return context_data
 
 
-	# def post(self, request, *args, **kwargs):
-	# 	form = self.form_class(request.POST)
-	# 	if form.is_valid():
-	# 		pass
+	def post(self, request, *args, **kwargs):
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			email_user = MessageUser.objects.get_or_create()
+			form.send_email()
 
-			# email_user = MessageUser.objects.get_or_create()
 			# add some kind of rate limiting here
 
-
-	def form_valid(self, form):
-		form.send_email()
-		return super().form_valid(form)
+	#
+	# def form_valid(self, form):
+	# 	form.send_email()
+	# 	return super().form_valid(form)
 
 
 @method_decorator(csrf_exempt)
