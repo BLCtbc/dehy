@@ -37,7 +37,9 @@ SECRET_KEY = env.str('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+print('ALLOWED_HOSTS: ', ALLOWED_HOSTS)
+print('type(ALLOWED_HOSTS): ', type(ALLOWED_HOSTS))
 
 INTERNAL_IPS = [
 	"127.0.0.1"
@@ -100,6 +102,7 @@ INSTALLED_APPS = [
 	'django_tables2',
 	# other 3rd-party apps
 	'django_better_admin_arrayfield',
+	'django_ses',
 ]
 
 
@@ -238,6 +241,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # }
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
+EMAIL_BACKEND = 'django_ses.SESBackend'
+AWS_SES_REGION_NAME = 'us-east-2'
+AWS_SES_REGION_ENDPOINT = 'email.us-east-2.amazonaws.com'
+AWS_SES_ACCESS_KEY_ID = env.str('AWS_SES_ACCESS_KEY_ID')
+AWS_SES_SECRET_ACCESS_KEY = env.str('AWS_SES_SECRET_ACCESS_KEY')
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'America/Chicago'
