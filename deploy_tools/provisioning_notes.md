@@ -27,6 +27,7 @@
 9. [running local django server over https](#local_django_https)
 10. [integrating stripe with django-oscar](#stripe_integration)
 11. [downloading and installing a package on debian](#debian_package_install)
+12. [setting up email sending and receiving on AWS SES](#aws_ses_integration)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1626,3 +1627,16 @@ sudo ufw allow from 104.14.25.32
 	head stripe_1.8.6_linux_x86_64.tar.gz # test contents of file
 	sudo dpkg -i stripe_1.8.6_linux_amd64.deb
 	```
+
+
+<a name="aws_ses_integration"></a>
+11. ###### setting up email sending and receiving on AWS SES (simple email service)
+
+	1. install via pip:
+	```sh
+	pip install 'django-ses[events]' # the quotes were needed on mac, unsure for linux
+	```
+	this guide: https://medium.com/hackernoon/the-easiest-way-to-send-emails-with-django-using-ses-from-aws-62f3d3d33efd
+	this library: https://github.com/django-ses/django-ses
+
+	using DKIM
