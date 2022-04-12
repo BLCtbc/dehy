@@ -97,14 +97,14 @@ def webhook_submit_order(request):
 	place_order_view = PlaceOrderView(request=request)
 
 	payload = request.body
-	endpoint_secret = 'whsec_63c2ac70680ad9eb9ceddd981cb1be311fbd0ab114767d63c69c28f0374d8b42'
+	# endpoint_secret = 'whsec_63c2ac70680ad9eb9ceddd981cb1be311fbd0ab114767d63c69c28f0374d8b42'
 
 	event = None
 	sig_header = request.headers['STRIPE_SIGNATURE']
 
 	try:
 		event = Facade.stripe.Webhook.construct_event(
-			payload, sig_header, endpoint_secret
+			payload, sig_header, Facade.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
 		)
 
 	except ValueError as e:
@@ -121,20 +121,31 @@ def webhook_submit_order(request):
 		response.status_code = 400
 		return response
 
-	# Handle the event
-	if event['type'] == 'payment_intent.succeeded':
+	if event['type'] == 'order.payment_completed' :
 		print('Event type {}'.format(event['type']))
-		payment_intent = event['data']['object']
 
-		basket = get_object_or_404(Basket, id=payment_intent.metadata.get('basket_id'))
-		order_id = payment_intent.metadata.get('order_id', None) or f"order_{basket.stripe_order_id}"
-
-		order = Facade.stripe.Order.retrieve(order_id, expand=['customer', 'payment.payment_intent', 'line_items'])
+		order = event['data']['object']
+		basket = get_object_or_404(Basket, id=order.metadata.get('basket_id'))
+		order = Facade.stripe.Order.retrieve(order.id, expand=['customer', 'payment.payment_intent', 'line_items'])
 		place_order_view.handle_place_order_submission(basket, order)
-
 		response = JsonResponse({})
 		response.status_code = 200
 		return response
+
+	# Handle the event
+	# if event['type'] == 'payment_intent.succeeded' or event['type'] == 'order.completed':
+	# 	print('Event type {}'.format(event['type']))
+	# 	payment_intent = event['data']['object']
+	#
+	# 	basket = get_object_or_404(Basket, id=payment_intent.metadata.get('basket_id'))
+	# 	order_id = payment_intent.metadata.get('order_id', None) or f"order_{basket.stripe_order_id}"
+	#
+	# 	order = Facade.stripe.Order.retrieve(order_id, expand=['customer', 'payment.payment_intent', 'line_items'])
+	# 	place_order_view.handle_place_order_submission(basket, order)
+	#
+	# 	response = JsonResponse({})
+	# 	response.status_code = 200
+	# 	return response
 
 	# if event['type'] == 'order.payment_succeeded':
 	# 	order = event['data']['object']
@@ -982,7 +993,6 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		isn't necessarily the correct one to use in placing the order.  This
 		can happen when a basket gets frozen.
 		"""
-		print('\n --- handle_order_placement ---')
 
 		order = self.place_order(
 			order_number=order_number, user=user, basket=basket,
@@ -999,8 +1009,6 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		Override this view if you want to perform custom actions when an
 		order is submitted.
 		"""
-
-		print('\n --- handle_order_placement ---')
 
 		# Send confirmation message (normally an email)
 		try:
