@@ -31,10 +31,10 @@
 					<td colspan="2">
 						{% if order.user %}
 						<div><span class="cell-title">USER</span></div>
-						<div><a href="{% url 'customer:profile-view' %}">{{order.user}}</a></div>
+						<div><a href="{% url 'customer:profile-view' %}">{{order.user|default:""}}</a></div>
 						{% else %}
 						<div><span class="cell-title">EMAIL</span></div>
-						<div><a href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.user}}</a></div>
+						<div><a href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.user|default:""}}</a></div>
 						<div>{{order.guest_email}}</div>
 						{% endif %}
 					</td>
@@ -71,7 +71,11 @@
 				<tr>
 					<td colspan="2">
 						<div><span class="cell-title">ORDER ID</span></div>
+						{% if order.user %}
 						<div><a href="{% url 'customer:order' order_number=order.number %}">{{order.number}}</a></div>
+						{% else %}
+						<div><a href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.number}}</a></div>
+						{% endif %}
 					</td>
 				</tr>
 			</tbody>

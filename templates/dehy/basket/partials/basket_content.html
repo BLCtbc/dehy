@@ -27,7 +27,7 @@
 	{% block basket_form_headers %}
 
 	{% if request.resolver_match.url_name != 'checkout' %}
-        <div class="basket-title d-none d-md-block">
+        <div class="basket_title col-12 col-lg-10 d-none d-md-block">
             <div class="row">
                 <h4 class="col-md-8">{% trans "Item" %}</h4>
                 <h4 class="col-md-2">{% trans "Quantity" %}</h4>
@@ -40,7 +40,7 @@
 	{% endblock %}
 
     {% block basket_form_main %}
-		<form method="post" class="basket_summary" id="basket_formset" action="{% url 'basket:summary' %}">
+		<form method="post" class="basket_summary col-12 {% if request.resolver_match.url_name != 'checkout' %}col-lg-10{% endif %}" id="basket_formset" action="{% url 'basket:summary' %}">
 
             {% csrf_token %}
             {{ formset.management_form }}
@@ -48,20 +48,29 @@
             {% for form in formset %}
                 {% with line=form.instance product=form.instance.product %}
                     {% purchase_info_for_line request line as session %}
-                    <div class="basket-items" data-product-id="{{line.product_id}}">
-                        <div class="row">
+                    <div class="basket-items row" data-product-id="{{line.product_id}}">
 							{% with image=product.primary_image %}
 							{{ form.id }}
 							{% if request.resolver_match.url_name != 'checkout' %}
+							{% oscar_thumbnail image.original "400x" crop=center upscale=False as thumb %}
+
                             <div class="col-3">
-							{% oscar_thumbnail image.original "200x" upscale=False as thumb %}
-                            <a href="{{ product.get_absolute_url }}">
-                                <img class="img-thumbnail w-auto mx-auto my-0 p-0" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
-                            </a>
+								<div class="image-container">
+									<img class="img-thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+								</div>
+								{% comment %}
+								<a href="{{ product.get_absolute_url }}">
+									{% oscar_thumbnail image.original "200x" upscale=False as thumb %}
+									<img class="img-thumbnail w-auto mx-auto my-0 p-0" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+								</a>
+								{% endcomment %}
+
 							{% else %}
-							{% oscar_thumbnail image.original "100x" upscale=False as thumb %}
 							<div class="col-3 pr-0">
-								<img class="img-thumbnail w-auto mx-auto my-0 p-0" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+								<div class="image-container">
+									{% oscar_thumbnail image.original "100x" upscale=False as thumb %}
+									<img class="" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+								</div>
 							{% endif %}
                             {% endwith %}
                             </div>
@@ -111,133 +120,124 @@
 								</div>
                             </div>
 							{% endif %}
-
-
-                        </div>
                     </div>
                 {% endwith %}
             {% endfor %}
         </form>
     {% endblock %}
 
-    <div class="row">
         {% block vouchers %}
             {# Hide the entire section if a custom BasketView doesn't pass in a voucher form #}
 
-			<div class="col-12">
-            {% if voucher_form %}
+		<div class="col-12 {% if request.resolver_match.url_name != 'checkout' %}col-lg-10{% endif %}">
+        {% if voucher_form %}
 
-                    <div id="voucher_form_container">
-                        <form id="voucher_form" action="{% url 'basket:vouchers-add' %}" method="post">
-                            {% csrf_token %}
-							<div class="input-group mb-3">
-							  <input class="form-control" aria-label="Gift or Discount Code"
-							  	aria-invalid="false" autocomplete="off" id="gift_and_promo_code_input"
-								placeholder="Gift or Discount Code" type="text" value=""
-								aria-describedby="promo_code_btn">
-							  <button class="btn btn-outline-secondary" type="button" id="promo_code_btn">{% trans "Apply" %}</button>
-							</div>
+                <div id="voucher_form_container">
+                    <form id="voucher_form" action="{% url 'basket:vouchers-add' %}" method="post">
+                        {% csrf_token %}
+						<div class="input-group mb-3">
+						  <input class="form-control" aria-label="Gift or Discount Code"
+						  	aria-invalid="false" autocomplete="off" id="gift_and_promo_code_input"
+							placeholder="Gift or Discount Code" type="text" value=""
+							aria-describedby="promo_code_btn">
+						  <button class="btn btn-outline-secondary" type="button" id="promo_code_btn">{% trans "Apply" %}</button>
+						</div>
 
-                        </form>
-                    </div>
-            {% endif %}
-			</div>
+                    </form>
+                </div>
+        {% endif %}
+		</div>
 
         {% endblock vouchers %}
 
         {% block baskettotals %}
-            <div id="basket_totals" class="col-12">
+        <div id="basket_totals" class="col-12 {% if request.resolver_match.url_name != 'checkout' %}col-lg-10{% endif %}">
 
-					{% block subtotal %}
+				{% block subtotal %}
+				<div class="row">
+					<div class="col">
+						<span>{% trans "Subtotal" %}</span>
+					</div>
+					<div class="col text-right">
+						<span id="subtotal" class="price-text">{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}</span>
+					</div>
+				</div>
+				{% endblock subtotal %}
+
+
+				{% if request.resolver_match.url_name == 'checkout' %}
+					{% block sales_tax %}
 					<div class="row">
 						<div class="col">
-							<span>{% trans "Subtotal" %}</span>
+							<span>{% trans "Sales Tax" %}</span>
 						</div>
 						<div class="col text-right">
-							<span id="subtotal" class="price-text">{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}</span>
+							<span id="total_tax" class="price-text text-right">
+							{% if is_shipping_address_set and order_total.is_tax_known %}
+								{{ basket.total_tax|currency:basket.currency }}
+							{% else %}
+								{{ "0.00"|currency:basket.currency }}
+							{% endif %}
+							</span>
+
 						</div>
 					</div>
-					{% endblock subtotal %}
+					{% endblock sales_tax %}
 
+					{% block shipping_charges %}
+					<div class="row">
+						<div class="col">
+							<span>{% trans "Shipping" %}</span><span id="shipping_postcode"></span>
+						</div>
+						<div class="col text-right">
+							<span id="shipping_charge" class="price-text">--</span>
+						</div>
+					</div>
+					{% endblock shipping_charges %}
 
-					{% if request.resolver_match.url_name == 'checkout' %}
-						{% block sales_tax %}
+					{% block discounts %}
+					{% if basket.offer_discounts or basket.grouped_voucher_discounts %}
 						<div class="row">
-							<div class="col">
-								<span>{% trans "Sales Tax" %}</span>
-							</div>
 							<div class="col text-right">
-								<span id="total_tax" class="price-text text-right">
-								{% if is_shipping_address_set and order_total.is_tax_known %}
-									{{ basket.total_tax|currency:basket.currency }}
-								{% else %}
-									{{ "0.00"|currency:basket.currency }}
-								{% endif %}
-								</span>
-
+								<span>{% trans "Discounts" %}</span>
+							</div>
+							<div class="col">
+								<span id="discounts" class="price-text">{{ basket.total_discount|currency:basket.currency }}</span>
 							</div>
 						</div>
-						{% endblock sales_tax %}
-
-						{% block shipping_charges %}
-						<div class="row">
-							<div class="col">
-								<span>{% trans "Shipping" %}</span><span id="shipping_postcode"></span>
-							</div>
-							<div class="col text-right">
-								<span id="shipping_charge" class="price-text">--</span>
-							</div>
-						</div>
-						{% endblock shipping_charges %}
-
-						{% block discounts %}
-						{% if basket.offer_discounts or basket.grouped_voucher_discounts %}
-							<div class="row">
-								<div class="col text-right">
-									<span>{% trans "Discounts" %}</span>
-								</div>
-								<div class="col">
-									<span id="discounts" class="price-text">{{ basket.total_discount|currency:basket.currency }}</span>
-								</div>
-							</div>
-						{% endif %}
-						{% endblock discounts %}
-
-						{% block total_cost %}
-						<div class="row mt-3">
-							<div class="col">
-								<span>{% trans "Total" %}</span>
-							</div>
-
-							<div class="col text-right">
-								<span id="order_total" class="price-text">
-									{% if order_total.is_tax_known %}
-										{{ order_total.incl_tax|currency:basket.currency }}
-									{% else %}
-										{{ order_total.excl_tax|currency:basket.currency }}
-									{% endif %}
-								</span>
-							</div>
-						</div>
-						{% endblock total_cost %}
-					{% else %}
 					{% endif %}
-				{# the basket totals are too granular for our intended checkout process, removed for now #}
+					{% endblock discounts %}
 
-            </div>
+					{% block total_cost %}
+					<div class="row mt-3">
+						<div class="col">
+							<span>{% trans "Total" %}</span>
+						</div>
+
+						<div class="col text-right">
+							<span id="order_total" class="price-text">
+								{% if order_total.is_tax_known %}
+									{{ order_total.incl_tax|currency:basket.currency }}
+								{% else %}
+									{{ order_total.excl_tax|currency:basket.currency }}
+								{% endif %}
+							</span>
+						</div>
+					</div>
+					{% endblock total_cost %}
+				{% else %}
+				{% endif %}
+			{# the basket totals are too granular for our intended checkout process, removed for now #}
+
+        </div>
         {% endblock baskettotals %}
-    </div>
 
 
     {% block formactions %}
 	{% if request.resolver_match.url_name != 'checkout' %}
-        <div class="form-group clearfix">
-            <div class="row">
-                <div class="col-sm-4 offset-sm-8 text-right">
-                    <a style="margin-top:2rem;" href="{% url 'checkout:checkout' %}" class="btn">{% trans "CHECKOUT" %}</a>
-                </div>
-            </div>
-        </div>
+	<div class="col-12 col-lg-10 text-right">
+		<a style="margin-top:2rem;" href="{% url 'checkout:checkout' %}" class="btn">{% trans "CHECKOUT" %}</a>
+	</div>
 	{% else %}
 	{% endif %}
     {% endblock formactions %}
@@ -257,7 +257,7 @@
             <div class="sub-header">
                 <h2>{% trans "Item" %}</h2>
             </div>
-            <div class="row basket-title d-none d-md-flex">
+            <div class="row basket_title d-none d-md-flex">
                 <div class="col-md-8 h4">{% trans "Items" %}</div>
                 <div class="col-md-2 h4 text-center">{% trans "Price" %}</div>
                 <div class="col-md-2">&nbsp;</div>
