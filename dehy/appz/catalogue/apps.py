@@ -3,6 +3,9 @@ from django.urls import include, path
 
 class CatalogueConfig(apps.CatalogueConfig):
 	name = 'dehy.appz.catalogue'
+	# name = 'shop'
+	label = 'catalogue'
+	namespace = 'shop'
 
 	def get_urls(self):
 		urls = super().get_urls()
@@ -14,7 +17,9 @@ class CatalogueConfig(apps.CatalogueConfig):
 		urls += [
 			path('p/<slug:product_slug>', self.detail_view.as_view(), name='detail'),
 			path('<slug:category_slug>', self.category_view.as_view(), name='category'),
+			path('', self.catalogue_view.as_view(), name='index'),
 		]
 
 		return self.post_process_urls(urls)
+
 

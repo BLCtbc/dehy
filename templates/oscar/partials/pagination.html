@@ -1,0 +1,47 @@
+{% load display_tags %}
+{% load i18n %}
+
+{% if paginator.num_pages > 1 %}
+<div class="row pagination-container">
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+					{% comment old %}
+					the old pagination links, issues with get_parameters function using all previously visited pages...
+					so you'd end up with something like: http://127.0.0.1:8000/shop/citrus?page=1&page=2&page=3
+					<a class="page-link" href="?{% get_parameters page %}page={{ page_obj.previous_page_number }}" tabindex="-1">
+                        {% trans "previous" %}
+                    </a>
+					{% endcomment %}
+
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" tabindex="-1">
+                        {% trans "previous" %}
+                    </a>
+                </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">
+                    {% blocktrans with page_num=page_obj.number total_pages=paginator.num_pages %}
+                        Page {{ page_num }} of {{ total_pages }}
+                    {% endblocktrans %}
+                </span>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+					{% comment old %}
+					{# the old pagination links, issues with pages being copied #}
+					<a class="page-link" href="?{% get_parameters page %}page={{ page_obj.next_page_number }}">
+                        {% trans "next" %}
+                    </a>
+					{% endcomment %}
+
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        {% trans "next" %}
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}

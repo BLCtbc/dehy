@@ -10,6 +10,7 @@ from oscar.defaults import *
 import environ
 from pathlib import Path
 from pygit2 import Repository
+from django.utils.translation import gettext_lazy as _
 
 ENV_FILE = '.env'
 if Repository('.').head.shorthand is 'main':
@@ -38,7 +39,9 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
-
+INTERNAL_IPS = [
+	"127.0.0.1"
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,28 +51,34 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'django.contrib.postgres',
 	'dehy',
+	'dehy.appz.generic.apps.GenericConfig',
+	'dehy.appz.recipes.apps.RecipesConfig',
+	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
+	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
+	# oscar overrides
+	'dehy.appz.address.apps.AddressConfig',
 	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
 	'dehy.appz.dashboard.catalogue.apps.CatalogueDashboardConfig',
+	'dehy.appz.basket.apps.BasketConfig',
+	'dehy.appz.search.apps.SearchConfig',
+	'dehy.appz.customer.apps.CustomerConfig',
+	'dehy.appz.checkout.apps.CheckoutConfig',
+	'dehy.appz.order.apps.OrderConfig',
+	'dehy.appz.partner.apps.PartnerConfig',
+	'dehy.appz.payment.apps.PaymentConfig',
+	'dehy.appz.shipping.apps.ShippingConfig',
 	# django apps added by oscar
 	'django.contrib.sites',
 	'django.contrib.flatpages',
 	# oscar apps
 	'oscar.config.Shop',
 	'oscar.apps.analytics.apps.AnalyticsConfig',
-	'oscar.apps.checkout.apps.CheckoutConfig',
-	'oscar.apps.address.apps.AddressConfig',
-	'oscar.apps.shipping.apps.ShippingConfig',
 	'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
 	'oscar.apps.communication.apps.CommunicationConfig',
-	'oscar.apps.partner.apps.PartnerConfig',
-	'oscar.apps.basket.apps.BasketConfig',
-	'oscar.apps.payment.apps.PaymentConfig',
 	'oscar.apps.offer.apps.OfferConfig',
-	'oscar.apps.order.apps.OrderConfig',
-	'oscar.apps.customer.apps.CustomerConfig',
-	'oscar.apps.search.apps.SearchConfig',
 	'oscar.apps.voucher.apps.VoucherConfig',
 	'oscar.apps.wishlists.apps.WishlistsConfig',
 	'oscar.apps.dashboard.reports.apps.ReportsDashboardConfig',
@@ -83,14 +92,16 @@ INSTALLED_APPS = [
 	'oscar.apps.dashboard.vouchers.apps.VouchersDashboardConfig',
 	'oscar.apps.dashboard.communications.apps.CommunicationsDashboardConfig',
 	'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
-
 	# 3rd-party apps that oscar depends on
 	'widget_tweaks',
 	'haystack',
 	'treebeard',
 	'sorl.thumbnail',   # Default thumbnail backend, can be replaced
 	'django_tables2',
+	# other 3rd-party apps
+	'django_better_admin_arrayfield',
 ]
+
 
 SITE_ID = 1
 
@@ -119,6 +130,7 @@ TEMPLATES = [
 				'django.template.context_processors.request',
 				'django.contrib.auth.context_processors.auth',
 				'django.contrib.messages.context_processors.messages',
+				'dehy.context_processors.add_ig_images_to_context',
 				'oscar.apps.search.context_processors.search_form',
 				'oscar.apps.checkout.context_processors.checkout',
 				'oscar.apps.communication.notifications.context_processors.notifications',
@@ -137,23 +149,55 @@ WSGI_APPLICATION = 'dehy.wsgi.application'
 # Parse database connection url strings
 # like psql://user:pass@127.0.0.1:8458/db
 DATABASES = {
-	'default': env.db('DATABASE_URL')
-    # read os.environ['DATABASE_URL'] and raises
-    # ImproperlyConfigured exception if not found
-    #
-    # The db() method is an alias for db_url().
-    # 'default': env.db(),
+	# 'default': env.db('DATABASE_URL'),
+	'default': {
+		'ENGINE': 'django.db.backends.postgresql',
+		'USER': env.str('DB_USER'),
+		'NAME': env.str('DB_NAME'),
+		'PASSWORD': env.str('DB_PASS'),
+		'HOST': env.str('DB_HOST'),
+		'PORT': env.str('DB_PORT'),
+		'ATOMIC_REQUESTS': True,
+		'TEST': {
+			'NAME': 'test_db',
+		},
+	}
+	# read os.environ['DATABASE_URL'] and raises
+	# ImproperlyConfigured exception if not found
 	#
-    # read os.environ['SQLITE_URL']
-    # 'extra': env.db_url(
-    #     'SQLITE_URL',
-    #     default='sqlite:////tmp/my-tmp-sqlite.db'
-    # )
+	# The db() method is an alias for db_url().
+	# 'default': env.db(),
+	#
+	# read os.environ['SQLITE_URL']
+	# 'extra': env.db_url(
+	#     'SQLITE_URL',
+	#     default='sqlite:////tmp/my-tmp-sqlite.db'
+	# )
 }
+
+if DEBUG:
+
+	INSTALLED_APPS += [
+		'sslserver',
+		'debug_toolbar'
+	]
+
+	MIDDLEWARE += [
+		"debug_toolbar.middleware.DebugToolbarMiddleware",
+	]
+	DEBUG_TOOLBAR_CONFIG = {
+    	'SHOW_TEMPLATE_CONTEXT': True,
+	}
+
+	# CACHES = {
+	#     'default': {
+	#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+	#    }
+	# }
+	# MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
 	{
 		'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -169,18 +213,36 @@ AUTH_PASSWORD_VALIDATORS = [
 	},
 ]
 
-
+# LOGGING = {
+# 	'version': 1,
+# 	'disable_existing_loggers': False,
+# 	'handlers': {
+# 		'file': {
+# 			'level': 'WARNING',
+# 			'class': 'logging.FileHandler',
+# 			'filename': '/var/log/django.log',
+# 		},
+# 	},
+# 	'loggers': {
+# 		'django': {
+# 			'handlers': ['file'],
+# 			'level': 'WARNING',
+# 			'propagate': True,
+# 		},
+# 		'django.request': {
+# 			'handlers': ['file'],
+# 			'level': 'WARNING',
+# 			'propagate': True,
+# 		}
+# 	},
+# }
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'America/Chicago'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -188,10 +250,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
+# STATICFILES_DIRS = [BASE_DIR / 'assets']
 
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash if there is a path component (optional in other cases).
-# Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
@@ -211,6 +271,8 @@ HAYSTACK_CONNECTIONS = {
 	},
 }
 
+AUTH_USER_MODEL = "generic.User"
+OSCAR_ALLOW_ANON_CHECKOUT = True
 OSCAR_INITIAL_ORDER_STATUS = 'Pending'
 OSCAR_INITIAL_LINE_STATUS = 'Pending'
 OSCAR_ORDER_STATUS_PIPELINE = {
@@ -224,6 +286,50 @@ OSCAR_ORDER_STATUS_CASCADE = {
 }
 
 OSCAR_DEFAULT_CURRENCY = 'USD'
-OSCAR_HIDDEN_FEATURES = ["reviews"]
-OSCAR_HOMEPAGE = reverse_lazy('home')
+OSCAR_HIDDEN_FEATURES = ["reviews", "wishlists"]
+OSCAR_HOMEPAGE = reverse_lazy('catalogue:index')
 OSCAR_SHOP_NAME = "DEHY"
+OSCAR_SHOP_TAGLINE = ""
+OSCAR_MISSING_IMAGE_URL = MEDIA_ROOT / "image_not_found.jpg"  # relative path from media root
+
+OSCAR_PRODUCTS_PER_PAGE = 10
+
+OSCAR_THUMBNAIL_DEBUG = THUMBNAIL_DEBUG = DEBUG
+
+OSCAR_DASHBOARD_NAVIGATION += [
+	{
+		'label': _('Recipe'),
+		'icon': 'fas fa-bullhorn',
+		'children': [
+			{
+				'label': _('Recipes'),
+				'url_name': 'dashboard:recipe-list',
+			},
+		 ]
+	},
+	{
+		'label': _('FAQ'),
+		'icon': 'fas fa-bullhorn',
+		'children': [
+			{
+				'label': _('FAQs'),
+				'url_name': 'dashboard:faq-list',
+			},
+		 ]
+	},
+]
+
+OSCAR_IMAGE_FOLDER = 'images/products'
+
+STRIPE_SECRET_KEY = env.str('STRIPE_API_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_API_PUBLISHABLE_KEY')
+STRIPE_CURRENCY = "USD"
+SHIPSTATION_API_KEY = env.str('DEHY_SHIPSTATION_API_KEY')
+SHIPSTATION_SECRET_KEY = env.str('DEHY_SHIPSTATION_SECRET_KEY')
+HOME_POSTCODE = "78701"
+
+FEDEX_ACCOUNT_NUMBER = env.str('FEDEX_ACCOUNT_NUMBER')
+FEDEX_API_KEY = env.str('FEDEX_TEST_API_KEY')
+FEDEX_SECRET_KEY = env.str('FEDEX_TEST_SECRET_KEY')
+FEDEX_API_URL = env.str('FEDEX_TEST_API_URL') if DEBUG else env.str('FEDEX_PRODUCTION_API_URL')
+USPS_USERNAME = env.str('USPS_USERNAME')

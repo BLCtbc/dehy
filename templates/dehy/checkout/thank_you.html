@@ -1,0 +1,421 @@
+{% extends "dehy/checkout/layout_v2.html" %}
+{% load currency_filters %}
+{% load i18n %}
+{% load image_tags %}
+
+{% block title %}
+    {% blocktrans with number=order.number %}
+        Order {{ number }}: confirmation
+    {% endblocktrans %} | {{ block.super }}
+{% endblock title %}
+
+{% block checkout_nav %}
+{% endblock %}
+
+
+{% block content %}
+<div class="col-12 col-md-11 col-lg-10">
+	<p class="lead">
+		{% blocktrans with number=order.number %}
+		Your order has been placed and a confirmation email has been sent - your order number is
+		<strong>{{ number }}</strong>.
+		{% endblocktrans %}
+		{% trans "Please make a note of this reference or" %} <a style="text-decoration: underline;" onclick="window.print()" href="#">{% trans "print this page" %}</a> {% trans "and quote it in any communication with us regarding your order." %}
+	</p>
+</div>
+	{% block order_info %}
+	<div class="col-12 col-md-11 col-lg-10 table-responsive-sm">
+		<table cellpadding="0" cellspacing="0" class="table" id="order_receipt_table">
+			<tbody>
+				<tr>
+					<td colspan="2">
+						{% if order.user %}
+						<div><span class="cell-title">USER</span></div>
+						<div><a href="{% url 'customer:profile-view' %}">{{order.user|default:""}}</a></div>
+						{% else %}
+						<div><span class="cell-title">EMAIL</span></div>
+						<div><a href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.user|default:""}}</a></div>
+						<div>{{order.guest_email}}</div>
+						{% endif %}
+					</td>
+					<td rowspan="3">
+						<div><span class="cell-title">BILLED TO</span></div>
+						<div>{{order.sources.first.label}}</div>
+						<div>{{order.billing_address.phone_number}}</div>
+						<div>{{order.billing_address.first_name}} {{order.billing_address.last_name}}</div>
+						<div>{{order.billing_address.line1}}</div>
+						<div>{{order.billing_address.line2}}</div>
+						<div>{{order.billing_address.line3}}</div>
+						<div>{{order.billing_address.line4}}, {{order.billing_address.state}}, {{order.billing_address.postcode}}</div>
+						<div>{{order.billing_address.country.iso_3166_1_a3}}</div>
+					</td>
+
+					<td rowspan="3">
+							<div><span class="cell-title">SHIPPING</span></div>
+							<div>{{order.shipping_method}}</div>
+							<div>{{order.shipping_address.phone_number}}</div>
+							<div>{{order.shipping_address.first_name}} {{order.shipping_address.last_name}}</div>
+							<div>{{order.shipping_address.line1}}</div>
+							<div>{{order.shipping_address.line2}}</div>
+							<div>{{order.shipping_address.line3}}</div>
+							<div>{{order.shipping_address.line4}}, {{order.shipping_address.state}}, {{order.shipping_address.postcode}}</div>
+							<div>{{order.shipping_address.country.iso_3166_1_a3}}</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<div><span class="cell-title">DATE</span></div>
+						<div>{{order.date_placed.date}}</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<div><span class="cell-title">ORDER ID</span></div>
+						{% if order.user %}
+						<div><a href="{% url 'customer:order' order_number=order.number %}">{{order.number}}</a></div>
+						{% else %}
+						<div><a href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.number}}</a></div>
+						{% endif %}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	{% endblock order_info %}
+
+	{% block order_contents %}
+	<div class="col-12 col-md-11 col-lg-10 table-responsive-sm">
+		<table cellpadding="0" cellspacing="0" class="table table-hover" id="order_contents_table">
+			<thead>
+				<tr class="basket-title">
+					<th colspan="1"></th>
+					<th colspan="4"><span>{% trans "Items purchased" %}</span></th>
+					<th colspan="1"><span>{% trans "Quantity" %}</span></th>
+					<th colspan="1"><span>{% trans "Total" %}</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for line in order.lines.all %}
+				<tr>
+					<td style="padding-left:0;" colspan="1">
+					{% with image=line.product.primary_image %}
+						{% oscar_thumbnail image.original "300x" as thumb %}
+						<div class="image-container">
+							<a class="image-link" href="{{ line.product.get_absolute_url }}">
+								<img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
+							</a>
+						</div>
+					{% endwith %}
+					</td>
+					<td colspan="4">
+						<a href="{{ line.product.get_absolute_url }}">{{ line.product.parent.title|default:line.product.title }}
+							{% if line.product.is_child %}
+							<br>
+							<span class="size-variant">Size: {{line.product.title}}</span>
+							{% endif %}
+						</a>
+					</td>
+					<td>{{line.quantity}}</td>
+					<td>{{ line.line_price_before_discounts_excl_tax|currency:order.currency }}</td>
+				</tr>
+				{% endfor %}
+				<tr style="border-top: double 2px; height: 10px">
+					<td colspan="7"></td>
+				</tr>
+				<tr style="border-top: double 2px">
+					<td colspan="5"></td>
+					<td><span>Subtotal</span></td>
+					<td><span>{{order.total_excl_tax|currency:order.currency}}</span></td>
+				</tr>
+				<tr>
+					<td colspan="5"></td>
+					<td><span>Shipping</span></td>
+					<td><span>{{order.shipping_excl_tax|currency:order.currency}}</span></td>
+				</tr>
+				<tr>
+					<td colspan="5"></td>
+					<td><span>Sales Tax</span></td>
+					<td><span>{{order.total_tax|currency:order.currency}}</span></td>
+				</tr>
+				<tr style="border-top: double 2px">
+					<td colspan="5"></td>
+					<td><span>Total</span></td>
+					<td><span>{{order.total_incl_tax|currency:order.currency}}</span></td>
+				</tr>
+
+			</tbody>
+			<tfoot>
+
+			</tfoot>
+		</table>
+	</div>
+
+
+	<div class="col-12 col-md-11 col-lg-10">
+		<div class="row justify-content-end">
+			<div class="col-6 col-lg-3 text-right"><a role="button" href="{{ homepage_url }}" class="btn">{% trans "Continue shopping" %}</a></div>
+			<div class="col-6 col-lg-2 text-right"><a role="button" onclick="window.print()" href="" class="btn">{% trans "Print" %}</a></div>
+
+		</div>
+
+
+		<tr style="border-top: double 2px">
+			<td></td>
+			<td colspan="5"></td>
+			<td></td>
+		</tr>
+	</div>
+
+
+
+	{# old #}
+	{% comment %}
+	<table cellpadding="0" cellspacing="0" class="col-12 col-lg-10 table" id="order_contents_table">
+		<thead>
+			<tr class="basket-title">
+				<th>
+				</th>
+				<th colspan="4">
+					<span>{% trans "Items purchased" %}</span>
+				</th>
+				<th colspan="1">
+					<span>{% trans "Quantity" %}</span>
+				</th>
+				<th colspan="1">
+					<span>{% trans "Total" %}</span>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for line in order.lines.all %}
+			<tr>
+				<td class="image-td" style="padding-left:0;" colspan="1">
+				<div class="outter-image-container">
+					{% with image=line.product.primary_image %}
+						{% oscar_thumbnail image.original "300x" as thumb %}
+						<a class="image-link" href="{{ line.product.get_absolute_url }}">
+							<div class="bg-image-container" style="background-image: url({{ thumb.url }})">
+								<!-- <img src="" alt="{{ product.get_title }}" class="product-img img-thumbnail"> -->
+							</div>
+						</a>
+					{% endwith %}
+				</div>
+				</td>
+				<td colspan="4">
+					<a href="{{ line.product.get_absolute_url }}">{{ line.product.parent.title|default:line.product.title }}
+						<div><span class="size-variant">Size: {{line.product.title}}</span></div>
+					</a>
+				</td>
+				<td>{{line.quantity}}</td>
+				<td>{{ line.line_price_before_discounts_excl_tax|currency:order.currency }}</td>
+			</tr>
+			{% endfor %}
+			<tr style="border-top: double 1px; height: 15px;">
+				<td colspan="7"></td>
+			</tr>
+			<!-- <tr style="border-top: double 1px">
+				<td colspan="7"><span>Totals</span></td>
+			</tr> -->
+			<tr>
+				<td colspan="6"><span>Subtotal</span></td>
+				<td><span>{{order.total_excl_tax}}</span></td>
+			</tr>
+			<tr>
+				<td colspan="6"><span>Shipping</span></td>
+				<td><span>{{order.shipping_excl_tax}}</span></td>
+			</tr>
+			<tr>
+				<td colspan="6"><span>Sales Tax</span></td>
+				<td><span>{{order.total_tax}}</span></td>
+			</tr>
+			<tr style="border-top: double 1px">
+				<td colspan="6"><span>Total</span></td>
+				<td><span>{{order.total_tax}}</span></td>
+			</tr>
+		</tbody>
+		<tfoot>
+
+		</tfoot>
+	</table>
+	{% endcomment %}
+    {% endblock order_contents %}
+
+{% endblock content %}
+
+	{% comment %}
+	<section class="col-10 col-lg-4">
+		<div class="row">
+			<section id="user_info_section" class="card card-body col-12">
+				{% if order.user %}
+				<div>User</div>
+				<div><a href="{% url 'customer:profile-view' %}">{{order.user}}</a></div>
+				{% else %}
+				<div>Guest Checkout</div>
+				<div><a href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.user}}</a></div>
+				<div>{{order.guest_email}}</div>
+				{% endif %}
+			</section>
+			<section id="date_section" class="card card-body col-12">
+				<div>Date</div>
+				<div>{{order.date_placed.date}}</div>
+			</section>
+			<section id="order_id_section" class="card card-body col-6">
+				<div>Order ID</div>
+				{% if order.user %}
+				<div><a href="{% url 'customer:order' order_number=order.number %}">{{order.number}}</a></div>
+				{% else %}
+				<div><a href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.number}}</a></div>
+				{% endif %}
+			</section>
+			<section id="order_id_section" class="card card-body col-6">
+				<div>Document </div>
+				<div>{{order.date_placed.date}}</div>
+			</section>
+		</div>
+	</section>
+	<section class="col-10 col-lg-4">
+		<div class="row">
+			<section id="billing_section" class="card card-body col-12">
+				<div>BILLED TO</div>
+				<div>{{order.sources.first.label}}</div>
+				<div>{{order.billing_address.first_name}} {{order.billing_address.last_name}}</div>
+				<div>{{order.billing_address.line1}}</div>
+				<div>{{order.billing_address.line2}}</div>
+				<div>{{order.billing_address.line3}}</div>
+				<div>{{order.billing_address.line4}}, {{order.billing_address.line4}}, {{order.billing_address.postcode}}</div>
+				<div>{{order.billing_address.country.iso_3166_1_a3}}</div>
+			</section>
+		</div>
+	</section>
+	<section class="col-10 col-lg-4">
+		<div class="row">
+			<div>SHIPPING</div>
+			<section id="shipping_address_section" class="card card-body col-6">
+				<div>{{order.sources.first.label}}</div>
+				<div>{{order.shipping_address.first_name}} {{order.shipping_address.last_name}}</div>
+				<div>{{order.shipping_address.line1}}</div>
+				<div>{{order.shipping_address.line2}}</div>
+				<div>{{order.shipping_address.line3}}</div>
+				<div>{{order.shipping_address.line4}}, {{order.shipping_address.line4}}, {{order.shipping_address.postcode}}</div>
+				<div>{{order.shipping_address.country.iso_3166_1_a3}}</div>
+			</section>
+			<section id="shipping_method_section" class="card card-body col-6">
+				<div>Shipping Method</div>
+				<div>{{order.shipping_method}}</div>
+			</section>
+		</div>
+	</section>
+
+    <div class="row justify-content-center shipping-payment">
+        <div class="col-sm-6">
+            {% block shipping_info %}
+                <div class="sub-header">
+                    <h2>{% trans "Shipping" %}</h2>
+                </div>
+                <div class="card card-body bg-light">
+                    <h3>{% trans "Address" %}</h3>
+                    {% if order.shipping_address %}
+                        <address>
+                            {% for field in order.shipping_address.active_address_fields %}
+                                {{ field }}<br/>
+                            {% endfor %}
+                        </address>
+
+                        {% if order.shipping_address.phone_number %}
+                            <h4>{% trans "Contact" %}</h4>
+                            <p>
+                                {% trans "Phone" %}: {{ order.shipping_address.phone_number }}
+                                {% if order.guest_email %}
+                                    <br/>{% trans "Email" %}: {{ order.guest_email }}
+                                {% endif %}
+                            </p>
+                        {% endif %}
+
+                        {% if order.shipping_address.notes %}
+                            <h4>{% trans "Instructions" %}</h4>
+                            <p>{{ order.shipping_address.notes|linebreaks }}</p>
+                        {% endif %}
+                    {% else %}
+                        <p>{% trans "No shipping address required." %}</p>
+                    {% endif %}
+                </div>
+
+                <div class="card card-body bg-light">
+                    <h3>{% trans "Shipping method" %}</h3>
+                    <p>{{ order.shipping_method }}</p>
+                </div>
+            {% endblock %}
+        </div>
+
+        <div class="col-sm-6">
+            {% block payment_info %}
+                <div class="sub-header">
+                    <h2>{% trans "Payment" %}</h2>
+                </div>
+                <div class="card card-body bg-light">
+                    <h3>{% trans "Payment" %}</h3>
+                    {% for source in order.sources.all %}
+                        <p>
+                        {% if source.reference %}
+                            {% blocktrans with amount=source.amount_allocated|currency:source.currency type=source.source_type.name reference=source.reference %}
+                                Allocation of {{ amount }} from type {{ type }} (reference: {{ reference }})
+                            {% endblocktrans %}
+                        {% else %}
+                            {% blocktrans with amount=source.amount_allocated|currency:source.currency type=source.source_type.name %}
+                                Allocation of {{ amount }} from type {{ type }}
+                            {% endblocktrans %}
+                        {% endif %}
+                        </p>
+                    {% empty %}
+                        <p>
+                        {% trans "No payment was required for this order." %}
+                        </p>
+                    {% endfor %}
+
+                    {% if order.billing_address %}
+                        <h4>{% trans "Billing address" %}</h4>
+                        <address>
+                            {% for field in order.billing_address.active_address_fields %}
+                                {{ field }}<br/>
+                            {% endfor %}
+                        </address>
+                    {% endif %}
+                </div>
+
+            {% endblock %}
+        </div>
+    </div>
+
+
+    {% block order_tracking %}
+        {% if not order.user %}
+            <div class="sub-header">
+                <h2>{% trans "Tracking your order" %}</h2>
+            </div>
+            <p>{% trans "You can track the status of your order" %}
+                <a class="btn btn-primary" href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{% trans "View order status" %}</a>.</p>
+        {% endif %}
+    {% endblock %}
+
+
+    {% block order_actions %}
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <p><a onclick="window.print()" href="#" class="btn btn-primary btn-block btn-lg">{% trans "Print this page" %}</a></p>
+                </div>
+                <div class="col-sm-4 offset-sm-4">
+                    <p><a href="{{ homepage_url }}" class="btn btn-primary btn-block btn-lg">{% trans "Continue shopping" %}</a></p>
+                </div>
+            </div>
+        </div>
+    {% endblock order_actions %}
+{% endblock content %}
+{% endcomment %}
+
+{% block tracking %}
+    {% if send_analytics_event %}
+        {% include "oscar/partials/google_analytics_transaction.html" %}
+    {% endif %}
+{% endblock %}

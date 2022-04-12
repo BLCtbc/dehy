@@ -1,0 +1,222 @@
+:root {
+	--shop-input-padding: 1.5rem;
+	--shop-input-border: 1px solid grey;
+}
+
+form {
+	font-family: itc-avant-garde-gothic-pro !important;
+	font-weight: 400;
+	font-size: 1.25rem;
+}
+
+span.not_price_color {
+	font-family: var(--avant-garde);
+	font-weight: 100;
+}
+
+span.variant_price {
+	font-family: var(--avant-garde);
+	color: var(--beige);
+	display: contents;
+	font-weight: 100;
+}
+
+.product_main span.not_price_color,
+.product_main span.variant_price  {
+	font-size: 1.5rem;
+}
+
+.variant-select-container, .quantity-select-container {
+    position: relative;
+    transition: opacity .1s ease-out;
+    text-align: left;
+    box-sizing: border-box;
+    line-height: normal;
+    color: inherit;
+    /* font-size: calc(1.1 * 1rem); */
+}
+
+.quantity-select-container {
+    border: 1px solid grey;
+    display: flex;
+    justify-content: space-around;
+}
+
+.quantity-select-container.active {
+	outline-width: 2px !important;
+	outline-style: solid !important;
+	outline-offset: 4px !important;
+}
+
+.variant-select-container, input#id_quantity{
+	padding: var(--shop-input-padding);
+	border: var(--shop-input-border);
+}
+
+.variant-select-container {
+	opacity: 0;
+}
+
+input#id_quantity {
+	color: inherit;
+	width: 100%;
+	text-align: center;
+	border: none;
+}
+
+.variant-option select, input#id_quantity {
+
+    height: 100%;
+    font-size: var(--shop-input-padding);
+	background: transparent;
+	-webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+	font-weight: 400;
+}
+
+.variant-option select {
+	position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+	padding-right: 3.5rem;
+	color: rgba(0,0,0,0);
+	border: none;
+}
+
+.variant-option select:focus {
+	box-shadow: none;
+	border-color: transparent;
+}
+
+.variant-select-container[data-text] {
+    opacity: 1;
+}
+
+.variant-select-container:before {
+    content: attr(data-text);
+    display: inline-block;
+}
+
+.variant-select-container:after {
+	content: '';
+	position: absolute;
+	right: 1rem;
+	transform: rotate(45deg);
+	border-bottom: 1px solid;
+	border-right: 1px solid;
+	height: 1rem;
+	width: 1rem;
+	transform-origin: top;
+	pointer-events: none;
+	font-size: 1rem;
+    border-bottom-color: #bca263;
+    border-right-color: #bca263;
+
+}
+
+.product-list-container {
+	display: flex;
+	display: -ms-flexbox;
+	flex-direction: column;
+	-ms-flex-direction: column;
+}
+
+.category-dropdown {
+	border: 2px solid #faa61c;
+    border-radius: 9px;
+}
+
+.category-dropdown a.dropdown-toggle {
+	color: var(--secondary-accent-color);
+    letter-spacing: 0.1em;
+    font-size: 1rem;
+}
+
+.dropdown-toggle::after {
+	margin-right: 0.5rem;
+}
+
+.category-selection-label {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin-right: 0.6em;
+}
+
+.product-info {
+	display: flex;
+	flex-direction: column;
+}
+
+.a-label {
+	position: absolute;
+	font-family: 'itc-avant-garde-gothic-pro' !important;
+	line-height: 2rem;
+	left: 0;
+	padding: var(--shop-input-padding);
+}
+
+.add-item-to-cart-btn,
+#size_selector {
+	outline-color: var(--gold) !important;
+	border-radius: 0;
+}
+
+#size_selector:focus,
+.add-item-to-cart-btn:focus {
+	outline-width: 2px !important;
+	outline-style: solid !important;
+	outline-offset: 4px !important;
+}
+
+.add-item-to-cart-btn {
+    background-color: var(--beige);
+    color: var(--hunter-green);
+    border: 1px solid var(--gold);
+}
+
+.plus-minus-btn {
+	padding: calc(var(--shop-input-padding) - 1rem);
+	background-color: transparent;
+	border-radius: 50%;
+	border-color: var(--gold);
+	/* line-height: 1rem; */
+	/* font-size: calc(var(--shop-input-padding) - 0.5rem);
+	position: absolute;
+	top: calc(var(--shop-input-padding) - 0.5rem); */
+}
+
+.plus-btn {
+	right: calc(var(--shop-input-padding) - 1rem);
+}
+.minus-btn {
+	left: calc(var(--shop-input-padding) - 1rem);
+}
+
+.plus-minus-btn svg {
+	height: var(--shop-input-padding);
+	width: var(--shop-input-padding);
+	pointer-events: none;
+}
+
+.plus-minus-container {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.input-quantity-container {
+    display: inline-flex;
+    justify-content: center;
+}
+
+input[name='quantity']:focus {
+	outline: none
+}
+
+.variant-option {
+	margin-bottom: 1rem;
+}

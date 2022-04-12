@@ -1,0 +1,86 @@
+{% block footer %}
+{% load static %}
+{% load image_tags %}
+
+<footer class="justify-content-center container-fluid footer-container">
+	<div class="row mx-auto">
+		<div class="brand-logo-big col-12 col-md-6 col-lg-3">
+			<div class="row justify-content-center">
+				<div class="brand-logo image-container col-12">
+					<a href="{% url 'home' %}"><img style="width: 80%" src="{% static 'img/custom/dehy_logo1_clipped2.png' %}" alt='Dehy Logo 1'></a>
+				</div>
+
+				<div class="col-12 contact-footer socials-container">
+					<ul class="navbar">
+						<li class="nav-items socials circles icon">
+							<a class="fa fa-phone-alt" href="tel:904-796-0812" target="_blank" aria-label="call 904-796-0812" alt=""></a>
+						</li>
+						<li class="nav-items socials circles icon">
+							<a class="fa fa-facebook" href="https:/www.facebook.com/dehygarnish" target="_blank" aria-hidden="true"></a>
+						</li>
+						<li class="nav-items socials circles icon">
+							<a class="fa fa-instagram" href="https:/www.instagram.com/dehygarnish" target="_blank" aria-hidden="true"></a>
+						</li>
+						<li class="nav-items socials circles icon">
+							<a class="fa fa-envelope" href="mailto:info@dehygarnish.com" target="_blank"></a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col-12 col-lg-9 site-directory">
+			<div class="row justify-content-center">
+				<div class="about-us col-10 col-md-5 col-lg-3">
+					<h3>About Us</h3>
+					<ul class="pl-0">
+						<li><a href="{% url 'recipes' %}">Recipes</a></li>
+						<li><a href="{% url 'returns' %}">Returns &amp; Refund Policy</a></li>
+						<li><a href="{% url 'returns' %}">Terms of Service</a></li>
+						<li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+
+					</ul>
+				</div>
+				<div class="contact-us col-10 col-md-6 col-lg-3">
+					<h3>Contact Us</h3>
+					<p>Email us:</p>
+					<p><a href="mailto:info@dehygarnish.com" target="_blank">info@dehygarnish.com</a></p>
+					<p>Call us:</p>
+					<p>
+						<a class="fa fa-phone-alt" href="tel:904-796-0812" target="_blank" aria-label="call 904-796-0812" alt="call 904-796-0812">904-796-0812</a>
+					</p>
+					<p>Pull up:</p>
+					<p>512 Rio Grande St.</p>
+					<p>Austin, Texas 78701</p>
+
+				</div>
+				<div class="ig-images my-3 col-12 col-sm-5">
+					<div class="ig-img-grid">
+					{% with default_image=MEDIA_URL|add:'media/image_not_found.jpg' %}
+					{% for image in ig_images %}
+						{% oscar_thumbnail image|default:default_image "500x400" as thumb %}
+							<a class="image-link" href="https://www.instagram.com/p/{{image}}/">
+								<div class='image-container'>
+									<img class="product-img" src="{% static 'img/ig/'|add:image %}.jpeg">
+								</div>
+							</a>
+					{% endfor %}
+					{% endwith %}
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- <div class="justify-content-center row"> -->
+
+
+		<div class="row w-100 bg-beige text-dark-hg container-fluid font-lydia">
+			<div class="col-12">
+				<small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small> | <small><a href="#">SITEMAP</a></small>
+			</div>
+		</div>
+	<!-- </div> -->
+
+</footer>
+{% endblock footer %}

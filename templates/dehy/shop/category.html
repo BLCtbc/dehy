@@ -1,0 +1,39 @@
+{% extends "dehy/shop/browse.html" %}
+
+{% load i18n %}
+
+{% block title %}
+    {{ category.get_meta_title }} | {{ block.super }}
+{% endblock %}
+
+{% block description %}
+    {{ category.get_meta_description }}
+{% endblock %}
+
+{% block header%}
+{{block.super}}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Shop" %}</a></li>
+            {% for category in category.get_ancestors %}
+                <li class="breadcrumb-item"><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+            {% endfor %}
+            <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+        </ol>
+    </nav>
+{% endblock breadcrumbs %}
+
+{% block content %}
+    {% if category.description %}
+        <div class="row">
+            <div class="col-sm-9"><p>{{ category.description|safe }}</p></div>
+            {% if category.image %}
+                <div class="col-sm-3"><img src="{{ category.image.url }}" alt="{{ category.name }}" class="img-fluid" /></div>
+            {% endif %}
+        </div>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
