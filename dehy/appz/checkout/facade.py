@@ -16,7 +16,7 @@ class Facade(object):
 	def __init__(self):
 		print("\n --- Facade instantiated --- \n")
 		self.stripe = stripe
-		self.ORDER_SUBMITTED_SIGNING_SECRET = settings.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
+		self.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET = settings.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
 
 	@staticmethod
 	def get_friendly_decline_message(error):
