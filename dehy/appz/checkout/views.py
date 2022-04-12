@@ -54,7 +54,7 @@ ShippingAddress = get_model('order', 'ShippingAddress')
 
 from dehy.appz.order.models import BillingAddress
 
-logger = logging.getLogger('oscar.checkout')
+logger = logging.getLogger('__name__')
 
 def calculate_tax(price, rate):
 	tax = D(price*rate)
@@ -95,8 +95,9 @@ def webhook_submit_order(request):
 	print('\n --- caught a webhook --- ', datetime.datetime.now())
 
 	place_order_view = PlaceOrderView(request=request)
-
 	payload = request.body
+
+	endpoint_secret = Facade.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
 	# endpoint_secret = 'whsec_63c2ac70680ad9eb9ceddd981cb1be311fbd0ab114767d63c69c28f0374d8b42'
 
 	event = None
@@ -104,7 +105,7 @@ def webhook_submit_order(request):
 
 	try:
 		event = Facade.stripe.Webhook.construct_event(
-			payload, sig_header, Facade.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
+			payload, sig_header, endpoint_secret
 		)
 
 	except ValueError as e:
@@ -112,6 +113,8 @@ def webhook_submit_order(request):
 		msg = 'Stripe webhook: Invalid payload' + str(e)
 		print(msg)
 		logger.error(msg)
+		response.status_code = 403
+
 		raise e
 
 	except Facade.stripe.error.SignatureVerificationError as e:
@@ -119,13 +122,14 @@ def webhook_submit_order(request):
 		logger.error(msg)
 		print(msg)
 		response = JsonResponse({})
-		response.status_code = 400
+		response.status_code = 403
 		return response
 
-	if event['type'] == 'order.payment_completed' :
+	if event['type'] == 'order.payment_completed':
 		print('Event type {}'.format(event['type']))
 
 		order = event['data']['object']
+		print('order: ', order)
 		basket = get_object_or_404(Basket, id=order.metadata.get('basket_id'))
 		order = Facade.stripe.Order.retrieve(order.id, expand=['customer', 'payment.payment_intent', 'line_items'])
 		place_order_view.handle_place_order_submission(basket, order)
@@ -156,7 +160,7 @@ def webhook_submit_order(request):
 	else:
 		msg = f"Unhandled event type {event['type']}"
 		logger.debug(msg)
-		status_code = 400
+		status_code = 404
 
 	response = JsonResponse({})
 	response.status_code = status_code
