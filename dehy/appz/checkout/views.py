@@ -93,7 +93,7 @@ def get_city_and_state(postcode=None):
 @require_POST
 def webhook_submit_order(request):
 	print('\n --- caught a webhook --- ', datetime.datetime.now())
-
+	data = {'test': 123}
 	place_order_view = PlaceOrderView(request=request)
 	payload = request.body
 
@@ -111,8 +111,11 @@ def webhook_submit_order(request):
 	except ValueError as e:
 		# Invalid payload
 		msg = 'Stripe webhook: Invalid payload' + str(e)
+		data['error'] = msg
 		print(msg)
 		logger.error(msg)
+		response = JsonResponse(data)
+
 		response.status_code = 403
 
 		raise e
@@ -121,7 +124,9 @@ def webhook_submit_order(request):
 		msg = 'Stripe webhook: ⚠️  Webhook signature verification failed.' + str(e)
 		logger.error(msg)
 		print(msg)
-		response = JsonResponse({})
+		data['error'] = msg
+
+		response = JsonResponse(data)
 		response.status_code = 403
 		return response
 
@@ -160,9 +165,11 @@ def webhook_submit_order(request):
 	else:
 		msg = f"Unhandled event type {event['type']}"
 		logger.debug(msg)
+		data['error'] = msg
+
 		status_code = 404
 
-	response = JsonResponse({})
+	response = JsonResponse(data)
 	response.status_code = status_code
 	return response
 
