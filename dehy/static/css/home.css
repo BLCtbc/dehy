@@ -189,10 +189,10 @@ b	ottom: 1rem;
 	border-color: inherit;
 }
 
-#wholesale {
-	background-image: url(/static/img/custom/dehy_jars1_filter.jpeg);
-    background-size: cover;
-    background-position: 50% 50%;
+#wholesale > .image-container {
+	padding-bottom: 30%;
+	border-left: 0;
+	border-right: 0;
 }
 
 .recipe-link-container, .shop-link-container {
