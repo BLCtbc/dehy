@@ -1,12 +1,18 @@
 {% load i18n %}
 {% load currency_filters %}
 {% load static %}
-<nav id="navbar" class="col-12 navbar navbar-expand-lg fixed-top scroll-hide category_view scrolled-up scrolled-top">
-	<div class="header-container-left container-fluid">
-		<div class="brand-container">
-			<a class="navbar-brand" href="{% url 'home' %}" title="dehygarnish.com"><small> {{ shop_tagline }}</small>
-				<img src="{% static 'img/brand.png' %}" alt="Dehy logo">
-			</a>
+
+{# new #}
+{% comment %}
+<nav id="navbar" class="container-fluid navbar navbar-expand-lg fixed-top scroll-hide category_view scrolled-up scrolled-top">
+	<div class="row">
+		<div class="brand-container col-9">
+			<div class="">
+				<a class="navbar-brand" href="{% url 'home' %}" title="dehygarnish.com"><small> {{ shop_tagline }}</small>
+					<img src="{% static 'img/brand.png' %}" alt="Dehy logo">
+				</a>
+			</div>
+
 		</div>
 
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#site_nav"
@@ -37,16 +43,15 @@
 			</ul>
 			{% endwith %}
 		</div>
-	</div>
 
 	<div class="buttons-container container-fluid d-none d-sm-flex">
 		<div class="socials-container">
 			<ul class="navbar">
 				<li class="nav-item socials circles icon">
-					<a class="fa fa-facebook" href="https:/www.facebook.com/dehygarnish" aria-hidden="true"></a>
+					<a class="fa fa-facebook" href="https://www.facebook.com/dehygarnish" aria-hidden="true"></a>
 				</li>
 				<li class="nav-item socials circles icon">
-					<a class="fa fa-instagram" href="https:/www.instagram.com/dehygarnish" aria-hidden="true"></a>
+					<a class="fa fa-instagram" href="https://www.instagram.com/dehygarnish" aria-hidden="true"></a>
 				</li>
 			</ul>
 		</div>
@@ -81,54 +86,13 @@
 		        </a>
 	    	</div>
 		</div>
-
-
-			{% comment %}
-			<ul class="navbar-nav ml-md-auto d-md-flex">
-
-					{% if user.is_authenticated %}
-					{% block nav_account_navbar_authenticated %}
-						<li class="nav-item mr-2">
-							{% if num_unread_notifications > 0 %}
-								{# If user has new notifications - we change account link to go to inbox #}
-								<a href="{% url 'customer:notifications-inbox' %}" class="nav-link mt-2 mt-lg-0">
-									<i class="far fa-user mr-2"></i>
-									<span class="badge badge-warning">{{ num_unread_notifications }}</span>
-								</a>
-							{% else %}
-								<a href="{% url 'customer:summary' %}" class="nav-link mt-2 mt-lg-0">
-									<i class="far fa-user mr-2"></i>
-								</a>
-							{% endif %}
-						</li>
-						{% if user.is_staff or perms.partner.dashboard_access %}
-							<li class="nav-item mr-2">
-								<a href="{% url 'dashboard:index' %}" class="nav-link">
-									<i class="fas fa-list-ul mr-2"></i>
-								</a>
-							</li>
-						{% endif %}
-						<li class="nav-item mr-2">
-							<a id="logout_link" href="{% url 'customer:logout' %}" class="nav-link">
-								<i class="fas fa-sign-out-alt mr-2"></i>
-							</a>
-						</li>
-					{% endblock %}
-					{% else %}
-						<li class="nav-item mr-2">
-							<a id="login_link" href="{% url 'customer:login' %}" class="nav-link">
-								<i class="fas fa-sign-in-alt mr-2"></i>
-								{% trans "Login or register" %}
-							</a>
-						</li>
-					{% endif %}
-			</ul>
-			{% endcomment %}
 		</div>
-	</nav>
+	</div> <!--  row -->
 
-	{# old #}
-	{% comment %}
+</nav>
+
+{% endcomment %}
+
 	<nav id="navbar" class="col-12 navbar navbar-expand-lg fixed-top scroll-hide category_view scrolled-up scrolled-top">
 		<div class="header-container-left container-fluid">
 			<div class="brand-container">
@@ -171,10 +135,10 @@
 			<div class="socials-container">
 				<ul class="navbar">
 					<li class="nav-item socials circles icon">
-						<a class="fa fa-facebook" href="https:/www.facebook.com/dehygarnish" aria-hidden="true"></a>
+						<a class="fa fa-facebook" href="https://www.facebook.com/dehygarnish" aria-hidden="true"></a>
 					</li>
 					<li class="nav-item socials circles icon">
-						<a class="fa fa-instagram" href="https:/www.instagram.com/dehygarnish" aria-hidden="true"></a>
+						<a class="fa fa-instagram" href="https://www.instagram.com/dehygarnish" aria-hidden="true"></a>
 					</li>
 				</ul>
 			</div>
@@ -211,7 +175,7 @@
 			</div>
 
 
-				{# old comment start #}
+				{% comment %}
 				<ul class="navbar-nav ml-md-auto d-md-flex">
 
 						{% if user.is_authenticated %}
@@ -251,8 +215,7 @@
 							</li>
 						{% endif %}
 				</ul>
-				{# old endcomment #}
+				{% endcomment %}
 			</div>
 		</nav>
 
-		{% endcomment %}
