@@ -240,12 +240,13 @@ LOGGING = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
+SITE_DOMAIN = 'dehygarnish.net'
 EMAIL_BACKEND = 'django_ses.SESBackend'
 AWS_SES_REGION_NAME = 'us-east-2'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-2.amazonaws.com'
 AWS_SES_ACCESS_KEY_ID = env.str('AWS_SES_ACCESS_KEY_ID')
 AWS_SES_SECRET_ACCESS_KEY = env.str('AWS_SES_SECRET_ACCESS_KEY')
-OSCAR_FROM_EMAIL = 'mail@dehygarnish.net'
+OSCAR_FROM_EMAIL = f'mail@{SITE_DOMAIN}'
 OSCAR_GOOGLE_ANALYTICS_ID = 'G-W6L54G8SQ1'
 
 LANGUAGE_CODE = 'en-us'
