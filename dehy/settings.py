@@ -38,7 +38,6 @@ SECRET_KEY = env.str('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
-
 INTERNAL_IPS = [
 	"127.0.0.1"
 ]
@@ -214,29 +213,31 @@ AUTH_PASSWORD_VALIDATORS = [
 	},
 ]
 
-LOGGING = {
-	'version': 1,
-	'disable_existing_loggers': False,
-	'handlers': {
-		'file': {
-			'level': 'DEBUG',
-			'class': 'logging.FileHandler',
-			'filename': 'django.log',
+if not DEBUG:
+
+	LOGGING = {
+		'version': 1,
+		'disable_existing_loggers': False,
+		'handlers': {
+			'file': {
+				'level': 'DEBUG',
+				'class': 'logging.FileHandler',
+				'filename': 'django.log',
+			},
 		},
-	},
-	'loggers': {
-		'django': {
-			'handlers': ['file'],
-			'level': 'DEBUG',
-			'propagate': True,
+		'loggers': {
+			'django': {
+				'handlers': ['file'],
+				'level': 'DEBUG',
+				'propagate': True,
+			},
+			'django.request': {
+				'handlers': ['file'],
+				'level': 'DEBUG',
+				'propagate': True,
+			}
 		},
-		'django.request': {
-			'handlers': ['file'],
-			'level': 'DEBUG',
-			'propagate': True,
-		}
-	},
-}
+	}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

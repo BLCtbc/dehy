@@ -10,7 +10,7 @@
         {% block product_image %}
 		{% with images=product.get_all_images|slice:":2" %}
 		<a class="image-link" href="{{ product.get_absolute_url }}" aria-label="{{ product.get_title }} Link">
-			<div class="product-image-container">
+			<div class="image-container">
 				{% for image in images %}
 					{% oscar_thumbnail image.original "x1000" quality=95 crop=center upscale=True as thumb %}
 					{% if image == images|first %}
@@ -41,9 +41,9 @@
 		{% block product_price %}
 			<div class="product_price">
 
-				{% include "oscar/catalogue/partials/stock_record.html" %}
+				{% include "dehy/shop/partials/stock_record.html" %}
 				{% if not product.is_parent and not product.has_options %}
-					{% include "oscar/catalogue/partials/add_to_basket_form_compact.html" %}
+					{% include "dehy/shop/partials/add_to_basket_form_compact.html" %}
 				{% endif %}
 			</div>
 		{% endblock product_price %}

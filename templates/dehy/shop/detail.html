@@ -3,7 +3,7 @@
 {% load history_tags %}
 {% load currency_filters %}
 {% load reviews_tags %}
-{% load product_tags %}
+{% load product_tagz %}
 {% load display_tags %}
 {% load i18n %}
 {% load purchase_info_tags %}
@@ -88,11 +88,9 @@
 
 
 			{# new #}
-
 				<form id="add_to_basket_form" action="{% url 'basket:add' pk=product.pk  %}"
 					method="post" class="add-to-basket col-12 mb-0 px-0" style='width:inherit;'>
 			        {% csrf_token %}
-			        {% include "oscar/partials/form_fields.html" with form=basket_form %}
 					<div class="d-flex">
 						<div class="col-8 pl-0 d-flex flex-column">
 							{% if product.is_parent %}
@@ -167,53 +165,53 @@
     {% endblock %}
 
 	{% if request.user.is_staff %}
-    {% block product_info %}
-    <div class="sub-header">
-        <h2>{% trans "Product Information" %} (Only visible to staff)</h2>
-    </div>
+	    {% block product_info %}
+	    <div class="sub-header">
+	        <h2>{% trans "Product Information" %} (Only visible to staff)</h2>
+	    </div>
 
-    <table class="table table-striped">
-        {% if product.upc %}
-        <tr>
-            <th>{% trans "UPC" %}</th><td>{{ product.upc }}</td>
-        </tr>
-        {% endif %}
-        <tr>
-            <th>{% trans "Product Type" %}</th><td>{{ product.get_product_class.name }}</td>
-        </tr>
+	    <table class="table table-striped">
+	        {% if product.upc %}
+	        <tr>
+	            <th>{% trans "UPC" %}</th><td>{{ product.upc }}</td>
+	        </tr>
+	        {% endif %}
+	        <tr>
+	            <th>{% trans "Product Type" %}</th><td>{{ product.get_product_class.name }}</td>
+	        </tr>
 
-        {% purchase_info_for_product request product as session %}
-        {% if session.price.exists %}
-            <tr>
-                <th>{% trans "Price (excl. tax)" %}</th><td>{{ session.price.excl_tax|currency:session.price.currency }}</td>
-            </tr>
-            {% if session.price.is_tax_known %}
-                <tr>
-                    <th>{% trans "Price (incl. tax)" %}</th><td>{{ session.price.incl_tax|currency:session.price.currency }}</td>
-                </tr>
-                <tr>
-                    <th>{% trans "Tax" %}</th><td>{{ session.price.tax|currency:session.price.currency }}</td>
-                </tr>
-            {% endif %}
-            <tr>
-                <th>{% trans "Availability" %}</th>
-                <td>{{ session.availability.message }}</td>
-            </tr>
-        {% endif %}
-        {% for av in product.get_attribute_values %}
-            <tr>
-                <th>{{ av.attribute.name }}</th>
-                <td>{{ av.value_as_html }}</td>
-            </tr>
-        {% endfor %}
-        {% iffeature "reviews" %}
-            <tr>
-                <th>{% trans "Number of reviews" %}</th>
-                <td>{{ product.num_approved_reviews }}</td>
-            </tr>
-        {% endiffeature %}
-    </table>
-    {% endblock product_info %}
+	        {% purchase_info_for_product request product as session %}
+	        {% if session.price.exists %}
+	            <tr>
+	                <th>{% trans "Price (excl. tax)" %}</th><td>{{ session.price.excl_tax|currency:session.price.currency }}</td>
+	            </tr>
+	            {% if session.price.is_tax_known %}
+	                <tr>
+	                    <th>{% trans "Price (incl. tax)" %}</th><td>{{ session.price.incl_tax|currency:session.price.currency }}</td>
+	                </tr>
+	                <tr>
+	                    <th>{% trans "Tax" %}</th><td>{{ session.price.tax|currency:session.price.currency }}</td>
+	                </tr>
+	            {% endif %}
+	            <tr>
+	                <th>{% trans "Availability" %}</th>
+	                <td>{{ session.availability.message }}</td>
+	            </tr>
+	        {% endif %}
+	        {% for av in product.get_attribute_values %}
+	            <tr>
+	                <th>{{ av.attribute.name }}</th>
+	                <td>{{ av.value_as_html }}</td>
+	            </tr>
+	        {% endfor %}
+	        {% iffeature "reviews" %}
+	            <tr>
+	                <th>{% trans "Number of reviews" %}</th>
+	                <td>{{ product.num_approved_reviews }}</td>
+	            </tr>
+	        {% endiffeature %}
+	    </table>
+	    {% endblock product_info %}
 	{% endif %}
 
     {% iffeature "reviews" %}

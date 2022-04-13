@@ -1,7 +1,7 @@
 {% extends "dehy/layout.html" %}
 {% load static %}
 {% load i18n %}
-{% load product_tags %}
+{% load product_tagz %}
 
 {% block title %}
 {{ block.super }} | {% trans "Home" %}
@@ -149,8 +149,6 @@
 				<div class="col-6 col-sm-3 product-card">
 				{% render_product product %}
 				</div>
-
-
 			{% endif %}
 
 
