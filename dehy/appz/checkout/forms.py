@@ -70,7 +70,6 @@ class ShippingMethodForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		methods = kwargs.pop('methods', [])
 		super().__init__(*args, **kwargs)
-		print('\n methods: ', methods)
 		self.fields['method_code'].choices = ((m.code, m.name) for m in methods)
 
 
@@ -80,9 +79,7 @@ class AdditionalInfoForm(forms.ModelForm):
 	class Meta:
 		model = AdditionalInfoQuestionaire
 		fields = '__all__'
-	# def __init__(self, *args, **kwargs):
-	# 	super().__init__(*args, **kwargs)
-	# 	self.fields['purchase_source']
+
 
 class UserInfoForm(AuthenticationForm):
 	username = forms.EmailField(label=_("Email"), help_text="You'll receive receipts and notifications at this email address.")

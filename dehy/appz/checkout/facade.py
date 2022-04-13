@@ -14,7 +14,6 @@ stripe.api_version = '2020-08-27; orders_beta=v3'
 class Facade(object):
 
 	def __init__(self):
-		print("\n --- Facade instantiated --- \n")
 		self.stripe = stripe
 		self.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET = settings.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
 
