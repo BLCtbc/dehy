@@ -1,9 +1,9 @@
 from django import template
 from django.template.loader import select_template
+from oscar.templatetags import product_tags
 
 register = template.Library()
 
-@register.simple_tag(takes_context=True)
 def render_product(context, product):
 	"""
 	Render a product snippet as you would see in a browsing display.
@@ -28,3 +28,7 @@ def render_product(context, product):
 	# Ensure the passed product is in the context as 'product'
 	context['product'] = product
 	return template_.render(context)
+
+
+product_tags.render_product = render_product
+register.simple_tag(takes_context=True, name="render_product")(product_tags.render_product)

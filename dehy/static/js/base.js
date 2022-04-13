@@ -110,13 +110,7 @@ var dehy = {
 				var quantity_selects = document.querySelectorAll('.quantity-select-container');
 				quantity_selects.forEach(elem=> {
 					elem.addEventListener('click', e=>{
-						console.log('clicked quantity select container');
-						console.log('e: ', e);
 						// e.stopImmediatePropogation();
-						console.log('e.target: ', e.target)
-						console.log('e.closest(quantity-select-container): ', e.target.closest('.quantity-select-container'));
-						
-						// e.target.classList.toggle('active', true);
 						var closest_input = elem.querySelector("input[name='quantity']");
 						if (closest_input) {
 							closest_input.focus();
@@ -124,25 +118,15 @@ var dehy = {
 					})
 				}, true);
 
-				// quantity_selects.forEach(elem=> {
-				// 	elem.addEventListener('blur', e=>{
-				// 		e.stopImmediatePropogation();
-				// 		e.target.classList.toggle('active', false);
-				// 	})
-				// });
-
 				var quantity_inputs = document.querySelectorAll("input[name='quantity']");
-
 				quantity_inputs.forEach(elem=>{
 					elem.addEventListener('focus', e=>{
-						console.log('focused')
 						var qty_select_container = e.target.closest('.quantity-select-container');
 						if (qty_select_container) {
 							qty_select_container.classList.toggle('active', true);
 						}
 					})
 					elem.addEventListener('blur', e=>{
-						console.log('blured')
 
 						var qty_select_container = e.target.closest('.quantity-select-container');
 						if (qty_select_container) {

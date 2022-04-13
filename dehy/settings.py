@@ -58,7 +58,6 @@ INSTALLED_APPS = [
 	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
 	# oscar overrides
 	'dehy.appz.address.apps.AddressConfig',
-	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
 	'dehy.appz.dashboard.catalogue.apps.CatalogueDashboardConfig',
 	'dehy.appz.basket.apps.BasketConfig',
@@ -91,6 +90,8 @@ INSTALLED_APPS = [
 	'oscar.apps.dashboard.vouchers.apps.VouchersDashboardConfig',
 	'oscar.apps.dashboard.communications.apps.CommunicationsDashboardConfig',
 	'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
+	'dehy.appz.catalogue.apps.CatalogueConfig',
+
 	# 3rd-party apps that oscar depends on
 	'widget_tweaks',
 	'haystack',
