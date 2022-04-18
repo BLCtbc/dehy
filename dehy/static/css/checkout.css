@@ -200,10 +200,6 @@ button.edit span {
 	justify-content: space-between;
 }
 
-.card-body {
-	background-color: var(--hunter-green);
-
-}
 .required:after {
     color: #dc3545;
     content: "*";
@@ -249,9 +245,6 @@ input:not([type="radio"], [type="checkbox"]):focus, .form-control:not([type="rad
 	color: azure;
 }
 
-.table {
-	color: inherit;
-}
 
 .total {
 	background-color: inherit;
@@ -507,11 +500,4 @@ img.img-thumbnail {
 	padding: 0;
 }
 
-
-.table-hover tbody tr:hover {
-	color: inherit;
-}
-.table-hover>tbody>tr:hover>* {
-	color: inherit
-}
 

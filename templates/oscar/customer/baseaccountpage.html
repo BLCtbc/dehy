@@ -1,6 +1,13 @@
-{% extends "oscar/layout_2_col.html" %}
+{% extends "dehy/layout_2_col.html" %}
 
 {% load i18n %}
+{% load static %}
+{% load image_tags %}
+
+
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/account.css' %}"/>
+{% endblock extrastyles %}
 
 {% block title %}
     {{ page_title }} | {% trans 'Account' %} | {{ block.super }}
@@ -8,31 +15,153 @@
 
 {% block body_class %}account-profile{% endblock %}
 
-{% block breadcrumbs %}
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ homepage_url }}">{% trans 'Home' %}</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{% url 'customer:summary' %}">{% trans 'Account' %}</a>
-            </li>
-            {% block extra_breadcrumbs %}{% endblock %}
-            <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
-        </ol>
-    </nav>
-{% endblock %}
+{% block splash_container %}
+{% endblock splash_container %}
+
+
+{% block header %}
+
+	{% get_media_prefix as MEDIA_PREFIX %}
+	{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/account/dehy2-884.jpg' %}
+	{% oscar_thumbnail image_url "1500x" upscale="true" as thumb %}
+	<header class="row navbar-padding justify-content-center">
+		<div style="padding-top: 20%; padding-bottom: 20%;" class="image-container">
+			<img alt="Dehy all products displayed in jars" src="{{thumb.url}}">
+		</div>
+		{% endwith %}
+
+		{% block navigation %}
+		{% endblock %}
+		<div class="col-8">
+
+		</div>
+	</header>
+{% endblock header %}
 
 {% block headertext %}{{ page_title }}{% endblock %}
 
-{% block column_left %}
-    <ul class="nav nav-pills flex-column">
-        {% block standard_tabs %}
-            {% include 'oscar/customer/partials/standard_tabs.html' %}
-        {% endblock %}
-    </ul>
+{% block content_wrapper %}
+	<div class="{% block content_wrapper_classes %}container navbar-padding{% endblock %}">
+		{% block column_left_outer %}
+		<div class="row">
+			<aside class="col-4 col-lg-3 sidebar">
+				{% block column_left %}
+				    <ul class="nav nav-pills flex-column">
+				        {% block standard_tabs %}
+				            {% include 'oscar/customer/partials/standard_tabs.html' %}
+				        {% endblock %}
+				    </ul>
+				{% endblock %}
+			</aside> <!-- col -->
+		{% endblock column_left_outer %}
+			<div class="col-8 info-container">
+				{% include "oscar/partials/alert_messages.html" %}
+
+				{% block pre_content %}{% endblock %}
+				{% block content %}
+					{% block tabcontent %}{% endblock tabcontent %}
+				{% endblock content %}
+			</div> <!-- col -->
+		</div><!-- row -->
+	</div> <!-- /container -->
+{% endblock content_wrapper %}
+
+{% comment %}
+{% extends "dehy/layout_2_col.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load image_tags %}
+
+
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/account.css' %}"/>
+{% endblock extrastyles %}
+
+{% block title %}
+    {{ page_title }} | {% trans 'Account' %} | {{ block.super }}
 {% endblock %}
 
-{% block content %}
-    {% block tabcontent %}{% endblock tabcontent %}
-{% endblock content %}
+{% block body_class %}account-profile{% endblock %}
+
+{% block splash_container %}
+{% endblock splash_container %}
+
+
+{% block header %}
+
+	{% get_media_prefix as MEDIA_PREFIX %}
+	{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/account/dehy2-884.jpg' %}
+	{% oscar_thumbnail image_url "1500x" upscale="true" as thumb %}
+	<header class="row navbar-padding justify-content-center">
+		<div style="padding-top: 20%; padding-bottom: 20%;" class="image-container">
+			<img alt="Dehy all products displayed in jars" src="{{thumb.url}}">
+		</div>
+		{% endwith %}
+
+		{% block navigation %}
+		{% endblock %}
+		<div class="col-8">
+
+		</div>
+	</header>
+{% endblock header %}
+
+{% block headertext %}{{ page_title }}{% endblock %}
+
+{% block content_wrapper %}
+	<div class="{% block content_wrapper_classes %}container navbar-padding{% endblock %}">
+		{% block column_left_outer %}
+		<div class="row">
+			<aside class="col-4 col-lg-3 sidebar">
+				{% block column_left %}
+				    <ul class="nav nav-pills flex-column">
+				        {% block standard_tabs %}
+				            {% include 'oscar/customer/partials/standard_tabs.html' %}
+				        {% endblock %}
+				    </ul>
+				{% endblock %}
+			</aside> <!-- col -->
+		</div>
+
+		{% endblock column_left_outer %}
+			<div class="col-8 info-container">
+				{% include "oscar/partials/alert_messages.html" %}
+
+				{% block pre_content %}{% endblock %}
+				{% block content %}
+					{% block tabcontent %}{% endblock tabcontent %}
+				{% endblock content %}
+			</div> <!-- col -->
+
+		</div><!-- row -->
+	</div> <!-- /container -->
+{% endblock content_wrapper %}
+
+{% comment %}
+{% block content_wrapper %}
+	<div class="{% block content_wrapper_classes %}container navbar-padding{% endblock %}">
+		{% block column_left_outer %}
+		<div class="row">
+			<aside class="col-4 col-lg-3 sidebar">
+				{% block column_left %}
+				    <ul class="nav nav-pills flex-column">
+				        {% block standard_tabs %}
+				            {% include 'oscar/customer/partials/standard_tabs.html' %}
+				        {% endblock %}
+				    </ul>
+				{% endblock %}
+			</aside> <!-- col -->
+		{% endblock column_left_outer %}
+			<div class="col-8 info-container">
+				{% include "oscar/partials/alert_messages.html" %}
+
+				{% block pre_content %}{% endblock %}
+				{% block content %}
+					{% block tabcontent %}{% endblock tabcontent %}
+				{% endblock content %}
+			</div> <!-- col -->
+		</div><!-- row -->
+	</div> <!-- /container -->
+{% endblock content_wrapper %}
+{% endcomment %}

@@ -34,7 +34,6 @@ var dehy = {
 			complete: function(xhr, status) {
 				console.log('ajax complete, xhr: ', xhr);
 				console.log('ajax complete, status: ', status);
-
 			},
 		});
 	},
@@ -83,9 +82,11 @@ var dehy = {
 				var size_selectors = document.querySelectorAll('.variant-size-selector');
 				size_selectors.forEach(function(select_elem) {
 					select_elem.addEventListener('change', e=> {
-						var variant_select_container = e.target.closest('.variant-select-container'),
-							not_price_selector = e.target.closest('.product_main').querySelector('span.not_price_color'),
-							variant_price = e.target.closest('.product_main').querySelector('span.variant_price'),
+						var variant_select_container = e.target.closest('.variant-select-container');
+						var product_price_container = e.target.closest('.product_price');
+
+						var not_price_selector = product_price_container.querySelector('span.not_price_color'),
+							variant_price = product_price_container.querySelector('span.variant_price'),
 							option_price = e.target.selectedOptions[0].dataset.price,
 							variant_id = e.target.selectedOptions[0].dataset.id,
 							form = e.target.closest('form');
@@ -175,6 +176,12 @@ var dehy = {
 		freeze_submissions: false,
 		update_cart_quantity(basket_items=0) {
 
+			var navbar = document.getElementById('navbar');
+			navbar.classList.toggle('scrolled-up', true);
+			setTimeout(function() {
+				navbar.classList.toggle('scrolled-up', false);
+				navbar.classList.toggle('scrolled-down', true);
+			}, 3000);
 			var cart_container = document.querySelector('.cart-container');
 			if (cart_container) {
 				cart_container.querySelector('a.icon-cart').ariaLabel = `${basket_items} items in cart`;
@@ -184,6 +191,7 @@ var dehy = {
 			if (cart_quantity_span) {
 				cart_quantity_span.textContent = basket_items
 			}
+
 
 		},
 		notifyUser(message) {

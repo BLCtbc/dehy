@@ -1,8 +1,10 @@
 :root {
-    --gold: #bca263;
-	--hunter-green: #224431;
-	--beige: #f4ecdc;
-	--orange-accent-color: #faa61c;
+    --gold: rgba(188, 162, 99, 1);
+	--gold-half-opacity: rgba(188, 162, 99, 0.5);
+	--hunter-green: rgba(34, 68, 49, 1);
+	--hg: rgba(34, 68, 49, 1);
+	--beige: rgba(244, 236, 220, 1);
+	--orange-accent-color: rgba(250, 166, 28, 1);
 	--avant-garde: 'itc-avant-garde-gothic-pro';
 	--dark-hg: rgba(28, 54, 39, 1);
 	--dark-gray: rgba(0,0,0,0.8);
@@ -31,6 +33,10 @@ button,
 button:hover,
 .btn:hover {
 	opacity: 0.8;
+}
+
+.btn:focus {
+	box-shadow: none;
 }
 
 .btn-bg-transparent {
@@ -288,6 +294,10 @@ nav .nav-item:not(:first-child) {
 	font-weight: 400;
 }
 
+.cart-quantity-container.modify {
+	transform: scale(1.2)
+}
+
 .socials-container > ul {
 	flex-wrap: nowrap;
 	padding: 0;
@@ -506,6 +516,10 @@ footer {
 	font-family: 'itc-avant-garde-gothic-pro';
 }
 
+.navbar-margin {
+	margin-top: var(--main-navbar-height);
+}
+
 .navbar-padding:after {
     display: block;
     clear: both;
@@ -652,8 +666,12 @@ li.breadcrumb-item {
 	opacity: 1;
 }
 
-.product {
+.product, .product-figure {
 	text-align: center;
+}
+
+.product-figure {
+	margin-top: 2rem;
 }
 
 .pagination-container {
@@ -827,12 +845,19 @@ input, select, label {
 	color: inherit;
 }
 
-
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
 	.product-list {
 	    grid-template-columns: repeat(3, minmax(0,1fr));
 	}
 }
+
+
+@media (max-width: 992px) {
+	.product-list {
+	    grid-template-columns: repeat(2, minmax(0,1fr));
+	}
+}
+
 
 @media (max-width: 768px) {
 	.product-list {
@@ -888,4 +913,56 @@ a.headerlink {
 	position: absolute;
 	top: 0;
 	right: -3px;
+}
+
+.card-body {
+    background-color: var(--hunter-green);
+}
+
+form {
+	font-family:'itc-avant-garde-gothic-pro';
+}
+
+table {
+	word-break: break-all;
+	table-layout: fixed;
+	font-size: 1rem;
+}
+
+
+td {
+	padding: 0 0 0 0.75rem;
+	vertical-align: middle;
+	border: 1px solid;
+}
+
+th, td {
+	border-color: var(--gold-half-opacity);
+}
+
+thead {
+    background-color: var(--hunter-green);
+    border-right: 1px solid;
+    border-left: 1px solid;
+}
+
+
+.table {
+	color: inherit;
+	border-color: inherit
+}
+
+.table-hover tbody tr:hover {
+	color: inherit;
+}
+.table-hover>tbody>tr:hover>* {
+	color: inherit
+}
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+	color: inherit;
+}
+
+.fixme {
+	color: magenta;
+	border-color: magenta;
 }

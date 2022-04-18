@@ -1,11 +1,9 @@
 {% extends "dehy/layout_2_col.html" %}
 {% load static %}
-
 {% load i18n %}
 {% load product_tags %}
 {% load thumbnail %}
 {% load image_tags %}
-
 
 {% block title %}
 {{ block.super }} | {% trans "FAQ" %}
@@ -18,11 +16,10 @@
 {% block splash_container %}
 <header class="faq navbar-padding justify-content-center row">
 	<div class="col-10 section-divider">
-			{% block header_title %}
-			<h1 class="faq-title">Frequently Asked FAQs <a class="headerlink" href="#" title="FAQ section permalink">¶</a></h1>
-			{% endblock header_title %}
+		{% block header_title %}
+		<h1 class="faq-title">Frequently Asked FAQs <a class="headerlink" href="#" title="FAQ section permalink">¶</a></h1>
+		{% endblock header_title %}
 	</div>
-
 </header>
 {% endblock splash_container %}
 

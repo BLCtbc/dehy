@@ -2,6 +2,7 @@
 {% load static %}
 {% load i18n %}
 {% load product_tags %}
+{% load image_tags %}
 
 {% block title %}
 {{ block.super }} | {% trans "Home" %}
@@ -18,13 +19,13 @@
 <header class='content-section row' id="header">
 	<div class='col-12 col-sm-7 d-flex flex-column justify-content-center img-split shop-header-image dotted-image-filter'
 		style='background-image: url({% static "img/custom/dehy_jars2_filter.jpeg" %}); background-size:cover;'>
-			<div class='row mx-auto'>
-				<div class="col-10 my-5">
-					<h1>CATCHY PUNCHLINE</h1>
-					<h1>NOW YOU FINNA BUY SHIT</h1>
-					<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">Shop Now</a>
-				</div>
+		<div class="row mx-auto justify-content-center">
+			<div class="col-10 my-5">
+				<h1>CATCHY PUNCHLINE</h1>
+				<h1>NOW YOU FINNA BUY SHIT</h1>
+				<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">Shop Now</a>
 			</div>
+		</div>
 	</div>
 	<div class='col-12 col-sm-5 fun-gif img-split'>
 		<figure>
@@ -32,11 +33,13 @@
 		</figure>
 	</div>
 </header>
-
-
 {% endblock header %}
 
+
+
 {% block content_wrapper %}
+{% get_media_prefix as MEDIA_PREFIX %}
+
 	<section class='about content-section row' id='about'>
 		<div class='container'>
 			<div class='row'>
@@ -97,9 +100,20 @@
 		</div>
 	</section>
 
-	<section id="wholesale" class='content-section row'>
-		<div style="padding-bottom: 30%" class="image-container col-12">
-			<img src='{% static 'img/custom/dehy_jars1_filter.jpeg' %}'>
+	{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/home/dehy-1279.jpg' %}
+	{% oscar_thumbnail image_url "1500x" upscale=True as thumb %}
+	<section id="wholesale" class='content-section row justify-content-center' style="background-image: url('{{ thumb.url }}')">
+		{% endwith %}
+
+		<div class="col-8 my-5 mx-auto">
+			<div class="text-container frosted-glass">
+				<p>Heyyy brew, something something <span class="text-light">wholesale</span> something <span class="text-light">wholesale</span> </p>
+				<p>Interested in creating an account?
+					<br>
+				 <a class="text-light" style="text-decoration: underline" href="{% url 'customer:register' %}">Clicky on this here button</a> now go on 'n git
+				</p>
+			</div>
+
 		</div>
 	</section>
 
@@ -139,20 +153,25 @@
 			</div>
 	</section>
 
-	<section class='content-section mini-shop row'>
+	<section class='content-section mini-shop-section row'>
+
 		<div class="shop-link-container" style="position: sticky; top:0; left:10px;">
 			<a role='button' style="position: absolute; top: -3rem;" class="temp shop-link btn btn-black" href="{% url 'shop:index' %}">Shop</a>
 		</div>
-		{% for product in products %}
-			{% if not product.is_child %}
-				{# temporary #}
-				<div class="col-6 col-sm-3 product-card">
-				{% render_product product %}
-				</div>
-			{% endif %}
+
+		<div class="mini-shop">
+			{% for product in products %}
+				{% if not product.is_child %}
+					{# temporary #}
+					<div class="product-card">
+					{% render_product product %}
+					</div>
+				{% endif %}
+			{% endfor %}
+		</div>
 
 
-		{% endfor %}
+
 	</section>
 
 

@@ -38,13 +38,11 @@
                 </a>
             </h3>
         {% endblock product_title %}
-		{% block product_price %}
-			<div class="product_price">
 
+		{% block product_price %}
+			<div class="product_price row justify-content-center">
 				{% include "dehy/shop/partials/stock_record.html" %}
-				{% if not product.is_parent and not product.has_options %}
-					{% include "dehy/shop/partials/add_to_basket_form_compact.html" %}
-				{% endif %}
+				{% include "dehy/shop/partials/add_to_basket_form_compact.html" %}
 			</div>
 		{% endblock product_price %}
 	</section>

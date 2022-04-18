@@ -1,0 +1,40 @@
+{% extends "oscar/customer/baseaccountpage.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans 'Login' %} {{ block.super }}
+{% endblock %}
+
+
+{% block header %}
+<header class="navbar-padding row">
+	<div class="col-10 section-divider">
+		{% block header_title %}
+		{% endblock header_title %}
+	</div>
+</header>
+{% endblock header %}
+
+{% block column_left_outer %}
+{% endblock column_left_outer %}
+
+{% block content %}
+    <div class="row form-container">
+        <div class="col-12 col-sm-10 col-md-9 col-lg-6">
+            <form id="login_form" action="{{ request.get_full_path }}" method="post" class="navbar-margin" >
+                <h2 class="form-title">{% trans 'Login' %}</h2>
+                {% csrf_token %}
+                {% include "oscar/partials/form_fields.html" with form=login_form %}
+
+                <p class="text-center"><a href="{% url 'password-reset' %}">{% trans "Forgot your password?" %} <span class="fixme">You're so stupid!</span></a></p>
+				<div class="form-group text-center">
+					<button name="login_submit" type="submit" value="Sign in" class="btn btn-lg" data-loading-text="{% trans "Logging in..." %}">{% trans 'Sign in' %}</button>
+				</div>
+            </form>
+        </div>
+		<div class="row"></div>
+		<div class="col-12 col-sm-10 col-md-9 col-lg-6">
+			<p class="text-center"><a href="{% url 'customer:register' %}">{% trans "Create account" %}</a></p>
+		</div>
+    </div>
+{% endblock content %}

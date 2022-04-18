@@ -12,7 +12,6 @@
 					<img src="{% static 'img/brand.png' %}" alt="Dehy logo">
 				</a>
 			</div>
-
 		</div>
 
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#site_nav"
@@ -144,7 +143,11 @@
 			</div>
 			<div class="icon-container">
 				<div class="account-container">
+					{% if request.user.is_authenticated %}
+					<a class="icon" href="{% url 'customer:summary' %}">
+					{% else %}
 					<a class="icon" href="{% url 'customer:login' %}">
+					{% endif %}
 				      <span class="svg-container">
 				        <svg style="stroke-width:0.1rem; top:3px;"class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">
 						    <g>

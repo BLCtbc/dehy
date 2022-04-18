@@ -8,6 +8,7 @@
 
         <div id="product_gallery" class="carousel slide">
 
+
             <div class="img-thumbnail mb-3">
                 <div class="carousel-inner">
                 {% for image in all_images %}
@@ -18,12 +19,36 @@
                 {% endfor %}
                 </div>
                 <a class="carousel-control-prev" href="#product_gallery" role="button" data-slide="prev">
+					<button type="button" role="presentation" class="carousel-scroll carousel-scroll-left">
+						<svg xmlns="http://www.w3.org/2000/svg" width="54.26" height="54.26" viewBox="0 0 54.26 54.26">
+							<g id="Group_1689" data-name="Group 1689" transform="translate(-99.871 -1987.87)">
+								<g id="Decorative_Arrow" data-name="Decorative Arrow" transform="translate(99.871 1987.87)">
+									<path id="Path_146" data-name="Path 146" d="M299.1-65.334,271.967-38.2,299.1-11.074,326.227-38.2ZM274.139-38.2,299.1-63.16,324.051-38.2,299.1-13.248Z" transform="translate(-271.967 65.334)" fill="peachpuff"></path>
+									<path id="Path_147" data-name="Path 147" d="M294.993-61.71l-19.4,19.4,19.4,19.4,19.4-19.4Zm-17.25,19.4,17.25-17.25,17.25,17.25-17.25,17.251Z" transform="translate(-267.864 69.438)" fill="peachpuff"></path>
+									<path id="Path_149" data-name="Path 149" d="M301.958-45.208h-17.79l9.407-9.478-1.052-1.044-11.19,11.273,11.153,11.362,1.058-1.039-9.346-9.52h17.761Z" transform="translate(-265.909 71.547)" fill="green">
+									</path>
+								</g>
+							</g>
+						</svg>
+					</button>
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">{% trans "Previous" %}</span>
                 </a>
                 <a class="carousel-control-next" href="#product_gallery" role="button" data-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="sr-only">{% trans "Next" %}</span>
+					<button type="button" role="presentation" class="carousel-scroll carousel-scroll-right">
+						<svg xmlns="http://www.w3.org/2000/svg" width="54.26" height="54.26" viewBox="0 0 54.26 54.26">
+							<g id="Group_1689" data-name="Group 1689" transform="translate(-99.871 -1987.87)">
+								<g id="Decorative_Arrow" data-name="Decorative Arrow" transform="translate(99.871 1987.87)">
+									<path id="Path_146" data-name="Path 146" d="M299.1-65.334,271.967-38.2,299.1-11.074,326.227-38.2ZM274.139-38.2,299.1-63.16,324.051-38.2,299.1-13.248Z" transform="translate(-271.967 65.334)" fill="peachpuff"></path>
+									<path id="Path_147" data-name="Path 147" d="M294.993-61.71l-19.4,19.4,19.4,19.4,19.4-19.4Zm-17.25,19.4,17.25-17.25,17.25,17.25-17.25,17.251Z" transform="translate(-267.864 69.438)" fill="peachpuff"></path>
+									<path id="Path_149" data-name="Path 149" d="M301.958-45.208h-17.79l9.407-9.478-1.052-1.044-11.19,11.273,11.153,11.362,1.058-1.039-9.346-9.52h17.761Z" transform="translate(-265.909 71.547)" fill="green">
+									</path>
+								</g>
+							</g>
+						</svg>
+					</button>
                 </a>
             </div>
 
