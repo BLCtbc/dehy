@@ -23,8 +23,8 @@
 {% block column_left %}
     {% category_tree as tree_categories %}
     {% if tree_categories %}
-        <h4>{% trans "Show results for" %}</h4>
-        <div class="side_categories card">
+        <h3 style="font-variant: all-petite-caps; font-size: 2.5rem">{% trans "Filter Products" %}</h3>
+        <div class="side_categories">
             <ul class="product-category-list">
                 {% for tree_category in tree_categories %}
                     <li class="mt-2 category-item">

@@ -1,16 +1,20 @@
 <div class="modal fade" id="confirm_item_removal" tabindex="-1" aria-labelledby="confirm_item_removal_label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirm_item_removal_label">Remove Item</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
+		<button style="align-self: flex-end; padding: 10px;" type="button" class="btn-close float-right" data-bs-dismiss="modal" aria-label="Close"></button>
+
+      <div class="modal-body mx-5">
+		  <h5 class="modal-title mb-2" id="confirm_item_removal_label">Remove Item</h5>
         <p>You have set this item's quantity to 0. This will remove it from your cart. Would you like to continue?</p>
       </div>
-      <div class="modal-footer">
-        <button id="cancel_remove_btn" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button id="confirm_remove_btn" type="button" class="btn btn-primary" data-bs-dismiss="modal">Confirm</button>
+      <div class="row">
+		  <div class="col-6 pr-0">
+			  <button id="cancel_remove_btn" type="button" class="btn py-3 w-100 bg-transparent" data-bs-dismiss="modal">Cancel</button>
+
+		  </div>
+		  <div class="col-6 pl-0">
+			  <button id="confirm_remove_btn" type="button" class="btn py-3 w-100 bg-transparent" data-bs-dismiss="modal">Confirm</button>
+		  </div>
       </div>
     </div>
   </div>

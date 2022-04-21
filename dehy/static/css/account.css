@@ -1,0 +1,128 @@
+
+form {
+	font-size: unset;
+}
+.required:after {
+	right: unset;
+	top: unset;
+}
+button {
+	font-variant:all-small-caps;
+}
+select, input {
+	outline: 2px solid var(--gold);
+	outline-offset: 1px;
+	background-color: rgba(231, 240, 254, 1) !important;
+	border: 1px solid var(--dark-hg) !important;
+}
+
+
+select:focus, input:focus {
+	outline: 2px solid var(--gold) !important;
+	outline-offset: 1px !important;
+}
+
+/* .form-container p,
+.form-container label {
+	font-size: 1rem !important
+} */
+
+.form-container {
+	margin-bottom: var(--main-navbar-height);
+	font-size: 1rem !important
+}
+
+.form-container * {
+	position: relative
+}
+
+#login_form (button, input) {
+	text-align: center;
+}
+
+.form-title {
+	text-align: center;
+	font-size: 3rem;
+	font-variant: all-petite-caps;
+	font-family: 'itc-avant-garde-gothic-pro';
+	margin-bottom: 1rem;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.row {
+	justify-content: center;
+}
+
+
+.info-container {
+	font-size: 1.25rem;
+	padding-left: 0;
+}
+
+/* .nav-pills .nav-link:hover {
+	border-left: 4px solid;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+	border-left: 4px solid;
+} */
+
+.sidebar {
+	padding-left: 7px;
+	padding-right: 24px;
+}
+
+
+.account-tab {
+	display: grid;
+	font-size: 14px;
+	position: relative;
+	border-radius: 6px;
+	padding: 6px 8px;
+	font-weight: 400;
+	grid-template-rows: min-content;
+	align-items: start;
+    grid-template-columns: min-content minmax(0, auto);
+}
+
+.account-tab.active {
+	background-color: rgba(0,0,0,0.25) !important;
+}
+
+.account-tab:hover {
+	background-color: rgba(0,0,0,0.35) !important;
+	color: var(--beige);
+}
+
+.account-tab.active::after {
+	position: absolute;
+	top: calc(50% - 12px);
+	left: -8px;
+	height: 24px;
+	width: 4px;
+	content: "";
+	border-radius: 6px;
+	background: var(--gold);
+}
+
+[data-toggle="datetimepicker"] {
+	z-index: 2;
+    margin-left: 4px !important;
+    height: calc(1.5em + 0.75rem + 2px);
+    margin-top: -3px;
+}
+
+.fa-icon {
+	margin-right: 8px;
+}
+
+.fa-ballot::before {
+	content: "\f732"
+}
+.fa-rectangle-list::before {
+	content: "\f022"
+}

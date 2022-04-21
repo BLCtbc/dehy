@@ -37,7 +37,7 @@ class HomeView(TemplateView):
 	def get_context_data(self, *args, **kwargs):
 		data = super().get_context_data(*args, **kwargs)
 		recipes = Recipe.objects.filter(featured=True)
-		products = Product.objects.exclude(product_class__name='Merch', structure='child')
+		products = Product._default_manager.exclude(product_class__name='Merch', structure='child')
 		data.update({'recipes':recipes, 'products':products})
 		return data
 

@@ -469,10 +469,11 @@ const FormStructures = {
 				"elems": [
 					{
 						"tag": "div",
-						"classes": "form-floating input-group col",
+						"classes": "form-group col",
 						"elems": [
 							{
 								"tag": "label",
+								"classes": "col-form-label",
 								"attrs": {
 									"for": "id_purchase_business_type"
 								},
@@ -484,7 +485,7 @@ const FormStructures = {
 									"name": "purchase_business_type",
 									"id": "id_purchase_business_type",
 									"class": "form-control",
-									"placeholder": "purchase_business_type"
+									"placeholder": "Business Type"
 								},
 								"elems": [
 									{
@@ -527,10 +528,11 @@ const FormStructures = {
 				"elems": [
 					{
 						"tag": "div",
-						"classes": "form-floating input-group col",
+						"classes": "form-group col",
 						"elems": [
 							{
 								"tag": "label",
+								"classes": "col-form-label",
 								"attrs": {
 									"for": "id_business_name"
 								},
@@ -545,7 +547,7 @@ const FormStructures = {
 									"required": "",
 									"id": "id_business_name",
 									"class": "form-control required",
-									"placeholder": "business_name",
+									"placeholder": "Business name",
 									"autofill": "text"
 								}
 							},
@@ -593,7 +595,7 @@ const FormStructures = {
 			"elems": [
 				{
 					"tag": "div",
-					"classes": "col-12 mb-1",
+					"classes": "col-12 my-2",
 					"elems": [
 						{
 							"tag": "h3",
@@ -606,13 +608,6 @@ const FormStructures = {
 					"classes": "input-group col",
 					"elems": [
 						{
-							"tag": "label",
-							"attrs": {
-								"for": "id_same_as_shipping"
-							},
-							"text": "Use shipping address"
-						},
-						{
 							"tag": "input",
 							"attrs": {
 								"type": "checkbox",
@@ -620,6 +615,14 @@ const FormStructures = {
 								"id": "id_same_as_shipping",
 								"checked": ""
 							}
+						},
+						{
+							"tag": "label",
+							"classes": "col-form-label",
+							"attrs": {
+								"for": "id_same_as_shipping"
+							},
+							"text": "Use shipping address"
 						}
 					]
 				}
@@ -635,10 +638,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating pr-0 input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_first_name"
 									},
@@ -653,7 +657,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_first_name",
 										"class": "form-control required",
-										"placeholder": "first_name",
+										"placeholder": "First name",
 										"autofill": "given-name"
 									}
 								}
@@ -661,10 +665,11 @@ const FormStructures = {
 						},
 						{
 							"tag": "div",
-							"classes": "form-floating pl-0 input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_last_name"
 									},
@@ -679,7 +684,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_last_name",
 										"class": "form-control required",
-										"placeholder": "last_name",
+										"placeholder": "Last name",
 										"autofill": "family-name"
 									}
 								}
@@ -693,10 +698,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_line1"
 									},
@@ -711,7 +717,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_line1",
 										"class": "form-control required",
-										"placeholder": "line1",
+										"placeholder": "Line 1",
 										"autofill": "address-line1"
 									}
 								}
@@ -725,10 +731,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_line2"
 									},
@@ -742,7 +749,7 @@ const FormStructures = {
 										"maxlength": "255",
 										"id": "id_line2",
 										"class": "form-control",
-										"placeholder": "line2",
+										"placeholder": "Line 2",
 										"autofill": "address-line2"
 									}
 								}
@@ -756,10 +763,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "input-group form-floating col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_country"
 									},
@@ -771,7 +779,7 @@ const FormStructures = {
 										"name": "country",
 										"id": "id_country",
 										"class": "form-control required",
-										"placeholder": "country",
+										"placeholder": "Country",
 										"autocomplete": "country-name",
 										"required": ""
 									},
@@ -2532,10 +2540,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating pr-0 input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_postcode"
 									},
@@ -2550,7 +2559,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_postcode",
 										"class": "form-control required",
-										"placeholder": "postcode",
+										"placeholder": "Postcode",
 										"autocomplete": "postal-code",
 										"pattern": "(^[0-9]{5}$)|(^[0-9]{5}-[0-9]{4}$)"
 									}
@@ -2559,10 +2568,11 @@ const FormStructures = {
 						},
 						{
 							"tag": "div",
-							"classes": "form-floating p-0 input-group col",
+							"classes": "form-group p-0 col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_line4"
 									},
@@ -2577,7 +2587,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_line4",
 										"class": "form-control required",
-										"placeholder": "line4",
+										"placeholder": "City",
 										"autofill": "address-level2"
 									}
 								}
@@ -2585,10 +2595,11 @@ const FormStructures = {
 						},
 						{
 							"tag": "div",
-							"classes": "form-floating pl-0 input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_state"
 									},
@@ -2600,7 +2611,7 @@ const FormStructures = {
 										"name": "state",
 										"id": "id_state",
 										"class": "form-control required",
-										"placeholder": "state",
+										"placeholder": "State",
 										"autofill": "address-level1",
 										"required": ""
 									},
@@ -2616,10 +2627,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_phone_number"
 									},
@@ -2633,7 +2645,7 @@ const FormStructures = {
 										"maxlength": "128",
 										"id": "id_phone_number",
 										"class": "form-control required",
-										"placeholder": "phone_number",
+										"placeholder": "123 456 7890",
 										"autocomplete": "tel",
 										"required":""
 									}
@@ -2683,13 +2695,6 @@ const FormStructures = {
 							"classes": "input-group col",
 							"elems": [
 								{
-									"tag": "label",
-									"text": "Create an account for faster checkout:",
-									"attrs": {
-										"for": "id_create_new_account"
-									},
-								},
-								{
 									"tag": "input",
 									"attrs": {
 										"id": "id_create_new_account",
@@ -2697,6 +2702,14 @@ const FormStructures = {
 										"type": "checkbox"
 									},
 								},
+								{
+									"tag": "label",
+									"classes": "col-form-label",
+									"text": "Create an account for faster checkout:",
+									"attrs": {
+										"for": "id_create_new_account"
+									},
+								}
 							]
 						}
 					]
@@ -2710,19 +2723,20 @@ const FormStructures = {
 							"classes": "input-group col",
 							"elems": [
 								{
-									"tag": "label",
-									"text": "Remember my payment information:",
-									"classes": "floating-label",
-									"attrs": {
-										"for": "id_remember_payment_info"
-									},
-								},
-								{
 									"tag": "input",
 									"attrs": {
 										"id": "id_remember_payment_info",
 										"name": "remember_payment_info",
 										"type": "checkbox"
+									},
+								},
+								{
+									"tag": "label",
+									"classes": "col-form-label",
+									"text": "Remember my payment information:",
+									"classes": "floating-label",
+									"attrs": {
+										"for": "id_remember_payment_info"
 									},
 								}
 							]
@@ -2766,10 +2780,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating pr-0 input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_first_name"
 									},
@@ -2784,7 +2799,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_first_name",
 										"class": "form-control required",
-										"placeholder": "first_name",
+										"placeholder": "First name",
 										"autofill": "given-name"
 									}
 								}
@@ -2792,10 +2807,11 @@ const FormStructures = {
 						},
 						{
 							"tag": "div",
-							"classes": "form-floating pl-0 input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_last_name"
 									},
@@ -2810,7 +2826,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_last_name",
 										"class": "form-control required",
-										"placeholder": "last_name",
+										"placeholder": "Last name",
 										"autofill": "family-name"
 									}
 								}
@@ -2824,10 +2840,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_line1"
 									},
@@ -2842,7 +2859,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_line1",
 										"class": "form-control required",
-										"placeholder": "line1",
+										"placeholder": "Line 1",
 										"autofill": "address-line1"
 									}
 								}
@@ -2856,10 +2873,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_line2"
 									},
@@ -2873,7 +2891,7 @@ const FormStructures = {
 										"maxlength": "255",
 										"id": "id_line2",
 										"class": "form-control",
-										"placeholder": "line2",
+										"placeholder": "Line 2",
 										"autofill": "address-line2"
 									}
 								}
@@ -2887,10 +2905,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_country"
 									},
@@ -2902,7 +2921,7 @@ const FormStructures = {
 										"name": "country",
 										"id": "id_country",
 										"class": "form-control required",
-										"placeholder": "country",
+										"placeholder": "Country",
 										"autocomplete": "country-name",
 										"required": ""
 									},
@@ -2933,10 +2952,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating pr-0 input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_postcode"
 									},
@@ -2951,7 +2971,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_postcode",
 										"class": "form-control required",
-										"placeholder": "postcode",
+										"placeholder": "Postcode",
 										"autocomplete": "postal-code",
 										"pattern": '(^[0-9]{5}$)|(^[0-9]{5}-[0-9]{4}$)'
 									}
@@ -2960,10 +2980,11 @@ const FormStructures = {
 						},
 						{
 							"tag": "div",
-							"classes": "form-floating p-0 input-group col",
+							"classes": "form-group p-0 col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_line4"
 									},
@@ -2978,7 +2999,7 @@ const FormStructures = {
 										"required": "",
 										"id": "id_line4",
 										"class": "form-control required",
-										"placeholder": "line4",
+										"placeholder": "City",
 										"autofill": "address-level2"
 									}
 								}
@@ -2986,10 +3007,11 @@ const FormStructures = {
 						},
 						{
 							"tag": "div",
-							"classes": "form-floating pl-0 input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_state"
 									},
@@ -3001,7 +3023,7 @@ const FormStructures = {
 										"name": "state",
 										"id": "id_state",
 										"class": "form-control required",
-										"placeholder": "state",
+										"placeholder": "State",
 										"autofill": "address-level1",
 										"required": ""
 									},
@@ -3017,10 +3039,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_phone_number"
 									},
@@ -3034,7 +3057,7 @@ const FormStructures = {
 										"maxlength": "128",
 										"id": "id_phone_number",
 										"class": "form-control required",
-										"placeholder": "phone_number",
+										"placeholder": "123 456 7890",
 										"autocomplete": "tel",
 										"required":""
 									}
@@ -3080,10 +3103,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group col",
+							"classes": "form-group col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_username"
 									},
@@ -3123,7 +3147,9 @@ const FormStructures = {
 											"attrs": {
 												"type": "button",
 												"role": "button",
-												"id": "signin_button"
+												"id": "signin_button",
+												"href": "/accounts/login/",
+												"target": "_blank"
 											}
 										}
 									]
@@ -3139,10 +3165,11 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "div",
-							"classes": "form-floating input-group d-none col",
+							"classes": "form-group d-none col",
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_password"
 									},
@@ -3175,6 +3202,7 @@ const FormStructures = {
 							"elems": [
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_options_0"
 									},
@@ -3182,6 +3210,7 @@ const FormStructures = {
 								},
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_options_0"
 									},
@@ -3219,6 +3248,7 @@ const FormStructures = {
 								},
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_options_1"
 									},
@@ -3255,6 +3285,7 @@ const FormStructures = {
 								},
 								{
 									"tag": "label",
+									"classes": "col-form-label",
 									"attrs": {
 										"for": "id_options_2"
 									},
@@ -3301,13 +3332,6 @@ const FormStructures = {
 							"classes": "input-group col",
 							"elems": [
 								{
-									"tag": "label",
-									"attrs": {
-										"for": "id_signup"
-									},
-									"text": "Subscribe to our mailing list to learn about new products and promotions!"
-								},
-								{
 									"tag": "input",
 									"attrs": {
 										"type": "checkbox",
@@ -3315,6 +3339,14 @@ const FormStructures = {
 										"id": "id_signup",
 										"checked": "",
 									}
+								},
+								{
+									"tag": "label",
+									"classes": "col-form-label",
+									"attrs": {
+										"for": "id_signup"
+									},
+									"text": "Subscribe to our mailing list to learn about new products and promotions!"
 								}
 							]
 						}
