@@ -12,17 +12,14 @@ button {
 select, input {
 	outline: 2px solid var(--gold);
 	outline-offset: 1px;
-	background-color: var(--dark-hg) !important;
-	color: white !important;
-	border: 1px inset transparent !important;
+	background-color: rgba(231, 240, 254, 1) !important;
+	border: 1px solid var(--dark-hg) !important;
 }
+
 
 select:focus, input:focus {
 	outline: 2px solid var(--gold) !important;
 	outline-offset: 1px !important;
-	border: 1px inset #bca26396 !important;
-	border: 1px inset rgba(188, 162, 99, 0.5) !important;
-
 }
 
 /* .form-container p,
@@ -48,6 +45,7 @@ select:focus, input:focus {
 	font-size: 3rem;
 	font-variant: all-petite-caps;
 	font-family: 'itc-avant-garde-gothic-pro';
+	margin-bottom: 1rem;
 }
 
 a:hover {

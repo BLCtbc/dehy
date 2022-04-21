@@ -58,6 +58,8 @@ dehy.basket = {
 					.catch(dehy.basket.basket_updated_handlers.error)
 				})
 			});
+		} else {
+			console.log('no basket form found');
 		}
 
 	},

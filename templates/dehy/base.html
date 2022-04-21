@@ -19,7 +19,7 @@
         {% block favicon %}
 			<link rel="shortcut icon" type="image/x-icon" href="{% static "favicon.ico" %}">
         {% endblock %}
-		<script {% if 'checkout' not in request.resolver_match.namespaces %}async {% endif %}src="https://js.stripe.com/v3/"></script>
+		<script {% if 'checkout' in request.resolver_match.namespaces %}{% else %}async {% endif %}src="https://js.stripe.com/v3/"></script>
 
         {# Block where global CSS will go. #}
         {% block styles %}

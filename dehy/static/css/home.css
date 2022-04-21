@@ -105,10 +105,12 @@ figure {
 #mailing_list_email,
 #mailing_list_submit {
 	font-family: monospace;
-	-webkit-box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
-	box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
+	-webkit-box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold) !important;
+	box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold) !important;
 	font-size: 1rem;
-	border: 2px solid white;
+	border: 2px solid white !important;
+	border-radius: 1px !important;
+	outline: none !important;
 }
 
 #mailing_list_email {
@@ -117,8 +119,9 @@ figure {
 }
 
 #mailing_list_submit {
-	line-height: 4rem;
-	color: black;
+    line-height: 2rem;
+    color: #0000009e;
+    padding: 1rem 2rem;
 }
 
 .mailing-list {
@@ -271,7 +274,12 @@ header {
 	}
 }
 
-.variant-option select, input#id_quantity,
-.plus-minus-btn, span.variant_price {
+input#id_quantity,
+.variant-select-container:before {
 	color: var(--hunter-green);
+}
+
+.plus-minus-btn,
+span.variant_price {
+	color: rgba(0, 136, 0, 1);
 }

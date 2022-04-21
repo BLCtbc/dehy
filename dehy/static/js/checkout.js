@@ -50,7 +50,7 @@ dehy.ch = {
 			var form = dehy.ch.forms.get_or_create('user_info', FormStructures['user_info']);
 			document.querySelector('section#user_info').append(form);
 			dehy.ch.forms.init();
-			dehy.ch.forms.reverse_form_labels(form);
+			// dehy.ch.forms.reverse_form_labels(form);
 		}
 	},
 	shipping: {
@@ -294,9 +294,46 @@ dehy.ch.stripe = {
 	},
 	payment_element_setup(client_secret, data){
 
-		const appearance = {
+		const old_appearance = {
 			theme: 'night',
 			labels: 'floating'
+		};
+		var gold_color = '#bca263',
+			dark_hg = '#1c3627';
+
+		const appearance = {
+			variables: {
+				colorPrimaryText: gold_color,
+			    colorPrimary: '#bca263',
+			    colorBackground: '#e7f0fe',
+			    colorText: '#495057',
+			    colorDanger: '#df1b41',
+			    fontFamily: 'Ideal Sans, system-ui, sans-serif',
+			    spacingUnit: '2px',
+			    borderRadius: '5px',
+				colorTextPlaceholder: '#495057bf',
+				spacingGridColumn: '1rem'
+			    // See all possible variables below
+			},
+			rules: {
+				'.Input': {
+        			border: `1px solid ${dark_hg}`,
+					outline: `2px solid ${gold_color}`,
+					outlineOffset: '1px',
+					lineHeight: '1.5rem',
+					padding: '0.375rem 0.75rem',
+					marginBottom: '0.25rem',
+
+      			},
+				'.Input:focus': {
+					outline: `2px solid ${gold_color}`,
+					boxShadow: 'none'
+				},
+				'.Label': {
+					color: gold_color,
+					lineHeight: 1.5
+				}
+			}
 		};
 
 		var options = {
@@ -401,75 +438,6 @@ dehy.ch.stripe = {
 		//
 		// 	// Handle result.error or result.paymentIntent
 		// })
-
-		// old
-		// form.addEventListener('submit', async (e) => {
-		// 	e.preventDefault();
-		// 	var form_data = new FormData(form);
-		//
-		// 	// if it hasn't changed, skip submitting the billing info to the server
-		// 	// if (!dehy.ch.forms.has_changed(form, 'billing')) {
-		// 	// 	dehy.ch.forms.success_handler({'section': 'billing'});
-		// 	// 	return false
-		// 	// }
-		//
-		// 	dehy.ch.stripe.submit_billing_info(form_data, ).then((data) =>{
-		// 		dehy.ch.forms.success_handler({'section': 'billing'});
-		// 		// hide stripe element
-		// 		// create preview for billing form
-		// 		// create place_order form
-		// 		// add form to page
-		// 		// add event handler that processes order to the form
-		// 		var address = {
-		// 			line1: form_data.get('line1'),
-		// 			line2: form_data.get('line2'),
-		// 			city: form_data.get('line4'),
-		// 			state: form_data.get('state'),
-		// 			country: form_data.get('country'),
-		// 			postal_code: form_data.get('postcode'),
-		// 		};
-		// 		var billing_details = {
-		// 			name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
-		// 			email: dehy.ch.forms.saved_form_data.user_info.username,
-		// 			phone: form_data.get('phone_number'),
-		// 			address: address
-		// 		};
-		//
-		// 		var place_order_form = document.querySelector('#place_order_form') || dehy.ch.forms.get();
-		// 		place_order_form.removeEventListener('submit', dehy.ch.forms.submit_handler);
-		// 		place_order_form.addEventListener('submit', async (e) => {
-		// 			dehy.utils.freeze_forms();
-		//
-		// 			e.preventDefault()
-		// 			stripe.processOrder({
-		// 				elements,
-		// 				confirmParams: {
-		// 				// Return URL where the customer should be redirected after the Order's payment is confirmed.
-		// 					return_url: new URL('checkout/thank_you/', window.location.origin).toString(),
-		// 					payment_method_data: {
-		// 						billing_details: billing_details,
-		// 					},
-		// 				},
-		// 			})
-		// 			.then(function(result) {
-		// 				console.log('stripe.processOrder result: ', result);
-		// 				if (result.error) {
-		// 				// Inform the customer that there was an error.
-		// 				dehy.ch.forms.errors.display(result.error);
-		// 				} else {
-		// 					// success, do stuff
-		// 				}
-		// 			})
-		// 			.catch(()=>{
-		// 				dehy.ch.forms.errors.display(data);
-		// 			})
-		// 			.finally(()=> {
-		// 				dehy.utils.unfreeze_forms();
-		// 			})
-		// 		})
-		//
-		// 	}, dehy.ch.forms.errors.display);
-		// });
 		payment_element.on('change', function(e) {
 			if (e.error) {
 				dehy.ch.forms.errors.display(e.error);
@@ -675,7 +643,6 @@ dehy.ch.forms = {
 			changed = true;
 		}
 		// if its the same, skip the ajax call and move to the next section
-		console.log('has_changed: ', changed);
 
 		return changed
 
@@ -710,6 +677,7 @@ dehy.ch.forms = {
 		} else {
 			dehy.ch.forms.errors.hide();
 		}
+
 
 		if (dehy.ch.forms.has_changed(section_name, form)) {
 			dehy.ch.forms.submit_form_info(e.target);
@@ -760,7 +728,7 @@ dehy.ch.forms = {
 			processData: false,
 			data: form_data,
 			success: dehy.ch.forms.success_handler,
-			error: dehy.ch.forms.error,
+			error: dehy.ch.forms.errors.display,
 		});
 	},
 	success_handler(response, textStatus=null, xhr=null) {
@@ -794,7 +762,7 @@ dehy.ch.forms = {
 		dehy.ch.forms.create_preview(response.section);
 		dehy.ch.forms.enable_edit_buttons(next_section.id); //6
 		dehy.ch.forms.init();
-		dehy.ch.forms.reverse_form_labels(form);
+		// dehy.ch.forms.reverse_form_labels(form);
 
 		if (next_section.id=="billing") {
 			var checked = true;
@@ -811,7 +779,6 @@ dehy.ch.forms = {
 
 				checked = form_elem.querySelector('#id_same_as_shipping').checked
 			}
-			console.log('repaint');
 
 			dehy.ch.shipping.billing_same_as_shipping_handler(checked);
 			dehy.ch.stripe.init(response.stripe_pkey, response.client_secret, response);
@@ -920,7 +887,7 @@ dehy.ch.forms = {
 						dehy.ch.forms.init();
 					}
 
-					dehy.ch.forms.reverse_form_labels(form);
+					// dehy.ch.forms.reverse_form_labels(form);
 					dehy.utils.unfreeze_forms();
 				});
 			}
@@ -946,7 +913,6 @@ dehy.ch.forms = {
 
 		var form_data_obj = dehy.ch.forms.get_saved_form_data(section);
 
-		console.log('form_data_obj: ', form_data_obj);
 		for (let [key, val] of Object.entries(form_data_obj)) {
 			var elem = preview_container.querySelector(`span[data-preview=${key}]`);
 			if (elem) {
@@ -978,10 +944,35 @@ dehy.ch.forms = {
 		});
 	},
 	errors: {
-		display(error) {
-			var error_message = error.statusText || error.message || error.text
+		display(response) {
+			var error_text = (response.responseJSON) ? response.responseJSON.errors : response.text || response.message;
 
-			console.log('error: ', error);
+			if (response.responseJSON && response.responseJSON.errors) {
+				error_text = "";
+				if (typeof(response.responseJSON.errors)!='object') {
+					response.responseJSON.errors = JSON.parse(response.responseJSON.errors);
+				}
+				for (let[k, val] of Object.entries(response.responseJSON.errors)) {
+
+					if (val) {
+						if (Array.isArray(val)) {
+							if (typeof(val[0])=='object') {
+								error_text += val[0].message
+							} else {
+								error_text += val.join(" ")
+							}
+
+						}
+					}
+				};
+
+			}
+
+			console.log('response: ', response);
+			console.log('error_text: ', error_text)
+			var error_message = `${response.statusText} (${response.status}): ${error_text}`
+
+			console.log('error_message: ', error_message);
 			var form = dehy.ch.forms.get();
 			var error_container = form.querySelector('#error_container');
 			error_container.classList.toggle('hidden', false);
@@ -1043,7 +1034,7 @@ dehy.ch.forms = {
 				if (section_name == 'shipping' || section_name == 'billing') {
 					if (e.target.hasAttribute('name') && e.target.name=='method_code') {
 						dehy.ch.shipping.update_shipping_method(e.target);
-						return false
+						return
 					}
 					var postcode_input = e.target.closest('form').querySelector('#id_postcode');
 					if (e.target.matches('#id_country')) {
@@ -1069,12 +1060,12 @@ dehy.ch.forms = {
 						if (e.target.matches('#id_postcode')) {
 							if (!e.target.checkValidity()) {
 								// e.target.reportValidity();
-								return false;
+								return
 							}
 						}
 						if (!postcode_input.checkValidity()) {
 							postcode_input.classList.toggle('invalid', true);
-							return false
+							return
 						}
 						// get/update the shipping methods
 						if (section_name == 'shipping') {
@@ -1082,10 +1073,8 @@ dehy.ch.forms = {
 							dehy.ch.shipping.get_shipping_methods(data);
 							console.log('getting shipping methods');
 							dehy.ch.forms.show_submit_button();
-							return false
-
+							return
 						}
-
 					}
 				}
 				if (e.target.matches("input#id_same_as_shipping")) {

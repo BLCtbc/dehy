@@ -177,11 +177,14 @@ var dehy = {
 		update_cart_quantity(basket_items=0) {
 
 			var navbar = document.getElementById('navbar');
-			navbar.classList.toggle('scrolled-up', true);
-			setTimeout(function() {
-				navbar.classList.toggle('scrolled-up', false);
-				navbar.classList.toggle('scrolled-down', true);
-			}, 3000);
+			if (navbar) {
+				navbar.classList.toggle('scrolled-up', true);
+				setTimeout(function() {
+					navbar.classList.toggle('scrolled-up', false);
+					navbar.classList.toggle('scrolled-down', true);
+				}, 3000);
+			}
+
 			var cart_container = document.querySelector('.cart-container');
 			if (cart_container) {
 				cart_container.querySelector('a.icon-cart').ariaLabel = `${basket_items} items in cart`;

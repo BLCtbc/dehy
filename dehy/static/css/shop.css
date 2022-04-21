@@ -270,6 +270,9 @@ input[name='quantity']:focus {
 	border-radius: 5px;
 }
 
+.compact .variant-select-container[data-text] {
+	padding: 1rem;
+}
 .for-screen-reader-only,
 .is-sr-only {
 	border: none!important;

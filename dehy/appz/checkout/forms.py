@@ -56,7 +56,7 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 			'phone_number',
 		]
 
-class FakeShippingAddressForm(ShippingAddressForm):
+class CountryAndPostcodeForm(ShippingAddressForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		required_fields = ['country', 'postcode']
@@ -82,8 +82,8 @@ class AdditionalInfoForm(forms.ModelForm):
 
 
 class UserInfoForm(AuthenticationForm):
-	username = forms.EmailField(label=_("Email"), help_text="You'll receive receipts and notifications at this email address.")
-	password = forms.CharField(label=_("Password"), help_text="Already have an account? Sign in", widget=forms.PasswordInput())
+	username = forms.EmailField(label=_("Email"), help_text=_("You'll receive receipts and notifications at this email address."))
+	password = forms.CharField(label=_("Password"), help_text=_("Already have an account? Sign in"), widget=forms.PasswordInput())
 
 	GUEST, NEW, EXISTING = 'anonymous', 'new', 'existing'
 	CHOICES = (
@@ -97,6 +97,11 @@ class UserInfoForm(AuthenticationForm):
 
 
 	signup = forms.BooleanField(initial=True, required=False, label=_("Subscribe to our mailing list to learn about new products and promotions!"))
+
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['username'].widget.attrs.update({'placeholder':'username@email.com', 'autofill':'email'})
 
 	class Meta:
 		fields = ['username', 'signup']

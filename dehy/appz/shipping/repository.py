@@ -20,7 +20,7 @@ class Repository(repository.Repository):
 		methods = [_shipping_methods.FreeShipping()]
 		status_code = 200
 		# print('repository: get_available_shipping_methods \n ')
-
+		print('shipping_addr: ', shipping_addr)
 		if shipping_addr and shipping_addr.country.code in ['US', 'CA', 'MX']:
 
 			weight = basket.total_weight
