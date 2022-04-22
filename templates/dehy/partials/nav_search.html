@@ -42,37 +42,6 @@
 	                   {% endblock %}
 	               </ul>
 
-			{% comment %}
-            {% block nav %}
-				<div class="col text-center">
-					<span class="category-selection-label d-md-inline-block d-none">CATEGORY:</span>
-					<ul class="navbar-nav category-dropdown">
-	                    {% block nav_items %}
-	                        <li id="shop_dropdown" class="nav-item dropdown">
-	                            <a class="nav-link dropdown-toggle" href="" id="categoryDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									{% if category %}
-									{{ category|upper }}
-									{% else %}
-									{% trans "All products"|upper %}
-									{% endif %}
-	                            </a>
-	                            <div class="dropdown-menu" aria-labelledby="categoryDropdown">
-	                                {% category_tree depth=1 as tree_categories %}
-	                                <a class="dropdown-item" href="{% url 'catalogue:index' %}">{% trans "All products"|upper %}</a>
-	                                {% if tree_categories %}
-	                                    <div class="dropdown-divider"></div>
-	                                    {% for tree_category in tree_categories %}
-	                                        <a class="dropdown-item" href="{{ tree_category.get_absolute_url }}">{{ tree_category.name|upper }}</a>
-	                                    {% endfor %}
-	                                {% endif %}
-	                            </div>
-	                        </li>
-	                   {% endblock %}
-	               </ul>
-				</div>
-            {% endblock %}
-			{% endcomment %}
-
             {% block nav_extra %}
 				<div class="col d-inline-flex justify-content-end">
 	                {% include "oscar/partials/search.html" %}

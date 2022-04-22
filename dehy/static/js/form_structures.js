@@ -23,13 +23,6 @@ const US_States =
 	},
 	{
 		"tag": "option",
-		"text": "AMERICAN SAMOA",
-		"attrs": {
-			"value": "AS"
-		}
-	},
-	{
-		"tag": "option",
 		"text": "ARIZONA",
 		"attrs": {
 			"value": "AZ"
@@ -79,13 +72,6 @@ const US_States =
 	},
 	{
 		"tag": "option",
-		"text": "FEDERATED STATES OF MICRONESIA",
-		"attrs": {
-			"value": "FM"
-		}
-	},
-	{
-		"tag": "option",
 		"text": "FLORIDA",
 		"attrs": {
 			"value": "FL"
@@ -96,13 +82,6 @@ const US_States =
 		"text": "GEORGIA",
 		"attrs": {
 			"value": "GA"
-		}
-	},
-	{
-		"tag": "option",
-		"text": "GUAM",
-		"attrs": {
-			"value": "GU"
 		}
 	},
 	{
@@ -282,13 +261,6 @@ const US_States =
 	},
 	{
 		"tag": "option",
-		"text": "NORTHERN MARIANA ISLANDS",
-		"attrs": {
-			"value": "MP"
-		}
-	},
-	{
-		"tag": "option",
 		"text": "OHIO",
 		"attrs": {
 			"value": "OH"
@@ -442,6 +414,7 @@ const FormStructures = {
 			"for": "id_password",
 			"hidden": "",
 			"disabled": "",
+			"aria-disabled": true,
 		},
 		"classes": "floating-label",
 		"text": "Password"
@@ -571,12 +544,12 @@ const FormStructures = {
 			ErrorContainer,
 			{
 				"tag": "div",
-				"classes": "form-group row",
+				"classes": "form-group row justify-content-center",
 				"elems": [
 					{
 						"tag": "button",
 						"text": "Continue",
-						"classes": "col-12",
+						"classes": "col-10",
 						"attrs": {
 							"type": "submit",
 							"hidden": "",
@@ -2663,15 +2636,17 @@ const FormStructures = {
 				ErrorContainer,
 				{
 					"tag": "div",
-					"classes": "form-group row",
+					"classes": "form-group row justify-content-center",
 					"elems": [
 						{
 							"tag": "button",
 							"text": "Continue",
-							"classes": "col-12",
+							"classes": "col-10",
 							"attrs": {
 								"type": "submit",
 								"hidden": "",
+								"disabled": "",
+								"ariaDisabled": true,
 								"aria-label": "Continue"
 							}
 						}
@@ -2757,7 +2732,7 @@ const FormStructures = {
 						{
 							"tag": "button",
 							"text": "Purchase",
-							"classes": "col-12",
+							"classes": "col-10",
 							"attrs": {
 								"type": "submit",
 								"hidden": "",
@@ -3075,12 +3050,12 @@ const FormStructures = {
 				ErrorContainer,
 				{
 					"tag": "div",
-					"classes": "form-group row",
+					"classes": "form-group row justify-content-center",
 					"elems": [
 						{
 							"tag": "button",
 							"text": "Continue",
-							"classes": "col-12",
+							"classes": "col-10",
 							"attrs": {
 								"type": "submit",
 								"hidden": "",
@@ -3361,12 +3336,12 @@ const FormStructures = {
 				ErrorContainer,
 				{
 					"tag": "div",
-					"classes": "form-group row",
+					"classes": "form-group row justify-content-center",
 					"elems": [
 						{
 							"tag": "button",
 							"text": "Continue",
-							"classes": "col-12",
+							"classes": "col-10",
 							"attrs": {
 								"type": "submit",
 								"hidden": "",

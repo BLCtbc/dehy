@@ -61,6 +61,10 @@ button:hover,
 	opacity: 0.8;
 }
 
+button[type='submit'] {
+	color: black;
+}
+
 .btn:focus {
 	box-shadow: none;
 }
@@ -279,6 +283,7 @@ nav .nav-item:not(:first-child) {
 
 nav#navbar .navbar-toggler-icon {
 	position: relative;
+	color: #212529 !important;
 }
 
 nav#navbar .navbar-toggler-icon i {

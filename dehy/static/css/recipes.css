@@ -4,7 +4,10 @@ header {
 
 
 .recipe-card {
-	padding: 0.5rem 0.75rem;
+	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
+    -webkit-box-shadow: rgb(28 28 28 / 60%) 2px 3px 6px;
+	margin: 0.5rem 0.75rem;
+	padding: 0;
 }
 
 .recipe-info {
@@ -15,8 +18,8 @@ header {
 
 .recipe-card .card-title {
 	font-size: 2rem;
-	font-family: cursive;
-	font-weight: 600;
+	font-variant: all-petite-caps;
+	font-weight: 400;
 }
 
 .recipe-card .directions-list p, .recipe-card .ingredients-list p{

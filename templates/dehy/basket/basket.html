@@ -32,6 +32,8 @@
 {% endblock %}
 
 {% block content %}
+	{% include 'dehy/basket/partials/confirm_item_removal_modal.html' %}
+	
     {# Use a partial template so that AJAX can be used to re-render basket #}
     {% include 'dehy/basket/partials/basket_content.html' %}
 {% endblock content %}

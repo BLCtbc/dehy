@@ -25,4 +25,7 @@ class Recipe(models.Model):
 	def __str__(self):
 		return f"{self.name}, Date created: {self.date_created}, Last edited: {self.last_modified}"
 
-
+# 
+# class RecipeCategory(models.Model):
+# 	name = models.CharField(max_length=100, default="", help_text="Name of the category, eg. whiskey, wine, etc.")
+#
