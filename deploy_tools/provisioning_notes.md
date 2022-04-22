@@ -28,6 +28,7 @@
 10. [integrating stripe with django-oscar](#stripe_integration)
 11. [downloading and installing a package on debian](#debian_package_install)
 12. [setting up email sending and receiving on AWS SES](#aws_ses_integration)
+13. [enabling ftp access](#enable_ftp)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1653,9 +1654,58 @@ sudo ufw allow from 104.14.25.32
 	```
 	CNAME 76you5sp74ywmnfhmt5qenbei6xykhrl._domainkey  76you5sp74ywmnfhmt5qenbei6xykhrl.dkim.amazonses.com
 	```
-	
+
 
 < name="certbot_integration"></a>
 12. ###### installing and setting up certbot (SSL cert)
 
 	follow the instructions here: https://certbot.eff.org/instructions?ws=nginx&os=debianbuster
+
+< name="enable_ftp"></a>
+12. ###### enabling ftp access on aws ec2 instance (debian 10)
+
+	follow the instructions here: https://www.infiflex.com/how-to-configure-ftp-on-an-ec2-instance
+
+	username:password = ftpuser:ftpuser
+
+		```sh
+		sudo apt install vsftpd
+		```
+
+	copy the original file`sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.orig`
+
+
+	add the ftp user`sudo adduser ftpuser`
+
+	change their permissions:
+		```sh
+		sudo chown nobody:nogroup /home/ftpuser/ftp
+		sudo chmod a-w /home/ftpuser/ftp
+		```
+
+	create the directories where files will be uploaded:
+		```sh
+		sudo mkdir /home/ftpuser/ftp/files
+		sudo chown ftpuser:ftpuser /home/ftpuser/ftp/files
+		```
+
+	add or uncomment the following lines:
+		```
+		anonymous_enable=NO
+		# Uncomment this to allow local users to log in.
+		local_enable=YES
+		write_enable=YES
+		chroot_local_user=YES
+		user_sub_token=$USER
+		local_root=/home/$USER/ftp
+
+		pasv_min_port=1024
+		pasv_max_port=1048
+
+		userlist_enable=YES
+		userlist_file=/etc/vsftpd.userlist
+		userlist_deny=NO
+		pasv_address=<Public IP of your instance>
+		```
+
+		restart the service `sudo systemctl restart vsftpd`

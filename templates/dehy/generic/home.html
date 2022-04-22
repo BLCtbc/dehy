@@ -107,10 +107,10 @@
 
 		<div class="col-8 my-5 mx-auto">
 			<div class="text-container frosted-glass">
-				<p>Heyyy brew, something something <span class="text-light">wholesale</span> something <span class="text-light">wholesale</span> </p>
+				<p><span class="text-light">Wholesale</span> account <span class="text-light">creation</span> </p>
 				<p>Interested in creating an account?
 					<br>
-				 <a class="text-light" style="text-decoration: underline" href="{% url 'customer:register' %}">Clicky on this here button</a> now go on 'n git
+				 <a class="text-light" style="text-decoration: underline" href="{% url 'customer:register' %}">Clicky on this here button</a>
 				</p>
 			</div>
 
@@ -118,15 +118,18 @@
 	</section>
 
 	{% block recipe_list %}
-	<section class='content-section mini-recipe-list row' id='mini_recipe_list'>
+	<section class="content-section mini-recipe-section row">
 		<div class="recipe-link-container">
 			<a role='button' class="temp shop-link btn btn-black" href="{% url 'recipes' %}">All Recipes</a>
 		</div>
-		{% for recipe in recipes %}
-		<article class="recipe-card col-6 col-sm-3">
-		{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
-		</article>
-		{% endfor %}
+		<div class="mini-recipe-list" id="mini_recipe_list">
+			{% for recipe in recipes %}
+			<article class="recipe-card">
+			{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
+			</article>
+			{% endfor %}
+		</div>
+
 	</section>
 	{% endblock recipe_list %}
 
@@ -169,9 +172,6 @@
 				{% endif %}
 			{% endfor %}
 		</div>
-
-
-
 	</section>
 
 

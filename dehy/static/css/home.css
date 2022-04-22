@@ -3,6 +3,11 @@
 	padding-top: 0;
 }
 
+.product-figure {
+	margin-top: 0;
+	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
+}
+
 .section-image-container {
 	display: flex;
 	justify-content: center;
@@ -156,13 +161,12 @@ figure {
 	max-height: 600px;
 }
 
-.mini-recipe-list, .mini-shop-section {
+.mini-recipe-section, .mini-shop-section {
 	flex-wrap: nowrap;
 	overflow-x: scroll;
 	padding-top: 3rem;
     background-attachment: scroll;
 	z-index: 1;
-
 }
 
 .mini-shop-section {
@@ -171,13 +175,17 @@ figure {
 	border-bottom: 12px solid white;
 }
 
-.mini-shop {
+.mini-shop, .mini-recipe-list {
     display: grid;
     grid-column-gap: 2vw;
     grid-auto-flow: column;
     grid-template-columns: repeat(auto-fill,minmax(25%, 1fr));
     grid-auto-columns: minmax(25%, 1fr);
     justify-content: flex-start;
+}
+
+.mini-shop {
+	grid-column-gap: 4vw;
 }
 
 header {

@@ -18,8 +18,11 @@
                         <h1>{% block headertext %}{% endblock %}</h1>
                     </div>
                     {% endblock %}
-                    {% include "oscar/partials/alert_messages.html" %}
 
+					{% comment %}
+                    {% include "oscar/partials/alert_messages.html" %}
+					{% endcomment %}
+					
                     {% block content %}{% endblock %}
                 </div>
 
