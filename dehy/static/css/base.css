@@ -916,8 +916,8 @@ input, select, label {
 	    grid-template-columns: repeat(1, minmax(0,1fr));
 	}
 	.mini-shop, .mini-recipe-list {
-		grid-template-columns: repeat(auto-fill,minmax(90%, 1fr)) !important;
-		grid-auto-columns: minmax(90%, 1fr) !important;
+		grid-template-columns: repeat(auto-fill,minmax(70%, 1fr)) !important;
+		grid-auto-columns: minmax(70%, 1fr) !important;
 	}
 }
 

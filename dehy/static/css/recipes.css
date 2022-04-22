@@ -2,6 +2,9 @@ header {
 	padding-top: var(--main-navbar-height);
 }
 
+.recipe-card .card-body {
+	border-radius: 1px;
+}
 
 .recipe-card {
 	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
