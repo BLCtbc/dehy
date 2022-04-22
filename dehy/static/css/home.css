@@ -156,7 +156,7 @@ figure {
 	max-height: 600px;
 }
 
-.mini-recipe-list, .mini-shop-section {
+.mini-recipe-section, .mini-shop-section {
 	flex-wrap: nowrap;
 	overflow-x: scroll;
 	padding-top: 3rem;
@@ -171,7 +171,7 @@ figure {
 	border-bottom: 12px solid white;
 }
 
-.mini-shop {
+.mini-shop, .mini-recipe-list {
     display: grid;
     grid-column-gap: 2vw;
     grid-auto-flow: column;

@@ -44,65 +44,9 @@
 	  				</div>
 	  			</div>
 	  		</div>
-			<div class="col-6 order-last button-container">
+			<div class="col-6 order-last button-container-lg">
 				<button name="add_{{product.pk}}_to_cart" type="submit" class="btn mb-0 add-item-to-cart-btn">{% trans "Add" %}</button>
 			</div>
 
 		</div>
 	</form>
-
-
-	{% comment %}
-	<form id="add_to_basket_form" action="{% url 'basket:add' pk=product.pk  %}"
-		method="post" class="add-to-basket col-12 mb-0 compact" style='width:inherit;'>
-		{% csrf_token %}
-		<div class="row justify-content-center">
-			{% if product.is_parent %}
-			<div class="col-12">
-				<div class="variant-option">
-					<div class="variant-select-container" data-text="Size">
-						<label for="size_selector_{{product.id}}" class="sr-only">{% trans "Size" %}</label>
-						<select required id="size_selector" class="custom-select variant-size-selector" aria-label="Select Size" data-variant-option-name="Size">
-							<option value>Size</option>
-							{% for child in product.children.public %}
-							  {% purchase_info_for_product request child as child_session %}
-							  {% if child_session.availability.is_available_to_buy %}
-							<option data-price="{{child.stockrecords.first.price}}" data-id="{{child.id}}" value="{{ child.get_title }}">{{ child.get_title }}</option>
-							  {% endif %}
-							{% endfor %}
-						  </select>
-					  </div>
-				  </div>
-			  </div>
-
-			  {% endif %}
-			  <div class="col-12">
-				  <div class="row justify-content-center">
-					  <div class="col-5 quantity-container">
-			  			<div class="quantity-select-container row">
-							<div class="plus-minus-container minus-container col-3 p-0">
-								<button aria-controls="#id_quantity" role="button" aria-label="Decrement" class="plus-minus-btn minus-btn" data-product_id="{{product.id}}">
-									<i class="fas fa-minus"></i>
-								</button>
-							</div>
-
-							<label for="quantity" class="sr-only">{% trans "Quantity" %}</label>
-			  				<div class="input-quantity-container px-0 col-6">
-			  					<input class="px-1" required type="number" name="quantity" value="1" id="id_quantity" min="1" max="99" data-product_id="{{product.id}}">
-			  				</div>
-
-			  				<div class="plus-minus-container plus-container col-3 p-0">
-		  						<button aria-controls="#id_quantity" role="button" aria-label="Increment" class="plus-minus-btn plus-btn" data-product_id="{{product.id}}">
-		  							<i class="fas fa-plus"></i>
-		  						</button>
-			  				</div>
-			  			</div>
-			  		</div>
-					<div class="col-6 button-container">
-						<button name="add_{{product.pk}}_to_cart" type="submit" class="btn mb-0 add-item-to-cart-btn">{% trans "Add" %}</button>
-					</div>
-				  </div>
-			  </div>
-		</div>
-	  </form>
-	  {% endcomment %}

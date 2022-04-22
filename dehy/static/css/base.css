@@ -156,8 +156,8 @@ a {
 }
 
 a:hover{
-	color: var(--beige);
-	text-decoration: none;
+	color: inherit;
+	/* text-decoration: none; */
 }
 
 a.navbar-brand {
@@ -549,6 +549,13 @@ footer {
 	position:relative;
 }
 
+nav > ol.breadcrumb {
+	margin-left: -15px;
+	margin-right: -15px;
+	border-radius: 0;
+	background-color: var(--dark-hg);
+}
+
 .breadcrumb {
 	background-color: inherit;
 	font-family:'itc-avant-garde-gothic-pro';
@@ -604,10 +611,8 @@ span.ig{
 
 #nav_primary {
 	/* margin-left: var(--bs-gutter-x,1.5rem); */
-	/* background-color: var(--dark-hg); */
-
-	background-color: var(--beige);
-	padding: 1.5rem 1rem;
+	background-color: var(--dark-hg);
+	padding: 0.75rem 1rem;
 	border-radius: 1px;
 	font-size: 1.3rem;
 	font-weight: 400;
@@ -633,30 +638,12 @@ li.breadcrumb-item {
     font-weight: 200;
 }
 
-
-
 .product_pod {
 	font-family: 'lydiacondensed-bold' !important;
 	height: auto;
 	overflow: visible;
 }
 
-/* .image_container img {
-	max-height: none;
-	height: auto;
-	width: 100% !important;
-} */
-
-/* .img-thumbnail {
-	border: 2px inset rgba(188,162,99,.62);
-	background-color: var(--beige);
-	object-fit: cover;
-	transition: opacity 1s ease,transform 1s ease;
-	transition-property: opacity, transform;
-	transition-duration: 1s, 1s;
-	transition-timing-function: ease, ease;
-	transition-delay: 0s, 0s;
-} */
 
 .product-list {
     display: grid;
@@ -898,7 +885,7 @@ input, select, label {
 	.product-list {
 	    grid-template-columns: repeat(3, minmax(0,1fr));
 	}
-	.mini-shop {
+	.mini-shop, .mini-recipe-list {
 		grid-template-columns: repeat(auto-fill,minmax(35%, 1fr)) !important;
 		grid-auto-columns: minmax(35%, 1fr) !important;
 	}
@@ -909,7 +896,7 @@ input, select, label {
 	.product-list {
 	    grid-template-columns: repeat(2, minmax(0,1fr));
 	}
-	.mini-shop {
+	.mini-shop, .mini-recipe-list {
 		grid-template-columns: repeat(auto-fill,minmax(50%, 1fr)) !important;
 		grid-auto-columns: minmax(50%, 1fr) !important;
 	}
@@ -923,7 +910,7 @@ input, select, label {
 	.product-list {
 	    grid-template-columns: repeat(1, minmax(0,1fr));
 	}
-	.mini-shop {
+	.mini-shop, .mini-recipe-list {
 		grid-template-columns: repeat(auto-fill,minmax(90%, 1fr)) !important;
 		grid-auto-columns: minmax(90%, 1fr) !important;
 	}
