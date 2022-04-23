@@ -12,29 +12,29 @@ from pathlib import Path
 from pygit2 import Repository
 from django.utils.translation import gettext_lazy as _
 
-ENV_FILE = '.env'
-if Repository('.').head.shorthand is 'main':
-	ENV_FILE = '.env-prod'
+
+ENV_FILE = '.env-prod' if Repository('.').head.shorthand == 'main' else '.env'
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
+
+ENV_FILE_LOCATION = BASE_DIR / ENV_FILE
+
+BASE_DIR = BASE_DIR.parent
 
 env = environ.Env(
 	# set casting, default value
 	DEBUG=(bool, False)
 )
-environ.Env.read_env()
 
-# env.read_env(env.str(BASE_DIR, '.env'))
-env.read_env(BASE_DIR / ENV_FILE)
+env.read_env(str(ENV_FILE_LOCATION))
+# env.read_env(BASE_DIR / ENV_FILE)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
@@ -163,6 +163,8 @@ DATABASES = {
 		},
 	}
 }
+
+print('DB_HOST: ', env.str('DB_HOST'))
 
 # if DEBUG:
 #
