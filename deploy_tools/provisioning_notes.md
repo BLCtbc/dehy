@@ -1417,7 +1417,7 @@ implementing a continuous deployment workflow on Debian 10+
 		$ python manage.py thumbnail cleanup && python manage.py thumbnail clear
 
 		```
-	after that, restart the server:
+	after that, restart everything:
 
 		`sudo systemctl daemon-reload && sudo systemctl restart nginx && sudo systemctl restart gunicorn`
 
@@ -1712,3 +1712,8 @@ sudo ufw allow from 104.14.25.32
 		```
 
 		restart the service `sudo systemctl restart vsftpd`
+
+
+issues connecting to RDS instance from EC2 instance (hint: use your private IP address when adding inbound traffic rules to security groups)
+see:
+https://stackoverflow.com/a/40078116/6158303
