@@ -1369,6 +1369,9 @@ Note, any changes made to `settings.py` might require restarting the server in o
 		change the owner:group -> if you aren't sure, check the media file owner first and just use those settings:
 			`sudo chown -R admin:www-data static/`
 
+		also need to change this, else venv will be deleted after each pull:
+			`sudo chown -R admin:www-data venv/`
+
 
 
 
