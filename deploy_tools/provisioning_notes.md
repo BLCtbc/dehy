@@ -1366,7 +1366,7 @@ Note, any changes made to `settings.py` might require restarting the server in o
 	- permission denied error when running `python manage.py collectstatic --noinput --clear`
 
 		go to the directory `cd /path/to/static/folder/`
-		change the owner:group -> is you aren't sure, check the media file owner first and just use those settings:
+		change the owner:group -> if you aren't sure, check the media file owner first and just use those settings:
 			`sudo chown -R admin:www-data static/`
 
 

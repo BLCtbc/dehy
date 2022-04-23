@@ -164,8 +164,6 @@ DATABASES = {
 	}
 }
 
-print('DB_HOST: ', env.str('DB_HOST'))
-
 # if DEBUG:
 #
 # 	INSTALLED_APPS += [
