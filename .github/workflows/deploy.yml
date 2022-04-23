@@ -2,13 +2,9 @@ name: dehy
 
 on:
   push:
-    branches:
-        - staging
-        - main
+    branches: [staging, main]
   pull_request:
-    branches:
-        - staging
-        - main
+    branches: [staging, main]
 
 jobs:
   start:
@@ -17,7 +13,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      with: # with: clean required if using virtual env, otherwise the venv is deleted every time
+      with: # with clean required if using virtual env, otherwise the venv is deleted every time
         clean: false
 
     - name: AWS SSM Send-Command
