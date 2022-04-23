@@ -6,6 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.conf import settings
 from django.urls import reverse_lazy
+from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
 
 from pathlib import Path
 
@@ -35,7 +37,7 @@ class HomeView(TemplateView):
 	def get_context_data(self, *args, **kwargs):
 		data = super().get_context_data(*args, **kwargs)
 		recipes = Recipe.objects.filter(featured=True)
-		products = Product.objects.exclude(product_class__name='Merch', structure='child')
+		products = Product._default_manager.exclude(product_class__name='Merch', structure='child')
 		data.update({'recipes':recipes, 'products':products})
 		return data
 
@@ -58,18 +60,42 @@ class FAQView(ListView, FormView):
 		return context_data
 
 
-	# def post(self, request, *args, **kwargs):
-	# 	form = self.form_class(request.POST)
-	# 	if form.is_valid():
-	# 		pass
+	def post(self, request, *args, **kwargs):
+		current_site = settings.SITE_DOMAIN
+		contact_form = self.form_class(request.POST)
+		if contact_form.is_valid():
+			first_name = contact_form.cleaned_data.get('first_name', None)
+			last_name = contact_form.cleaned_data.get('last_name', None)
+			email = contact_form.cleaned_data.get('email', None)
 
+			subject = contact_form.cleaned_data.get('subject', None)
+			message = contact_form.cleaned_data.get('message', None)
+			recipients = [f'faq+contact@{current_site}']
+			subject = f'[CONTACT FORM] FROM: {email} SUBJECT: {subject}'
+			sent = send_mail(subject, message, settings.OSCAR_FROM_EMAIL, recipients, fail_silently=False)
+			print('emails sent: ', sent)
+			response = redirect(self.success_url)
+			return response
+
+			# some kind of rate limiting here, spam detection, etc. would be good here
 			# email_user = MessageUser.objects.get_or_create()
-			# add some kind of rate limiting here
+
+			# if 'email' in contact_form.cleaned_data:
+				# new_message = contact_form.save(commit=False)
+				# message_user = forms.MessageUserForm(self.cleaned_data['email'])
+
+				# if message_user.is_valid():
+					# message_user.save()
+					# new_message.email = message_user.instance.address
+					# new_message.save()
 
 
-	def form_valid(self, form):
-		form.send_email()
-		return super().form_valid(form)
+
+
+	#
+	# def form_valid(self, form):
+	# 	form.send_email()
+	# 	return super().form_valid(form)
 
 
 @method_decorator(csrf_exempt)

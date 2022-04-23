@@ -10,7 +10,7 @@
         {% block product_image %}
 		{% with images=product.get_all_images|slice:":2" %}
 		<a class="image-link" href="{{ product.get_absolute_url }}" aria-label="{{ product.get_title }} Link">
-			<div class="product-image-container">
+			<div class="image-container">
 				{% for image in images %}
 					{% oscar_thumbnail image.original "x1000" quality=95 crop=center upscale=True as thumb %}
 					{% if image == images|first %}
@@ -23,18 +23,6 @@
 		</a>
 		{% endwith %}
 		{% endblock product_image %}
-
-		{# testing #}
-		{% comment product_image old %}
-		{% block product_image %}
-		<a class="image-link" href="{{ product.get_absolute_url }}" aria-label="{{ product.get_title }} Link">
-			<div class="image-container">
-				<img class="product-img" src="{% static 'img/sphinx_hat/sphinx_hat_front.jpg' %}">
-				<img class="product-img alt-img" src="{% static 'img/sphinx_hat/sphinx_hat_back.jpg' %}">
-			</div>
-		</a>
-		{% endblock product_image %}
-		{% endcomment %}
 
 
 	</figure>
@@ -50,68 +38,13 @@
                 </a>
             </h3>
         {% endblock product_title %}
-		{% block product_price %}
-			<div class="product_price">
 
-				{% include "oscar/catalogue/partials/stock_record.html" %}
-				{% if not product.is_parent and not product.has_options %}
-					{% include "oscar/catalogue/partials/add_to_basket_form_compact.html" %}
-				{% endif %}
+		{% block product_price %}
+			<div class="product_price row justify-content-center">
+				{% include "dehy/shop/partials/stock_record.html" %}
+				{% include "dehy/shop/partials/add_to_basket_form_compact.html" %}
 			</div>
 		{% endblock product_price %}
 	</section>
 
 {% endblock product %}
-
-{% comment old product pod %}
-{% block product %}
-    <article class="product_pod">
-        {% block product_image %}
-            <div class="image_container w-100">
-                {% with image=product.primary_image %}
-                    {% oscar_thumbnail image.original "x600" upscale=False as thumb %}
-                    <a href="{{ product.get_absolute_url }}">
-                        <img src="{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail mx-auto my-0">
-                    </a>
-                {% endwith %}
-            </div>
-        {% endblock %}
-
-        {% block product_review %}
-            {% iffeature "reviews" %}
-                <p class="star-rating {{ product.rating|as_stars }}">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                </p>
-            {% endiffeature %}
-        {% endblock %}
-
-		{% block product_title %}
-            <h3 class="mt-3 product-title">
-                <a href="{{ product.get_absolute_url }}" title="{{ product.get_title }}">
-					{% if product.structure == 'child' %}
-						{{ product.parent.get_title }}
-						<br>
-					{% endif %}
-
-                    {{ product.get_title }}
-
-                </a>
-            </h3>
-        {% endblock %}
-
-        {% block product_price %}
-            <div class="product_price w-100">
-
-                {% include "oscar/catalogue/partials/stock_record.html" %}
-                {% if not product.is_parent and not product.has_options %}
-                    {% include "oscar/catalogue/partials/add_to_basket_form_compact.html" %}
-                {% endif %}
-            </div>
-        {% endblock %}
-    </article>
-{% endblock %}
-{% endcomment %}

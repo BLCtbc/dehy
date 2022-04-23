@@ -46,7 +46,7 @@
 
 {% block content %}
 
-<article class="product_page"><!-- Start of product page -->
+<article class="product_page col-12"><!-- Start of product page -->
 
     <div class="row">
 
@@ -57,7 +57,7 @@
         {% endblock product_gallery %}
 
 		{% block product_main %}
-        <div class="col-sm-6 product_main">
+        <div class="col-sm-6 product_main product_price">
             {% comment %}
                 This is a bit clunky here.  Better to have some kind of JS-driven dashboard menu that
                 pops out when clicked.  A bit like the Django-Debug-Toolbar button
@@ -86,72 +86,7 @@
             {% endiffeature %}
             <hr/>
 
-
-			{# new #}
-
-				<form id="add_to_basket_form" action="{% url 'basket:add' pk=product.pk  %}"
-					method="post" class="add-to-basket col-12 mb-0 px-0" style='width:inherit;'>
-			        {% csrf_token %}
-			        {% include "oscar/partials/form_fields.html" with form=basket_form %}
-					<div class="d-flex">
-						<div class="col-8 pl-0 d-flex flex-column">
-							{% if product.is_parent %}
-							<div class="variant-option">
-								<div class="variant-select-container" data-text="Select Size">
-									<select required id="size_selector" class="custom-select variant-size-selector" aria-label="Select Size" data-variant-option-name="Size">
-								        <option value>Select Size</option>
-										{% for child in product.children.public %}
-										  {% purchase_info_for_product request child as child_session %}
-										  {% if child_session.availability.is_available_to_buy %}
-										<option data-price="{{child.stockrecords.first.price}}" data-id="{{child.id}}" value="{{ child.get_title }}">{{ child.get_title }}</option>
-										  {% endif %}
-										{% endfor %}
-								      </select>
-								  </div>
-							  </div>
-							  {% endif %}
-							  <div class="button-container h-100">
-								  <button name="add_{{product.pk}}_to_cart" type="submit" class="btn btn-lg w-100 h-100 mb-0 add-item-to-cart-btn">{% trans "Add to basket" %}</button>
-							  </div>
-						</div>
-
-						<div class="col-4">
-							<div class="quantity-select-container row">
-								<div class="plus-minus-container col-3 p-0">
-									<button aria-controls="#id_quantity" role="button" aria-label="Decrement" class="plus-minus-btn minus-btn" data-product_id="{{product.id}}">
-										<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
-											<path d="M19.333 11H4.667v2h14.666z"></path>
-										</svg>
-									</button>
-								</div>
-								<div class="input-quantity-container col-4 p-0">
-									<input class="px-1" required type="number" name="quantity" value="1" id="id_quantity" min="1" max="99" data-product_id="{{product.id}}">
-								</div>
-								<div class="plus-minus-container col-3 p-0">
-									<button aria-controls="#id_quantity" role="button" aria-label="Increment" class="plus-minus-btn plus-btn" data-product_id="{{product.id}}">
-										<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
-											<path d="M19.333 11H13V4.665h-2v6.333H4.667v2H11v6.334h2v-6.334h6.333z"></path>
-										</svg>
-									</button>
-								</div>
-
-							</div>
-
-						</div>
-					</div>
-					<div class="d-flex justify-content-between">
-					  </div>
-					  <div class="row mt-4">
-						  <div class="col-2">
-						  </div>
-						  <div class="col-8">
-						  </div>
-						  <div class="col-2">
-						  </div>
-					  </div>
-				  </form>
-
-
+				{% include "dehy/shop/partials/add_to_basket_form.html" %}
         </div><!-- /col-sm-6 -->
         {% endblock product_main %}
 
@@ -167,53 +102,53 @@
     {% endblock %}
 
 	{% if request.user.is_staff %}
-    {% block product_info %}
-    <div class="sub-header">
-        <h2>{% trans "Product Information" %} (Only visible to staff)</h2>
-    </div>
+	    {% block product_info %}
+	    <div class="sub-header">
+	        <h2>{% trans "Product Information" %} (Only visible to staff)</h2>
+	    </div>
 
-    <table class="table table-striped">
-        {% if product.upc %}
-        <tr>
-            <th>{% trans "UPC" %}</th><td>{{ product.upc }}</td>
-        </tr>
-        {% endif %}
-        <tr>
-            <th>{% trans "Product Type" %}</th><td>{{ product.get_product_class.name }}</td>
-        </tr>
+	    <table class="table table-striped">
+	        {% if product.upc %}
+	        <tr>
+	            <th>{% trans "UPC" %}</th><td>{{ product.upc }}</td>
+	        </tr>
+	        {% endif %}
+	        <tr>
+	            <th>{% trans "Product Type" %}</th><td>{{ product.get_product_class.name }}</td>
+	        </tr>
 
-        {% purchase_info_for_product request product as session %}
-        {% if session.price.exists %}
-            <tr>
-                <th>{% trans "Price (excl. tax)" %}</th><td>{{ session.price.excl_tax|currency:session.price.currency }}</td>
-            </tr>
-            {% if session.price.is_tax_known %}
-                <tr>
-                    <th>{% trans "Price (incl. tax)" %}</th><td>{{ session.price.incl_tax|currency:session.price.currency }}</td>
-                </tr>
-                <tr>
-                    <th>{% trans "Tax" %}</th><td>{{ session.price.tax|currency:session.price.currency }}</td>
-                </tr>
-            {% endif %}
-            <tr>
-                <th>{% trans "Availability" %}</th>
-                <td>{{ session.availability.message }}</td>
-            </tr>
-        {% endif %}
-        {% for av in product.get_attribute_values %}
-            <tr>
-                <th>{{ av.attribute.name }}</th>
-                <td>{{ av.value_as_html }}</td>
-            </tr>
-        {% endfor %}
-        {% iffeature "reviews" %}
-            <tr>
-                <th>{% trans "Number of reviews" %}</th>
-                <td>{{ product.num_approved_reviews }}</td>
-            </tr>
-        {% endiffeature %}
-    </table>
-    {% endblock product_info %}
+	        {% purchase_info_for_product request product as session %}
+	        {% if session.price.exists %}
+	            <tr>
+	                <th>{% trans "Price (excl. tax)" %}</th><td>{{ session.price.excl_tax|currency:session.price.currency }}</td>
+	            </tr>
+	            {% if session.price.is_tax_known %}
+	                <tr>
+	                    <th>{% trans "Price (incl. tax)" %}</th><td>{{ session.price.incl_tax|currency:session.price.currency }}</td>
+	                </tr>
+	                <tr>
+	                    <th>{% trans "Tax" %}</th><td>{{ session.price.tax|currency:session.price.currency }}</td>
+	                </tr>
+	            {% endif %}
+	            <tr>
+	                <th>{% trans "Availability" %}</th>
+	                <td>{{ session.availability.message }}</td>
+	            </tr>
+	        {% endif %}
+	        {% for av in product.get_attribute_values %}
+	            <tr>
+	                <th>{{ av.attribute.name }}</th>
+	                <td>{{ av.value_as_html }}</td>
+	            </tr>
+	        {% endfor %}
+	        {% iffeature "reviews" %}
+	            <tr>
+	                <th>{% trans "Number of reviews" %}</th>
+	                <td>{{ product.num_approved_reviews }}</td>
+	            </tr>
+	        {% endiffeature %}
+	    </table>
+	    {% endblock product_info %}
 	{% endif %}
 
     {% iffeature "reviews" %}
@@ -278,7 +213,7 @@
     <!-- Oscar -->
     <script src="{% static "oscar/js/oscar/ui.js" %}"></script>
 	<!-- custom -->
-	<script src="{% static 'js/sticky_nav.js' %}"></script>
+	<script src="{% static 'js/nav.js' %}"></script>
 	<script src="{% static 'js/base.js' %}"></script>
 
 {% endblock %}
@@ -289,4 +224,6 @@
 
 {% block onbodyload %}
     {{ block.super }}
+	dehy.loading_message = '{% trans "Updating cart..." %}';
+
 {% endblock %}

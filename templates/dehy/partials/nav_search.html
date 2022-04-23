@@ -2,82 +2,54 @@
 {% load category_tags %}
 {% load i18n %}
 
-<nav id="nav_primary" class="{% block nav_classes %}navbar navbar-expand-sm{% endblock %}">
-    {% block navbar_toggler %}
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    {% endblock %}
-
-    {% block navbar_basket %}
-        <a class="btn btn-secondary float-right btn-cart ml-auto d-inline-block d-md-none" href="{% url 'basket:summary' %}">
-            <i class="fas fa-shopping-cart"></i>
-            {% trans "Basket" %}
-            {% if not request.basket.is_empty %}
-                {% if request.basket.is_tax_known %}
-                    {% blocktrans with total=request.basket.total_incl_tax|currency:request.basket.currency %}
-                        Total: {{ total }}
-                    {% endblocktrans %}
-                {% else %}
-                    {% blocktrans with total=request.basket.total_excl_tax|currency:request.basket.currency %}
-                        Total: {{ total }}
-                    {% endblocktrans %}
-                {% endif %}
-            {% endif %}
-        </a>
-    {% endblock %}
-
+<nav id="nav_primary">
     {% block navbar_collapse %}
-        <div class="collapse navbar-collapse justify-content-space-around" id="navbarSupportedContent">
-            {% block nav %}
-			<div class="d-flex">
-				<div class="category-selection-label">CATEGORY:</div>
-				<ul class="navbar-nav category-dropdown">
-                    {% block nav_items %}
-                        <li id="shop_dropdown" class="nav-item dropdown">
-							{% comment olddropdown %}
-							<a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {% block browse_store_text %}{% trans "Browse store" %}{% endblock %}
-                            </a>
-							{% endcomment %}
+        <div class="container-fluid">
+			<div class="row">
+		        <ol class="col breadcrumb d-md-inline-flex d-none py-0 mb-0" style="width: fit-content">
+		            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Shop" %}</a></li>
+						{% if category.name %}
+				            {% for category in category.get_ancestors %}
+				            <li class="breadcrumb-item"><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+							{% endfor %}
+							<li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+						{% else %}
+						<li class="breadcrumb-item active" aria-current="page">{{ summary }}</li>
+						{% endif %}
+		        	</ol>
 
-                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								{% if category %}
-								{{ category|upper }}
-								{% else %}
-								{% trans "All products"|upper %}
-								{% endif %}
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-
-                                {% category_tree depth=1 as tree_categories %}
-                                <a class="dropdown-item" href="{% url 'catalogue:index' %}">{% trans "All products"|upper %}</a>
-                                {% if tree_categories %}
-                                    <div class="dropdown-divider"></div>
-                                    {% for tree_category in tree_categories %}
-                                        <a class="dropdown-item" href="{{ tree_category.get_absolute_url }}">{{ tree_category.name|upper }}</a>
-                                    {% endfor %}
-                                {% endif %}
-
-								{% comment offers %}
-                                <div class="dropdown-divider"></div>
-                                {% block nav_dropdown_extra_items %}
-                                    <a class="dropdown-item" href="{% url 'offer:list' %}">{% trans "Offers" %}</a>
-                                {% endblock %}
-								{% endcomment %}
-
-                            </div>
-                        </li>
-                   {% endblock %}
-               </ul>
-			</div>
-
-
-            {% endblock %}
+					<ul class="d-md-none d-inline-flex navbar-nav category-dropdown">
+	                    {% block nav_items %}
+	                        <li id="shop_dropdown" class="nav-item dropdown">
+	                            <a class="nav-link dropdown-toggle" href="" id="categoryDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									{% if category %}
+									{{ category|upper }}
+									{% else %}
+									{% trans "All products"|upper %}
+									{% endif %}
+	                            </a>
+	                            <div class="dropdown-menu" aria-labelledby="categoryDropdown">
+	                                {% category_tree depth=1 as tree_categories %}
+	                                <a class="dropdown-item" href="{% url 'catalogue:index' %}">{% trans "All products"|upper %}</a>
+	                                {% if tree_categories %}
+	                                    <div class="dropdown-divider"></div>
+	                                    {% for tree_category in tree_categories %}
+	                                        <a class="dropdown-item" href="{{ tree_category.get_absolute_url }}">{{ tree_category.name|upper }}</a>
+	                                    {% endfor %}
+	                                {% endif %}
+	                            </div>
+	                        </li>
+	                   {% endblock %}
+	               </ul>
 
             {% block nav_extra %}
-                {% include "oscar/partials/search.html" %}
+				<div class="col d-inline-flex justify-content-end">
+	                {% include "oscar/partials/search.html" %}
+				</div>
             {% endblock %}
-        </div>
+			</div> <!-- row -->
+
+        </div> <!-- container -->
+
     {% endblock %}
 </nav>

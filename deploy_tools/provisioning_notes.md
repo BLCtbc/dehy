@@ -27,6 +27,8 @@
 9. [running local django server over https](#local_django_https)
 10. [integrating stripe with django-oscar](#stripe_integration)
 11. [downloading and installing a package on debian](#debian_package_install)
+12. [setting up email sending and receiving on AWS SES](#aws_ses_integration)
+13. [enabling ftp access](#enable_ftp)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1379,7 +1381,7 @@ implementing a continuous deployment workflow on Debian 10+
 	```
 [installing ssm agent on debian running](https://docs.aws.amazon.com/systems-manager/latest/userguide/agent-install-deb.html)
 
-<a name="runner_config_rest"></a>
+<a name="runner_config_reset"></a>
 6. ###### resetting the self-hosted runner config
 
 	1. follow the steps given here
@@ -1626,3 +1628,84 @@ sudo ufw allow from 104.14.25.32
 	head stripe_1.8.6_linux_x86_64.tar.gz # test contents of file
 	sudo dpkg -i stripe_1.8.6_linux_amd64.deb
 	```
+
+
+<a name="aws_ses_integration"></a>
+11. ###### setting up email sending and receiving on AWS SES (simple email service)
+
+	1. install via pip:
+	```sh
+	pip install 'django-ses[events]' # the quotes were needed on mac, unsure for linux
+	```
+	this guide: https://medium.com/hackernoon/the-easiest-way-to-send-emails-with-django-using-ses-from-aws-62f3d3d33efd
+	this library: https://github.com/django-ses/django-ses
+
+	2. after configuring a domain identity [here](https://us-east-2.console.aws.amazon.com/ses/home?region=us-east-2#/verified-identities), you will be sent to edit your DNS records [here](https://domains.google.com/registrar/dehygarnish.net/dns)
+
+	the instructions given by amazon say to add 3 CNAME DNS records in the following format:
+	type  name													         value
+	```
+	CNAME 76you5sp74ywmnfhmt5qenbei6xykhrl._domainkey.dehygarnish.net     76you5sp74ywmnfhmt5qenbei6xykhrl.dkim.amazonses.com
+	```
+
+	in all 3 of the `name` fields, chop of everything after `._domainkey`, as this is already added automatically by google domains...
+	so your DNS record should look like this:
+	type  name										   value
+	```
+	CNAME 76you5sp74ywmnfhmt5qenbei6xykhrl._domainkey  76you5sp74ywmnfhmt5qenbei6xykhrl.dkim.amazonses.com
+	```
+
+
+< name="certbot_integration"></a>
+12. ###### installing and setting up certbot (SSL cert)
+
+	follow the instructions here: https://certbot.eff.org/instructions?ws=nginx&os=debianbuster
+
+< name="enable_ftp"></a>
+12. ###### enabling ftp access on aws ec2 instance (debian 10)
+
+	follow the instructions here: https://www.infiflex.com/how-to-configure-ftp-on-an-ec2-instance
+
+	username:password = ftpuser:ftpuser
+
+		```sh
+		sudo apt install vsftpd
+		```
+
+	copy the original file`sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.orig`
+
+
+	add the ftp user`sudo adduser ftpuser`
+
+	change their permissions:
+		```sh
+		sudo chown nobody:nogroup /home/ftpuser/ftp
+		sudo chmod a-w /home/ftpuser/ftp
+		```
+
+	create the directories where files will be uploaded:
+		```sh
+		sudo mkdir /home/ftpuser/ftp/files
+		sudo chown ftpuser:ftpuser /home/ftpuser/ftp/files
+		```
+
+	add or uncomment the following lines:
+		```
+		anonymous_enable=NO
+		# Uncomment this to allow local users to log in.
+		local_enable=YES
+		write_enable=YES
+		chroot_local_user=YES
+		user_sub_token=$USER
+		local_root=/home/$USER/ftp
+
+		pasv_min_port=1024
+		pasv_max_port=1048
+
+		userlist_enable=YES
+		userlist_file=/etc/vsftpd.userlist
+		userlist_deny=NO
+		pasv_address=<Public IP of your instance>
+		```
+
+		restart the service `sudo systemctl restart vsftpd`

@@ -54,7 +54,8 @@ class VisionStatement(models.Model):
 
 class Message(models.Model):
 	email = models.ForeignKey('MessageUser', on_delete=models.CASCADE)
-	message = models.TextField(_("Message"), default="", help_text='message')
+	message = models.TextField(_("Message"), default="", help_text=_('Your inquiry'))
+	subject = models.CharField(_('Subject'), blank=True, null=True, help_text=_("What is the nature if your inquiry?"), max_length=50)
 	first_name = models.CharField(_("First Name"), blank=True, null=True, max_length=50)
 	last_name = models.CharField(_("Last Name"), blank=True, null=True, max_length=50)
 	date_created = models.DateField(auto_now_add=True, editable=False)
@@ -69,6 +70,10 @@ class MessageUser(models.Model):
 
 	def __str__(self):
 		return f"{self.email}"
+
+	@property
+	def address(self):
+		return self.email
 
 class AdditionalInfoQuestionnaire(models.Model):
 	BAR_OR_RESTAURANT,HOME,OTHER = 'b_r','h','o'

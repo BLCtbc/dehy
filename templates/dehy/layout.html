@@ -24,46 +24,31 @@
     {% include "dehy/partials/nav.html" %}
 
 	<main class="container-fluid" id="main">
-	{# splash image container #}
-	{% block splash_container %}
-	{% endblock splash_container %}
+		{# splash image container #}
+		{% block splash_container %}
+		{% endblock splash_container %}
 
 
-    {# Site logo/title, mini-basket, browse dropdown and searchbox #}
-	{% block header %}
-	<header class="row header">
-		{% block navigation %}
-		{% include "dehy/partials/nav_search.html" %}
-		{% endblock %}
-	</header>
-	{% endblock header %}
+	    {# Site logo/title, mini-basket, browse dropdown and searchbox #}
+		{% block header %}
+		<header class="row header">
+			{% block navigation %}
+			{% include "dehy/partials/nav_search.html" %}
+			{% endblock %}
+		</header>
+		{% endblock header %}
 
 
 
-    {# Main content of page - other layout templates may override this block #}
-    {% block content_wrapper %}
-            {% block breadcrumbs %}{% endblock %}
-            <div class="content justify-content-center row">
-                {# Div exists for AJAX updates to entire content section #}
-                {% block content %}{% endblock content %}
-            </div>
-    {% endblock content_wrapper %}
-
-	{# old #}
-	{% comment %}
-	{% block content_wrapper %}
-		<div class="container-fluid">
-			<div class="page_inner">
-				{% block breadcrumbs %}{% endblock %}
-				<div class="content">
-					{# Div exists for AJAX updates to entire content section #}
-					<div id="content_inner">{% block content %}{% endblock content %}</div>
-				</div>
-			</div>
-		</div>
-	{% endblock content_wrapper %}
-	{% endcomment %}
-
+	    {# Main content of page - other layout templates may override this block #}
+	    {% block content_wrapper %}
+	            {% block breadcrumbs %}{% endblock %}
+	            <div class="content justify-content-center row">
+	                {# Div exists for AJAX updates to entire content section #}
+	                {% block content %}
+					{% endblock content %}
+	            </div>
+	    {% endblock content_wrapper %}
 	</main>
 
     {% include "dehy/partials/footer.html" %}
@@ -78,7 +63,7 @@
     <!-- Oscar -->
     <script src="{% static "oscar/js/oscar/ui.js" %}"></script>
 	<!-- custom -->
-	<script src="{% static 'js/sticky_nav.js' %}"></script>
+	<script src="{% static 'js/nav.js' %}"></script>
 	<script src="{% static 'js/base.js' %}"></script>
 
 {% endblock %}

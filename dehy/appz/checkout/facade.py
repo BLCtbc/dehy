@@ -3,19 +3,19 @@ from oscar.apps.payment.exceptions import UnableToTakePayment, InvalidGatewayReq
 import stripe, json
 from decimal import Decimal as D
 from oscar.core.loading import get_model
+
 Country = get_model('address', 'Country')
 
 # stripe.api_version = '2020-08-27; orders_beta=v2'
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.pkey = settings.STRIPE_PUBLISHABLE_KEY
-stripe.api_version = '2020-08-27; orders_beta=v2'
+stripe.api_version = '2020-08-27; orders_beta=v3'
 
 class Facade(object):
 
 	def __init__(self):
-		print("\n --- Facade instantiated --- \n")
 		self.stripe = stripe
-
+		self.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET = settings.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
 
 	@staticmethod
 	def get_friendly_decline_message(error):
@@ -161,9 +161,7 @@ class Facade(object):
 	def update_or_create_order(self, basket, shipping_fields={}, shipping_method={}, discounts=[], billing_fields={}, metadata={}, **kwargs):
 
 		order = ''
-		print('shipping_method: ', shipping_method)
 		shipping_cost = self.coerce_shipping_cost_object(shipping_method)
-		print('coerced shipping_cost: ', shipping_cost)
 
 		metadata.update({'basket_id': basket.id})
 		order_details = kwargs

@@ -3,6 +3,11 @@
 	padding-top: 0;
 }
 
+.product-figure {
+	margin-top: 0;
+	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
+}
+
 .section-image-container {
 	display: flex;
 	justify-content: center;
@@ -67,11 +72,15 @@ h2 {
 }
 
 .shop-link, .btn {
-	border: 2px solid var(--beige);
+}
+
+.shop-link {
 	color: var(--beige);
-	line-height: 3rem;
-	font-weight: 800;
 	background-color: transparent;
+	font-weight: 800;
+
+	border: 2px solid var(--beige);
+	line-height: 3rem;
 }
 
 
@@ -101,10 +110,12 @@ figure {
 #mailing_list_email,
 #mailing_list_submit {
 	font-family: monospace;
-	-webkit-box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
-	box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold);
+	-webkit-box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold) !important;
+	box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold) !important;
 	font-size: 1rem;
-	border: 2px solid white;
+	border: 2px solid white !important;
+	border-radius: 1px !important;
+	outline: none !important;
 }
 
 #mailing_list_email {
@@ -113,8 +124,9 @@ figure {
 }
 
 #mailing_list_submit {
-	line-height: 4rem;
-	color: black;
+    line-height: 2rem;
+    color: #0000009e;
+    padding: 1rem 2rem;
 }
 
 .mailing-list {
@@ -149,21 +161,32 @@ figure {
 	max-height: 600px;
 }
 
-.mini-recipe-list, .mini-shop {
+.mini-recipe-section, .mini-shop-section {
 	flex-wrap: nowrap;
 	overflow-x: scroll;
 	padding-top: 3rem;
     background-attachment: scroll;
 	z-index: 1;
-
 }
 
-.mini-shop {
+.mini-shop-section {
 	background: #fffbf4 url(/static/img/textures/diamond_pattern-3.svg) repeat;
 	border-color: transparent !important;
 	border-bottom: 12px solid white;
 }
 
+.mini-shop, .mini-recipe-list {
+    display: grid;
+    grid-column-gap: 2vw;
+    grid-auto-flow: column;
+    grid-template-columns: repeat(auto-fill,minmax(25%, 1fr));
+    grid-auto-columns: minmax(25%, 1fr);
+    justify-content: flex-start;
+}
+
+.mini-shop {
+	grid-column-gap: 4vw;
+}
 
 header {
 	padding-top: 0 !important;
@@ -174,7 +197,7 @@ header {
 }
 .card-body .product-price {
 	position: absolute;
-b	ottom: 1rem;
+	bottom: 1rem;
 }
 
 .recipe-preview .card-title {
@@ -189,16 +212,36 @@ b	ottom: 1rem;
 	border-color: inherit;
 }
 
+#wholesale > .image-container {
+	padding-bottom: 30%;
+	border-left: 0;
+	border-right: 0;
+}
+
 #wholesale {
-	background-image: url(/static/img/custom/dehy_jars1_filter.jpeg);
-    background-size: cover;
-    background-position: 50% 50%;
+	background-size: cover;
+	padding: 10% 0;
+	background-position: 50% 80%;
+}
+
+#wholesale .text-container {
+	backdrop-filter: blur(5px) hue-rotate(8deg);
+	border-radius: 8px;
+	background-color: rgb(255 255 255 / 10%);
+	box-shadow: 0 1px 12px rgb(0 0 0 / 10%);
+	border: 1px solid rgb(255 255 255 / 5%);
+	padding: 20px 40px;
 }
 
 .recipe-link-container, .shop-link-container {
 	position: sticky;
 	top: 0;
 	left: 0;
+}
+
+.shop-link-container {
+	width: 0;
+	left: 10px;
 }
 
 .recipe-link-container > a,
@@ -215,4 +258,36 @@ b	ottom: 1rem;
 .shop-link-container > a:hover {
 	background-color: var(--dark-hg);
 	color: white;
+}
+.product-card {
+	text-align: center;
+}
+
+.quantity-container {
+	padding-left: 15px;
+}
+.button-container {
+	padding: 0
+}
+
+@media (max-width: 992px) {
+	h1 {
+		font-size: calc(2.5*1rem)
+	}
+	h2 {
+		font-size: 2.5rem;
+	}
+	header .col-10 {
+		padding-top: var(--main-navbar-height);
+	}
+}
+
+input#id_quantity,
+.variant-select-container:before {
+	color: var(--hunter-green);
+}
+
+.plus-minus-btn,
+span.variant_price {
+	color: rgba(0, 136, 0, 1);
 }

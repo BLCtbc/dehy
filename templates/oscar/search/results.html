@@ -1,4 +1,4 @@
-{% extends "oscar/layout_2_col.html" %}
+{% extends "dehy/layout_2_col.html" %}
 
 {% load currency_filters %}
 {% load product_tags %}
@@ -78,16 +78,16 @@
     </form>
 
     {% if page.object_list %}
-        <section>
-            <div>
-                <ol class="row list-unstyled ml-0 pl-0">
-                    {% for result in page.object_list %}
-                        <li class="col-sm-4 col-md-3 col-lg-3">{% render_product result.object %}</li>
-                    {% endfor %}
-                </ol>
-                {% include "oscar/partials/pagination.html" with page_obj=page %}
-            </div>
-        </section>
+		<div class="product-list-container">
+			<div class="product-list" id="product_list">
+				{% for result in page.object_list %}
+					<div class="product">{% render_product result.object %}</div>
+				{% endfor %}
+			</div>
+		</div>
+
+		{% include "oscar/partials/pagination.html" with page_obj=page %}
+
     {% endif %}
 
 {% endblock %}

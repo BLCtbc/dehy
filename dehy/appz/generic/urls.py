@@ -14,6 +14,5 @@ urlpatterns = [
 	path('shipping/location/', ajax_get_shipping_methods, name='get_shipping_methods'),
 	path('shipping/set_method/', ajax_set_shipping_method, name='set_shipping_method'),
 	path('webhooks/order_submitted/', webhook_submit_order, name='webhook_submit_order'),
-
 ]
 

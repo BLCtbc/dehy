@@ -12,19 +12,13 @@
 {% block headertext %}{{ summary }}{% endblock %}
 
 {% block breadcrumbs %}
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Shop" %}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ summary }}</li>
-        </ol>
-    </nav>
 {% endblock breadcrumbs %}
 
 {% block column_left %}
     {% category_tree as tree_categories %}
     {% if tree_categories %}
-        <h4>{% trans "Show results for" %}</h4>
-        <div class="side_categories card">
+        <h3 style="font-variant: all-petite-caps; font-size: 2.5rem">{% trans "Filter Products" %}</h3>
+        <div class="side_categories">
             <ul class="product-category-list">
                 {% for tree_category in tree_categories %}
                     <li class="mt-2 category-item">

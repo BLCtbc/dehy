@@ -37,8 +37,7 @@ SECRET_KEY = env.str('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS')
-
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 INTERNAL_IPS = [
 	"127.0.0.1"
 ]
@@ -59,7 +58,6 @@ INSTALLED_APPS = [
 	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
 	# oscar overrides
 	'dehy.appz.address.apps.AddressConfig',
-	'dehy.appz.catalogue.apps.CatalogueConfig',
 	'dehy.appz.dashboard.apps.DashboardConfig',
 	'dehy.appz.dashboard.catalogue.apps.CatalogueDashboardConfig',
 	'dehy.appz.basket.apps.BasketConfig',
@@ -92,6 +90,7 @@ INSTALLED_APPS = [
 	'oscar.apps.dashboard.vouchers.apps.VouchersDashboardConfig',
 	'oscar.apps.dashboard.communications.apps.CommunicationsDashboardConfig',
 	'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
+	'dehy.appz.catalogue.apps.CatalogueConfig',
 	# 3rd-party apps that oscar depends on
 	'widget_tweaks',
 	'haystack',
@@ -100,6 +99,7 @@ INSTALLED_APPS = [
 	'django_tables2',
 	# other 3rd-party apps
 	'django_better_admin_arrayfield',
+	'django_ses',
 ]
 
 
@@ -162,39 +162,28 @@ DATABASES = {
 			'NAME': 'test_db',
 		},
 	}
-	# read os.environ['DATABASE_URL'] and raises
-	# ImproperlyConfigured exception if not found
-	#
-	# The db() method is an alias for db_url().
-	# 'default': env.db(),
-	#
-	# read os.environ['SQLITE_URL']
-	# 'extra': env.db_url(
-	#     'SQLITE_URL',
-	#     default='sqlite:////tmp/my-tmp-sqlite.db'
-	# )
 }
 
-if DEBUG:
-
-	INSTALLED_APPS += [
-		'sslserver',
-		'debug_toolbar'
-	]
-
-	MIDDLEWARE += [
-		"debug_toolbar.middleware.DebugToolbarMiddleware",
-	]
-	DEBUG_TOOLBAR_CONFIG = {
-    	'SHOW_TEMPLATE_CONTEXT': True,
-	}
-
-	# CACHES = {
-	#     'default': {
-	#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-	#    }
-	# }
-	# MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
+# if DEBUG:
+#
+# 	INSTALLED_APPS += [
+# 		'sslserver',
+# 		'debug_toolbar'
+# 	]
+#
+# 	MIDDLEWARE += [
+# 		"debug_toolbar.middleware.DebugToolbarMiddleware",
+# 	]
+# 	DEBUG_TOOLBAR_CONFIG = {
+#     	'SHOW_TEMPLATE_CONTEXT': True,
+# 	}
+#
+# 	# CACHES = {
+# 	#     'default': {
+# 	#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+# 	#    }
+# 	# }
+# 	# MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -213,31 +202,42 @@ AUTH_PASSWORD_VALIDATORS = [
 	},
 ]
 
-# LOGGING = {
-# 	'version': 1,
-# 	'disable_existing_loggers': False,
-# 	'handlers': {
-# 		'file': {
-# 			'level': 'WARNING',
-# 			'class': 'logging.FileHandler',
-# 			'filename': '/var/log/django.log',
-# 		},
-# 	},
-# 	'loggers': {
-# 		'django': {
-# 			'handlers': ['file'],
-# 			'level': 'WARNING',
-# 			'propagate': True,
-# 		},
-# 		'django.request': {
-# 			'handlers': ['file'],
-# 			'level': 'WARNING',
-# 			'propagate': True,
-# 		}
-# 	},
-# }
+if not DEBUG:
+
+	LOGGING = {
+		'version': 1,
+		'disable_existing_loggers': False,
+		'handlers': {
+			'file': {
+				'level': 'DEBUG',
+				'class': 'logging.FileHandler',
+				'filename': 'django.log',
+			},
+		},
+		'loggers': {
+			'django': {
+				'handlers': ['file'],
+				'level': 'DEBUG',
+				'propagate': True,
+			},
+			'django.request': {
+				'handlers': ['file'],
+				'level': 'DEBUG',
+				'propagate': True,
+			}
+		},
+	}
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
+SITE_DOMAIN = 'dehygarnish.net'
+EMAIL_BACKEND = 'django_ses.SESBackend'
+AWS_SES_REGION_NAME = 'us-east-2'
+AWS_SES_REGION_ENDPOINT = 'email.us-east-2.amazonaws.com'
+AWS_SES_ACCESS_KEY_ID = env.str('AWS_SES_ACCESS_KEY_ID')
+AWS_SES_SECRET_ACCESS_KEY = env.str('AWS_SES_SECRET_ACCESS_KEY')
+OSCAR_FROM_EMAIL = f'mail@{SITE_DOMAIN}'
+OSCAR_GOOGLE_ANALYTICS_ID = 'G-W6L54G8SQ1'
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'America/Chicago'
@@ -276,13 +276,18 @@ OSCAR_ALLOW_ANON_CHECKOUT = True
 OSCAR_INITIAL_ORDER_STATUS = 'Pending'
 OSCAR_INITIAL_LINE_STATUS = 'Pending'
 OSCAR_ORDER_STATUS_PIPELINE = {
-	'Pending': ('Being processed', 'Cancelled',),
-	'Being processed': ('Processed', 'Cancelled',),
+	'Pending': ('Processed', 'Cancelled',),
+	'Processed': ('Shipped', 'Cancelled',),
+	'Shipped': ('Delivered', 'Cancelled',),
+	'Delivered': (),
 	'Cancelled': (),
 }
 
 OSCAR_ORDER_STATUS_CASCADE = {
-	'Being processed': 'In progress'
+	'Processed': 'In progress',
+	'Shipped': 'Shipped',
+	'Delivered': 'Delivered',
+	'Cancelled': 'Cancelled'
 }
 
 OSCAR_DEFAULT_CURRENCY = 'USD'
@@ -324,6 +329,7 @@ OSCAR_IMAGE_FOLDER = 'images/products'
 STRIPE_SECRET_KEY = env.str('STRIPE_API_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_API_PUBLISHABLE_KEY')
 STRIPE_CURRENCY = "USD"
+STRIPE_ORDER_SUBMITTED_SIGNING_SECRET = env.str('STRIPE_ORDER_SUBMITTED_SIGNING_SECRET')
 SHIPSTATION_API_KEY = env.str('DEHY_SHIPSTATION_API_KEY')
 SHIPSTATION_SECRET_KEY = env.str('DEHY_SHIPSTATION_SECRET_KEY')
 HOME_POSTCODE = "78701"

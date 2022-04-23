@@ -21,7 +21,7 @@
 	<div class="row">
 
 	{% for recipe in recipes %}
-		<article class="recipe-card col-4">
+		<article class="recipe-card col-12 col-md-6 col-lg-4">
 			{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
 		</article>
 	{% endfor %}

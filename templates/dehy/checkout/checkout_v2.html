@@ -15,7 +15,7 @@
 {% block content %}
 
 	{% include 'dehy/basket/partials/confirm_item_removal_modal.html' %}
-	
+
 	{% block checkout_flow %}
 	<div class="col-12 col-sm-6 col-lg-4 checkout-flow" id="checkout_flow" >
 
@@ -32,6 +32,8 @@
 			</div>
 
 			{% block user_info %}
+
+			{% include 'dehy/checkout/partials/user_info_form.html' with form=user_info_form %}
 			{% endblock user_info %}
 		</section>
 
@@ -104,7 +106,9 @@
 {% block onbodyload %}
     {{ block.super }}
     oscar.checkout.gateway.init();
-	dehy.ch.gateway.init();
+
+	//dehy.ch.gateway.init();
+	dehy.ch.forms.init();
 
 	var currencySymbol = '{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}';
 	currencySymbol = currencySymbol.slice(0, 1);

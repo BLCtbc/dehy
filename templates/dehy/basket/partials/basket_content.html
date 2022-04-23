@@ -66,7 +66,7 @@
 								{% endcomment %}
 
 							{% else %}
-							<div class="col-3 pr-0">
+							<div class="col-3 px-0">
 								<div class="image-container">
 									{% oscar_thumbnail image.original "100x" upscale=False as thumb %}
 									<img class="" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
@@ -80,7 +80,7 @@
 
                                 <h3><a href="{{ product.get_absolute_url }}">{{ product.parent.title|default:product.title }}</a></h3>
 								{% else %}
-								<div class="col-6">
+								<div class="col-6 pr-0">
 								<h4>{{ product.parent.title|default:product.title }}</h4>
 								{% endif %}
 
@@ -113,10 +113,12 @@
 								</p>
 								<div class="checkout-quantity text-right">
 									<div class="input-group justify-content-end{% if form.errors %} error{% endif %}">
-										<span class="input-group-text">Qty</span>
+										<label for="{{form.quantity.id_for_label}}" class="input-group-text">Qty</label>
 										{% render_field form.quantity pattern="[0-9]*" type="text" class+="product-quantity" %}
 									</div>
-									<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
+									<p class="remove-container">
+										<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
+									</p>
 								</div>
                             </div>
 							{% endif %}

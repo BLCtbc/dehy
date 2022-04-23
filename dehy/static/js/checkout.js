@@ -50,7 +50,7 @@ dehy.ch = {
 			var form = dehy.ch.forms.get_or_create('user_info', FormStructures['user_info']);
 			document.querySelector('section#user_info').append(form);
 			dehy.ch.forms.init();
-			dehy.ch.forms.reverse_form_labels(form);
+			// dehy.ch.forms.reverse_form_labels(form);
 		}
 	},
 	shipping: {
@@ -88,7 +88,6 @@ dehy.ch = {
 					data[k] = val;
 				}
 			};
-			console.log('get_shipping_methods: ', data);
 			$.ajax({
 				method: "POST",
 				url: '/shipping/location/',
@@ -96,7 +95,6 @@ dehy.ch = {
 				// contentType: false,
 				// processData: false,
 				success: function(data) {
-					console.log('get_shipping_methods data: ', data);
 					dehy.ch.forms.errors.hide();
 					if (data.order_client_secret) {
 						dehy.ch.stripe.order_client_secret = data.order_client_secret;
@@ -238,29 +236,7 @@ dehy.ch.stripe = {
 		var elements = dehy.ch.stripe.elements.get();
 	},
 	order_placed_success(response, textStatus=null, xhr=null) {
-		console.log('order_placed_success() response: ', response);
 		window.location.href = response.redirect;
-	},
-	payment_intent_created(response, textStatus=null, xhr=null) {
-		console.log('payment_intent_created()');
-
-		// save and remove the billing address form
-		dehy.ch.forms.save_and_remove();
-
-		// add billing sections preview elems
-		// dehy.ch.forms.create_preview('billing');
-		// enable the billing section's edit button
-		dehy.ch.forms.enable_edit_buttons('place_order');
-		var form = dehy.ch.forms.get_or_create('place_order', FormStructures['place_order']);
-		// add the stripe.confirmCardPayment event to the form
-
-		// paint the order confirmation form onto the page
-		var section = document.querySelector("#place_order");
-		section.append(form);
-
-		dehy.utils.cleanup_temp_containers();
-		// show the order confirmation button
-		dehy.ch.forms.show_submit_button();
 	},
 	payment_intent_client_secret: null,
 	order_client_secret: null,
@@ -294,9 +270,46 @@ dehy.ch.stripe = {
 	},
 	payment_element_setup(client_secret, data){
 
-		const appearance = {
+		const old_appearance = {
 			theme: 'night',
 			labels: 'floating'
+		};
+		var gold_color = '#bca263',
+			dark_hg = '#1c3627';
+
+		const appearance = {
+			variables: {
+				colorPrimaryText: gold_color,
+			    colorPrimary: '#bca263',
+			    colorBackground: '#e7f0fe',
+			    colorText: '#495057',
+			    colorDanger: '#df1b41',
+			    fontFamily: 'Ideal Sans, system-ui, sans-serif',
+			    spacingUnit: '2px',
+			    borderRadius: '5px',
+				colorTextPlaceholder: '#495057bf',
+				spacingGridColumn: '1rem'
+			    // See all possible variables below
+			},
+			rules: {
+				'.Input': {
+        			border: `1px solid ${dark_hg}`,
+					outline: `2px solid ${gold_color}`,
+					outlineOffset: '1px',
+					lineHeight: '1.5rem',
+					padding: '0.375rem 0.75rem',
+					marginBottom: '0.25rem',
+
+      			},
+				'.Input:focus': {
+					outline: `2px solid ${gold_color}`,
+					boxShadow: 'none'
+				},
+				'.Label': {
+					color: gold_color,
+					lineHeight: 1.5
+				}
+			}
 		};
 
 		var options = {
@@ -401,166 +414,34 @@ dehy.ch.stripe = {
 		//
 		// 	// Handle result.error or result.paymentIntent
 		// })
+		payment_element.on('ready', e=>{
+			setTimeout(function() {
+				payment_element.focus();
+			}, 250);
+		});
 
-		// old
-		// form.addEventListener('submit', async (e) => {
-		// 	e.preventDefault();
-		// 	var form_data = new FormData(form);
-		//
-		// 	// if it hasn't changed, skip submitting the billing info to the server
-		// 	// if (!dehy.ch.forms.has_changed(form, 'billing')) {
-		// 	// 	dehy.ch.forms.success_handler({'section': 'billing'});
-		// 	// 	return false
-		// 	// }
-		//
-		// 	dehy.ch.stripe.submit_billing_info(form_data, ).then((data) =>{
-		// 		dehy.ch.forms.success_handler({'section': 'billing'});
-		// 		// hide stripe element
-		// 		// create preview for billing form
-		// 		// create place_order form
-		// 		// add form to page
-		// 		// add event handler that processes order to the form
-		// 		var address = {
-		// 			line1: form_data.get('line1'),
-		// 			line2: form_data.get('line2'),
-		// 			city: form_data.get('line4'),
-		// 			state: form_data.get('state'),
-		// 			country: form_data.get('country'),
-		// 			postal_code: form_data.get('postcode'),
-		// 		};
-		// 		var billing_details = {
-		// 			name: `${form_data.get('first_name')} ${form_data.get('last_name')}`,
-		// 			email: dehy.ch.forms.saved_form_data.user_info.username,
-		// 			phone: form_data.get('phone_number'),
-		// 			address: address
-		// 		};
-		//
-		// 		var place_order_form = document.querySelector('#place_order_form') || dehy.ch.forms.get();
-		// 		place_order_form.removeEventListener('submit', dehy.ch.forms.submit_handler);
-		// 		place_order_form.addEventListener('submit', async (e) => {
-		// 			dehy.utils.freeze_forms();
-		//
-		// 			e.preventDefault()
-		// 			stripe.processOrder({
-		// 				elements,
-		// 				confirmParams: {
-		// 				// Return URL where the customer should be redirected after the Order's payment is confirmed.
-		// 					return_url: new URL('checkout/thank_you/', window.location.origin).toString(),
-		// 					payment_method_data: {
-		// 						billing_details: billing_details,
-		// 					},
-		// 				},
-		// 			})
-		// 			.then(function(result) {
-		// 				console.log('stripe.processOrder result: ', result);
-		// 				if (result.error) {
-		// 				// Inform the customer that there was an error.
-		// 				dehy.ch.forms.errors.display(result.error);
-		// 				} else {
-		// 					// success, do stuff
-		// 				}
-		// 			})
-		// 			.catch(()=>{
-		// 				dehy.ch.forms.errors.display(data);
-		// 			})
-		// 			.finally(()=> {
-		// 				dehy.utils.unfreeze_forms();
-		// 			})
-		// 		})
-		//
-		// 	}, dehy.ch.forms.errors.display);
-		// });
-		payment_element.on('change', function(e) {
+		payment_element.on('change', e=>{
 			if (e.error) {
 				dehy.ch.forms.errors.display(e.error);
 			} else {
+				var submit_button = form.querySelector("button[type='submit']");
 				dehy.ch.forms.errors.hide(form);
+				if (e.complete) {
+					// enable the submit button
+					submit_button.disabled = false;
+				} else {
+					// disable the submit button
+					submit_button.disabled = true;
+				}
 			}
 		});
+
+		payment_element.on('blur', e=>{
+
+		});
+
 		form.prepend(stripe_payment_container)
 		dehy.utils.unfreeze_forms();
-	},
-	card_setup(style=null) {
-		console.log('called card setup');
-		// dehy.utils.remove_event_listeners(form);
-		var cardClasses = {
-			focus: 'focused',
-			empty: 'empty',
-			invalid: 'invalid',
-		};
-		var style = style || {
-			base: {
-				color: "#32325d",
-				fontFamily: 'Consolas, Menlo, monospace',
-				fontSmoothing: "antialiased",
-				fontSize: "16px",
-				"::placeholder": {
-					color: "#aab7c4"
-				},
-				'::placeholder': {
-					color: '#CFD7DF',
-				},
-				':-webkit-autofill': {
-					color: '#e39f48',
-				},
-		},
-		invalid: {
-			color: "#fa755a",
-			iconColor: "#fa755a"
-			},
-		};
-
-		var inputs = document.querySelectorAll('input');
-		var options = {style: style, classes: cardClasses, hidePostalCode:true};
-
-		var form = dehy.ch.forms.get(),
-			stripe = dehy.ch.stripe.get();
-
-		var elements = stripe.elements();
-
-		var stripe_payment_container = document.getElementById("stripe_payment_container") || dehy.utils.create_element({tag:'div', classes: 'form-group row', attrs:{'id':'stripe_payment_container'}});
-		var form_container = form.querySelector('.form-container');
-		form.prepend(stripe_payment_container)
-		// form.insertBefore(stripe_payment_container, form_container);
-
-		var cardElement = (elements.getElement('card')) ? elements.getElement('card') : elements.create('card', options);
-		cardElement.mount(stripe_payment_container)
-		cardElement.on('change', function(event) {
-			var displayError = document.getElementById('error_container');
-			if (event.error) {
-				displayError.classList.toggle('hide', false);
-				displayError.textContent = event.error.message;
-			} else {
-				displayError.classList.toggle('hide', true);
-				displayError.textContent = '';
-			}
-		});
-
-		form.removeEventListener('submit', dehy.ch.forms.submit_handler);
-		//
-		form.addEventListener('submit', e=> {
-			// We don't want to let default form submission happen here,
-			// which would refresh the page.
-			e.preventDefault();
-
-			var form_data = new FormData(form);
-			dehy.ch.forms.saved_form_data.billing = dehy.ch.forms.get_form_data_as_object(form);
-
-			$.ajax({
-				method: "POST",
-				url: "/checkout/billing/",
-				contentType: false,
-				processData: false,
-				data: form_data,
-				success: dehy.ch.stripe.payment_intent_created,
-				error: dehy.ch.forms.error,
-			});
-		});
-
-		var myPostalCodeField = document.querySelector('input[name="postcode"]');
-		myPostalCodeField.addEventListener('change', function(event) {
-			cardElement.update({value: {postalCode: event.target.value}});
-		});
 	},
 	set(pkey=null) {
 		if (pkey) {
@@ -586,7 +467,8 @@ dehy.ch.stripe = {
 			var form = stripe_payment_container.closest('form');
 			stripe_payment_container.classList.toggle('display-none', false);
 			form.classList.toggle('display-none', false);
-
+			var payment_element = dehy.ch.stripe.elements.getElement('payment');
+			payment_element.focus();
 		} else {// attempts to set the pkey and add the stripe elements to the page
 			dehy.utils.freeze_forms();
 
@@ -675,7 +557,6 @@ dehy.ch.forms = {
 			changed = true;
 		}
 		// if its the same, skip the ajax call and move to the next section
-		console.log('has_changed: ', changed);
 
 		return changed
 
@@ -700,6 +581,7 @@ dehy.ch.forms = {
 
 	},
 	submit_handler(e) {
+		dehy.ch.forms.save_all();
 		var form = e.target.closest('form');
 		var section_name = form.closest('section').id
 		// var form = e.target();
@@ -710,6 +592,7 @@ dehy.ch.forms = {
 		} else {
 			dehy.ch.forms.errors.hide();
 		}
+
 
 		if (dehy.ch.forms.has_changed(section_name, form)) {
 			dehy.ch.forms.submit_form_info(e.target);
@@ -760,15 +643,15 @@ dehy.ch.forms = {
 			processData: false,
 			data: form_data,
 			success: dehy.ch.forms.success_handler,
-			error: dehy.ch.forms.error,
+			error: dehy.ch.forms.errors.display,
 		});
 	},
 	success_handler(response, textStatus=null, xhr=null) {
-		console.log('success response: ', response);
 
 		if (response.order_client_secret) {
 			dehy.ch.stripe.order_client_secret = response.order_client_secret;
 		}
+
 		var form = dehy.ch.forms.get();
 		dehy.ch.forms.save_submitted_form_data(form, response.section);
 		dehy.ch.forms.save_form_data(form, response.section);
@@ -779,7 +662,7 @@ dehy.ch.forms = {
 			stripe_payment_container.classList.toggle('display-none', true);
 			stripe_payment_container.closest('form').classList.toggle('display-none', true);
 		}
-		dehy.ch.forms.save_and_remove(); //1
+		dehy.ch.forms.remove_all(); //1
 		var next_section = dehy.ch.utils.get_next_section(response.section);
 		// var form = dehy.ch.forms.get_or_create(next_section.id, FormStructures[next_section.id]); //2
 		var form = dehy.ch.forms.get_or_create(next_section.id, FormStructures[next_section.id]); //2
@@ -788,13 +671,10 @@ dehy.ch.forms = {
 		dehy.ch.utils.deactivate_sections()
 		next_section.classList.toggle('active', true);
 		dehy.ch.forms.disable_edit_buttons(); //4
-		// if (response.preview_elems) {
-		// 	dehy.ch.forms.create_preview(response.section, response.preview_elems); //5
-		// }
 		dehy.ch.forms.create_preview(response.section);
 		dehy.ch.forms.enable_edit_buttons(next_section.id); //6
 		dehy.ch.forms.init();
-		dehy.ch.forms.reverse_form_labels(form);
+		// dehy.ch.forms.reverse_form_labels(form);
 
 		if (next_section.id=="billing") {
 			var checked = true;
@@ -808,16 +688,15 @@ dehy.ch.forms = {
 				var form_container = next_section.removeChild(next_section.querySelector('.form-container'));
 				form_elem.insertBefore(form_container, error_button_container);
 				form_elem.classList.toggle('display-none', false);
-
 				checked = form_elem.querySelector('#id_same_as_shipping').checked
+
 			}
-			console.log('repaint');
 
 			dehy.ch.shipping.billing_same_as_shipping_handler(checked);
 			dehy.ch.stripe.init(response.stripe_pkey, response.client_secret, response);
 		}
 
-		dehy.utils.unfreeze_forms();
+		//dehy.utils.unfreeze_forms();
 	},
 	// Attempts to get a previously saved form, or create one if it doesn't exist
 	// If a form isnt saved under the section name, creates a new one from given form structure (required)
@@ -831,12 +710,7 @@ dehy.ch.forms = {
 		}
 		return form;
 	},
-
-	save(form, section) {
-		dehy.ch.forms.saved[section] = form;
-	},
-	//removing the form ensures no left over event handlers are attached
-	save_and_remove() {
+	save_all() {
 		var all_checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
 		all_checkout_sections.forEach(function(section) {
 			if (section.querySelector('form')) {
@@ -846,13 +720,35 @@ dehy.ch.forms = {
 					if (form.querySelector('.form-container')) {
 						form_container = form.querySelector('.form-container');
 						var form_copy = form_container.cloneNode(true);
-						dehy.ch.forms.save(form_copy, section.id);
+						dehy.ch.forms.saved[section.id] = form_copy;
+					}
+				} else {
+					var form_copy = form.cloneNode(true);
+					dehy.ch.forms.saved[section.id] = form_copy;
+				}
+
+			}
+		});
+	},
+	save(form, section) {
+		dehy.ch.forms.saved[section] = form;
+	},
+	//removing the form ensures no left over event handlers are attached
+	remove_all() {
+		var all_checkout_sections = Array.from(document.querySelectorAll('#checkout_flow section'));
+		all_checkout_sections.forEach(function(section) {
+			if (section.querySelector('form')) {
+				var form = section.querySelector('form');
+				if (section.id=="billing") {
+					// need to leave the stripe form on the page
+					if (form.querySelector('.form-container')) {
+						form_container = form.querySelector('.form-container');
+						var form_copy = form_container.cloneNode(true);
 						form_container.remove();
 						form.classList.toggle('display-none', true);
 					}
 				} else {
 					var form_copy = form.cloneNode(true);
-					dehy.ch.forms.save(form_copy, section.id);
 					form.remove();
 				}
 
@@ -874,7 +770,8 @@ dehy.ch.forms = {
 						preview_container.remove();
 					}
 
-					dehy.ch.forms.save_and_remove(); //1
+					dehy.ch.forms.save_all(); //1
+					dehy.ch.forms.remove_all(); //1
 					var form = dehy.ch.forms.get_or_create(section.id, FormStructures[section.id]); //2
 
 					if (section.id=='billing') {
@@ -908,6 +805,7 @@ dehy.ch.forms = {
 					var submit_btn = form.querySelector("button[type='submit']");
 
 					if (submit_btn) {
+						console.log('submit_btn: ', submit_btn);
 						submit_btn.disabled = false;
 					}
 
@@ -920,8 +818,8 @@ dehy.ch.forms = {
 						dehy.ch.forms.init();
 					}
 
-					dehy.ch.forms.reverse_form_labels(form);
-					dehy.utils.unfreeze_forms();
+					// dehy.ch.forms.reverse_form_labels(form);
+					// dehy.utils.unfreeze_forms();
 				});
 			}
 		})
@@ -946,7 +844,6 @@ dehy.ch.forms = {
 
 		var form_data_obj = dehy.ch.forms.get_saved_form_data(section);
 
-		console.log('form_data_obj: ', form_data_obj);
 		for (let [key, val] of Object.entries(form_data_obj)) {
 			var elem = preview_container.querySelector(`span[data-preview=${key}]`);
 			if (elem) {
@@ -978,10 +875,35 @@ dehy.ch.forms = {
 		});
 	},
 	errors: {
-		display(error) {
-			var error_message = error.statusText || error.message || error.text
+		display(response) {
+			var error_text = (response.responseJSON) ? response.responseJSON.errors : response.text || response.message;
 
-			console.log('error: ', error);
+			if (response.responseJSON && response.responseJSON.errors) {
+				error_text = "";
+				if (typeof(response.responseJSON.errors)!='object') {
+					response.responseJSON.errors = JSON.parse(response.responseJSON.errors);
+				}
+				for (let[k, val] of Object.entries(response.responseJSON.errors)) {
+
+					if (val) {
+						if (Array.isArray(val)) {
+							if (typeof(val[0])=='object') {
+								error_text += val[0].message
+							} else {
+								error_text += val.join(" ")
+							}
+
+						}
+					}
+				};
+
+			}
+
+			console.log('response: ', response);
+			console.log('error_text: ', error_text)
+			var error_message = `${response.statusText} (${response.status}): ${error_text}`
+
+			console.log('error_message: ', error_message);
 			var form = dehy.ch.forms.get();
 			var error_container = form.querySelector('#error_container');
 			error_container.classList.toggle('hidden', false);
@@ -1043,7 +965,7 @@ dehy.ch.forms = {
 				if (section_name == 'shipping' || section_name == 'billing') {
 					if (e.target.hasAttribute('name') && e.target.name=='method_code') {
 						dehy.ch.shipping.update_shipping_method(e.target);
-						return false
+						return
 					}
 					var postcode_input = e.target.closest('form').querySelector('#id_postcode');
 					if (e.target.matches('#id_country')) {
@@ -1069,12 +991,12 @@ dehy.ch.forms = {
 						if (e.target.matches('#id_postcode')) {
 							if (!e.target.checkValidity()) {
 								// e.target.reportValidity();
-								return false;
+								return
 							}
 						}
 						if (!postcode_input.checkValidity()) {
 							postcode_input.classList.toggle('invalid', true);
-							return false
+							return
 						}
 						// get/update the shipping methods
 						if (section_name == 'shipping') {
@@ -1082,10 +1004,8 @@ dehy.ch.forms = {
 							dehy.ch.shipping.get_shipping_methods(data);
 							console.log('getting shipping methods');
 							dehy.ch.forms.show_submit_button();
-							return false
-
+							return
 						}
-
 					}
 				}
 				if (e.target.matches("input#id_same_as_shipping")) {

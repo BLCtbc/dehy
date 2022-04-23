@@ -52,7 +52,11 @@
                         <h1>{% block headertext %}{% endblock %}</h1>
                     </div>
                 {% endblock %}
+
+				{% comment %}
                 {% include "oscar/partials/alert_messages.html" %}
+				{% endcomment %}
+
                 {% block subnavigation %}{% endblock %}
                 <div class="content">
                     {% block subheader %}{% endblock subheader %}
