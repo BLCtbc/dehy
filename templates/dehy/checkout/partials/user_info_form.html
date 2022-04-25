@@ -1,6 +1,25 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
+{% if request.user.is_authenticated %}
+<div class="preview_container">
+	<div class="row">
+		<div class="col-10">
+			<span>{% trans "Signed in as" %}:</span>
+			<a href="{% url 'customer:summary' %}" target="_blank"><span data-preview="username">{{request.user.email}}</span></a>
+		</div>
+		<a id="logout" href="{% url 'customer:logout' %}?next={% url 'checkout:index' %}">{% trans "Logout" %}</a>
+	</div>
+	<div class="error-container button-container">
+		<div class="form-group row hidden" id="error_container">
+			<span class="col-12 errors"></span>
+		</div>
+		<div class="form-group row justify-content-center">
+			<button class="col-10" type="submit" aria-label="Continue">{% trans "Continue" %}</button>
+		</div>
+	</div>
+</div>
+{% else %}
 <form id="user_info_form" method="post" class="checkout-form" action="{% url 'checkout:checkout' %}">
 	{% csrf_token %}
 	{{ form.non_field_errors }}
@@ -11,14 +30,9 @@
 				<label class="col-form-label required" for="{{form.username.id_for_label}}">{{form.username.label}}</label>
 				{% render_field form.username class+="form-control" %}
 
-				<p class="helptext mt-1">{{ form.username.help_text }} Already have an account? <a class="underline" type="button" role="button" id="signin_button" href="{% url 'customer:login' %}" target="_blank">Sign in</a></p>
+				<p class="helptext mt-1">{{ form.username.help_text }} Already have an account? <a class="underline" type="button" role="button" id="signin_button" href="{% url 'customer:login' %}?next={% url 'checkout:index' %}">Sign in</a></p>
 
 			</div>
-		{# testing what this does #}
-
-		{% comment %}
-		{% include "oscar/partials/form_field.html" with field=form.username %}
-		{% endcomment %}
 
 		</div>
 
@@ -67,3 +81,4 @@
 		</div>
 	</div>
 </form>
+{% endif %}

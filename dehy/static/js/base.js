@@ -47,6 +47,7 @@ var dehy = {
 				dehy.handlers.shop.variant_size_selection_handler();
 				dehy.handlers.shop.plus_minus_button_handler();
 				dehy.handlers.shop.show_active_input_handler();
+				dehy.handlers.shop.toggle_mini_basket();
 			},
 			add_item_to_cart_handler() {
 				var forms = document.querySelectorAll('form.add-to-basket');
@@ -142,6 +143,9 @@ var dehy = {
 
 				input.value = (n < 0) ? Math.max(v, input.min) : Math.min(v, input.max);
 
+				const change = new Event('change');
+				input.dispatchEvent(change);
+
 				// input.value = (n < 0) ? Math.max((input.value - n), input.min) : Math.min((input.value + n), input.max);
 			},
 			plus_minus_button_handler() {
@@ -157,6 +161,42 @@ var dehy = {
 					});
 				})
 			},
+			toggle_mini_basket() {
+				var cart_icon = document.getElementById("cart_icon");
+				if (cart_icon) {
+
+					var close_button = document.getElementById("close_mini_basket"),
+						mini_basket = document.getElementById("mini_basket_container"),
+						body = document.body;
+
+					document.addEventListener("keydown", e=>{
+						console.log('keydown: ', e)
+						if (e.which===27) {
+							document.body.classList.toggle("modal-open", false);
+							if (mini_basket) {
+								mini_basket.classList.toggle("display-none", true);
+							}
+						}
+					});
+
+					if (close_button && mini_basket) {
+
+						close_button.addEventListener("click", e=>{
+							mini_basket.classList.toggle("display-none", true);
+							document.body.classList.toggle("modal-open", false);
+						});
+
+						cart_icon.addEventListener("click", e=>{
+							mini_basket.classList.toggle("display-none");
+							document.body.classList.toggle("modal-open");
+						});
+					}
+
+
+
+
+				}
+			}
 		},
 	},
 	ajax: {

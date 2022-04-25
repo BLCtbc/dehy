@@ -141,9 +141,6 @@ class BasketView(CoreBasketView):
 		data = {}
 		response = super().post(request, *args, **kwargs)
 
-		print('basket shipping address set: ', self.checkout_session.is_shipping_address_set())
-		print('basket shipping method set: ', self.checkout_session.is_shipping_method_set(request.basket))
-
 		num_items = request.basket.num_items
 		data['object_list'] = {}
 
@@ -157,7 +154,6 @@ class BasketView(CoreBasketView):
 
 		shipping_addr = request.POST.get('shipping_addr', None)
 		shipping_addr = json.loads(shipping_addr) if shipping_addr else self.checkout_session.get_shipping_address()
-		print('\n BasketView shipping_addr: ', shipping_addr)
 
 		if self.checkout_session.is_shipping_address_set() and self.checkout_session.is_shipping_method_set(request.basket):
 
@@ -171,8 +167,6 @@ class BasketView(CoreBasketView):
 				if 'Referer' in self.request.headers.keys() and 'checkout' in self.request.headers['Referer']:
 					order = Facade.update_or_create_order(request.basket, shipping_fields=shipping_addr, shipping_method=shipping_method)
 					data['total_tax'] = D(order.total_details.amount_tax/100).quantize(TWO_PLACES)
-					print('type(total_tax): ', type(data['total_tax']))
-					print('type(order_total): ', type(data['order_total']))
 
 					data['order_total'] += (D(data['shipping_charge']).quantize(TWO_PLACES) + data['total_tax'])
 					# data['order_total'] = str(data['order_total'])

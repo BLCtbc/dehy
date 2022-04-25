@@ -14,16 +14,6 @@ dehy.basket = {
 		if (basket_formset) {
 
 			basket_formset.querySelectorAll('.product-quantity').forEach(function(elem) {
-				if (!window.location.pathname.includes("checkout")) {
-					dehy.basket.utils.set_product_quantity_width(elem);
-				}
-				elem.addEventListener('change', dehy.basket.update_product_quantity_handler);
-			});
-
-			basket_formset.querySelectorAll('.product-quantity').forEach(function(elem) {
-				if (!window.location.pathname.includes("checkout")) {
-					dehy.basket.utils.set_product_quantity_width(elem);
-				}
 
 				elem.addEventListener('change', (e)=> {
 					dehy.basket.update_product_quantity_handler(e)
@@ -46,20 +36,23 @@ dehy.basket = {
 			basket_formset.querySelectorAll('.remove-basket-item').forEach(function(elem) {
 				elem.addEventListener('click', (e) => {
 					dehy.basket.update_product_quantity_handler(e, 0)
-					.then(dehy.basket.update_product_quantity, dehy.basket.basket_updated_handlers.error)
-					.then((data)=> {
-						e.target.closest('.basket-items').remove()
-						dehy.basket.basket_updated_handlers.success(data);
-						if (data.hasOwnProperty('shipping_methods') && window.location.pathname.includes("checkout")) {
-							// update shipping methods
-							dehy.ch.shipping.update_shipping_methods(data);
-						}
-					}, (data)=> {dehy.basket.basket_updated_handlers.error(data) })
-					.catch(dehy.basket.basket_updated_handlers.error)
-				})
+					.then((input)=>{
+						const change = new Event('change');
+						input.dispatchEvent(change);
+						return input
+					}, ()=>{throw false})
+					.then((input)=>{
+						input.closest('.basket-items').remove();
+					})
+					.catch(err=>{
+						console.log('err: ', err);
+					});
+
+				});
 			});
+
 		} else {
-			console.log('no basket form found');
+			// console.log('no basket form found');
 		}
 
 	},
@@ -102,18 +95,20 @@ dehy.basket = {
 			});
 		});
 	},
+	// new
 	update_product_quantity_handler(e, n=null) {
 		const modal = new Promise((resolve, reject) => {
+
 			if (n != null) {
+
 				var name = `form-${e.target.dataset.id}-quantity`;
 				var input = document.querySelector(`input[name='${name}']`);
-				input.value = 0;
 				$('#confirm_item_removal').modal('show');
 				$('#confirm_remove_btn').click(function(){
-					resolve(e)
+					input.value = 0;
+					resolve(input)
 				});
 				$('#cancel_remove_btn').click(function(){
-					console.log("reject: user clicked cancel");
 					reject("user clicked cancel");
 				});
 			} else {
@@ -123,6 +118,7 @@ dehy.basket = {
 		})
 		return modal
 	},
+
 	basket_updated_handlers: {
 		success(response, xhr, status) {
 			console.log('response: ', response)
@@ -162,7 +158,6 @@ dehy.basket = {
 				for (let [k,v] of Object.entries(response.object_list)) {
 					var basket_item_element = document.querySelector(`.basket-items[data-product-id='${k}']`);
 					var quantity_container = basket_item_element.querySelector('.product-quantity');
-					dehy.basket.utils.set_product_quantity_width(quantity_container);
 					basket_item_element.querySelector('.price-text').textContent = `${dehy.basket.currency_symbol}${v.price}`;
 				}
 			}

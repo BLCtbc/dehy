@@ -39,7 +39,7 @@
 	display: flex;
 }
 
-h2 {
+.content-section h2 {
 	font-family: 'freefrm';
 	font-size: 5rem;
 }
@@ -176,6 +176,7 @@ figure {
 }
 
 .mini-shop, .mini-recipe-list {
+	margin-bottom: 10px;
     display: grid;
     grid-column-gap: 2vw;
     grid-auto-flow: column;
@@ -287,7 +288,7 @@ input#id_quantity,
 	color: var(--hunter-green);
 }
 
-.plus-minus-btn,
+.mini-shop .plus-minus-btn,
 span.variant_price {
 	color: rgba(0, 136, 0, 1);
 }

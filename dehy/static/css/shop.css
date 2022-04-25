@@ -233,7 +233,9 @@ input#id_quantity {
 }
 
 
-input[name='quantity']:focus {
+input[name='quantity']:focus,
+input.quantity:focus
+ {
 	outline: none
 }
 
@@ -268,6 +270,7 @@ input[name='quantity']:focus {
     border: 2px solid;
     justify-content: space-around;
 	border-radius: 5px;
+	line-height: 1rem;
 }
 
 .compact .variant-select-container[data-text] {
@@ -300,8 +303,16 @@ input[name='quantity']:focus {
 	opacity: 1 !important;
 }
 
+#product_gallery .carousel-inner > .carousel-item {
+    height: 100%;
+    vertical-align: middle;
+    text-align: center;
+}
+
 #product_gallery .carousel-inner > .carousel-item > img {
     width: 100%;
+	max-height: unset;
+
 }
 
 .img-thumbnail {
@@ -320,6 +331,7 @@ input[name='quantity']:focus {
 	background-color: #f8f9fa;
 	border-color: transparent;
 	opacity: 1;
+	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
 }
 
 .carousel-scroll-right:hover {
@@ -370,3 +382,4 @@ input[name='quantity']:focus {
 #confirm_item_removal .modal-title {
 	font-variant: all-petite-caps;
 }
+
