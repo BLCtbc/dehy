@@ -47,6 +47,7 @@ CheckoutSessionData = get_class('checkout.utils', 'CheckoutSessionData')
 OrderDispatcher = get_class('order.utils', 'OrderDispatcher')
 AdditionalInfoQuestionnaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionnaire')
 UnableToPlaceOrder = get_class('order.exceptions', 'UnableToPlaceOrder')
+BasketVoucherForm = get_class('basket.forms', 'BasketVoucherForm')
 
 SourceType = get_model('payment', 'SourceType')
 Source = get_model('payment', 'Source')
@@ -134,7 +135,6 @@ def webhook_submit_order(request):
 		print('Event type {}'.format(event['type']))
 
 		order = event['data']['object']
-		print('order: ', order)
 		basket = get_object_or_404(Basket, id=order.metadata.get('basket_id'))
 		order = Facade.stripe.Order.retrieve(order.id, expand=['customer', 'payment.payment_intent', 'line_items'])
 		place_order_view.handle_place_order_submission(basket, order)
@@ -251,7 +251,6 @@ def ajax_get_shipping_methods(request):
 
 	# try:
 	post_data = request.POST.copy()
-	print('post_data: ', post_data)
 
 	if post_data.get('postcode', None):
 		city_and_state_data = get_city_and_state(request.POST.get('postcode'))
@@ -315,6 +314,13 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 	def get_context_data(self, *args, **kwargs):
 		context_data = super().get_context_data(*args, **kwargs)
+		context_data.update({
+			'form': self.form_class(), 'user_info_form': self.form_class(),
+			'is_shipping_address_set': self.checkout_session.is_shipping_address_set(),
+			'is_shipping_method_set':self.checkout_session.is_shipping_method_set(self.request.basket),
+			'voucher_form':BasketVoucherForm()
+		})
+
 		return context_data
 
 	def get(self, request, *args, **kwargs):
@@ -322,16 +328,14 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		response = super().get(request, *args, **kwargs)
 		self.checkout_session.reset_shipping_data()
 
-		basket_view = BasketView.as_view()(request)
+		if request.user.is_authenticated:
+
+			print('dir(request.user): ', dir(request.user))
+
+		# basket_view = BasketView.as_view()(request)
 
 		order = Facade.update_or_create_order(request.basket)
 
-		response.context_data.update({
-			'form': self.form_class(), 'user_info_form': self.form_class(),
-			'basket_summary_context_data': basket_view.context_data,
-			'is_shipping_address_set': self.checkout_session.is_shipping_address_set(),
-			'is_shipping_method_set':self.checkout_session.is_shipping_method_set(request.basket)
-		})
 		return response
 
 	def post(self, request, *args, **kwargs):

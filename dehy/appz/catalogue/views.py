@@ -5,8 +5,13 @@ from oscar.apps.catalogue.views import CatalogueView as BrowseView
 from dehy.appz.catalogue.models import Category, Product
 from django.shortcuts import get_object_or_404, redirect
 from django.core.paginator import InvalidPage
-from oscar.core.loading import get_class
+from oscar.core.loading import get_class, get_model
 from django.utils.translation import gettext_lazy as _
+from django.forms import modelformset_factory
+
+BaseBasketLineFormSet = get_class('basket.formsets', 'BaseBasketLineFormSet')
+BasketLineFormSet = get_class('basket.formsets', 'BasketLineFormSet')
+BasketLineForm = get_class('basket.forms', 'BasketLineForm')
 
 get_product_search_handler_class = get_class('catalogue.search_handlers', 'get_product_search_handler_class')
 
@@ -35,10 +40,22 @@ class CatalogueView(BrowseView):
 		return get_product_search_handler_class()(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
+
+
 		context_data = super().get_context_data(**kwargs)
 		context_data['summary'] = _("All products")
 		search_context = self.search_handler.get_search_context_data(
 			self.context_object_name)
+
+		print('dir(self.request): ', dir(self.request))
+		print('self.request.basket.strategy: ', self.request.basket.strategy)
+		formset = BaseBasketLineFormSet(self.request.basket.strategy)
+
+		# old
+		# context_data['formset'] = BasketLineFormSet(get_model('basket', 'line'), BasketLineForm, formset)
+
+		# kwargs.update({'strategy':self.request.basket.strategy})
+		# context_data['formset'] = BasketLineFormSet(queryset=self.request.basket.all_lines(), strategy=self.request.basket.strategy)
 
 		context_data.update(search_context)
 

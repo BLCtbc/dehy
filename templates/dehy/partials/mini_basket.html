@@ -1,0 +1,31 @@
+{% load currency_filters %}
+{% load i18n %}
+
+<div class="display-none" id="mini_basket_container">
+
+	<div id="mini_basket" class="basket-mini col-12 col-md-10 col-lg-5">
+		<div class="row justify-content-end">
+			<button id="close_mini_basket" style="padding: 10px;" type="button" class="btn-close float-right" aria-label="{% trans 'Close mini basket' %}"></button>
+		</div>
+
+		{% include "dehy/basket/partials/basket_content.html" %}
+		<div class="col-12">
+			<small><span style="font-style:italic; font-size: 12px;">{% trans "Taxes and shipping calculated at checkout" %}</span></small>
+		</div>
+		<div class="col-12 d-inline-flex justify-content-between mb-2">
+			<div class="d-inline-block">
+				<a class="btn btn-small" href="{% url 'basket:summary' %}">{% trans "Cart" %}</a>
+
+			</div>
+			<div class="d-inline-block">
+				<a class="btn btn-small d-inline-block " href="{% url 'checkout:index' %}">{% trans "Checkout" %}</a>
+			</div>
+		</div>
+
+
+		<div class="row justify-content-between">
+
+		</div>
+
+	</div>
+</div>

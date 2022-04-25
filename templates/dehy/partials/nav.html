@@ -2,7 +2,6 @@
 {% load currency_filters %}
 {% load static %}
 
-{# new #}
 <nav id="navbar" class="fixed-top scroll-hide scrolled-up scrolled-top navbar-expand-lg">
 	<div class="container-fluid">
 		<div class="row">
@@ -56,7 +55,7 @@
 				    </a>
 				</div>
 				<div class="cart-container mx-1" data-controller="Cart">
-			        <a aria-label="{{request.basket.num_items}} items in cart" data-test="continue-to-cart" class="icon icon-cart" href="{% url 'basket:summary' %}">
+			        <a id="cart_icon" aria-label="{{request.basket.num_items}} items in cart" role="button" data-test="continue-to-cart" class="icon icon-cart">
 			          <span class="svg-container">
 			            <svg viewBox="0 0 31 24" class="icon icon-cart">
 						  <g class="svg-icon cart-icon">
@@ -100,3 +99,9 @@
 		</div>
 	</div> <!-- container-fluid -->
 </nav>
+
+{% if 'basket' in request.resolver_match.app_names %}
+{% else %}
+{% include 'dehy/partials/mini_basket.html' with formset=basket_formset %}
+{% endif %}
+

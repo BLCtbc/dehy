@@ -15,7 +15,6 @@ from django.utils.translation import gettext_lazy as _
 
 ENV_FILE = '.env-prod' if Repository('.').head.shorthand == 'main' else '.env'
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -131,6 +130,8 @@ TEMPLATES = [
 				'django.contrib.auth.context_processors.auth',
 				'django.contrib.messages.context_processors.messages',
 				'dehy.context_processors.add_ig_images_to_context',
+				'dehy.context_processors.basket_contents',
+				'dehy.context_processors.order_total',
 				'oscar.apps.search.context_processors.search_form',
 				'oscar.apps.checkout.context_processors.checkout',
 				'oscar.apps.communication.notifications.context_processors.notifications',
@@ -177,13 +178,13 @@ DATABASES = {
 # 	DEBUG_TOOLBAR_CONFIG = {
 #     	'SHOW_TEMPLATE_CONTEXT': True,
 # 	}
-#
-# 	# CACHES = {
-# 	#     'default': {
-# 	#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-# 	#    }
-# 	# }
-# 	# MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
+
+	# CACHES = {
+	#     'default': {
+	#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+	#    }
+	# }
+	# MIDDLEWARE += ['dehy.middleware.DisableBrowserCacheMiddleware']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -245,6 +246,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+LOGOUT_REDIRECT_URL = reverse_lazy('customer:login')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
