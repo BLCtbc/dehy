@@ -72,15 +72,15 @@
 }
 
 .shop-link, .btn {
+	padding: 0.375rem 3rem
 }
 
 .shop-link {
 	color: var(--beige);
 	background-color: transparent;
 	font-weight: 800;
-
 	border: 2px solid var(--beige);
-	line-height: 3rem;
+	line-height: 2rem;
 }
 
 

@@ -11,8 +11,8 @@ class EmailAuthenticationForm(BaseEmailAuthenticationForm):
 
 class EmailUserCreationForm(BaseEmailUserCreationForm):
 
-	first_name = forms.CharField(label=_('First Name'), required=False)
-	last_name = forms.CharField(label=_('Last Name'), required=False)
+	first_name = forms.CharField(label=_('First Name'), required=True)
+	last_name = forms.CharField(label=_('Last Name'), required=True)
 	email = forms.EmailField(label=_('Email'))
 	field_order = ['first_name', 'last_name', 'email', 'password1', 'password2']
 

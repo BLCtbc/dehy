@@ -3,4 +3,7 @@
 
 {% block tabcontent %}
     {% include 'oscar/partials/form.html' with form_id="profile_form" %}
+	<a id="logout" href="{% url 'customer:logout' %}" class="btn btn-lg btn-primary">{% trans 'Logout' %}</a>
 {% endblock tabcontent %}
+
+

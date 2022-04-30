@@ -2,11 +2,26 @@
 {% load display_tags %}
 
 <li class="nav-item">
-    <a href="{% url 'customer:profile-view' %}" class="nav-link account-tab{% if active_tab == 'profile' %} active{% endif %}">
+    <a href="{% url 'customer:profile-update' %}" class="nav-link account-tab{% if active_tab == 'profile-update' %} active{% endif %}">
 		<span class="fa-icon"><i class="far fa-user"></i></span>
 		<span>{% trans "Profile" %}</span>
 	</a>
 </li>
+
+<li class="nav-item">
+    <a href="{% url 'customer:profile-view' %}" class="nav-link account-tab{% if active_tab == 'profile' %} active{% endif %}">
+		<span class="fa-icon"><i class="fas fa-cog"></i></span>
+		<span>{% trans "Account" %}</span>
+	</a>
+</li>
+
+<li class="nav-item">
+    <a href="{% url 'customer:billing-info' %}" class="nav-link account-tab{% if active_tab == 'billing-info' %} active{% endif %}">
+		<span class="fa-icon"><i class="fas fa-credit-card"></i></span>
+		<span>{% trans "Billing" %}</span>
+	</a>
+</li>
+
 <li class="nav-item">
     <a href="{% url 'customer:order-list' %}" class="nav-link account-tab{% if active_tab == 'orders' %} active{% endif %}">
 		<span class="fa-icon"><i class="far fa-rectangle-list"></i></span>

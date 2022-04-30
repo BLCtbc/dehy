@@ -15,4 +15,4 @@ def order_total(request):
 
 
 def basket_contents(request):
-	return {'basket_formset':BasketLineFormSet(queryset=request.basket.all_lines(), strategy=request.basket.strategy), }
+	return {'basket_formset':BasketLineFormSet(queryset=request.basket.all_lines(), strategy=request.basket.strategy)}
