@@ -14,8 +14,6 @@
 
 {% block content %}
 
-	{% include 'dehy/basket/partials/confirm_item_removal_modal.html' %}
-
 	{% block checkout_flow %}
 	<div class="col-12 col-sm-6 col-lg-4 checkout-flow" id="checkout_flow" >
 
@@ -27,7 +25,7 @@
 
 		<section id="user_info" class="card card-body mb-lg-4 mb-sm-2 col-12 customer-info">
 			<div class="section-header">
-				<h2>{% trans "1. Your Email" %}</h2>
+				<h2>{% trans "1. Contact information" %}</h2>
 				<button class="edit" disabled hidden aria-label="Edit Customer Information"><span>Edit</span></button>
 			</div>
 
@@ -83,7 +81,7 @@
 	{% block order_contents %}
 	<div class="col-12 col-sm-6 col-lg-4 order-contents">
 		<div class="card card-body">
-		{% include 'dehy/basket/partials/basket_content.html' with shipping_charge=basket_summary_context_data.shipping_charge is_shipping_method_set=is_shipping_method_set is_shipping_address_set=is_shipping_address_set formset=basket_summary_context_data.formset order_total=basket_summary_context_data.order_total object_list=basket_summary_context_data.object_list basket_warnings=basket_summary_context_data.basket_warnings voucher_form=basket_summary_context_data.voucher_form %}
+		{% include 'dehy/basket/partials/basket_content.html' with shipping_charge=basket_summary_context_data.shipping_charge is_shipping_method_set=is_shipping_method_set is_shipping_address_set=is_shipping_address_set formset=basket_formset order_total=order_total %}
 		</div>
 	</div>
 	{% endblock order_contents %}
@@ -97,7 +95,6 @@
 
 <script src="{% static "js/checkout.js" %}"></script>
 <script src="{% static "js/form_structures.js" %}"></script>
-<script src="{% static "js/basket.js" %}"></script>
 <!-- <script>
 	const stripe = Stripe("{{stripe_data.publishable_key}}");
 </script> -->
@@ -109,9 +106,5 @@
 
 	//dehy.ch.gateway.init();
 	dehy.ch.forms.init();
-
-	var currencySymbol = '{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}';
-	currencySymbol = currencySymbol.slice(0, 1);
-	dehy.basket.init(currencySymbol);
 
 {% endblock %}

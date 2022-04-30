@@ -81,7 +81,6 @@ class Facade(object):
 		try:
 			created = False
 
-
 			if checkout_session.is_stripe_customer_id_set():
 				customer = self.stripe.Customer.retrieve(
 					id=checkout_session.get_stripe_customer_id(),

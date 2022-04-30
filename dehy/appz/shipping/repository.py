@@ -1,6 +1,6 @@
 from oscar.apps.shipping import repository
 from dehy.appz.shipping import methods as _shipping_methods
-from dehy.appz.shipping.methods import BaseFedex
+from dehy.appz.shipping.methods import BaseFedex, FreeShipping
 from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 
 import base64, json, requests
@@ -16,11 +16,13 @@ logger = logging.getLogger(__name__)
 
 class Repository(repository.Repository):
 
+	def get_free_shipping(self):
+		return FreeShipping()
+
 	def get_available_shipping_methods(self, basket, user=None, shipping_addr=None, request=None, **kwargs):
-		methods = [_shipping_methods.FreeShipping()]
+		methods = [FreeShipping()]
 		status_code = 200
 		# print('repository: get_available_shipping_methods \n ')
-		print('shipping_addr: ', shipping_addr)
 		if shipping_addr and shipping_addr.country.code in ['US', 'CA', 'MX']:
 
 			weight = basket.total_weight
@@ -29,7 +31,7 @@ class Repository(repository.Repository):
 			###############################################################################
 			## will need to implement some sort of API here to properly configure which  ##
 			## shipping methods are available to a user based on their geo location      ##
-		 	###############################################################################
+			###############################################################################
 			return methods,status_code
 
 		return methods
@@ -37,55 +39,57 @@ class Repository(repository.Repository):
 	def fedex_get_rates_and_transit_times(self, basket, weight, shipping_addr):
 		methods = []
 		street_lines = [x for x in [shipping_addr.line1, shipping_addr.line2, shipping_addr.line3] if x]
-		payload={
-		  "accountNumber": {
-		    "value": settings.FEDEX_ACCOUNT_NUMBER
-		  },
-		  "carrierCodes": ["FDXE", "FDXG"],
-		  "rateRequestControlParameters": {
-		  	"returnTransitTimes": True,
-			"rateSortOrder": "COMMITASCENDING"
-		  },
-		  "requestedShipment": {
-		    "shipper": {
-		      "address": {
-				"streetLines": [
-					"512 Rio Grande St"
-				],
-				"city":"Austin",
-				"stateOrProvinceCode":"TX",
-		        "postalCode": int(settings.HOME_POSTCODE),
-		        "countryCode": "US"
-		      }
-		    },
-			"recipient": {
-			  "address": {
-			  "streetLines": street_lines,
-				"postalCode": shipping_addr.postcode,
-				"city": shipping_addr.line4,
-				"stateOrProvinceCode":shipping_addr.state,
-				"countryCode": shipping_addr.country.code
-			  }
+		to_address = {
+			"streetLines": street_lines,
+			"postalCode": shipping_addr.postcode,
+			"city": shipping_addr.line4,
+			"stateOrProvinceCode":shipping_addr.state,
+			"countryCode": shipping_addr.country.code
+		}
+
+		payload = {
+			"accountNumber": {
+				"value":settings.FEDEX_ACCOUNT_NUMBER
 			},
-		    "pickupType": "DROPOFF_AT_FEDEX_LOCATION",
-		    "rateRequestType": [
-		      "LIST",
-		    ],
-		    "requestedPackageLineItems": [
-		      {
-		        "weight": {
-		          "units": "LB",
-		          "value": weight
-		        }
-		      }
-		    ]
-		  }
+			"carrierCodes": ["FDXE", "FDXG"],
+			"rateRequestControlParameters": {
+				"returnTransitTimes": True,
+				"rateSortOrder": "COMMITASCENDING"
+			},
+			"requestedShipment": {
+				"shipper": {
+					"address": {
+						"streetLines": [
+							"512 Rio Grande St"
+						],
+						"city":"Austin",
+						"stateOrProvinceCode":"TX",
+						"postalCode": int(settings.HOME_POSTCODE),
+						"countryCode": "US"
+					}
+				},
+				"recipient": {
+					"address": to_address
+				},
+				"pickupType": "DROPOFF_AT_FEDEX_LOCATION",
+				"rateRequestType": [
+					"LIST",
+				],
+				"requestedPackageLineItems": [
+					{
+					"weight": {
+						"units": "LB",
+						"value": weight
+					}
+				  }
+			  ]
+			}
 		}
 
 		headers = {
-		    'Content-Type': "application/json",
-		    'X-locale': "en_US",
-		    'Authorization': "Bearer " + self.get_fedex_auth_token()
+			'Content-Type': "application/json",
+			'X-locale': "en_US",
+			'Authorization': "Bearer " + self.get_fedex_auth_token()
 		}
 		url = settings.FEDEX_API_URL + "rate/v1/rates/quotes"
 		response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
@@ -108,6 +112,7 @@ class Repository(repository.Repository):
 				)
 		else:
 			response_text = json.loads(response.text)
+			print('\n response.text: ', response.text)
 			error = response_text['errors'][0]
 			# error_code = errors[0]['code']
 			print('Error message: ', error['message'])
@@ -200,8 +205,6 @@ class Repository(repository.Repository):
 			self.update_fedex_auth_token(FedexAuthToken)
 
 		return FedexAuthToken.access_token
-
-
 
 
 	def get_shipstation_shipping_methods(self, basket, weight, shipping_addr):

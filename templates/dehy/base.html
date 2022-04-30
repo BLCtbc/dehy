@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load static %}
+{% load currency_filters %}
+
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" class="{% block html_class %}{% endblock %}">
     <head>
@@ -38,7 +40,8 @@
     </head>
 
     <body id="{% block body_id %}default{% endblock %}" class="{% block body_class %}default{% endblock %}">
-        {# Main content goes in this 'layout' block #}
+		{% include 'dehy/basket/partials/confirm_item_removal_modal.html' %}
+
         {% block layout %}{% endblock layout %}
 
         {# Scripts loaded from a CDN. #}
@@ -53,6 +56,9 @@
 
         {# Local scripts #}
         {% block scripts %}
+		<script src="{% static "js/base.js" %}"></script>
+		<script src="{% static "js/nav.js" %}"></script>
+		<script src="{% static "js/basket.js" %}"></script>
         {% endblock %}
 
         {# Additional JS scripts #}
@@ -62,7 +68,12 @@
         {# Block for body onload functions #}
         <script>
             $(function() {
-                {% block onbodyload %}{% endblock %}
+                {% block onbodyload %}
+				dehy.init('index');
+				var currencySymbol = '{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}';
+				currencySymbol = currencySymbol.slice(0, 1);
+				dehy.basket.init(currencySymbol);
+				{% endblock %}
             });
         </script>
 

@@ -13,6 +13,10 @@
 	font-family: var(--checkout-font) !important;
 }
 
+#logout {
+	text-decoration: underline;
+}
+
 .form-floating label {
     color: black;
 }
@@ -196,12 +200,6 @@ button.edit span {
 	margin-bottom: unset;
 }
 
-.basket_summary p,
-.basket_summary h4
- {
-	margin-bottom: 0;
-}
-
 .total {
 	background-color: inherit;
 }
@@ -227,24 +225,23 @@ input[type="radio"],
 input[type="checkbox"] {
 	width: 20px;
 	height: 20px;
-	top: 0.25rem;
+	/* top: 0.25rem;
 	left: 0.5rem;
-	position:absolute;
+	position:absolute; */
 }
 
 input[type="radio"],
 input[type="radio"] + label,
 input[type="checkbox"],
 input[type="checkbox"] + label{
-	/* position: absolute; */
-	/* top: 0; */
-	/* left: 1rem; */
+	display: table-cell;
+	vertical-align: middle;
 }
 
 
 input[type="radio"] + label,
 input[type="checkbox"] + label{
-    padding-left: 1.5rem;
+	padding-left: 0.5rem;
 }
 
 .form-floating>label {
@@ -291,8 +288,6 @@ input.invalid {
 	margin-top: 1rem;
 }
 
-
-
 .order-contents {
 	height: 100%;
 	position: sticky;
@@ -311,6 +306,12 @@ input.invalid {
 	margin-left: 4px;
 	background-color: transparent;
 	border: none;
+	color: white;
+}
+
+#promo_code_btn:hover {
+	color: var(--hg);
+	background-color: var(--gold);
 }
 
 
@@ -480,3 +481,21 @@ img.img-thumbnail {
     padding-left: 0.5rem;
 }
 
+.avatar-img-container {
+	display: table-cell;
+	padding-right: 12px;
+	vertical-align: middle;
+}
+
+.avatar-img {
+	width: 50px;
+	height: 50px;
+	border-radius: 10px;
+}
+
+p.user-info {
+	display: table-cell;
+	vertical-align: middle;
+	width: 100%;
+	line-height: 20px;
+}
