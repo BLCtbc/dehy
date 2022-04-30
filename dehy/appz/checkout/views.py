@@ -28,11 +28,14 @@ Facade = Facade()
 from urllib.parse import quote
 import datetime, json, logging, requests, sys, xmltodict, time
 
+import urllib, hashlib
+
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
 
 BasketView = get_class('basket.views', 'BasketView')
 Basket = get_model('basket', 'Basket')
 Order = get_model('order', 'Order')
+Product = get_model('catalogue', 'Product')
 
 User = get_model('generic', 'User')
 
@@ -47,6 +50,7 @@ CheckoutSessionData = get_class('checkout.utils', 'CheckoutSessionData')
 OrderDispatcher = get_class('order.utils', 'OrderDispatcher')
 AdditionalInfoQuestionnaire = get_class('dehy.appz.generic.models', 'AdditionalInfoQuestionnaire')
 UnableToPlaceOrder = get_class('order.exceptions', 'UnableToPlaceOrder')
+BasketVoucherForm = get_class('basket.forms', 'BasketVoucherForm')
 
 SourceType = get_model('payment', 'SourceType')
 Source = get_model('payment', 'Source')
@@ -93,7 +97,6 @@ def get_city_and_state(postcode=None):
 @csrf_exempt
 @require_POST
 def webhook_submit_order(request):
-	print('\n --- caught a webhook --- ', datetime.datetime.now())
 	data = {'test': 123}
 	place_order_view = PlaceOrderView(request=request)
 	payload = request.body
@@ -123,7 +126,6 @@ def webhook_submit_order(request):
 	except Facade.stripe.error.SignatureVerificationError as e:
 		msg = 'Stripe webhook: ⚠️  Webhook signature verification failed.' + str(e)
 		logger.error(msg)
-		print(msg)
 		data['error'] = msg
 
 		response = JsonResponse(data)
@@ -134,7 +136,6 @@ def webhook_submit_order(request):
 		print('Event type {}'.format(event['type']))
 
 		order = event['data']['object']
-		print('order: ', order)
 		basket = get_object_or_404(Basket, id=order.metadata.get('basket_id'))
 		order = Facade.stripe.Order.retrieve(order.id, expand=['customer', 'payment.payment_intent', 'line_items'])
 		place_order_view.handle_place_order_submission(basket, order)
@@ -251,7 +252,6 @@ def ajax_get_shipping_methods(request):
 
 	# try:
 	post_data = request.POST.copy()
-	print('post_data: ', post_data)
 
 	if post_data.get('postcode', None):
 		city_and_state_data = get_city_and_state(request.POST.get('postcode'))
@@ -264,7 +264,6 @@ def ajax_get_shipping_methods(request):
 
 	if not shipping_address_form.is_valid():
 
-		print('cleaned_data: ', shipping_address_form.cleaned_data)
 		print(f'\n form.errors: {shipping_address_form.errors}')
 		data['errors'] = shipping_address_form.errors.as_json()
 
@@ -313,25 +312,47 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 	template_name = "dehy/checkout/checkout_v2.html"
 	form_class = UserInfoForm
 
+	def get_avatar(self):
+
+		email = self.request.user.email
+		default = self.request.get_host() + "/static/default_profile.png"
+		size = 100
+		# construct the url
+		gravatar_url = "https://www.gravatar.com/avatar/" + hashlib.md5(email.lower().encode('utf-8')).hexdigest() + "?"
+		gravatar_url += urllib.parse.urlencode({'d':default, 's':str(size)})
+		return gravatar_url
+
 	def get_context_data(self, *args, **kwargs):
 		context_data = super().get_context_data(*args, **kwargs)
+
+		context_data.update({
+			'form': self.form_class(), 'user_info_form': self.form_class(),
+			'is_shipping_address_set': self.checkout_session.is_shipping_address_set(),
+			'is_shipping_method_set':self.checkout_session.is_shipping_method_set(self.request.basket),
+			'voucher_form':BasketVoucherForm()
+		})
+
+		if self.request.user.is_authenticated:
+			context_data.update({'avatar_image': self.get_avatar()})
+
 		return context_data
 
 	def get(self, request, *args, **kwargs):
 
+
 		response = super().get(request, *args, **kwargs)
+
 		self.checkout_session.reset_shipping_data()
 
-		basket_view = BasketView.as_view()(request)
+
+		if request.user.is_authenticated:
+			pass
+			# print('dir(request.user): ', dir(request.user))
+
+		# basket_view = BasketView.as_view()(request)
 
 		order = Facade.update_or_create_order(request.basket)
 
-		response.context_data.update({
-			'form': self.form_class(), 'user_info_form': self.form_class(),
-			'basket_summary_context_data': basket_view.context_data,
-			'is_shipping_address_set': self.checkout_session.is_shipping_address_set(),
-			'is_shipping_method_set':self.checkout_session.is_shipping_method_set(request.basket)
-		})
 		return response
 
 	def post(self, request, *args, **kwargs):
@@ -341,22 +362,26 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		form = self.form_class(request, request.POST)
 		response = super().post(request, *args, **kwargs)
 
-		if request.is_ajax() and form.is_valid():
+		if request.is_ajax():
+			email = ''
+			if request.user.is_authenticated:
+				email = request.user.email
 
-			## get or create the stripe customer object
-			email = form.cleaned_data['username']
+			elif form.is_valid():
+				email = form.cleaned_data['username']
+
+
 			customer = Facade.get_or_create_customer(email)
 			request.basket.stripe_customer_id = customer.id
 			request.basket.save()
 
 			if request.user.is_authenticated:
+				# get saved shipping addresses
 				request.user.stripe_customer_id = customer.id
 				request.user.save()
 
 			status_code = 200
 			data['section'] = 'user_info'
-
-
 
 		else:
 			data['errors'] = form.errors
@@ -367,7 +392,11 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 	def form_valid(self, form):
 		# the stripe customer object should be created along the same time as a user account is setup
-		if form.is_guest_checkout() or form.is_new_account_checkout():
+		if self.request.user.is_authenticated:
+			signals.start_checkout.send_robust(
+				sender=self, request=self.request)
+
+		else:
 			email = form.cleaned_data['username']
 			self.checkout_session.set_guest_email(email)
 			# We raise a signal to indicate that the user has entered the
@@ -375,29 +404,10 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 			signals.start_checkout.send_robust(
 				sender=self, request=self.request, email=email)
 
-			if form.is_new_account_checkout():
-				messages.info(
-					self.request,
-					_("Create your account and then you will be redirected "
-					  "back to the checkout process"))
-				self.success_url = "%s?next=%s&email=%s" % (
-					reverse('customer:register'),
-					reverse('checkout:shipping'),
-					quote(email)
-				)
-		else:
-			user = form.get_user()
-			login(self.request, user)
-
-			# We raise a signal to indicate that the user has entered the
-			# checkout process.
-			signals.start_checkout.send_robust(
-				sender=self, request=self.request)
-
 		return redirect(self.get_success_url())
 
-	def get_form_structure(self, form, use_labels=True):
-		return super().get_form_structure(form, use_labels=True)
+	# def get_form_structure(self, form, use_labels=True):
+	# 	return super().get_form_structure(form, use_labels=True)
 
 
 	def get_form_kwargs(self):
@@ -405,7 +415,7 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		email = self.checkout_session.get_guest_email()
 		if email:
 			kwargs['initial'] = {
-				'username': email,
+				'username': email
 			}
 		return kwargs
 
@@ -423,6 +433,8 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 	form_class = ShippingAddressForm
 
 	def get(self, request, *args, **kwargs):
+
+
 		status_code = 302
 
 		if request.is_ajax():
@@ -468,8 +480,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			# shipping_address_form = ShippingAddressForm(shipping_address_data, *args, **kwargs)
 			shipping_address_form = ShippingAddressForm(request.POST)
 
-			print('shipping_address_form: ', shipping_address_form)
-			print('shipping_address_form.is_valid: ', shipping_address_form.is_valid())
 
 			print('form_valid: ', self.form_valid(shipping_address_form))
 

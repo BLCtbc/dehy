@@ -562,7 +562,7 @@ dehy.ch.forms = {
 
 	},
 	saved: {},
-	show_submit_button: function(form=null) {
+	show_submit_button(form=null) {
 		var form = form || dehy.ch.forms.get(),
 			hidden = true;
 
@@ -577,9 +577,6 @@ dehy.ch.forms = {
 		return hidden;
 
 	},
-	place_order() {
-
-	},
 	submit_handler(e) {
 		dehy.ch.forms.save_all();
 		var form = e.target.closest('form');
@@ -592,7 +589,6 @@ dehy.ch.forms = {
 		} else {
 			dehy.ch.forms.errors.hide();
 		}
-
 
 		if (dehy.ch.forms.has_changed(section_name, form)) {
 			dehy.ch.forms.submit_form_info(e.target);

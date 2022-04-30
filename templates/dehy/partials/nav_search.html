@@ -42,11 +42,18 @@
 	                   {% endblock %}
 	               </ul>
 
+
+		    {% comment %}
+			{# search is shelved for now #}
+			{# does not work proper out out of the box #}
+			{# not really needed for this project #}
+
             {% block nav_extra %}
 				<div class="col d-inline-flex justify-content-end">
 	                {% include "oscar/partials/search.html" %}
 				</div>
             {% endblock %}
+			{% endcomment %}
 			</div> <!-- row -->
 
         </div> <!-- container -->

@@ -25,7 +25,7 @@
 	{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/account/dehy2-884.jpg' %}
 	{% oscar_thumbnail image_url "1500x" upscale="true" as thumb %}
 	<header class="row navbar-padding justify-content-center">
-		<div style="padding-top: 20%; padding-bottom: 20%;" class="image-container">
+		<div style="padding-bottom: 15%;" class="image-container">
 			<img alt="Dehy all products displayed in jars" src="{{thumb.url}}">
 		</div>
 		{% endwith %}
@@ -60,7 +60,7 @@
 				{% comment %}
 				{% include "oscar/partials/alert_messages.html" %}
 				{% endcomment %}
-				
+
 				{% block pre_content %}{% endblock %}
 				{% block content %}
 					{% block tabcontent %}{% endblock tabcontent %}

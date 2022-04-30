@@ -1,3 +1,8 @@
+#mini_basket a.btn {
+	color: white;
+	background-color: var(--hg);
+}
+
 .basket_title * {
     text-transform: uppercase;
     font-variant-caps: all-petite-caps;
@@ -18,8 +23,17 @@
 	margin: 0;
 }
 
+.basket-items:last-child{
+	border-bottom: 2px solid #ced4da;
+}
+
 .basket-items:nth-child(even) {
     background: transparent;
+}
+
+.basket_summary .price-text {
+	text-align: center;
+	line-height: 20px;
 }
 
 .price-text {
@@ -40,6 +54,7 @@ form {
 	font-weight: 400;
 	letter-spacing: 0.01em;
 	opacity: 0.8;
+	text-align: right;
 }
 
 .checkout-quantity {
@@ -51,22 +66,20 @@ form {
 }
 
 .size-variant {
-	font-size: smaller;
+	font-size: 12px;
 	opacity: 0.75;
 	line-height: 20px;
 }
+
 #basket_formset .image-container {
-	padding-bottom: 60%;
+	margin-bottom: 10px;
 }
 
-#basket_formset .image-container > img {
-	width: 60%;
-	height: 60%;
-}
 .basket-items {
 	max-height: 150px;
 	padding: unset;
 	margin: 10px 0 0;
+	border-bottom: 1px solid #ced4da9c;
 }
 
 .img-thumbnail {
@@ -76,12 +89,68 @@ form {
 .remove-container {
 	line-height: 20px;
 	color: rgb(190 190 170);
+	text-align: center;
 }
 
+.order-contents .price-text,
+.order-contents h4,
+#basket_totals span,
+.basket_summary h4,
+#mini_basket h3 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22px;
+}
+
+.basket_summary p,
+.basket_summary h4 {
+    margin-bottom: 0;
+}
+
+
+#mini_basket_container {
+	position: absolute;
+	right: 0;
+	z-index: 1100;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.35);
+	overflow-y: scroll;
+	display: none;
+}
+
+#mini_basket_container.show {
+	display: block;
+}
+
+#mini_basket {
+	height: 100%;
+    overflow-y: scroll;
+    background-color: rgba(0,0,0,0.9);
+    position: fixed;
+    z-index: 1101;
+    right: 0;
+}
+
+
 @media (max-width: 768px) {
+
+	#mini_basket a.btn {
+		color: black;
+		background-color: var(--beige);
+	}
+
 	#basket_formset .image-container > img {
 		width: 100%;
 		height: 100%;
+	}
+
+	#mini_basket {
+		background-color: var(--hg);
+	}
+
+	#mini_basket .btn {
+
 	}
 
 	#basket_formset .image-container {
@@ -95,3 +164,8 @@ form {
 	}
 }
 
+.btn-close {
+	filter: invert(90%);
+	opacity: 1;
+	margin:1rem;
+}

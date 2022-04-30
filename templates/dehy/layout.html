@@ -15,6 +15,7 @@
 		src="//use.typekit.net/ik/KNANHmG_B92iEsxFQzwZfQGIUSK8j-_8lPBRCuP1V1vfe032fFHN4UJLFRbh52jhWDm8FDSoZcsR5Abtwe4qwemqZAwkwQbaZynNMKG0jAFu-WsoShFGZAsude80ZkoRdhXCHKoyjamTiY8Djhy8ZYmC-Ao1Oco8if37OcBDOcu8OfG0ZemGpAiyScoTSh60SaBujW48Sagyjh90jhNlOfG0SaBujW48SagyjhmDjhy8ZYmC-Ao1OcFzdPUyjamTiY8Djhy8ZYmC-Ao1OcFzdPUyjamTiY8Djhy8ZYmC-Ao1Oco8ifUySkolZPUqZAyoZhBkdc8D-foRdhXCZemGpAiyScoTSh60SaBujW48Sagyjh90jhNlOeUzjhBC-eNDifUDSWmyScmDSeBRZWFR-emqiAUTdcS0jhNlOYiaikoyjamTiY8Djhy8ZYmC-Ao1OcFzdPUaiaS0jAFu-WsoShFGZAsude80Zko0ZWbCiaiaOcBDOcu8OYiaikoqZAyoZhBkdc8D-foRdhXCiaiaOcs8-	Y81jW40-WFGO1FUiABkZWF3jAF8OcFzdPUaiaS0SaBujW48SagyjhmDjhy8ZYmC-Ao1OcFzdPJ--WsROABhjAoXOAiyScs8OAizieyTjku3Scv7f6KXC3JbMg62JMJ7f6KuC3JbMg6BJMJ7f6KDC3JbMg6YJMHbMZnrRjCe.js"></script>
 	<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/basket.css' %}"/>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/shop.css' %}"/>
 {% endblock %}
 
@@ -63,8 +64,6 @@
     <!-- Oscar -->
     <script src="{% static "oscar/js/oscar/ui.js" %}"></script>
 	<!-- custom -->
-	<script src="{% static 'js/nav.js' %}"></script>
-	<script src="{% static 'js/base.js' %}"></script>
 
 {% endblock %}
 
@@ -75,5 +74,4 @@
 {% block onbodyload %}
     {{ block.super }}
     oscar.init();
-	dehy.init('index');
 {% endblock %}

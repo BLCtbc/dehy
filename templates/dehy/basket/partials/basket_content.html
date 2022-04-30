@@ -26,7 +26,8 @@
 
 	{% block basket_form_headers %}
 
-	{% if request.resolver_match.url_name != 'checkout' %}
+	{% if 'basket' in request.resolver_match.app_names %}
+
         <div class="basket_title col-12 col-lg-10 d-none d-md-block">
             <div class="row">
                 <h4 class="col-md-8">{% trans "Item" %}</h4>
@@ -40,7 +41,7 @@
 	{% endblock %}
 
     {% block basket_form_main %}
-		<form method="post" class="basket_summary col-12 {% if request.resolver_match.url_name != 'checkout' %}col-lg-10{% endif %}" id="basket_formset" action="{% url 'basket:summary' %}">
+		<form method="post" class="basket_summary col-12 {% if 'basket' in request.resolver_match.app_names %}col-lg-10{% else %}compact{% endif %}" id="basket_formset" action="{% url 'basket:summary' %}">
 
             {% csrf_token %}
             {{ formset.management_form }}
@@ -51,37 +52,32 @@
                     <div class="basket-items row" data-product-id="{{line.product_id}}">
 							{% with image=product.primary_image %}
 							{{ form.id }}
-							{% if request.resolver_match.url_name != 'checkout' %}
+							{% if 'basket' in request.resolver_match.app_names %}
 							{% oscar_thumbnail image.original "400x" crop=center upscale=False as thumb %}
 
-                            <div class="col-3">
+                            <div class="col-3 col-md-2 px-0">
 								<div class="image-container">
-									<img class="img-thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+									<img class="img-thumbnail" src="{{ thumb.url }}" alt="{{ product.parent.title|default:product.title }}"/>
 								</div>
-								{% comment %}
-								<a href="{{ product.get_absolute_url }}">
-									{% oscar_thumbnail image.original "200x" upscale=False as thumb %}
-									<img class="img-thumbnail w-auto mx-auto my-0 p-0" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
-								</a>
-								{% endcomment %}
 
 							{% else %}
+							{% oscar_thumbnail image.original "200x" upscale=False as thumb %}
+
 							<div class="col-3 px-0">
 								<div class="image-container">
-									{% oscar_thumbnail image.original "100x" upscale=False as thumb %}
-									<img class="" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+									<img class="" src="{{ thumb.url }}" alt="{{ product.parent.title|default:product.title }}"/>
 								</div>
 							{% endif %}
                             {% endwith %}
                             </div>
 
-								{% if request.resolver_match.url_name != 'checkout' %}
-                            	<div class="col-5">
-
-                                <h3><a href="{{ product.get_absolute_url }}">{{ product.parent.title|default:product.title }}</a></h3>
-								{% else %}
-								<div class="col-6 pr-0">
+								{% if 'checkout' in request.resolver_match.app_names %}
+								<div class="col-6 mt-2 pr-0">
 								<h4>{{ product.parent.title|default:product.title }}</h4>
+
+								{% else %}
+								<div class="col-6 col-md-5 mt-3">
+                                <h3><a href="{{ product.get_absolute_url }}">{{ product.parent.title|default:product.title }}</a></h3>
 								{% endif %}
 
 								{% if product.is_child %}
@@ -90,7 +86,7 @@
 
                             	</div>
 
-							{% if request.resolver_match.url_name != 'checkout' %}
+							{% if 'basket' in request.resolver_match.app_names %}
                             <div class="col-2">
                                 <div class="checkout-quantity">
                                     <div class="input-group {% if form.errors %}error{% endif %}">
@@ -108,18 +104,18 @@
 
 							{% else %}
 							<div class="col-3">
-								<p class="price-text text-right">
+								<p class="price-text">
 									{{ line.line_price_excl_tax|currency:line.price_currency }}
 								</p>
-								<div class="checkout-quantity text-right">
-									<div class="input-group justify-content-end{% if form.errors %} error{% endif %}">
-										<label for="{{form.quantity.id_for_label}}" class="input-group-text">Qty</label>
+										{% include 'dehy/shop/partials/quantity_select_container.html' with field=form.quantity product=product %}
+
+										{% comment %}
+										<input type="number"pattern="[0-9]*" name="{{form.quantity.html_name}}" id="{{form.quantity.id_for_label}}" value="{{form.quantity.value}}">
 										{% render_field form.quantity pattern="[0-9]*" type="text" class+="product-quantity" %}
-									</div>
+										{% endcomment %}
 									<p class="remove-container">
 										<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
 									</p>
-								</div>
                             </div>
 							{% endif %}
                     </div>
@@ -131,7 +127,7 @@
         {% block vouchers %}
             {# Hide the entire section if a custom BasketView doesn't pass in a voucher form #}
 
-		<div class="col-12 {% if request.resolver_match.url_name != 'checkout' %}col-lg-10{% endif %}">
+		<div class="col-12 {% if 'basket' in request.resolver_match.app_names %}col-lg-10{% endif %}">
         {% if voucher_form %}
 
                 <div id="voucher_form_container">
@@ -153,7 +149,7 @@
         {% endblock vouchers %}
 
         {% block baskettotals %}
-        <div id="basket_totals" class="col-12 {% if request.resolver_match.url_name != 'checkout' %}col-lg-10{% endif %}">
+        <div id="basket_totals" class="col-12 {% if 'basket' in request.resolver_match.app_names %}col-lg-10{% endif %}">
 
 				{% block subtotal %}
 				<div class="row">
@@ -229,14 +225,14 @@
 					{% endblock total_cost %}
 				{% else %}
 				{% endif %}
-			{# the basket totals are too granular for our intended checkout process, removed for now #}
+			{# the basket totals partial template are too granular for our intended checkout process, removed for now #}
 
         </div>
         {% endblock baskettotals %}
 
 
     {% block formactions %}
-	{% if request.resolver_match.url_name != 'checkout' %}
+	{% if 'basket' in request.resolver_match.app_names %}
 	<div class="col-12 col-lg-10 text-right">
 		<a style="margin-top:2rem;" href="{% url 'checkout:checkout' %}" class="btn">{% trans "CHECKOUT" %}</a>
 	</div>
@@ -276,7 +272,7 @@
                                 {% with image=form.instance.product.primary_image %}
                                     {% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
                                     <a href="{{ form.instance.product.get_absolute_url }}">
-                                        <img class="card card-body mx-auto" src="{{ thumb.url }}" alt="{{ form.instance.product.get_title }}">
+                                        <img class="card card-body mx-auto" src="{{ thumb.url }}" alt="{{ form.instance.product.parent.title|default:form.instance.product.title }}">
                                     </a>
                                 {% endwith %}
                             </div>
@@ -309,3 +305,4 @@
         </div>
     {% endif %}
 {% endblock %}
+

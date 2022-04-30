@@ -83,24 +83,14 @@ class AdditionalInfoForm(forms.ModelForm):
 
 class UserInfoForm(AuthenticationForm):
 	username = forms.EmailField(label=_("Email"), help_text=_("You'll receive receipts and notifications at this email address."))
-	password = forms.CharField(label=_("Password"), help_text=_("Already have an account? Sign in"), widget=forms.PasswordInput())
-
-	GUEST, NEW, EXISTING = 'anonymous', 'new', 'existing'
-	CHOICES = (
-		(GUEST, _('I am a new customer and want to checkout as a guest')),
-		(NEW, _('I am a new customer and want to create an account '
-				'before checking out')),
-		(EXISTING, _('I am a returning customer, and my password is')))
-
-	options = forms.ChoiceField(widget=forms.widgets.RadioSelect,
-								choices=CHOICES, initial=GUEST)
-
-
 	signup = forms.BooleanField(initial=True, required=False, label=_("Subscribe to our mailing list to learn about new products and promotions!"))
 
 
 	def __init__(self, *args, **kwargs):
+
+
 		super().__init__(*args, **kwargs)
+
 		self.fields['username'].widget.attrs.update({'placeholder':'username@email.com', 'autofill':'email'})
 
 	class Meta:
@@ -110,22 +100,19 @@ class UserInfoForm(AuthenticationForm):
 		return normalise_email(self.cleaned_data['username'])
 
 	def clean(self):
-		if self.is_guest_checkout() or self.is_new_account_checkout():
-			if 'password' in self.errors:
-				del self.errors['password']
-			if 'username' in self.cleaned_data:
-				email = normalise_email(self.cleaned_data['username'])
-				if User._default_manager.filter(email__iexact=email).exists():
-					msg = _("A user with that email address already exists")
-					self._errors["username"] = self.error_class([msg])
-			return self.cleaned_data
+
+		if 'username' in self.cleaned_data:
+			email = normalise_email(self.cleaned_data['username'])
+			if User._default_manager.filter(email__iexact=email).exists():
+
+				msg = _("A user with that email address already exists")
+				self._errors["username"] = self.error_class([msg])
+
+		# return self.cleaned_data
+
 		return super().clean()
 
-	def is_guest_checkout(self):
-		return self.cleaned_data.get('options', None) == self.GUEST
 
-	def is_new_account_checkout(self):
-		return self.cleaned_data.get('options', None) == self.NEW
 
 class BillingAddressForm(payment_forms.BillingAddressForm):
 

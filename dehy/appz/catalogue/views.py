@@ -1,12 +1,11 @@
-from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
-from oscar.apps.catalogue.views import ProductCategoryView as CoreProductCategoryView
-from oscar.apps.catalogue.views import CatalogueView as BrowseView
 
+from oscar.apps.catalogue import views
 from dehy.appz.catalogue.models import Category, Product
 from django.shortcuts import get_object_or_404, redirect
 from django.core.paginator import InvalidPage
 from oscar.core.loading import get_class
 from django.utils.translation import gettext_lazy as _
+
 
 get_product_search_handler_class = get_class('catalogue.search_handlers', 'get_product_search_handler_class')
 
@@ -14,7 +13,7 @@ get_product_search_handler_class = get_class('catalogue.search_handlers', 'get_p
 # class CatalogueView(CoreCatalogueView):
 # 	template_name = 'catalogue/browse.html'
 
-class CatalogueView(BrowseView):
+class CatalogueView(views.CatalogueView):
 	"""
 	Browse all products in the catalogue
 	"""
@@ -35,6 +34,8 @@ class CatalogueView(BrowseView):
 		return get_product_search_handler_class()(*args, **kwargs)
 
 	def get_context_data(self, **kwargs):
+
+
 		context_data = super().get_context_data(**kwargs)
 		context_data['summary'] = _("All products")
 		search_context = self.search_handler.get_search_context_data(
@@ -44,7 +45,7 @@ class CatalogueView(BrowseView):
 
 		return context_data
 
-class ProductCategoryView(CoreProductCategoryView):
+class ProductCategoryView(views.ProductCategoryView):
 	model = Category
 	slug_field = 'slug'
 	slug_url_kwarg = 'category_slug'
@@ -58,7 +59,7 @@ class ProductCategoryView(CoreProductCategoryView):
 		return get_object_or_404(Category, slug=self.kwargs['category_slug'])
 
 
-class ProductDetailView(CoreProductDetailView):
+class ProductDetailView(views.ProductDetailView):
 	model = Product
 	slug_field = 'slug'
 	slug_url_kwarg = 'product_slug'

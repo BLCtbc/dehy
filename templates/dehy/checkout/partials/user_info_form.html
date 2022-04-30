@@ -6,55 +6,44 @@
 	{{ form.non_field_errors }}
 
 	<div class="form-container">
+		{% if request.user.is_authenticated %}
+		<div class="row">
+			<div class="col-12">
+				<input type="hidden" name="username" placeholder="{{request.user.email}}" autocomplete="off" class="form-control" type="hidden" id="id_username" value="{{request.user.email}}">
+					<div class="avatar-img-container">
+						<img class="avatar-img" src="{{avatar_image}}" alt="user avatar image">
+					</div>
+					<p class="user-info">
+						{% if request.user.first_name or request.user.last_name %}
+						<span>{{request.user.first_name}} {{request.user.last_name}}</span><span> ({{request.user.email}})</span>
+						{% else %}
+						<span>{{request.user.email}}</span>
+						{% endif %}
+						<br>
+					<span><a id="logout" href="{% url 'customer:logout' %}?next={% url 'checkout:index' %}">{% trans "Logout" %}</a></span>
+					</p>
+			</div>
+
+		</div>
+		{% else %}
+
 		<div class="row">
 			<div class="form-group col">
 				<label class="col-form-label required" for="{{form.username.id_for_label}}">{{form.username.label}}</label>
 				{% render_field form.username class+="form-control" %}
-
-				<p class="helptext mt-1">{{ form.username.help_text }} Already have an account? <a class="underline" type="button" role="button" id="signin_button" href="{% url 'customer:login' %}" target="_blank">Sign in</a></p>
-
+				<p class="helptext mt-1">{{ form.username.help_text }} Already have an account? <a class="underline" type="button" role="button" id="signin_button" href="{% url 'customer:login' %}?next={% url 'checkout:index' %}">Sign in</a></p>
 			</div>
-		{# testing what this does #}
-
-		{% comment %}
-		{% include "oscar/partials/form_field.html" with field=form.username %}
-		{% endcomment %}
 
 		</div>
 
-		 <div class="row d-none">
-				 <div class="form-group col">
-					{{ form.options.0 }}
-				 </div>
-			 </div>
-		 </div>
 
 
-		 <div class="row d-none">
-			 <div class="form-group col{% if form.password.errors %} error{% endif %}">
-	 			{{ form.options.errors }}
+		{% endif %}
 
- 					{{ form.options.2 }}
- 					<div class="form-inline">
- 						{% render_field form.password|append_attr:"hidden"|append_attr:"required"|remove_attr:"required" class+="form-control mr-sm-2" %}
- 						<small><a href="{% url 'password-reset' %}" tabindex="-1">{% trans "Get a password reminder" %}</a></small>
- 						{% for error in form.password.errors %}
- 							<span class="error-block">{{ error }}</span>
- 						{% endfor %}
-	 			</div>
-	 		</div>
-		 </div>
-
-		<div class="row d-none">
-			<div class="form-group col">
-				{{ form.options.1 }}
-			</div>
-		</div>
-		<div class="row">
-			<div class="input-group col">
+		<div class="row mt-4">
+			<div class="form-group col d-table">
 				{% render_field form.signup %}
 				<label class="col-form-label" for="{{form.signup.id_for_label}}">{{form.signup.label}}</label>
-
 			</div>
 		</div>
 
