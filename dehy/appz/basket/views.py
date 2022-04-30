@@ -1,9 +1,9 @@
-from oscar.apps.basket.views import BasketAddView as CoreBasketAddView
 from oscar.apps.basket.views import BasketView as CoreBasketView
 from oscar.core.loading import get_class, get_classes, get_model
-from oscar.apps.basket.signals import (basket_addition, voucher_addition, voucher_removal)
+from oscar.apps.basket.signals import basket_addition
 from oscar.core.loading import get_class, get_classes, get_model
 from oscar.core.utils import redirect_to_referrer, safe_referrer
+from sorl.thumbnail import get_thumbnail
 
 from django.template.loader import render_to_string
 from django.contrib import messages
@@ -12,6 +12,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, View
 from django import shortcuts
 from django.shortcuts import redirect
+
+from sorl.thumbnail import get_thumbnail
 
 from decimal import Decimal as D
 TWO_PLACES = D(10)**-2
@@ -34,6 +36,8 @@ CheckoutSessionData = get_class('checkout.utils', 'CheckoutSessionData')
 UserAddress = get_model('address', 'UserAddress')
 ShippingAddress = get_model('order', 'ShippingAddress')
 
+Repository = get_class('shipping.repository', 'Repository')
+# Product = get_model('catalogue', 'Product')
 
 class BasketAddView(FormView):
 	"""
@@ -49,13 +53,38 @@ class BasketAddView(FormView):
 	def post(self, request, *args, **kwargs):
 
 		quantity = request.POST.get('quantity', None)
-		data = {}
+		data = {'object_list': {}}
 
 		self.product = shortcuts.get_object_or_404(self.product_model, pk=kwargs['pk'])
+
+
+		data['object_list'][self.product.id] = {
+			'quantity': quantity,
+			'url': self.product.get_absolute_url(),
+			'price': self.product.stockrecords.first().price * D(quantity),
+			'id': self.product.id,
+		}
+
+
+		img = self.product.primary_image()
+
+		if img:
+			img = img.original
+			thumbnail = get_thumbnail(img, '200', crop='center', quality=99)
+			data['object_list'][self.product.id].update({'img_url':thumbnail.url})
+
 		response = super().post(request, *args, **kwargs)
 
-		data['basket_items'] = request.basket.num_items
-		data['product'] = {'pk': self.product.pk, 'title':self.product.title}
+		data['basket_num_items'] = request.basket.num_items
+		title =  self.product.title
+
+		if self.product.is_child:
+			data['object_list'][self.product.id].update({'size': title})
+			title = self.product.parent.title
+
+		data['object_list'][self.product.id].update({'title': title})
+
+		data['subtotal'] = D(request.basket.total_excl_tax_excl_discounts).quantize(TWO_PLACES)
 
 		response = JsonResponse(data)
 		return response
@@ -111,6 +140,7 @@ class BasketAddView(FormView):
 			{'product': form.product,
 			 'quantity': form.cleaned_data['quantity']})
 
+
 class BasketView(CoreBasketView):
 	model = get_model('basket', 'Line')
 	basket_model = get_model('basket', 'Basket')
@@ -122,9 +152,29 @@ class BasketView(CoreBasketView):
 	}
 
 	template_name = 'dehy/basket/basket.html'
+
+	def get_shipping_methods(self, basket):
+		pass
+		# if 'checkout' in self.request.resolver_match.app_names:
+		# 	return Repository().get_shipping_methods(
+		# 		basket=self.request.basket, user=self.request.user,
+		# 		request=self.request)
+
+	def get_default_shipping_method(self, basket):
+		# if 'checkout' in self.request.resolver_match.app_names:
+		# 	return Repository().get_default_shipping_method(
+		# 		basket=self.request.basket, user=self.request.user,
+		# 		request=self.request, shipping_addr=self.get_default_shipping_address())
+		#
+		# else:
+
+		return Repository().get_free_shipping()
+
+
 	def dispatch(self, request, *args, **kwargs):
 		# We add an instance of checkout session data so its available in the basket view.
 		# This is useful since we
+
 		self.checkout_session = CheckoutSessionData(request)
 		return super().dispatch(request, *args, **kwargs)
 
@@ -138,11 +188,13 @@ class BasketView(CoreBasketView):
 		return BasketVoucherForm()
 
 	def post(self, request, *args, **kwargs):
-		data = {}
+		data = {'object_list': {}}
 		response = super().post(request, *args, **kwargs)
+		print('\n shipping set: ', self.checkout_session.is_shipping_address_set())
+		for line in self.object_list:
+			data['object_list'][line.product_id] = {'quantity': line.quantity, 'price': line.line_price_excl_tax}
 
 		num_items = request.basket.num_items
-		data['object_list'] = {}
 
 		data['basket_num_items'] = request.basket.num_items
 		data['subtotal'] = D(request.basket.total_excl_tax_excl_discounts).quantize(TWO_PLACES)
@@ -172,9 +224,7 @@ class BasketView(CoreBasketView):
 					# data['order_total'] = str(data['order_total'])
 					data['total_tax'] = data['total_tax']
 
-		for line in self.object_list:
-			data['object_list'][line.product_id] = {'quantity': line.quantity, 'price': line.line_price_excl_tax}
-
+		# remove empty dict
 		if 'shipping_methods' in data.keys() and not data['shipping_methods']:
 			data.pop('shipping_methods')
 

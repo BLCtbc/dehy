@@ -14,6 +14,7 @@
 						<i class="fas fa-bars"></i>
 					</span>
 				</button>
+
 				<div class="collapse navbar-collapse mt-2">
 					<ul class="navbar flex-lg-row">
 						<li class="nav-item">
@@ -43,7 +44,7 @@
 			</div>
 			<div class="col-3 col-lg-4 d-flex justify-content-end align-self-center">
 				<div class="account-container mx-1">
-					<a class="icon" href="{% url 'customer:login' %}">
+					<a class="icon" href="{% url 'customer:profile-update' %}">
 				      <span class="svg-container">
 				        <svg style="stroke-width:0.1rem; top:3px;"class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">
 						    <g>
@@ -88,7 +89,7 @@
 						<a class="nav-link{% if url_name == 'faq' %} active{% endif %}" href="{% url 'faq' %}">FAQ</a>
 					</li>
 					<li class="nav-item d-lg-none">
-						<a class="nav-link{% if url_name == 'faq' %} active{% endif %}" href="{% url 'faq' %}">Recipes</a>
+						<a class="nav-link{% if url_name == 'recipes' %} active{% endif %}" href="{% url 'faq' %}">Recipes</a>
 					</li>
 					<li class="nav-item d-lg-none">
 						<a class="nav-link{% if url_name == 'faq' %} active{% endif %}" href="{% url 'faq' %}">Test</a>
@@ -100,8 +101,7 @@
 	</div> <!-- container-fluid -->
 </nav>
 
-{% if 'basket' in request.resolver_match.app_names %}
-{% else %}
+{% if 'basket' not in request.resolver_match.app_names %}
 {% include 'dehy/partials/mini_basket.html' with formset=basket_formset %}
 {% endif %}
 

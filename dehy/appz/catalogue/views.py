@@ -1,17 +1,11 @@
-from oscar.apps.catalogue.views import ProductDetailView as CoreProductDetailView
-from oscar.apps.catalogue.views import ProductCategoryView as CoreProductCategoryView
-from oscar.apps.catalogue.views import CatalogueView as BrowseView
 
+from oscar.apps.catalogue import views
 from dehy.appz.catalogue.models import Category, Product
 from django.shortcuts import get_object_or_404, redirect
 from django.core.paginator import InvalidPage
-from oscar.core.loading import get_class, get_model
+from oscar.core.loading import get_class
 from django.utils.translation import gettext_lazy as _
-from django.forms import modelformset_factory
 
-BaseBasketLineFormSet = get_class('basket.formsets', 'BaseBasketLineFormSet')
-BasketLineFormSet = get_class('basket.formsets', 'BasketLineFormSet')
-BasketLineForm = get_class('basket.forms', 'BasketLineForm')
 
 get_product_search_handler_class = get_class('catalogue.search_handlers', 'get_product_search_handler_class')
 
@@ -19,7 +13,7 @@ get_product_search_handler_class = get_class('catalogue.search_handlers', 'get_p
 # class CatalogueView(CoreCatalogueView):
 # 	template_name = 'catalogue/browse.html'
 
-class CatalogueView(BrowseView):
+class CatalogueView(views.CatalogueView):
 	"""
 	Browse all products in the catalogue
 	"""
@@ -47,21 +41,11 @@ class CatalogueView(BrowseView):
 		search_context = self.search_handler.get_search_context_data(
 			self.context_object_name)
 
-		print('dir(self.request): ', dir(self.request))
-		print('self.request.basket.strategy: ', self.request.basket.strategy)
-		formset = BaseBasketLineFormSet(self.request.basket.strategy)
-
-		# old
-		# context_data['formset'] = BasketLineFormSet(get_model('basket', 'line'), BasketLineForm, formset)
-
-		# kwargs.update({'strategy':self.request.basket.strategy})
-		# context_data['formset'] = BasketLineFormSet(queryset=self.request.basket.all_lines(), strategy=self.request.basket.strategy)
-
 		context_data.update(search_context)
 
 		return context_data
 
-class ProductCategoryView(CoreProductCategoryView):
+class ProductCategoryView(views.ProductCategoryView):
 	model = Category
 	slug_field = 'slug'
 	slug_url_kwarg = 'category_slug'
@@ -75,7 +59,7 @@ class ProductCategoryView(CoreProductCategoryView):
 		return get_object_or_404(Category, slug=self.kwargs['category_slug'])
 
 
-class ProductDetailView(CoreProductDetailView):
+class ProductDetailView(views.ProductDetailView):
 	model = Product
 	slug_field = 'slug'
 	slug_url_kwarg = 'product_slug'

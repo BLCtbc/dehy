@@ -57,7 +57,7 @@
 
                             <div class="col-3 col-md-2 px-0">
 								<div class="image-container">
-									<img class="img-thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+									<img class="img-thumbnail" src="{{ thumb.url }}" alt="{{ product.parent.title|default:product.title }}"/>
 								</div>
 
 							{% else %}
@@ -65,7 +65,7 @@
 
 							<div class="col-3 px-0">
 								<div class="image-container">
-									<img class="" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+									<img class="" src="{{ thumb.url }}" alt="{{ product.parent.title|default:product.title }}"/>
 								</div>
 							{% endif %}
                             {% endwith %}
@@ -272,7 +272,7 @@
                                 {% with image=form.instance.product.primary_image %}
                                     {% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
                                     <a href="{{ form.instance.product.get_absolute_url }}">
-                                        <img class="card card-body mx-auto" src="{{ thumb.url }}" alt="{{ form.instance.product.get_title }}">
+                                        <img class="card card-body mx-auto" src="{{ thumb.url }}" alt="{{ form.instance.product.parent.title|default:form.instance.product.title }}">
                                     </a>
                                 {% endwith %}
                             </div>
@@ -305,3 +305,4 @@
         </div>
     {% endif %}
 {% endblock %}
+

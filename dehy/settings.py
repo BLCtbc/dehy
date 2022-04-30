@@ -112,7 +112,7 @@ MIDDLEWARE = [
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'oscar.apps.basket.middleware.BasketMiddleware',
+	'dehy.appz.basket.middleware.BasketMiddleware',
 	'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
 
@@ -292,7 +292,10 @@ OSCAR_ORDER_STATUS_CASCADE = {
 	'Cancelled': 'Cancelled'
 }
 
+OSCAR_ACCOUNTS_REDIRECT_URL = 'customer:profile-update'
 OSCAR_DEFAULT_CURRENCY = 'USD'
+
+OSCAR_COOKIES_DELETE_ON_LOGOUT = ['oscar_recently_viewed_products', 'oscar_open_basket']
 OSCAR_HIDDEN_FEATURES = ["reviews", "wishlists"]
 OSCAR_HOMEPAGE = reverse_lazy('catalogue:index')
 OSCAR_SHOP_NAME = "DEHY"

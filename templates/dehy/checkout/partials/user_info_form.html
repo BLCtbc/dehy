@@ -1,74 +1,49 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
-{% if request.user.is_authenticated %}
-<div class="preview_container">
-	<div class="row">
-		<div class="col-10">
-			<span>{% trans "Signed in as" %}:</span>
-			<a href="{% url 'customer:summary' %}" target="_blank"><span data-preview="username">{{request.user.email}}</span></a>
-		</div>
-		<a id="logout" href="{% url 'customer:logout' %}?next={% url 'checkout:index' %}">{% trans "Logout" %}</a>
-	</div>
-	<div class="error-container button-container">
-		<div class="form-group row hidden" id="error_container">
-			<span class="col-12 errors"></span>
-		</div>
-		<div class="form-group row justify-content-center">
-			<button class="col-10" type="submit" aria-label="Continue">{% trans "Continue" %}</button>
-		</div>
-	</div>
-</div>
-{% else %}
 <form id="user_info_form" method="post" class="checkout-form" action="{% url 'checkout:checkout' %}">
 	{% csrf_token %}
 	{{ form.non_field_errors }}
 
 	<div class="form-container">
+		{% if request.user.is_authenticated %}
+		<div class="row">
+			<div class="col-12">
+				<input type="hidden" name="username" placeholder="{{request.user.email}}" autocomplete="off" class="form-control" type="hidden" id="id_username" value="{{request.user.email}}">
+					<div class="avatar-img-container">
+						<img class="avatar-img" src="{{avatar_image}}" alt="user avatar image">
+					</div>
+					<p class="user-info">
+						{% if request.user.first_name or request.user.last_name %}
+						<span>{{request.user.first_name}} {{request.user.last_name}}</span><span> ({{request.user.email}})</span>
+						{% else %}
+						<span>{{request.user.email}}</span>
+						{% endif %}
+						<br>
+					<span><a id="logout" href="{% url 'customer:logout' %}?next={% url 'checkout:index' %}">{% trans "Logout" %}</a></span>
+					</p>
+			</div>
+
+		</div>
+		{% else %}
+
 		<div class="row">
 			<div class="form-group col">
 				<label class="col-form-label required" for="{{form.username.id_for_label}}">{{form.username.label}}</label>
 				{% render_field form.username class+="form-control" %}
-
 				<p class="helptext mt-1">{{ form.username.help_text }} Already have an account? <a class="underline" type="button" role="button" id="signin_button" href="{% url 'customer:login' %}?next={% url 'checkout:index' %}">Sign in</a></p>
-
 			</div>
 
 		</div>
 
-		 <div class="row d-none">
-				 <div class="form-group col">
-					{{ form.options.0 }}
-				 </div>
-			 </div>
-		 </div>
 
 
-		 <div class="row d-none">
-			 <div class="form-group col{% if form.password.errors %} error{% endif %}">
-	 			{{ form.options.errors }}
+		{% endif %}
 
- 					{{ form.options.2 }}
- 					<div class="form-inline">
- 						{% render_field form.password|append_attr:"hidden"|append_attr:"required"|remove_attr:"required" class+="form-control mr-sm-2" %}
- 						<small><a href="{% url 'password-reset' %}" tabindex="-1">{% trans "Get a password reminder" %}</a></small>
- 						{% for error in form.password.errors %}
- 							<span class="error-block">{{ error }}</span>
- 						{% endfor %}
-	 			</div>
-	 		</div>
-		 </div>
-
-		<div class="row d-none">
-			<div class="form-group col">
-				{{ form.options.1 }}
-			</div>
-		</div>
-		<div class="row">
-			<div class="input-group col">
+		<div class="row mt-4">
+			<div class="form-group col d-table">
 				{% render_field form.signup %}
 				<label class="col-form-label" for="{{form.signup.id_for_label}}">{{form.signup.label}}</label>
-
 			</div>
 		</div>
 
@@ -81,4 +56,3 @@
 		</div>
 	</div>
 </form>
-{% endif %}

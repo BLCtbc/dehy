@@ -1,3 +1,8 @@
+#mini_basket a.btn {
+	color: white;
+	background-color: var(--hg);
+}
+
 .basket_title * {
     text-transform: uppercase;
     font-variant-caps: all-petite-caps;
@@ -109,8 +114,13 @@ form {
 	z-index: 1100;
 	height: 100%;
 	width: 100%;
-	background-color: rgba(0, 0, 0, 0.25);
+	background-color: rgba(0, 0, 0, 0.35);
 	overflow-y: scroll;
+	display: none;
+}
+
+#mini_basket_container.show {
+	display: block;
 }
 
 #mini_basket {
@@ -124,6 +134,12 @@ form {
 
 
 @media (max-width: 768px) {
+
+	#mini_basket a.btn {
+		color: black;
+		background-color: var(--beige);
+	}
+
 	#basket_formset .image-container > img {
 		width: 100%;
 		height: 100%;
@@ -131,6 +147,10 @@ form {
 
 	#mini_basket {
 		background-color: var(--hg);
+	}
+
+	#mini_basket .btn {
+
 	}
 
 	#basket_formset .image-container {
