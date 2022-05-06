@@ -13,6 +13,47 @@
 	font-family: var(--checkout-font) !important;
 }
 
+
+.dropdown-spacer, .dropdown-arrow {
+	position: absolute;
+    right: 3px;
+    line-height: 1;
+    color: #495057;
+    z-index: 1350;
+    font-family: "Font Awesome 5 Free";
+    font-size: 22px;
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+	top: 8px;
+	pointer-events: none;
+}
+
+.dropdown-spacer {
+	right: 25px;
+}
+
+/* .dropdown-container::after{
+	position: absolute;
+	right: 0;
+	line-height: 1;
+	background-color: blue;
+	color: red;
+	z-index: 1350;
+	height: 20px;
+	font-family: "Font Awesome 5 Free";
+	width: 20px;
+	font-size: 22px;
+	-webkit-font-smoothing: antialiased;
+	display: inline-block;
+	font-style: normal;
+	font-variant: normal;
+	text-rendering: auto;
+	line-height: 1;
+} */
+
 #logout {
 	text-decoration: underline;
 }
@@ -498,4 +539,12 @@ p.user-info {
 	vertical-align: middle;
 	width: 100%;
 	line-height: 20px;
+}
+
+section:not(#user_info) [data-preview],
+#saved_address_dropdown {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
 }

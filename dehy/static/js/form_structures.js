@@ -282,13 +282,6 @@ const US_States =
 	},
 	{
 		"tag": "option",
-		"text": "PALAU",
-		"attrs": {
-			"value": "PW"
-		}
-	},
-	{
-		"tag": "option",
 		"text": "PENNSYLVANIA",
 		"attrs": {
 			"value": "PA"
@@ -348,13 +341,6 @@ const US_States =
 		"text": "VERMONT",
 		"attrs": {
 			"value": "VT"
-		}
-	},
-	{
-		"tag": "option",
-		"text": "VIRGIN ISLANDS",
-		"attrs": {
-			"value": "VI"
 		}
 	},
 	{
@@ -566,6 +552,14 @@ const FormStructures = {
 			"tag": "div",
 			"classes": "row",
 			"elems": [
+				{
+					"tag": "input",
+					"attrs": {
+						"type": "hidden",
+						"name": "address_id",
+						"id": "id_address_id",
+						}
+				},
 				{
 					"tag": "div",
 					"classes": "col-12 my-2",
@@ -2754,6 +2748,14 @@ const FormStructures = {
 					"classes": "row",
 					"elems": [
 						{
+							"tag": "input",
+							"attrs": {
+								"type": "hidden",
+								"name": "address_id",
+								"id": "id_address_id",
+							}
+						},
+						{
 							"tag": "div",
 							"classes": "form-group col",
 							"elems": [
@@ -3359,13 +3361,49 @@ const FormStructures = {
 			"classes":"row",
 			"elems": [{
 				"tag": "div",
-				"classes": "col-6",
-				"elems": [{
-					"tag": "span",
-					"attrs": {
-						"data-preview": "username"
+				"classes": "col-12",
+				"elems": [
+					{
+						"tag": "div",
+						"classes":"avatar-img-container",
+						"elems": [{
+							"tag":"img",
+							"classes": "avatar-img",
+							"attrs": {
+								"src": "",
+								"alt": "user avatar image",
+								"data-preview":"user_avatar"
+							}
+						}]
+					},
+					{
+						"tag": "p",
+						"classes": "user-info",
+						"elems": [
+							{
+								"tag":"span",
+								"attrs": {
+									"data-preview": "name"
+								},
+							},
+							{
+								"tag":"span",
+								"text": " ("
+							},
+							{
+								"tag":"span",
+								"attrs": {
+									"data-preview": "username"
+								},
+							},
+							{
+								"tag":"span",
+								"text": ")"
+							},
+						]
+
 					}
-				}]
+				]
 			}]
 		}],
 		"shipping": [{
@@ -3431,17 +3469,32 @@ const FormStructures = {
 									{
 										"tag": "span",
 										"attrs": {
+											"data-preview": "line2",
+										}
+									}
+								]
+							},
+							{
+								"tag": "div",
+								"classes": "col-12",
+								"elems": [
+									{
+										"tag": "span",
+										"classes": "d-inline-block",
+										"attrs": {
 											"data-preview": "line4",
 										}
 									},
 									{
 										"tag": "span",
+										"classes": "d-inline-block",
 										"attrs": {
-											"data-preview": "city"
+											"data-preview": "state"
 										}
 									},
 									{
 										"tag": "span",
+										"classes": "d-inline-block",
 										"attrs": {
 											"data-preview": "postcode",
 										}
@@ -3563,18 +3616,21 @@ const FormStructures = {
 								"elems": [
 									{
 										"tag": "span",
+										"classes": "d-inline-block",
 										"attrs": {
 											"data-preview": "line4",
 										}
 									},
 									{
 										"tag": "span",
+										"classes": "d-inline-block",
 										"attrs": {
-											"data-preview": "city"
+											"data-preview": "state"
 										}
 									},
 									{
 										"tag": "span",
+										"classes": "d-inline-block",
 										"attrs": {
 											"data-preview": "postcode",
 										}

@@ -35,7 +35,7 @@ CheckoutSessionData = get_class('checkout.utils', 'CheckoutSessionData')
 
 UserAddress = get_model('address', 'UserAddress')
 ShippingAddress = get_model('order', 'ShippingAddress')
-
+Country = get_model('address', 'Country')
 Repository = get_class('shipping.repository', 'Repository')
 # Product = get_model('catalogue', 'Product')
 
@@ -153,6 +153,30 @@ class BasketView(CoreBasketView):
 
 	template_name = 'dehy/basket/basket.html'
 
+	def get_shipping_address(self, basket):
+
+		addr_data = self.checkout_session.new_shipping_address_fields()
+		if addr_data:
+			# Load address data into a blank shipping address model
+			return ShippingAddress(**addr_data)
+
+		addr_id = self.checkout_session.shipping_user_address_id()
+		if addr_id:
+			try:
+				address = UserAddress._default_manager.get(pk=addr_id)
+			except UserAddress.DoesNotExist:
+				# An address was selected but now it has disappeared.  This can
+				# happen if the customer flushes their address book midway
+				# through checkout.  No idea why they would do this but it can
+				# happen.  Checkouts are highly vulnerable to race conditions
+				# like this.
+				return None
+			else:
+				# Copy user address data into a blank shipping address instance
+				shipping_addr = ShippingAddress()
+				address.populate_alternative_model(shipping_addr)
+				return shipping_addr
+
 	def get_shipping_methods(self, basket):
 		pass
 		# if 'checkout' in self.request.resolver_match.app_names:
@@ -190,7 +214,6 @@ class BasketView(CoreBasketView):
 	def post(self, request, *args, **kwargs):
 		data = {'object_list': {}}
 		response = super().post(request, *args, **kwargs)
-		print('\n shipping set: ', self.checkout_session.is_shipping_address_set())
 		for line in self.object_list:
 			data['object_list'][line.product_id] = {'quantity': line.quantity, 'price': line.line_price_excl_tax}
 
@@ -204,12 +227,23 @@ class BasketView(CoreBasketView):
 
 		order_data = {'basket': request.basket}
 
+
 		shipping_addr = request.POST.get('shipping_addr', None)
-		shipping_addr = json.loads(shipping_addr) if shipping_addr else self.checkout_session.get_shipping_address()
 
-		if self.checkout_session.is_shipping_address_set() and self.checkout_session.is_shipping_method_set(request.basket):
+		shipping_addr = json.loads(shipping_addr) if shipping_addr else self.get_shipping_address(request.basket)
 
-			data['shipping_methods'] = checkout_views.get_shipping_methods(request, shipping_addr, True)
+		fields = ['first_name', 'last_name', 'line1', 'line2', 'line4', 'postcode', 'state', 'country', 'phone_number']
+		shipping_fields = dict(zip(fields, shipping_addr.get_field_values(fields)))
+
+		if len(shipping_fields['country']) > 2:
+			ctry = Country.objects.get(printable_name=shipping_fields['country'])
+			shipping_fields['country'] = ctry.iso_3166_1_a2
+
+		# shipping_form = ShippingAddressForm(shipping_fields)
+		
+		if 'checkout' in self.request.resolver_match.app_names and self.checkout_session.is_shipping_address_set() and self.checkout_session.is_shipping_method_set(request.basket):
+
+			data['shipping_methods'] = checkout_views.get_shipping_methods(request, shipping_fields, True)
 			data['method_code'] = self.checkout_session.shipping_method_code(request.basket)
 
 			shipping_method = next(filter(lambda x: x['code'] == data['method_code'], data['shipping_methods']), None)
@@ -217,12 +251,13 @@ class BasketView(CoreBasketView):
 			if shipping_method:
 				data['shipping_charge'] = shipping_method['cost']
 				if 'Referer' in self.request.headers.keys() and 'checkout' in self.request.headers['Referer']:
-					order = Facade.update_or_create_order(request.basket, shipping_fields=shipping_addr, shipping_method=shipping_method)
+					order = Facade.update_or_create_order(request.basket, shipping_fields=shipping_fields, shipping_method=shipping_method)
 					data['total_tax'] = D(order.total_details.amount_tax/100).quantize(TWO_PLACES)
 
+					request.basket._total_tax = data['total_tax']
+					request.basket.save()
 					data['order_total'] += (D(data['shipping_charge']).quantize(TWO_PLACES) + data['total_tax'])
 					# data['order_total'] = str(data['order_total'])
-					data['total_tax'] = data['total_tax']
 
 		# remove empty dict
 		if 'shipping_methods' in data.keys() and not data['shipping_methods']:

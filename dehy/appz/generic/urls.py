@@ -4,10 +4,11 @@ from dehy.appz.checkout.views import ajax_get_shipping_methods, ajax_set_shippin
 
 urlpatterns = [
 	path('', views.HomeView.as_view(), name='home'),
-	path('returns/', views.ReturnsRefundsView.as_view(), name='returns'),
+	path('returns-refunds/', views.ReturnsRefundsView.as_view(), name='returns'),
 	path('wholesale/', views.WholesaleView.as_view(), name='wholesale'),
 	path('faq/', views.FAQView.as_view(), name='faq'),
 	path('privacy-policy/', views.PrivacyPolicyView.as_view(), name='privacy_policy'),
+	path('contact/', views.contact_view, name='contact'),
 	path('terms-of-service/', views.TermsOfServiceView.as_view(), name='terms_of_service'),
 	path('ajax/get_cart_quantity/', views.get_cart_quantity, name='get_cart_quantity'),
 	path('ajax/create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),

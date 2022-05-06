@@ -111,6 +111,7 @@ form {
 #mini_basket_container {
 	position: absolute;
 	right: 0;
+	top: 0;
 	z-index: 1100;
 	height: 100%;
 	width: 100%;

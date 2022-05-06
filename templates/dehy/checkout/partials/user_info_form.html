@@ -9,13 +9,17 @@
 		{% if request.user.is_authenticated %}
 		<div class="row">
 			<div class="col-12">
-				<input type="hidden" name="username" placeholder="{{request.user.email}}" autocomplete="off" class="form-control" type="hidden" id="id_username" value="{{request.user.email}}">
+					<input type="hidden" name="username" placeholder="{{request.user.email}}" autocomplete="off" class="form-control" type="hidden" id="id_username" value="{{request.user.email}}">
 					<div class="avatar-img-container">
 						<img class="avatar-img" src="{{avatar_image}}" alt="user avatar image">
+						<input type="hidden" name="user_avatar" class="form-control" type="hidden" id="id_user_avatar" value="{{avatar_image}}">
 					</div>
 					<p class="user-info">
 						{% if request.user.first_name or request.user.last_name %}
-						<span>{{request.user.first_name}} {{request.user.last_name}}</span><span> ({{request.user.email}})</span>
+						<span>{{request.user.first_name}} {{request.user.last_name}}</span>
+						<span> ({{request.user.email}})</span>
+						<input type="hidden" name="name" autocomplete="off" class="form-control" type="hidden" id="id_name" value="{{request.user.first_name}} {{request.user.last_name}}">
+
 						{% else %}
 						<span>{{request.user.email}}</span>
 						{% endif %}

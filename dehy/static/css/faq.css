@@ -89,10 +89,6 @@ header.faq {
 	margin: 0.25rem 0;
 }
 
-.row {
-	justify-content: center !important;
-}
-
 #contact_section {
 	background-size: cover;
 	background-position: center;
