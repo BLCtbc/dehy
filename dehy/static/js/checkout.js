@@ -1127,7 +1127,6 @@ dehy.ch.forms = {
 	errors: {
 		display(response) {
 			var error_text = (response.responseJSON) ? response.responseJSON.errors : response.text || response.message;
-
 			if (response.responseJSON && response.responseJSON.errors) {
 				error_text = "";
 				if (typeof(response.responseJSON.errors)!='object') {
@@ -1146,7 +1145,6 @@ dehy.ch.forms = {
 						}
 					}
 				};
-
 			}
 
 			console.log('response: ', response);
@@ -1156,8 +1154,11 @@ dehy.ch.forms = {
 			console.log('error_message: ', error_message);
 			var form = dehy.ch.forms.get();
 			var error_container = form.querySelector('#error_container');
-			error_container.classList.toggle('hidden', false);
-			error_container.querySelector('span').textContent = error_message
+			if (error_container) {
+				error_container.classList.toggle('hidden', false);
+				error_container.querySelector('span').textContent = error_message
+			}
+
 			// error_container.append(dehy.utils.create_element({tag:'div', classes:'error', text: error_message, attrs:{'id':'errors'}}));
 		},
 		hide(form=dehy.ch.forms.get()) {

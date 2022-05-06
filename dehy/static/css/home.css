@@ -108,6 +108,7 @@ figure {
 
 
 #mailing_list_email,
+#id_email,
 #mailing_list_submit {
 	font-family: monospace;
 	-webkit-box-shadow: 0 0 10px 5px var(--gold), inset 0 0 6px 3px var(--gold) !important;
@@ -118,7 +119,8 @@ figure {
 	outline: none !important;
 }
 
-#mailing_list_email {
+#mailing_list_email,
+#id_email {
 	width: 70%;
 	padding: 2rem;
 }

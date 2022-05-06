@@ -1,6 +1,8 @@
 from django.views.generic import ListView, TemplateView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, ModelFormMixin, ProcessFormView
 from django.views.generic.base import RedirectView
+from django.views.decorators.http import require_POST
+from django.utils.translation import gettext_lazy as _
 
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -19,33 +21,62 @@ from dehy.appz.checkout import facade
 from dehy.appz.generic import forms
 
 import os
+from dehy.appz.generic.models import Message, MessageUser
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
 
-# class ContactView(RedirectView):
-# 	permanent = True
-# 	query_string = True
-# 	url = reverse_lazy('faq')
-# 	# pattern_name = 'faq'
-#
-# 	def get_redirect_url(self, *args, **kwargs):
-# 		url = super().get_redirect_url(*args, **kwargs)
-# 		print('intial url: ', url)
-#
-# 		print('dir(self): ', dir(self))
-#
-# 		# url = self.request.get_host()+"#contact"
-# 		print('url: ', url)
-#
-# 		print('type(reverse_lazy(faq)): ', type(reverse_lazy(faq)))
-#
-# 		# print(reverse_lazy('faq'))
-# 		# print('dir(url): ', dir(url))
-# 		# print(self.request.get_host())
-#
-# 		return url
+
+class MailingListView(ModelFormMixin, ProcessFormView):
+	success_url = reverse_lazy('home')
+	form_class = forms.MailingListUserForm
+	model = MessageUser
+	def post(self, request, *args, **kwargs):
+
+		status_code = 400
+		message = _('Uh oh, something went wrong...')
+		data = {}
+
+		# print('form: ', form)
+		# print('form.is_valid(): ', form.is_valid())
+		# response = super().post(request, *args, **kwargs)
+
+		form = self.form_class(self.request.POST)
+		if form.is_valid() and self.form_valid(form):
+			status_code = 200
+			print('form valid')
+			message = _("Successfully added email to mailing list: ")
+			message += form.cleaned_data["email"]
+		else:
+			print('errors.as_json(): ', form.errors.as_json())
+			print('errors.as_data(): ', form.errors.as_data())
+			print('errors.as_text(): ', form.errors.as_text())
+			print('errors.get_json_data(): ', form.errors.get_json_data())
+
+			print('errors: ', form.errors)
+			print('dir(errors): ', dir(form.errors))
+
+			for k,v in form.errors.as_data().items():
+				print('k: ', k)
+				print('v: ', v)
+				print('v[0]: ', v[0])
+				# print(" ''.join(v): ", ''.join())
+
+				message += ' '.join(v[0])
+
+		data['status_code'] = status_code
+		data['message'] = message
+
+		response = JsonResponse(data)
+		response.status_code = status_code
+
+		return response
+
+
+@require_POST
+def mailing_list(request):
+	pass
 
 def contact_view(request):
 	url = request._current_scheme_host+reverse_lazy('faq')+"#contact"
@@ -69,11 +100,13 @@ class HomeView(TemplateView):
 		data = super().get_context_data(*args, **kwargs)
 		recipes = Recipe.objects.filter(featured=True)
 		products = Product._default_manager.exclude(product_class__name='Merch', structure='child')
-		data.update({'recipes':recipes, 'products':products})
+
+		data.update({'recipes':recipes, 'products':products, 'mailing_list_form': forms.MailingListUserForm})
 		return data
 
 class ReturnsRefundsView(TemplateView):
 	template_name = "dehy/generic/returns.html"
+
 
 class FAQView(ListView, FormView):
 	model = FAQ
@@ -124,7 +157,6 @@ class FAQView(ListView, FormView):
 
 
 
-	#
 	# def form_valid(self, form):
 	# 	form.send_email()
 	# 	return super().form_valid(form)

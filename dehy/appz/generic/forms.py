@@ -21,38 +21,35 @@ class ContactForm(forms.Form):
 		for visible in self.visible_fields():
 			visible.field.widget.attrs['class'] = 'form-control'
 
-		self.fields['email'].widget.attrs.update({'placeholder': 'Email'})
-		self.fields['subject'].widget.attrs.update({'placeholder': 'Subject'})
-
 		self.fields['first_name'].widget.attrs.update({'placeholder': 'First Name'})
 		self.fields['last_name'].widget.attrs.update({'placeholder': 'Last Name'})
+		self.fields['email'].widget.attrs.update({'placeholder': 'Email'})
+		self.fields['subject'].widget.attrs.update({'placeholder': 'Subject'})
 		self.fields['message'].widget.attrs.update({'placeholder': 'Message'})
-		
+
 # this version saves message and the associated email address to the database
 # useful if you want to reference message from admin or dashboard panels...
 # will definitely need some form of rate limiting and spam control if we use this version
+
+
+class MailingListUserForm(forms.ModelForm):
+	email = forms.EmailField(required=True, label=_("Email"), error_messages={'unique': _("That email is already on our mailing list!")})
+
+	class Meta:
+		model = MessageUser
+		fields = ['email']
+		# error_messages = {
+        #     'email': {
+        #         'unique': ,
+        #     },
+        # }
+
 class ContactFormV2(forms.ModelForm):
 	email = forms.EmailField(required=True, label=_("Email"))
 
 	class Meta:
 		model = Message
 		fields = '__all__'
-
-
-	def clean(self):
-
-		cleaned_data = super().clean()
-		email = cleaned_data.get('email')
-		message = cleaned_data.get('message')
-
-		if email and message:
-			user,_ = MessageUser.objects.get_or_create(email=email, defaults={'email': email})
-			if user:
-				cleaned_data['email'] = user
-
-		return cleaned_data
-
-
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -70,3 +67,16 @@ class ContactFormV2(forms.ModelForm):
 		self.fields['last_name'].widget.attrs.update({'placeholder': 'Last Name'})
 		self.fields['message'].widget.attrs.update({'placeholder': 'Message'})
 
+
+	def clean(self):
+
+		cleaned_data = super().clean()
+		email = cleaned_data.get('email')
+		message = cleaned_data.get('message')
+
+		if email and message:
+			user,_ = MessageUser.objects.get_or_create(email=email, defaults={'email': email})
+			if user:
+				cleaned_data['email'] = user
+
+		return cleaned_data
