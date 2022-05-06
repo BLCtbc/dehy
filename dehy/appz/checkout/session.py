@@ -21,8 +21,70 @@ BaseFedex = get_class('shipping.methods', 'BaseFedex')
 SurchargeApplicator = get_class("checkout.applicator", "SurchargeApplicator")
 ShippingAddress = get_model('order', 'ShippingAddress')
 Country = get_model('address', 'Country')
+UserAddress = get_model('address', 'UserAddress')
 
 class CheckoutSessionMixin(session.CheckoutSessionMixin):
+	def check_a_valid_shipping_method_is_captured(self):
+
+		# Check that shipping method has been set
+		if not self.checkout_session.is_shipping_method_set(self.request.basket):
+			pass
+			# raise exceptions.FailedPreCondition(
+			# 	url=reverse('checkout:shipping'),
+			# 	message=_("Please choose a shipping method")
+			# )
+
+		# Check that a *valid* shipping method has been set
+		shipping_address = self.get_shipping_address(
+			basket=self.request.basket)
+		shipping_method = self.get_shipping_method(
+			basket=self.request.basket,
+			shipping_address=shipping_address)
+		if not shipping_method:
+			pass
+			# raise exceptions.FailedPreCondition(
+			# 	url=reverse('checkout:shipping'),
+			# 	message=_("Your previously chosen shipping method is "
+			# 			  "no longer valid.  Please choose another one")
+			# )
+
+	def check_shipping_data_is_captured(self, request):
+
+		if not request.basket.is_shipping_required():
+			# Even without shipping being required, we still need to check that
+			# a shipping method code has been set.
+			if not self.checkout_session.is_shipping_method_set(self.request.basket):
+				pass
+				# raise exceptions.FailedPreCondition(
+				# 	url=reverse('checkout:shipping'),
+				# )
+			return
+
+		self.check_a_valid_shipping_address_is_captured()
+		self.check_a_valid_shipping_method_is_captured()
+
+	def check_a_valid_shipping_address_is_captured(self):
+
+		# Check that shipping address has been completed
+		if not self.checkout_session.is_shipping_address_set():
+
+			pass
+			# raise exceptions.FailedPreCondition(
+			# 	url=reverse('checkout:shipping'),
+			# 	message=_("Please choose a shipping address")
+			# )
+
+		# Check that the previously chosen shipping address is still valid
+		shipping_address = self.get_shipping_address(
+			basket=self.request.basket)
+		if not shipping_address:
+			pass
+			# raise exceptions.FailedPreCondition(
+			# 	url=reverse('checkout:shipping'),
+			# 	message=_("Your previously chosen shipping address is "
+			# 			  "no longer valid.  Please choose another one")
+			# )
+
 
 	def get_shipping_address(self, basket):
 
@@ -62,7 +124,9 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		The shipping address is passed as we need to check that the method
 		stored in the session is still valid for the shipping address.
 		"""
+
 		code = self.checkout_session.shipping_method_code(basket)
+
 
 		# methods,status_code = Repository().get_shipping_methods(
 		# 	basket=basket, user=self.request.user,
@@ -140,7 +204,6 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		)
 		total = self.get_order_totals(request.basket, shipping_charge, surcharges)
 		if total.excl_tax == D('0.00'):
-			print("total.excl_tax == D('0.00')")
 			print("total.excl_tax: ", total.excl_tax)
 
 			raise exceptions.PassedSkipCondition(

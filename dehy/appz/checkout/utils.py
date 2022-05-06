@@ -120,6 +120,6 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		self._flush_namespace('billing')
 		self._set('billing', 'billing_address_same_as_shipping', True)
 
-	get_shipping_address = new_shipping_address_fields
+	# get_shipping_address = new_shipping_address_fields
 	is_stripe_customer_set = is_stripe_customer_field_set
 	is_stripe_customer_id_set = is_stripe_customer_field_set

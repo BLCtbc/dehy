@@ -11,6 +11,10 @@ var dehy = {
 			dehy.utils.freeze_submissions = true;
 			dehy.utils.freeze_forms();
 			dehy.loadStart = window.performance.now();
+			// unfreeze after 20s, just incase
+			setTimeout(function() {
+				dehy.utils.unfreeze_forms();
+			}, 20000);
 		});
 
 		$( document ).ajaxStop(function(xhr, settings) {
@@ -21,6 +25,7 @@ var dehy = {
 			} else {
 				dehy.utils.unfreeze_forms();
 			}
+			dehy.loading_message = 'Loading...';
 
 		});
 
@@ -153,9 +158,15 @@ var dehy = {
 					}
 					let v = parseInt(input.value) + n;
 
-					input.value = (n < 0) ? Math.max(v, input.min) : Math.min(v, input.max);
-					const change = new Event('change');
-					input.dispatchEvent(change);
+					var min = (input.closest("#basket_formset")) ? 0 : input.min;
+					input.value = (n < 0) ? Math.max(v, min) : Math.min(v, input.max);
+					if (v==0 && min==0) {
+						var qty_select = input.closest(".quantity-select-container");
+						qty_select.parentNode.querySelector('.remove-basket-item').click();
+					} else {
+						const change = new Event('change');
+						input.dispatchEvent(change);
+					}
 				}
 			},
 			// increment_input_quantity(elem, n=1) {
@@ -223,10 +234,6 @@ var dehy = {
 					document.body.addEventListener("click", e=>{
 						var loading_modal = document.getElementById("loading_modal"),
 							confirm_item_removal =  document.getElementById("confirm_item_removal");
-
-						console.log('e.path: ', e.path);
-						console.log('confirm_item_removal: ', e.path.includes(confirm_item_removal));
-						console.log('loading_modal: ', e.path.includes(loading_modal));
 
 						if (mini_basket_container && !e.path.includes(mini_basket) && !e.path.includes(confirm_item_removal) && !e.path.includes(loading_modal)) {
 							document.body.classList.toggle("modal-open", false);

@@ -1,15 +1,49 @@
-{% extends "dehy/layout.html" %}
+{% extends "dehy/layout_2_col.html" %}
 
 {% load i18n %}
 {% load product_tags %}
+{% load static %}
 
 {% block title %}
 {{ block.super }} | {% trans "Terms of Service" %}
 {% endblock title %}
 
-{% block layout %}
-{{block.super}}
-	{% block content %}
-	{% endblock content %}
-{% endblock layout %}
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/policies.css' %}"/>
+{% endblock extrastyles %}
+
+{% block header_title %}
+{% trans "Terms of Service" %}
+{% endblock header_title %}
+
+{% block header %}
+<header class='content-section row mb-5' id="header">
+</header>
+{% endblock header %}
+
+{% block content_wrapper %}
+<div class="row justify-content-center">
+	<div class="col-10">
+		<p>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lectus vestibulum mattis ullamcorper velit. Arcu bibendum at varius vel. Enim lobortis scelerisque fermentum dui faucibus in ornare. Elit duis tristique sollicitudin nibh sit amet. Eu consequat ac felis donec et odio pellentesque diam. Non diam phasellus vestibulum lorem sed risus ultricies. Sed turpis tincidunt id aliquet. Et malesuada fames ac turpis egestas sed. Eu facilisis sed odio morbi quis commodo odio aenean. Ultricies tristique nulla aliquet enim tortor at. Amet commodo nulla facilisi nullam vehicula ipsum a arcu.
+		</p>
+
+		<p>
+		Mi proin sed libero enim sed faucibus turpis in. Facilisis volutpat est velit egestas dui id ornare. Amet justo donec enim diam. Ut sem viverra aliquet eget sit. Eu sem integer vitae justo eget magna fermentum iaculis eu. Diam sit amet nisl suscipit adipiscing bibendum est ultricies. Dignissim sodales ut eu sem. Nisl tincidunt eget nullam non nisi. Tortor posuere ac ut consequat. Massa id neque aliquam vestibulum. Malesuada proin libero nunc consequat. Facilisi cras fermentum odio eu feugiat.
+		</p>
+
+		<p>
+		Purus gravida quis blandit turpis cursus. Commodo quis imperdiet massa tincidunt nunc. Cursus in hac habitasse platea dictumst quisque. Odio ut sem nulla pharetra diam sit amet nisl suscipit. Orci eu lobortis elementum nibh tellus. Accumsan sit amet nulla facilisi morbi tempus iaculis urna id. Dolor purus non enim praesent. Ultrices in iaculis nunc sed augue. Velit scelerisque in dictum non consectetur a erat. Nisl vel pretium lectus quam id leo.
+		</p>
+
+		<p>
+		Nisi est sit amet facilisis magna etiam tempor orci eu. Amet cursus sit amet dictum sit. Volutpat est velit egestas dui id ornare arcu. In nisl nisi scelerisque eu ultrices vitae. Fermentum dui faucibus in ornare quam viverra orci sagittis eu. Velit laoreet id donec ultrices. Vel elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique. Lorem ipsum dolor sit amet consectetur adipiscing. In ornare quam viverra orci sagittis eu volutpat odio facilisis. Semper viverra nam libero justo laoreet sit amet cursus. Dignissim sodales ut eu sem integer vitae. In mollis nunc sed id semper risus in. Donec massa sapien faucibus et. Vitae et leo duis ut diam quam. Nec nam aliquam sem et tortor consequat id porta. Nisi est sit amet facilisis magna. Varius quam quisque id diam vel quam. Risus nec feugiat in fermentum. Duis convallis convallis tellus id.
+		</p>
+
+		<p>
+		Massa vitae tortor condimentum lacinia quis vel eros donec. Leo integer malesuada nunc vel. Eu tincidunt tortor aliquam nulla facilisi cras. Arcu non odio euismod lacinia at quis risus sed vulputate. Egestas congue quisque egestas diam in arcu cursus. Nunc lobortis mattis aliquam faucibus. Sed ullamcorper morbi tincidunt ornare massa eget egestas purus. Dolor magna eget est lorem ipsum. Convallis posuere morbi leo urna molestie at elementum eu facilisis. Suscipit adipiscing bibendum est ultricies integer quis auctor elit sed. Enim nec dui nunc mattis enim. Ornare massa eget egestas purus viverra accumsan in. Eget mi proin sed libero enim sed faucibus turpis. Velit ut tortor pretium viverra suspendisse potenti nullam ac tortor. Vel quam elementum pulvinar etiam non quam lacus. A iaculis at erat pellentesque adipiscing commodo elit at. Magna eget est lorem ipsum dolor sit amet.
+		</p>
+	</div>
+</div>
+{% endblock content_wrapper %}
 

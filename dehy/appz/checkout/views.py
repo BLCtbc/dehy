@@ -8,7 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
-from django.http import QueryDict, JsonResponse, HttpResponseRedirect
+from django.http import QueryDict, JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.forms.models import model_to_dict
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect, render, get_object_or_404
@@ -38,6 +38,7 @@ Order = get_model('order', 'Order')
 Product = get_model('catalogue', 'Product')
 
 User = get_model('generic', 'User')
+UserAddress = get_model('address', 'UserAddress')
 
 BillingAddressForm, StripeTokenForm, ShippingAddressForm, ShippingMethodForm, UserInfoForm, AdditionalInfoForm, SubmitOrderForm, CountryAndPostcodeForm \
 	= get_classes('checkout.forms', ['BillingAddressForm', 'StripeTokenForm', 'ShippingAddressForm', 'ShippingMethodForm', 'UserInfoForm', 'AdditionalInfoForm', 'PurchaseConfirmationForm', 'CountryAndPostcodeForm'])
@@ -133,7 +134,6 @@ def webhook_submit_order(request):
 		return response
 
 	if event['type'] == 'order.payment_completed':
-		print('Event type {}'.format(event['type']))
 
 		order = event['data']['object']
 		basket = get_object_or_404(Basket, id=order.metadata.get('basket_id'))
@@ -143,26 +143,7 @@ def webhook_submit_order(request):
 		response.status_code = 200
 		return response
 
-	# Handle the event
-	# if event['type'] == 'payment_intent.succeeded' or event['type'] == 'order.completed':
-	# 	print('Event type {}'.format(event['type']))
-	# 	payment_intent = event['data']['object']
-	#
-	# 	basket = get_object_or_404(Basket, id=payment_intent.metadata.get('basket_id'))
-	# 	order_id = payment_intent.metadata.get('order_id', None) or f"order_{basket.stripe_order_id}"
-	#
-	# 	order = Facade.stripe.Order.retrieve(order_id, expand=['customer', 'payment.payment_intent', 'line_items'])
-	# 	place_order_view.handle_place_order_submission(basket, order)
-	#
-	# 	response = JsonResponse({})
-	# 	response.status_code = 200
-	# 	return response
 
-	# if event['type'] == 'order.payment_succeeded':
-	# 	order = event['data']['object']
-
-
-	# ... handle other event types
 	else:
 		msg = f"Unhandled event type {event['type']}"
 		logger.debug(msg)
@@ -198,29 +179,42 @@ def ajax_set_shipping_method(request):
 		data['shipping_charge'] = str(D(order.total_details.amount_shipping/100).quantize(TWO_PLACES))
 		data['order_total'] = str(D(order.amount_total/100).quantize(TWO_PLACES))
 
+		# request.basket._total_tax = data['total_tax']
+		# request.basket.save()
+
+		request.session['total_tax'] = data['total_tax']
+		request.session['subtotal'] = data['subtotal']
 
 	response = JsonResponse(data)
 	response.status_code = status_code
 	return response
 
 
-def get_shipping_methods(request, shipping_fields, frontend_formatted=False, return_status_code=False, form=None):
+def get_shipping_methods(request, shipping_fields={}, frontend_formatted=False, return_status_code=False, form=None):
 	shipping_address_form = form
 	shipping_methods, methods = [], []
+
+	print('shipping_fields: ', shipping_fields)
+	print('dir(shipping_fields): ', dir(shipping_fields))
+
 	if type(shipping_fields) is str:
 		shipping_fields = json.loads(shipping_fields)
 
-	if not shipping_fields.get('country', None):
-		# shipping_fields['country'] = Country.objects.get(iso_3166_1_a2=shipping_fields['country_id'])
-		shipping_fields['country'] = shipping_fields.get('country_id')
+	if shipping_fields:
+		if hasattr(shipping_fields, 'country') and not shipping_fields.country:
+			shipping_fields['country'] = shipping_fields.get('country_id')
+		elif isinstance(shipping_fields, dict) and not shipping_fields.get('country', None):
+			shipping_fields['country'] = shipping_fields.get('country_id', None)
 
-	if not shipping_address_form:
+		# shipping_fields['country'] = Country.objects.get(iso_3166_1_a2=shipping_fields['country_id'])
+
+	if shipping_fields and not shipping_address_form:
 		shipping_address_form = CountryAndPostcodeForm(shipping_fields)
 
-		if not shipping_address_form.is_valid():
-			print('\n shipping_address_form errors: ', shipping_address_form.errors)
+	if not shipping_address_form.is_valid():
+		print('\n shipping_address_form errors: ', shipping_address_form.errors)
 
-	if 'postcode' in shipping_address_form.cleaned_data.keys() and 'country' in shipping_address_form.cleaned_data.keys():
+	if shipping_address_form.is_valid() and 'postcode' in shipping_address_form.cleaned_data.keys() and 'country' in shipping_address_form.cleaned_data.keys():
 
 		# address_fields = dict((k, v) for (k, v) in shipping_address_form.instance.__dict__.items() if not k.startswith('_'))
 		# country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
@@ -246,21 +240,19 @@ def get_shipping_methods(request, shipping_fields, frontend_formatted=False, ret
 	return methods
 
 # also 'corrects' city and state based on postcode
-def ajax_get_shipping_methods(request):
+def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_response=True):
 	data = {}
 	status_code = 400
 
-	# try:
 	post_data = request.POST.copy()
 
-	if post_data.get('postcode', None):
+	if post_data.get('postcode', None) and (correct_city_state or not (post_data.get('line4', None) or post_data.get('state', None))):
 		city_and_state_data = get_city_and_state(request.POST.get('postcode'))
 		post_data.update(city_and_state_data)
 		data.update(city_and_state_data)
 
-
 	checkout_session = CheckoutSessionData(request)
-	shipping_address_form = CountryAndPostcodeForm(post_data)
+	shipping_address_form = form if (form and form.is_valid()) else CountryAndPostcodeForm(post_data)
 
 	if not shipping_address_form.is_valid():
 
@@ -270,7 +262,6 @@ def ajax_get_shipping_methods(request):
 	if 'postcode' in shipping_address_form.cleaned_data.keys() and 'country' in shipping_address_form.cleaned_data.keys():
 		status_code = 200
 		address_fields = dict((k, v) for (k, v) in shipping_address_form.instance.__dict__.items() if not k.startswith('_'))
-		print('address_fields: ', address_fields)
 		country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
 		# shipping_address = ShippingAddress(**address_fields)
 		# checkout_session.ship_to_new_address(address_fields)
@@ -279,15 +270,21 @@ def ajax_get_shipping_methods(request):
 
 		if methods:
 
+
 			data['shipping_methods'] = methods
 			data['shipping_postcode'] = address_fields['postcode']
 			checkout_session = CheckoutSessionData(request)
+			selected_shipping_method = data['shipping_methods'][0]
+			selected_code = post_data.get('method_code', None)
+			if selected_code:
+				selected_method_filter = list(filter(lambda x: x['code']==selected_code, data['shipping_methods']))
+				if selected_method_filter:
+					selected_shipping_method = selected_method_filter[0]
 
-			data['shipping_charge'] = data['shipping_methods'][0]['cost']
-			checkout_session.use_shipping_method(data['shipping_methods'][0]['code'])
 
-
-			order = Facade.update_or_create_order(request.basket, shipping_fields=address_fields, shipping_method={'cost':data['shipping_charge'], 'code':data['shipping_methods'][0]['code'], 'name':data['shipping_methods'][0]['name']})
+			data['shipping_charge'] = selected_shipping_method['cost']
+			checkout_session.use_shipping_method(selected_shipping_method['code'])
+			order = Facade.update_or_create_order(request.basket, shipping_fields=address_fields, shipping_method={'cost':selected_shipping_method['cost'], 'code':selected_shipping_method['code'], 'name':selected_shipping_method['name']})
 
 			checkout_session.set_order_number(str(order.id).replace("order_", ""))
 			data['order_client_secret'] = order.client_secret
@@ -296,10 +293,17 @@ def ajax_get_shipping_methods(request):
 			data['subtotal'] = str(D(order.amount_subtotal/100).quantize(TWO_PLACES))
 			data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWO_PLACES))
 
+			request.session['total_tax'] = data['total_tax']
+			request.session['subtotal'] = data['subtotal']
+
+			# request.basket._total_tax = data['total_tax']
+			# request.basket.save()
+
 
 	response = JsonResponse(data)
 	response.status_code = status_code
-	return response
+	return response if as_response else data
+
 
 
 class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
@@ -339,11 +343,10 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 	def get(self, request, *args, **kwargs):
 
-
 		response = super().get(request, *args, **kwargs)
-
-		self.checkout_session.reset_shipping_data()
-
+		print('request.session: ', request.session)
+		print('dir(request.session): ', dir(request.session))
+		print('request.session.items(): ', request.session.items())
 
 		if request.user.is_authenticated:
 			pass
@@ -355,17 +358,64 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 		return response
 
+	def get_available_addresses(self):
+		# Include only addresses where the country is flagged as valid for
+		# shipping. Also, use ordering to ensure the default address comes
+		# first.
+		return self.request.user.addresses.filter(
+			country__is_shipping_country=True).order_by(
+			'-is_default_for_shipping')
+
 	def post(self, request, *args, **kwargs):
 
+		print('shipping method set: ', self.checkout_session.is_shipping_method_set(self.request.basket))
+		print('shipping address set: ', self.checkout_session.is_shipping_address_set())
 		data = {}
 		status_code = 400
 		form = self.form_class(request, request.POST)
 		response = super().post(request, *args, **kwargs)
 
 		if request.is_ajax():
+
 			email = ''
 			if request.user.is_authenticated:
 				email = request.user.email
+
+				available_shipping_addresses = self.get_available_addresses()
+				default_shipping_addr = available_shipping_addresses[0]
+				self.checkout_session.ship_to_user_address(default_shipping_addr)
+
+				data['saved_addresses'] = []
+
+				fields = ['first_name', 'last_name', 'line1', 'line2', 'line4', 'postcode', 'state', 'country', 'phone_number']
+				shipping_fields = dict(zip(fields, default_shipping_addr.get_field_values(fields)))
+
+				if len(shipping_fields['country']) > 2:
+					ctry = Country.objects.get(printable_name=shipping_fields['country'])
+					shipping_fields['country'] = ctry.iso_3166_1_a2
+
+				shipping_form = ShippingAddressForm(shipping_fields)
+
+				_data = ajax_get_shipping_methods(request, form=shipping_form, as_response=False)
+
+				data.update(_data)
+
+				for _address in available_shipping_addresses:
+					address = {
+						'id': _address.id,
+						'first_name': _address.first_name,
+						'last_name': _address.last_name,
+						'line1': _address.line1,
+						'line2': _address.line2,
+						'line4': _address.line4,
+						'postcode': _address.postcode,
+						'state': _address.state,
+						'country': _address.country.iso_3166_1_a2,
+						'phone_number': str(_address.phone_number)
+					}
+
+					data['saved_addresses'].append(address)
+
 
 			elif form.is_valid():
 				email = form.cleaned_data['username']
@@ -440,12 +490,15 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		if request.is_ajax():
 			status_code = 400
 
+
 			# need some kind of check here to see if shipping methods should be returned
 			# need another check to see if shipping methods should have changed, i.e
 			if not hasattr(self, '_methods'):
 				self._methods = self.get_available_shipping_methods() ## must be called prior to super().get()
 
 			data = {'shipping_methods':[]}
+
+
 
 			if self.geolocation_is_valid():
 				## attempt to get shipping methods available based on geolocation
@@ -464,6 +517,10 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		return response
 
 	def post(self, request, *args, **kwargs):
+		print('\n CURRENT SHIPPING METHOD: ', self.checkout_session.shipping_method_code(self.request.basket))
+
+		print('shipping method set: ', self.checkout_session.is_shipping_method_set(self.request.basket))
+		print('shipping address set: ', self.checkout_session.is_shipping_address_set())
 		# super().get_context_data(*args, **kwargs)
 		status_code = 400
 
@@ -474,14 +531,12 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			# qd = request.POST.dict()
 			shipping_method_code = request.POST.get('method_code', None)
 			shipping_method_code = shipping_method_code if shipping_method_code else self.checkout_session.shipping_method_code
-			# shipping_method_data.update({'csrfmiddlewaretoken': [qd['csrfmiddlewaretoken']], 'method_code': shipping_method_code})
-			# shipping_address_data.update(qd)
 
 			# shipping_address_form = ShippingAddressForm(shipping_address_data, *args, **kwargs)
 			shipping_address_form = ShippingAddressForm(request.POST)
 
 
-			print('form_valid: ', self.form_valid(shipping_address_form))
+			# print('form_valid: ', self.form_valid(shipping_address_form))
 
 			if not hasattr(self, '_methods'):
 				shipping_methods = self.get_available_shipping_methods()
@@ -492,21 +547,32 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 
 			response = super().post(request, *args, **kwargs)
 
-			data = {'shipping_methods':[], 'section': 'shipping'}
+			data = {'section': 'shipping'}
 
-
-			# shipping_method_form = ShippingMethodForm(shipping_method_data, methods=self._methods)
 
 			shipping_method_form = ShippingMethodForm(request.POST, methods=self._methods)
 
 			if all([shipping_address_form.is_valid(), self.shipping_method_form_valid(shipping_method_form)]):
 
-				status_code = 200
-				country = shipping_address_form.cleaned_data['country']
+				if request.user.is_authenticated:
+					if 'address_id' in self.request.POST:
+						address = UserAddress._default_manager.filter(pk=self.request.POST['address_id'], user=self.request.user)
+						if address:
+							address = address.first()
+							self.checkout_session.ship_to_user_address(address)
 
-				context_data = self.get_context_data(*args, **kwargs)
-				shipping_address_obj = self.get_shipping_address(self.request.basket)
-				data['shipping_charge'] = context_data['shipping_charge'].incl_tax
+				else:
+					self.checkout_session.ship_to_new_address(address_fields)
+
+				status_code = 200
+
+				self.checkout_session.use_shipping_method(shipping_method_form.cleaned_data['method_code'])
+
+				# country = shipping_address_form.cleaned_data['country']
+				# context_data = self.get_context_data(*args, **kwargs)
+				# shipping_address_obj = self.get_shipping_address(self.request.basket)
+
+				# data['shipping_charge'] = context_data['shipping_charge'].incl_tax
 
 			else:
 				data['errors'] = shipping_address_form.errors
@@ -568,7 +634,10 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 			print(f'\n *** form.errors: {form.errors}')
 			return False
 
+		print('shipping_method_form_valid, using method_code: ', form.cleaned_data['method_code'])
+
 		self.checkout_session.use_shipping_method(form.cleaned_data['method_code'])
+
 		return True
 
 	def form_valid(self, form, option=None):
@@ -576,7 +645,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		# Store the address details in the session and redirect to next step
 		address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
 
-		self.checkout_session.ship_to_new_address(address_fields)
 		return super().form_valid(form)
 
 	## checks validity of zipcode or city + state
@@ -623,14 +691,68 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 		response.status_code = status_code
 		return response
 
+	def get_available_addresses(self):
+		# Include only addresses where the country is flagged as valid for
+		# shipping. Also, use ordering to ensure the default address comes
+		# first.
+		return self.request.user.addresses.filter(
+			country__is_shipping_country=True).order_by(
+			'-is_default_for_billing')
+
 	def post(self, request, *args, **kwargs):
 		status_code = 400
 		response = super().post(request,*args, **kwargs)
-		data = {'section': 'additional_info'}
+		data = {'section': 'additional_info', 'same_as_shipping': True}
 		if request.is_ajax():
 			form = self.form_class(request.POST)
 
+
 			if self.form_valid(form) and form.is_valid():
+
+				if self.request.user.is_authenticated:
+
+					available_billing_addresses = self.get_available_addresses()
+
+					default_billing_addr = available_billing_addresses[0]
+					self.checkout_session.bill_to_user_address(default_billing_addr)
+
+					if not default_billing_addr.is_default_for_shipping:
+						data['same_as_shipping'] = False
+
+					# self.checkout_session.ship_to_user_address(default_billing_addr)
+
+					data['saved_addresses'] = []
+
+					fields = ['first_name', 'last_name', 'line1', 'line2', 'line4', 'postcode', 'state', 'country', 'phone_number']
+					billing_fields = dict(zip(fields, default_billing_addr.get_field_values(fields)))
+
+					if len(billing_fields['country']) > 2:
+						ctry = Country.objects.get(printable_name=billing_fields['country'])
+						billing_fields['country'] = ctry.iso_3166_1_a2
+
+
+					billing_form = BillingAddressForm(billing_fields)
+
+					# should we get cards here?
+					#
+
+					for _address in available_billing_addresses:
+						address = {
+							'id': _address.id,
+							'first_name': _address.first_name,
+							'last_name': _address.last_name,
+							'line1': _address.line1,
+							'line2': _address.line2,
+							'line4': _address.line4,
+							'postcode': _address.postcode,
+							'state': _address.state,
+							'country': _address.country.iso_3166_1_a2,
+							'phone_number': str(_address.phone_number)
+						}
+
+						data['saved_addresses'].append(address)
+
+
 
 				form.cleaned_data['purchase_business_type']
 				form.cleaned_data['business_name']
@@ -689,7 +811,7 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 	def post(self, request, *args, **kwargs):
 		data = {'section': 'billing'}
 		status_code = 400
-
+		email = ''
 		response = super().post(request, *args, **kwargs)
 		context = self.get_context_data(*args, **kwargs)
 		total = context['order_total']
@@ -700,26 +822,35 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 			print('form non_field_errors: ', form.non_field_errors)
 
 		if not request.is_ajax():
-			print('form errors: ', form.errors)
+			return HttpResponseBadRequest()
 
 		if request.is_ajax() and form.is_valid():
 			status_code = 200
 			cleaned_data = form.cleaned_data
 
-			if cleaned_data['same_as_shipping']:
-				# self.checkout_session.ship_to_new_address(self.checkout_session.new_shipping_address_fields())
-				self.checkout_session.bill_to_shipping_address()
-
 			address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
-
 			phone_number = address_fields.get('phone_number').as_international if address_fields.get('phone_number', None) else None
-			address_fields.update({'email': self.checkout_session.get_guest_email()})
-
 			if phone_number:
 				address_fields.update({'phone':phone_number})
 
 			if isinstance(address_fields.get('country', None), Country):
 				address_fields['country'] = address_fields['country'].iso_3166_1_a2
+
+			if request.user.is_authenticated:
+				email = self.request.user.email
+				if 'address_id' in self.request.POST and UserAddress._default_manager.filter(pk=self.request.POST['address_id'], user=self.request.user):
+					address = UserAddress._default_manager.get(pk=self.request.POST['address_id'], user=self.request.user)
+					self.checkout_session.bill_to_user_address(address)
+
+			else:
+				email = self.checkout_session.get_guest_email()
+				self.checkout_session.bill_to_new_address(address_fields)
+
+			if cleaned_data['same_as_shipping']:
+				# self.checkout_session.ship_to_new_address(self.checkout_session.new_shipping_address_fields())
+				self.checkout_session.bill_to_shipping_address()
+
+			address_fields.update({'email': email})
 
 			# order = Facade.update_and_process_order(request.basket, billing_fields=address_fields)
 			billing_details = Facade.coerce_to_address_object(address_fields)
@@ -765,7 +896,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		try:
 			self.check_skip_conditions(request)
 		except exceptions.PassedSkipCondition as e:
-			return http.HttpResponseRedirect(e.url)
+			return HttpResponseRedirect(e.url)
 
 		# Enforce any pre-conditions for the view.
 		try:
@@ -773,7 +904,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		except exceptions.FailedPreCondition as e:
 			for message in e.messages:
 				messages.warning(request, message)
-			return http.HttpResponseRedirect(e.url)
+			return HttpResponseRedirect(e.url)
 
 		return super().dispatch(
 			request, *args, **kwargs)
@@ -802,6 +933,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			if request.basket.is_submitted():
 				data['order_number'] = self.get_order_number() or request.basket.stripe_order_id
 				pass
+
 			# uh oh...
 			else:
 				pass
@@ -1097,7 +1229,7 @@ class ThankYouView(views.ThankYouView):
 	Displays the 'thank you' page which summarises the order just submitted.
 	"""
 	template_name = 'dehy/checkout/thank_you.html'
-	max_wait = 15
+	max_wait = 20
 	def get(self, request, *args, **kwargs):
 		self.object = self.get_object()
 		if self.object is None:
@@ -1138,10 +1270,8 @@ class ThankYouView(views.ThankYouView):
 					basket.refresh_from_db()
 					submitted = basket.is_submitted
 
-					print(f'\n basket.is_submitted: {submitted}')
 
 					if time.time() - start_time > self.max_wait:
-						print('\n *** max wait time exceeded: ', time.time() - start_time)
 						return order
 
 
@@ -1152,11 +1282,19 @@ class ThankYouView(views.ThankYouView):
 
 		return order
 
-
-class ShippingAddressRedirectView(RedirectView):
-
-    permanent = True
-    pattern_name = 'checkout:shipping'
-
-    def get_redirect_url(self, *args, **kwargs):
-        return reverse_lazy('checkout:shipping')
+#
+# class ShippingAddressRedirectView(RedirectView):
+#
+# 	permanent = True
+# 	pattern_name = 'checkout:shipping'
+#
+# 	def get_redirect_url(self, *args, **kwargs):
+# 		return reverse_lazy('checkout:shipping')
+#
+# class ShippingMethodRedirectView(RedirectView):
+#
+# 	permanent = True
+# 	pattern_name = 'checkout:shipping'
+#
+# 	def get_redirect_url(self, *args, **kwargs):
+# 		return reverse_lazy('checkout:shipping')

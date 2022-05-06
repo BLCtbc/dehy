@@ -1,5 +1,7 @@
 from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
+from django.views.generic.base import RedirectView
+
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -21,6 +23,35 @@ import os
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
+
+# class ContactView(RedirectView):
+# 	permanent = True
+# 	query_string = True
+# 	url = reverse_lazy('faq')
+# 	# pattern_name = 'faq'
+#
+# 	def get_redirect_url(self, *args, **kwargs):
+# 		url = super().get_redirect_url(*args, **kwargs)
+# 		print('intial url: ', url)
+#
+# 		print('dir(self): ', dir(self))
+#
+# 		# url = self.request.get_host()+"#contact"
+# 		print('url: ', url)
+#
+# 		print('type(reverse_lazy(faq)): ', type(reverse_lazy(faq)))
+#
+# 		# print(reverse_lazy('faq'))
+# 		# print('dir(url): ', dir(url))
+# 		# print(self.request.get_host())
+#
+# 		return url
+
+def contact_view(request):
+	url = request._current_scheme_host+reverse_lazy('faq')+"#contact"
+	request.status_code = 302
+	return redirect(url)
+	# pattern_name = 'faq'
 
 class WholesaleView(TemplateView):
 	template_name = "dehy/generic/wholesale.html"
@@ -77,7 +108,8 @@ class FAQView(ListView, FormView):
 			response = redirect(self.success_url)
 			return response
 
-			# some kind of rate limiting here, spam detection, etc. would be good here
+			# some kind of rate limiting/spam detection, etc. would be good here
+			# maybe a captcha?
 			# email_user = MessageUser.objects.get_or_create()
 
 			# if 'email' in contact_form.cleaned_data:

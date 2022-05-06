@@ -1,0 +1,21 @@
+main h2 {
+	font-family: 'freefrm';
+	font-size: 3.5rem;
+	margin: 2rem 0;
+}
+main h1 {
+	font-size: 4rem;
+	margin: 2rem 0;
+}
+
+main p,
+main li {
+	color: white;
+	font-size: 1.5rem;
+	font-weight: 400;
+	font-family: 'lydiacondensed-bold';
+}
+
+main li {
+	list-style: inherit;
+}

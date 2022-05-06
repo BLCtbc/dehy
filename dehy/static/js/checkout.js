@@ -7,6 +7,13 @@ window.addEventListener('load', function () {
 // DEHY.checkout namespace
 dehy.ch = {
 	utils: {
+		loading_messages: {
+			'user_info':'Loading shipping addresses...',
+			'shipping':'Updating shipping info...',
+			'additional_info':'Loading billing addresses...',
+			'billing':'updating billing info...',
+			'place_order':'Placing Order...',
+		},
 		re: {
 			us: '(^[0-9]{5}$)|(^[0-9]{5}-[0-9]{4}$)',
 			ca: /^[abceghjklmnprstvxy][0-9][abceghjklmnprstvwxyz]\s?[0-9][abceghjklmnprstvwxyz][0-9]$/i,
@@ -41,7 +48,22 @@ dehy.ch = {
 			document.querySelectorAll('#checkout_flow section').forEach(function(section) {
 				section.classList.toggle('active', false);
 			})
-		}
+		},
+		objects_are_same(obj1=null, obj2=null) {
+			var is_same = true;
+			if (!obj1 || !obj2) {
+				is_same = false
+			} else {
+				for (let [key, val] of Object.entries(obj1)) {
+					if (obj2.hasOwnProperty(key) && obj2[key] != val) {
+						console.log(`${obj2[key]} != ${val}`);
+						is_same = false;
+						return is_same;
+					}
+				}
+			}
+			return is_same;
+		},
 
 	},
 	_stripe: null,
@@ -57,21 +79,28 @@ dehy.ch = {
 		billing_same_as_shipping_handler(checked=true, form=dehy.ch.forms.get()) {
 			if (checked) {
 				dehy.ch.forms.saved_form_data.billing = dehy.ch.forms.saved_form_data.shipping;
+				var saved_address_dropdown = document.getElementById('saved_address_dropdown');
+				if (saved_address_dropdown) {
+					saved_address_dropdown.selectedIndex = saved_address_dropdown.options.length-1
+				}
 			}
-			var elems = Array.from(form.querySelector('.form-container').querySelectorAll("input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping']), select"));
+			var same_as_shipping_elem = document.getElementById('id_same_as_shipping');
+			same_as_shipping_elem.checked = checked;
+
+			var selector_string = "input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping'], [for='saved_address_dropdown']), select:not([id='saved_address_dropdown'])";
+			var elems = Array.from(form.querySelector('.form-container').querySelectorAll(selector_string));
 			var form_controls = [...new Set(elems.map(function(e) {return e.closest('.row')}))]
 			var address = dehy.ch.forms.saved_form_data.billing
 			form_controls.forEach(function(row) {
 				row.classList.toggle('display-none', checked);
-				var inputs_and_labels = row.querySelectorAll("input:not([type=hidden], [name='same_as_shipping']), label:not([for='id_same_as_shipping']), select")
+				var inputs_and_labels = row.querySelectorAll(selector_string)
 				inputs_and_labels.forEach(function(elem) {
-					if (elem.name && address.hasOwnProperty(elem.name)) {
+					if (elem.name && address && address.hasOwnProperty(elem.name)) {
 						if (elem.type=='select-one') {
 							var options = Array.from(elem.options);
 							var selected_index = options.findIndex(ele=>ele.textContent==address[elem.name]);
 							// elem.selectedIndex = (checked) ? selected_index : 0;
 							elem.selectedIndex = selected_index;
-
 						} else {
 							// elem.value = (checked) ? address[elem.name] : '';
 							elem.value = address[elem.name];
@@ -88,6 +117,7 @@ dehy.ch = {
 					data[k] = val;
 				}
 			};
+			dehy.loading_message = 'Updating shipping methods...';
 			$.ajax({
 				method: "POST",
 				url: '/shipping/location/',
@@ -160,8 +190,8 @@ dehy.ch = {
 				shipping_method_container = dehy.utils.create_element({tag:'div', classes:'shipping-method-container'})
 			}
 
-			shipping_method_container.append(fieldset)
-			fieldset.append(dehy.utils.create_element({tag:'legend', classes: "required", text:'Shipping Methods'}))
+			shipping_method_container.append(fieldset);
+			fieldset.append(dehy.utils.create_element({tag:'legend', classes: "required", text:'Shipping Methods'}));
 			var prefix = (data.prefix) ? `${data.prefix}-`:'';
 			data.shipping_methods.forEach((method, ix) => {
 				// create form group
@@ -206,9 +236,14 @@ dehy.ch = {
 			})
 
 			dehy.utils.cleanup_temp_containers();
-			if (!data.method_code) {
+			if (dehy.ch.forms.saved_form_data.shipping && dehy.ch.forms.saved_form_data.shipping.hasOwnProperty('method_code') && shipping_method_container.querySelector(`input[type='radio'][value='${dehy.ch.forms.saved_form_data.shipping.method_code}']`)){
+				shipping_method_container.querySelector(`input[type='radio'][value='${dehy.ch.forms.saved_form_data.shipping.method_code}']`).checked = true;
+
+			} else {
+				// gets the first option and selects it
 				shipping_method_container.querySelector("input[type='radio']").checked = true;
 			}
+
 			// if section is active, add form to the page
 			if (document.contains(form)) {
 				form.insertBefore(shipping_method_container, document.querySelector('.error-container.button-container'))
@@ -244,7 +279,6 @@ dehy.ch.stripe = {
 	elements: null,
 	submit_billing_info(form_data) {
 
-		console.log('form_data: ', form_data);
 
 		return new Promise((resolve, reject) => {
 
@@ -354,7 +388,14 @@ dehy.ch.stripe = {
 		// New
 		form.addEventListener('submit', async (e) => {
 			e.preventDefault();
+
 			var form_data = new FormData(form);
+
+			if (!dehy.ch.forms.form_data_matches_saved_address(form)) {
+				// check if billing info matches one of the saved_addresses
+				form_data.delete("address_id")
+			}
+
 			var address = {
 				line1: form_data.get('line1'),
 				line2: form_data.get('line2'),
@@ -415,9 +456,11 @@ dehy.ch.stripe = {
 		// 	// Handle result.error or result.paymentIntent
 		// })
 		payment_element.on('ready', e=>{
+			console.log('ready, e:', e);
+
 			setTimeout(function() {
 				payment_element.focus();
-			}, 250);
+			}, 500);
 		});
 
 		payment_element.on('change', e=>{
@@ -437,7 +480,10 @@ dehy.ch.stripe = {
 		});
 
 		payment_element.on('blur', e=>{
-
+			console.log('blur, e:', e);
+		});
+		payment_element.on('focus', e=>{
+			console.log('focus, e:', e);
 		});
 
 		form.prepend(stripe_payment_container)
@@ -492,12 +538,44 @@ dehy.ch.stripe = {
 };
 
 dehy.ch.forms = {
-	get_form_data_as_object(form=dehy.ch.forms.get(), omit_empty_vals=false, expand_select_elems=true) { // accepts form_data object or creates one
+	saved_addresses:[],
+	form_data_matches_saved_address(form=dehy.ch.forms.get()) {
+		if (dehy.ch.forms.saved_addresses.length < 1) {
+			return false
+		}
+
+		var matches = false,
+			saved_address_obj;
+
+		var form_data_obj = dehy.ch.forms.get_form_data_as_object(form, false, false),
+			address_id_elem = document.getElementById('id_address_id');
+
+		if (address_id_elem) {
+			var saved_address = dehy.ch.forms.saved_addresses.find(elem=>elem.id==address_id_elem.value);
+
+			if (saved_address) {
+				saved_address_object = Object.assign({}, saved_address);
+			} else {
+				return false
+			}
+			// saved address needs to be copied, then remove the ID
+		}
+
+		matches = dehy.ch.utils.objects_are_same(form_data_obj, saved_address_object);
+		return matches
+		// get the address id from the form
+		// then get the saved address using said id
+		// remove extra properties from both objects
+
+	},
+	// accepts form_data object or creates one, returns an object in standard notation
+	get_form_data_as_object(form=dehy.ch.forms.get(), omit_empty_vals=false, expand_select_elems=true) {
 		var data = {};
-		var form_elements = form.querySelectorAll("input:not([type='hidden'], [type='password']), select");
-		form_elements.forEach(function(elem) {
+		var form_elements = document.evaluate(".//input[not(@type='hidden' and @name='csrfmiddlewaretoken')] | .//select[not(@id='saved_address_dropdown')]", form, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+		for (var i=0; i<form_elements.snapshotLength;i++) {
+			var elem = form_elements.snapshotItem(i);
 			if ((elem.type == 'checkbox' || elem.type == 'radio') && elem.checked == false) {
-				return;
+				continue
 			}
 
 			if (elem.type == 'select-one') {
@@ -510,7 +588,8 @@ dehy.ch.forms = {
 			} else {
 				data[elem.name] = elem.value;
 			}
-		})
+
+		}
 
 		return data;
 
@@ -537,21 +616,16 @@ dehy.ch.forms = {
 	},
 	saved_form_data: {},
 	submitted_form_data: {},
+
 	has_changed(section=null, form=dehy.ch.forms.get()) {
 		var changed = false;
 		var submitted_form_data = dehy.ch.forms.get_submitted_form_data(section);
-
 		// compare current form data with saved info
+
 		if (submitted_form_data) {
 			var new_form_data = dehy.ch.forms.get_form_data_as_object(form);
-			for (let [key, val] of Object.entries(new_form_data)) {
-				if (submitted_form_data.hasOwnProperty(key)) {
-					if (submitted_form_data[key] != val) {
-						console.log(`${submitted_form_data[key]} != ${val}`);
-						changed = true;
-						return changed;
-					}
-				}
+			if (!dehy.ch.utils.objects_are_same(submitted_form_data, new_form_data)) {
+				changed = true;
 			}
 		} else {
 			changed = true;
@@ -610,11 +684,131 @@ dehy.ch.forms = {
 		// create the form
 		var form = dehy.utils.create_element({tag:'form', classes: 'checkout-form', attrs:{'method':"post", 'id':`${section}_form`, 'action': `/checkout/${section}/`}});
 		let csrftoken_elem = dehy.utils.create_element({tag:'input', attrs:{'name':'csrfmiddlewaretoken', 'type': 'hidden', 'value':dehy.utils.getCookie('csrftoken')}})
-		form.append(csrftoken_elem)
-		form.append(dehy.utils.create_elements(form_structure))
 
+		form.append(csrftoken_elem)
+
+
+		form.append(dehy.utils.create_elements(form_structure));
+
+		if (dehy.ch.forms.saved_addresses.length > 0 && (section=='shipping' ||  section=='billing')) {
+			// create the dropdown containing the saved_addresses
+
+			var dropdown = dehy.utils.create_element({tag:'select', style:"padding-right:35px" ,classes: 'form-control mb-2', attrs:{'name':'saved_addresses', 'id':'saved_address_dropdown', 'data-required':false}}),
+				dropdown_container = dehy.utils.create_element({tag:'div',style:"position:relative;", classes:"mb-2 px-0 dropdown-container"});
+
+			// dropdown_container.append(dehy.utils.create_element({tag:'span', text:"|", classes:"dropdown-spacer"}));
+			// dropdown_container.append(dehy.utils.create_element({tag:'i',classes:"fas fa-grip-lines-vertical dropdown-spacer"}));
+
+			dropdown_container.append(dehy.utils.create_element({tag:'i',classes:"fas fa-chevron-down dropdown-arrow"}));
+
+			var dropdown_label = dehy.utils.create_element({tag:'label', classes:"col-form-label", text:'Saved Addresses', attrs:{'for':"saved_address_dropdown"}});
+			// var default_option = dehy.utils.create_element({tag:'option', text: '----', attrs:{'value':""}});
+			// dropdown.append(default_option);
+			dehy.ch.forms.saved_addresses.forEach((address,i) => {
+				var address_lines = address.line1;
+				if (address.line2) {
+					address_lines = address_lines + `, ${address.line2}`
+				}
+				address_lines = address_lines + `, ${address.line4}`
+				if (address.state) {
+					address_lines = address_lines + `, ${address.state}`
+				}
+				address_lines = address_lines + `, ${address.postcode}`
+
+				var address_summary = `${address.first_name} ${address.last_name} (${address_lines}, ${address.country})`
+				var attrs = {'value':address_summary};
+
+				var address_option = dehy.utils.create_element({tag:'option', text: address_summary, attrs:attrs});
+
+				dropdown.append(address_option);
+			});
+
+			// dropdown.selectedIndex = 0;
+			var default_option = dehy.utils.create_element({tag:'option', text: '----', attrs:{'value':""}});
+			dropdown.append(default_option);
+
+			dropdown.options[0].selected = true;
+			dropdown_container.append(dropdown);
+
+			if (section=='billing') {
+				var form_container = form.querySelector(".form-container");
+				dropdown_label.classList += " mt-3"
+				form_container.insertBefore(dropdown_container, form_container.firstChild);
+				form_container.insertBefore(dropdown_label, form_container.firstChild);
+			} else {
+				form.insertBefore(dropdown_container, form.firstChild);
+				form.insertBefore(dropdown_label, form.firstChild);
+			}
+
+			// set the value of the form to the first saved address
+			dehy.ch.forms.set_form_to_saved_address(null, form, section);
+			dehy.ch.forms.saved_address_handler(dropdown);
+		}
 		dehy.ch.forms.init();
 		return form
+	},
+	saved_address_handler(elem) {
+		var saved_address_dropdown = (elem) ? elem : document.getElementById('saved_address_dropdown');
+		if (saved_address_dropdown) {
+			saved_address_dropdown.addEventListener('change', dehy.ch.forms.set_form_to_saved_address);
+		}
+	},
+	set_form_to_saved_address(e=null, form=dehy.ch.forms.get(), section=null) {
+		// if (e) {
+		// 	e.stopImmediatePropogation();
+		// }
+		var section = (section) ? section : form.closest('section').id;
+		var saved_address_dropdown = form.querySelector('#saved_address_dropdown');
+		var selected_index = (saved_address_dropdown.selectedIndex) ? saved_address_dropdown.selectedIndex: 0;
+
+		if (selected_index != -1) {
+			if (selected_index == saved_address_dropdown.options.length-1) {
+				// clear the form
+				form.reset();
+				saved_address_dropdown.selectedIndex = saved_address_dropdown.options.length-1;
+			} else {
+				var billing_same_as_shipping_input = document.getElementById('id_same_as_shipping');
+				if (billing_same_as_shipping_input) {
+					if (billing_same_as_shipping_input.checked) {
+						billing_same_as_shipping_input.click();
+					}
+				}
+				var address = dehy.ch.forms.saved_addresses[selected_index];
+				var selectors = ['state', 'country']
+				selectors.forEach(selector_name=>{
+					var selector = form.querySelector(`select[name='${selector_name}']`);
+					if (selector && address.hasOwnProperty(selector_name)) {
+						var options = Array.from(selector.options);
+						var selector_index = options.findIndex(ele=>ele.textContent==address[selector_name]);
+						if (selector_index == -1) {
+							selector_index = options.findIndex(ele=>ele.value==address[selector_name]);
+						}
+						selector.selectedIndex = selector_index;
+					}
+				});
+				for (let [key, val] of Object.entries(address)) {
+					let field = form.querySelector(`[name="${key}"]`);
+
+					if (field && field.type != 'select-one') {
+						field.value = val;
+					}
+				}
+				var address_id_elem = form.querySelector("input#id_address_id");
+				if (address_id_elem) {
+					address_id_elem.value = address.id
+				}
+
+				if (e) {
+					const change = new Event('change');
+					var postcode = document.getElementById('id_postcode');
+
+					postcode.dispatchEvent(change);
+					form.dispatchEvent(change);
+				}
+			}
+
+		}
+
 	},
 	// moves the labels to be after their various inputs/selects
 	reverse_form_labels(form=dehy.ch.forms.get()) {
@@ -627,10 +821,25 @@ dehy.ch.forms = {
 		});
 	},
 	submit_form_info(form) {
+		var section = form.closest('section');
+		if (section) {
+			dehy.loading_message = dehy.ch.utils.loading_messages[section.id]
+		}
 		var form_data = new FormData(form);
 		form.querySelectorAll("input[type='checkbox']").forEach(function(checkbox) {
 			form_data.set(checkbox.name, form_data.has(checkbox.name) ? 'on':'off');
 		})
+
+		if (form_data.has('saved_addresses')) {
+			form_data.delete('saved_addresses');
+		}
+
+		if (form_data.has('address_id')) {
+			if (!dehy.ch.forms.form_data_matches_saved_address(form)) {
+				// check if billing info matches one of the saved_addresses
+				form_data.delete("address_id")
+			}
+		}
 
 		$.ajax({
 			method: "POST",
@@ -661,10 +870,13 @@ dehy.ch.forms = {
 		dehy.ch.forms.remove_all(); //1
 		var next_section = dehy.ch.utils.get_next_section(response.section);
 		// var form = dehy.ch.forms.get_or_create(next_section.id, FormStructures[next_section.id]); //2
+		if (response.saved_addresses) {
+			dehy.ch.forms.saved_addresses = response.saved_addresses;
+		}
 		var form = dehy.ch.forms.get_or_create(next_section.id, FormStructures[next_section.id]); //2
 
 		next_section.append(form); //3
-		dehy.ch.utils.deactivate_sections()
+		dehy.ch.utils.deactivate_sections();
 		next_section.classList.toggle('active', true);
 		dehy.ch.forms.disable_edit_buttons(); //4
 		dehy.ch.forms.create_preview(response.section);
@@ -685,11 +897,21 @@ dehy.ch.forms = {
 				form_elem.insertBefore(form_container, error_button_container);
 				form_elem.classList.toggle('display-none', false);
 				checked = form_elem.querySelector('#id_same_as_shipping').checked
+			}
 
+			if (response.hasOwnProperty('same_as_shipping')) {
+				checked = response.same_as_shipping
 			}
 
 			dehy.ch.shipping.billing_same_as_shipping_handler(checked);
 			dehy.ch.stripe.init(response.stripe_pkey, response.client_secret, response);
+		}
+
+		if (response.hasOwnProperty('shipping_methods')) {
+			dehy.ch.shipping.update_shipping_methods(response);
+			// response.shipping_charge = response.shipping_methods[0].cost
+
+			dehy.basket.basket_updated_handlers.success(response);
 		}
 
 		//dehy.utils.unfreeze_forms();
@@ -776,19 +998,34 @@ dehy.ch.forms = {
 							error_button_container = section.querySelector('.error-container.button-container');
 
 							if (dehy.ch.forms.saved_form_data.hasOwnProperty(section.id)){
-								var country_selector = form.querySelector("select[name='country']");
-								if (country_selector && dehy.ch.forms.saved_form_data[section.id].hasOwnProperty('country')) {
-									let options = Array.from(country_selector.options);
-									let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_form_data[section.id].country);
-									country_selector.selectedIndex = selected_index;
-								}
-								var state_selector = form.querySelector("select[name='state']");
 
-								if (state_selector && dehy.ch.forms.saved_form_data[section.id].hasOwnProperty('state')) {
-									let options = Array.from(state_selector.options);
-									let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_form_data[section.id].state);
-									state_selector.selectedIndex = selected_index;
-								}
+								var address = dehy.ch.forms.saved_form_data[section.id][selected_index];
+								var selectors = ['state', 'country']
+								selectors.forEach(selector_name=>{
+									var selector = form.querySelector(`select[name='${selector_name}']`);
+									if (selector && address.hasOwnProperty(selector_name)) {
+										var options = Array.from(selector.options);
+										var selector_index = options.findIndex(ele=>ele.textContent==address[selector_name]);
+										if (selector_index == -1) {
+											selector_index = options.findIndex(ele=>ele.value==address[selector_name]);
+										}
+										selector.selectedIndex = selector_index;
+									}
+								});
+
+								// var country_selector = form.querySelector("select[name='country']");
+								// if (country_selector && dehy.ch.forms.saved_form_data[section.id].hasOwnProperty('country')) {
+								// 	let options = Array.from(country_selector.options);
+								// 	let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_form_data[section.id].country);
+								// 	country_selector.selectedIndex = selected_index;
+								// }
+								// var state_selector = form.querySelector("select[name='state']");
+								//
+								// if (state_selector && dehy.ch.forms.saved_form_data[section.id].hasOwnProperty('state')) {
+								// 	let options = Array.from(state_selector.options);
+								// 	let selected_index = options.findIndex(ele=>ele.textContent==dehy.ch.forms.saved_form_data[section.id].state);
+								// 	state_selector.selectedIndex = selected_index;
+								// }
 							}
 
 						form_elem.insertBefore(form, error_button_container);
@@ -801,7 +1038,6 @@ dehy.ch.forms = {
 					var submit_btn = form.querySelector("button[type='submit']");
 
 					if (submit_btn) {
-						console.log('submit_btn: ', submit_btn);
 						submit_btn.disabled = false;
 					}
 
@@ -813,7 +1049,6 @@ dehy.ch.forms = {
 					if (section.id != 'billing') {
 						dehy.ch.forms.init();
 					}
-
 					// dehy.ch.forms.reverse_form_labels(form);
 					// dehy.utils.unfreeze_forms();
 				});
@@ -841,9 +1076,28 @@ dehy.ch.forms = {
 		var form_data_obj = dehy.ch.forms.get_saved_form_data(section);
 
 		for (let [key, val] of Object.entries(form_data_obj)) {
-			var elem = preview_container.querySelector(`span[data-preview=${key}]`);
+			var elem = preview_container.querySelector(`*[data-preview=${key}]`);
 			if (elem) {
-				elem.textContent = val;
+				if (elem.tagName=='IMG') {
+					elem.src = val;
+				} else {
+					var text_content = val;
+
+					if (val && (elem.dataset.preview=='line4' || elem.dataset.preview=='state')) {
+						if (elem.dataset.preview=='state') {
+							var state = US_States.find(st=>st.text==val);
+							if (state) {
+								text_content = state.attrs.value
+							}
+
+						}
+						text_content += ", "
+					}
+
+					elem.textContent = text_content;
+
+				}
+
 			}
 		}
 		if (section=='shipping') {
@@ -950,6 +1204,7 @@ dehy.ch.forms = {
 
 			form.addEventListener('submit', dehy.ch.forms.submit_handler);
 			form.addEventListener('change', e=> {
+
 				var section_name = form.closest('section').id;
 				dehy.ch.forms.save_form_data(form, section_name);
 
@@ -979,14 +1234,19 @@ dehy.ch.forms = {
 							state_selector.required = true;
 							state_selector.disabled = false;
 						}
-						validity_message = (postcode_input.checkValidity()) ? "" : validity_message;
-						postcode_input.setCustomValidity(validity_message)
+						if (postcode_input.validity.patternMismatch) {
+							postcode_input.setCustomValidity(validity_message)
+						} else {
+							postcode_input.setCustomValidity("")
+						}
+
 						postcode_input.pattern = dehy.ch.utils.re[country];
 					}
-					if (e.target.matches('#id_postcode, #id_state, #id_city')) {
+					if (e.target.matches('#id_postcode, #id_state, #id_city, #saved_address_dropdown')) {
+						// console.log('e.target.reportValidity(): ', e.target.reportValidity());
 						if (e.target.matches('#id_postcode')) {
 							if (!e.target.checkValidity()) {
-								// e.target.reportValidity();
+								e.target.reportValidity();
 								return
 							}
 						}
@@ -1017,6 +1277,21 @@ dehy.ch.forms = {
 					dehy.ch.shipping.billing_same_as_shipping_handler(checked);
 				}
 			});
+
+			var saved_address_dropdown = document.getElementById('saved_address_dropdown');
+			console.log('saved_address_dropdown: ', saved_address_dropdown);
+
+			if (saved_address_dropdown) {
+				console.log('saved_address_dropdown: ', saved_address_dropdown);
+				var address_id_elem = document.getElementById('id_address_id');
+				if (address_id_elem) {
+					console.log('address_id_elem: ', address_id_elem);
+					var saved_address = dehy.ch.forms.saved_addresses.find(elem=>elem.id==address_id_elem.value);
+					saved_address_dropdown.selectedIndex = dehy.ch.forms.saved_addresses.indexOf(saved_address);
+
+				}
+				saved_address_dropdown.addEventListener('change', dehy.ch.forms.set_form_to_saved_address);
+			}
 
 			// dehy.utils.unfreeze_forms();
 		}
