@@ -4,7 +4,7 @@ $(document).ready(function() {
 	  var href = '/faq/';
 
 	  if (window.scrollY > elementTarget.offsetHeight) {
-		  href = '/faq/#contact';
+		  href = '/contact/';
 	  }
 	  document.querySelector(`nav a.nav-link[href='${href}']`).classList.toggle('active', true);
 	  document.querySelectorAll(`nav a.nav-link.active:not([href='${href}'])`).forEach(elem=>{

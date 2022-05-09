@@ -12,6 +12,7 @@ Line = get_model('basket', 'line')
 Product = get_model('catalogue', 'product')
 
 Selector = get_class('partner.strategy', 'Selector')
+Country = get_model('address', 'Country')
 
 selector = Selector()
 
@@ -24,7 +25,6 @@ class BasketMiddleware:
 	def __call__(self, request):
 		# Keep track of cookies that need to be deleted (which can only be done
 		# when we're processing the response instance).
-
 
 		request.cookies_to_delete = []
 
@@ -46,7 +46,6 @@ class BasketMiddleware:
 			basket.strategy = request.strategy
 
 			self.apply_offers_to_basket(request, basket)
-
 
 			return basket
 
@@ -103,13 +102,18 @@ class BasketMiddleware:
 				secure=settings.OSCAR_BASKET_COOKIE_SECURE, httponly=True)
 
 
-		# print('\ndir(response)\n: ', dir(response))
-		# print('\ndir(request)\n: ', dir(request))
-		# print('\n request.session.items(): ', request.session.items())
-		#
-		# print('\ndir(request.session)\n: ', dir(request.session))
-
 		basket_content = request.session.get('basket_content', None)
+		checkout_data = request.session.get('checkout_data')
+		for item in checkout_data.items():
+
+			if item[0] == 'shipping' or item[0] == 'billing':
+				address_fields = item[1].get('new_address_fields', None)
+				if address_fields:
+					country = address_fields.get('country', None)
+					if country and isinstance(country, Country):
+						address_fields['country'] = country.iso_3166_1_a2
+
+
 		return response
 
 	def preserve_basket(self):
@@ -177,8 +181,6 @@ class BasketMiddleware:
 					self.merge_baskets(basket, other_basket)
 					num_baskets_merged += 1
 
-				print('\n middleware5: ', basket)
-
 
 			# Assign user onto basket to prevent further SQL queries when
 			# basket.owner is accessed.
@@ -198,7 +200,6 @@ class BasketMiddleware:
 		else:
 			# Anonymous user with no basket - instantiate a new basket
 			# instance.  No need to save yet.
-			print('\n no basket found, instantiating new basket (anonymous user)')
 
 			basket = Basket()
 			basket.strategy = request.strategy

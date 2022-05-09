@@ -20,12 +20,27 @@ from oscar.core.loading import get_class, get_model
 from dehy.appz.checkout import facade
 from dehy.appz.generic import forms
 
-import os
+import json, os, requests
 from dehy.appz.generic.models import Message, MessageUser
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
+
+def recaptcha_verify(request):
+	print('\n attempting to verify recaptcha')
+
+	url = "https://www.google.com/recaptcha/api/siteverify"
+	payload = {
+		'secret': settings.GOOGLE_RECAPTCHA_V3_SECRET_KEY,
+		'response': request.GET.get('token'),
+	}
+	req = requests.request("POST", url, data=json.dumps(payload))
+	print('\n recaptcha: ', req)
+
+	data = {}
+	response = JsonResponse(data)
+	return response
 
 
 class MailingListView(ModelFormMixin, ProcessFormView):
@@ -38,31 +53,14 @@ class MailingListView(ModelFormMixin, ProcessFormView):
 		message = _('Uh oh, something went wrong...')
 		data = {}
 
-		# print('form: ', form)
-		# print('form.is_valid(): ', form.is_valid())
-		# response = super().post(request, *args, **kwargs)
-
 		form = self.form_class(self.request.POST)
 		if form.is_valid() and self.form_valid(form):
 			status_code = 200
-			print('form valid')
 			message = _("Successfully added email to mailing list: ")
 			message += form.cleaned_data["email"]
 		else:
-			print('errors.as_json(): ', form.errors.as_json())
-			print('errors.as_data(): ', form.errors.as_data())
-			print('errors.as_text(): ', form.errors.as_text())
-			print('errors.get_json_data(): ', form.errors.get_json_data())
-
-			print('errors: ', form.errors)
-			print('dir(errors): ', dir(form.errors))
 
 			for k,v in form.errors.as_data().items():
-				print('k: ', k)
-				print('v: ', v)
-				print('v[0]: ', v[0])
-				# print(" ''.join(v): ", ''.join())
-
 				message += ' '.join(v[0])
 
 		data['status_code'] = status_code

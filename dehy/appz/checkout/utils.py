@@ -18,24 +18,51 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		"""
 		Use a manually entered address as the shipping address
 		"""
+		print("\n ship_to_new_address: \n", address_fields)
+
 		self._unset('shipping', 'new_address_fields')
 		phone_number = address_fields.get('phone_number')
-		if phone_number:
+		if phone_number and isinstance(phone_number, PhoneNumber):
 			# Phone number is stored as a PhoneNumber instance. As we store
 			# strings in the session, we need to serialize it.
 			address_fields = address_fields.copy()
-			if isinstance(phone_number, PhoneNumber):
-				address_fields['phone_number'] = phone_number.as_international
+			address_fields['phone_number'] = phone_number.as_international
 
 		country = address_fields.get('country', None)
-		if country:
+
+		if country and isinstance(country, Country):
+			print("\n resetting country obj \n")
+
 			address_fields = address_fields.copy()
-			if isinstance(country, Country):
-				address_fields['country'] = address_fields['country'].iso_3166_1_a2
+			address_fields['country'] = address_fields['country'].iso_3166_1_a2
 
 		self._set('shipping', 'new_address_fields', address_fields)
 
+	def bill_to_new_address(self, address_fields):
+		"""
+		Store address fields for a billing address.
+		"""
+		print("\n bill_to_new_address: \n", address_fields)
+
+		self._unset('billing', 'new_address_fields')
+
+		phone_number = address_fields.get('phone_number')
+		if phone_number and isinstance(phone_number, PhoneNumber):
+			# Phone number is stored as a PhoneNumber instance. As we store
+			# strings in the session, we need to serialize it.
+			address_fields = address_fields.copy()
+			address_fields['phone_number'] = phone_number.as_international
+
+		country = address_fields.get('country', None)
+		if country and isinstance(country, Country):
+
+			address_fields = address_fields.copy()
+			address_fields['country'] = address_fields['country'].iso_3166_1_a2
+
+		self._set('billing', 'new_address_fields', address_fields)
+
 	def set_questionnaire_response(self, additional_info):
+		print('additional_info: ', additional_info)
 		self._set('questionnaire', 'purchase_business_type', additional_info.purchase_business_type)
 		self._set('questionnaire', 'business_name', additional_info.business_name)
 		self._set('questionnaire', 'additional_info_id', additional_info.id)

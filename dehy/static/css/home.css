@@ -294,3 +294,13 @@ input#id_quantity,
 span.variant_price {
 	color: rgba(0, 136, 0, 1);
 }
+
+.recipe-card {
+	padding: 10%;
+	background-color: var(--hg);
+	margin: 0;
+}
+.mini-recipe-list {
+	grid-template-columns: repeat(auto-fill,minmax(20%, 1fr));
+	grid-auto-columns: minmax(20%, 1fr);
+}

@@ -45,8 +45,6 @@ class persist_basket_contents(object):
 
 			basket_content = request.session.get('basket_content', None)
 
-			print('\n request.session.items: ', request.session.items())
-			print('\n *** basket status: ', request.basket.status)
 
 			if basket_content:
 				for key, val in basket_content.items():
@@ -59,7 +57,6 @@ class persist_basket_contents(object):
 
 
 			request.session.modified = True
-			print('decorator3: ', request.basket)
 
 			return response
 

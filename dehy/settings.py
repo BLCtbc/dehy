@@ -132,6 +132,7 @@ TEMPLATES = [
 				'dehy.context_processors.add_ig_images_to_context',
 				'dehy.context_processors.basket_contents',
 				'dehy.context_processors.order_total',
+				'dehy.context_processors.add_recaptcha_site_key',
 				'oscar.apps.search.context_processors.search_form',
 				'oscar.apps.checkout.context_processors.checkout',
 				'oscar.apps.communication.notifications.context_processors.notifications',
@@ -344,3 +345,6 @@ FEDEX_API_KEY = env.str('FEDEX_TEST_API_KEY')
 FEDEX_SECRET_KEY = env.str('FEDEX_TEST_SECRET_KEY')
 FEDEX_API_URL = env.str('FEDEX_TEST_API_URL') if DEBUG else env.str('FEDEX_PRODUCTION_API_URL')
 USPS_USERNAME = env.str('USPS_USERNAME')
+
+GOOGLE_RECAPTCHA_V3_SITE_KEY = env.str('GOOGLE_RECAPTCHA_V3_SITE_KEY')
+GOOGLE_RECAPTCHA_V3_SECRET_KEY = env.str('GOOGLE_RECAPTCHA_V3_SECRET_KEY')

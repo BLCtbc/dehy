@@ -1,6 +1,7 @@
 from django.contrib.auth import models
 from oscar.core.loading import get_class
 from oscar.core import prices
+from django.conf import settings
 
 BasketLineFormSet = get_class('basket.formsets', 'BasketLineFormSet')
 
@@ -13,6 +14,8 @@ def order_total(request):
 	incl_tax = request.basket.total_incl_tax if request.basket.is_tax_known else None
 	return {'order_total': prices.Price(currency=request.basket.currency, excl_tax=excl_tax, incl_tax=incl_tax)}
 
-
 def basket_contents(request):
 	return {'basket_formset':BasketLineFormSet(queryset=request.basket.all_lines(), strategy=request.basket.strategy)}
+
+def add_recaptcha_site_key(request):
+	return {'recaptcha_site_key': settings.GOOGLE_RECAPTCHA_V3_SITE_KEY}

@@ -1,6 +1,6 @@
 {% load image_tags %}
 
-	<div class="card card-body{% if preview %} recipe-preview{% endif %}">
+	<div class="{% if preview %}recipe-preview{% else %}card card-body{% endif %}">
 
 		{% if not preview %}
 		<div class='recipe-info row'>

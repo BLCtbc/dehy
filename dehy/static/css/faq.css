@@ -110,6 +110,10 @@ header.faq {
 #contact {
 	background-color: rgba(0, 0, 0, 0.4);
 }
+
+#contact .form-floating label {
+	z-index: 5;
+}
 /*
 .faq-page-inner > .faq-item:last-of-type {
 	background: linear-gradient(var(--hunter-green), transparent);

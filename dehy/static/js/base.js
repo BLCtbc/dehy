@@ -206,32 +206,6 @@ var dehy = {
 					}
 				}
 			},
-			// increment_input_quantity(elem, n=1) {
-			//
-			// 	var input = document.querySelector(`input[data-product_id='${elem.dataset.product_id}']`);
-			// 	let v = parseInt(input.value) + n;
-			// 	input.value = (n < 0) ? Math.max(v, input.min) : Math.min(v, input.max);
-			//
-			// 	const change = new Event('change');
-			// 	input.dispatchEvent(change);
-			//
-			// 	// input.value = (n < 0) ? Math.max((input.value - n), input.min) : Math.min((input.value + n), input.max);
-			// },
-			// activate_plus_minus_buttons() {
-			// 	var plus_minus_buttons = document.querySelectorAll('.plus-minus-btn');
-			// 	plus_minus_buttons.forEach(elem =>{
-			//
-			// 		var n = 1;
-			// 		if (elem.matches('.minus-btn')) {
-			// 			n *= -1;
-			// 		}
-			// 		elem.addEventListener('click', e=>{
-			// 			e.preventDefault();
-			// 			dehy.handlers.shop.increment_input_quantity(e.target, n);
-			// 		});
-			// 	})
-			// },
-
 			activate_plus_minus_buttons() {
 				var plus_minus_buttons = document.querySelectorAll('.plus-minus-btn');
 				plus_minus_buttons.forEach(elem =>{
@@ -298,6 +272,17 @@ var dehy = {
 	},
 	utils: {
 		freeze_submissions: false,
+		recaptcha_verify(token) {
+			console.log('recaptcha token: ', token);
+
+			fetch('/recaptcha_verify/?token='+token).then(function(response) {
+                    response.json().then(function(data) {
+						console.log('response from google: ', JSON.stringify(data, null, 4));
+                });
+        	});
+
+			// document.getElementById("demo-form").submit();
+		},
 		keep_forms_frozen(tf=true) {
 			dehy.keep_frozen = tf;
 		},
@@ -541,6 +526,4 @@ var dehy = {
 	}
 }
 
-
-
-
+window.recaptcha_verify = dehy.utils.recaptcha_verify

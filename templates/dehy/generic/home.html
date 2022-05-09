@@ -10,8 +10,8 @@
 {% endblock title %}
 
 {% block extrastyles %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}"/>
 <link rel="stylesheet" type="text/css" href="{% static 'css/recipes.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}"/>
 
 {% endblock extrastyles %}
 
@@ -181,13 +181,13 @@
 	{% endblock mailing_list_split %}
 
 	{% block recipe_list %}
-	<section class="content-section mini-recipe-section row">
+	<section class="content-section mini-recipe-section row justify-content-end">
 		<div class="recipe-link-container">
 			<a role='button' class="temp shop-link btn btn-black" href="{% url 'recipes' %}">All Recipes</a>
 		</div>
 		<div class="mini-recipe-list" id="mini_recipe_list">
 			{% for recipe in recipes %}
-			<article class="recipe-card">
+			<article class="recipe-card preview">
 			{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
 			</article>
 			{% endfor %}

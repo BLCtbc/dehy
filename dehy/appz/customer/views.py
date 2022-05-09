@@ -1,17 +1,19 @@
-from django.views import generic
-from oscar.apps.customer import views
-from oscar.core.loading import get_class, get_classes, get_model
 from django.urls import reverse_lazy
 from django.contrib.auth import logout as auth_logout
-from django.conf import settings
-from .decorators import persist_basket_contents
-from django.utils.decorators import method_decorator
+from django.contrib.auth import views as auth_views
 
+from django.conf import settings
+from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.views import generic
+
+from oscar.apps.customer import views
+from oscar.core.loading import get_class, get_classes, get_model
+
+from .decorators import persist_basket_contents
 from dehy.appz.checkout.facade import Facade
 Facade = Facade()
 
-from django.contrib.auth import views as auth_views
 
 PageTitleMixin = get_class('customer.mixins','PageTitleMixin')
 
@@ -24,16 +26,18 @@ class AccountRegistrationView(views.AccountRegistrationView):
 
 	def post(self, request, *args, **kwargs):
 
+		print('\npost: ', request.POST)
 		response = super().post(request, *args, **kwargs)
-
-		form = self.form_class(request, request.POST)
-		print('\n form.is_valid(): ', form.is_valid())
-		print('\n form.errors: ', form.errors)
 
 		return response
 
 	def form_valid(self, form):
-		self.register_user(form)
+		user = self.register_user(form)
+		print('created user: ', user)
+		customer = Facade.stripe.Customer.create(email=user.email, metadata={'uid':user.id})
+		user.stripe_customer_id = customer.id
+		user.save()
+
 		return redirect(form.cleaned_data['redirect_url'])
 
 @method_decorator(persist_basket_contents([]), name='dispatch')

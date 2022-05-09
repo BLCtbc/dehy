@@ -4,6 +4,7 @@
 {% load product_tags %}
 {% load thumbnail %}
 {% load image_tags %}
+{% load widget_tweaks %}
 
 {% block title %}
 {{ block.super }} | {% trans "FAQ" %}
@@ -78,96 +79,13 @@
 	<div class="container">
 		<div class="row justify-content-center">
 			<div class="col-lg-7">
-				<form class="p-4 card card-body" id="contact" method="post" action="{% url 'faq' %}">
-					{% csrf_token %}
-					<h3>Waddup!</h3>
-					<div class="form-row">
-						<div class="input-group col">
-							<label class="col-form-label required" for="{{ form.first_name.id_for_label }}"></label>
-							{{ form.first_name.errors }}
-							{{ form.first_name }}
-						</div>
-						<div class="input-group col">
-							<label class="col-form-label required" for="{{ form.last_name.id_for_label }}"></label>
-
-							{{ form.last_name.errors }}
-							{{ form.last_name }}
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="input-group col">
-							{{ form.email.errors }}
-							{{ form.email }}
-							<label class="col-form-label required" for="{{ form.email.id_for_label }}"></label>
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="input-group col">
-							{{ form.subject.errors }}
-							{{ form.subject }}
-							<label class="col-form-label required" for="{{ form.subject.id_for_label }}"></label>
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="input-group col">
-							{{ form.message.errors }}
-							{{ form.message }}
-							<label class="col-form-label required" for="{{ form.message.id_for_label }}"></label>
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="input-group justify-content-end col">
-							<button name="contact" type="submit" value="contact" class="btn btn-lg" data-loading-text="{%trans 'Sending Message...' %}">{% trans 'Send' %}</button>
-						</div>
-					</div>
-
-				</form>
+				{% include "dehy/generic/contact_form.html" %}
 			</div>
 		</div>
 
 	</div>
 </section>
 
-{% comment %}
-<div class="row justify-content-center faq-page-inner">
-	{% for faq in faq_list %}
-		<section class="faq-item-container col-10">
-			<figure class="row outer-image-container px-0">
-				<div class="col-6">
-				<div class="image-container dotted-image-filter">
-					{% with image_name=image_list|random %}
-					{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/faq/'|add:image_name %}
-					{% oscar_thumbnail image_url "1000x1000" as thumb %}
-					<img class="question-img" src="{{ thumb.url }}">
-					{% endwith %}
-					{% endwith %}
-					<div class="question-text-container">
-						<h2 class="d-inline-block">Q.</h2>
-						<span class='question-span'>{{faq.question}}</span>
-					</div>
-				</div>
-				</div>
-				<div class="col-6">
-				<div class="image-container dotted-image-filter">
-					{% with image_name=image_list|random %}
-					{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/faq/'|add:image_name %}
-					{% oscar_thumbnail image_url "1000x1000" as thumb %}
-
-					<img class="question-img" src="{{ thumb.url }}">
-					{% endwith %}
-					{% endwith %}
-					<div class="answer-text-container">
-						<h2 class="d-inline-block">A.</h2>
-						<span class='answer-span'>{{faq.answer}}</span>
-					</div>
-				</div>
-				</div>
-			</figure>
-		</section>
-
-	{% endfor %}
-</div>
-{% endcomment %}
 
 {% endblock content_wrapper %}
 
