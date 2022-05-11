@@ -132,7 +132,8 @@ TEMPLATES = [
 				'dehy.context_processors.add_ig_images_to_context',
 				'dehy.context_processors.basket_contents',
 				'dehy.context_processors.order_total',
-				'dehy.context_processors.add_recaptcha_site_key',
+				'dehy.context_processors.add_recaptcha_site_keys',
+				'dehy.context_processors.add_notifications',
 				'oscar.apps.search.context_processors.search_form',
 				'oscar.apps.checkout.context_processors.checkout',
 				'oscar.apps.communication.notifications.context_processors.notifications',
@@ -276,10 +277,8 @@ HAYSTACK_CONNECTIONS = {
 
 AUTH_USER_MODEL = "generic.User"
 OSCAR_ALLOW_ANON_CHECKOUT = True
-OSCAR_INITIAL_ORDER_STATUS = 'Pending'
-OSCAR_INITIAL_LINE_STATUS = 'Pending'
-OSCAR_ORDER_STATUS_PIPELINE = {
-	'Pending': ('Processed', 'Cancelled',),
+OSCAR_INITIAL_ORDER_STATUS = OSCAR_INITIAL_LINE_STATUS = 'Processed'
+OSCAR_ORDER_STATUS_PIPELINE = OSCAR_LINE_STATUS_PIPELINE = {
 	'Processed': ('Shipped', 'Cancelled',),
 	'Shipped': ('Delivered', 'Cancelled',),
 	'Delivered': (),
@@ -287,7 +286,7 @@ OSCAR_ORDER_STATUS_PIPELINE = {
 }
 
 OSCAR_ORDER_STATUS_CASCADE = {
-	'Processed': 'In progress',
+	'Processed': 'Processed',
 	'Shipped': 'Shipped',
 	'Delivered': 'Delivered',
 	'Cancelled': 'Cancelled'
@@ -336,8 +335,13 @@ STRIPE_SECRET_KEY = env.str('STRIPE_API_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = env.str('STRIPE_API_PUBLISHABLE_KEY')
 STRIPE_CURRENCY = "USD"
 STRIPE_ORDER_SUBMITTED_SIGNING_SECRET = env.str('STRIPE_ORDER_SUBMITTED_SIGNING_SECRET')
-SHIPSTATION_API_KEY = env.str('DEHY_SHIPSTATION_API_KEY')
-SHIPSTATION_SECRET_KEY = env.str('DEHY_SHIPSTATION_SECRET_KEY')
+
+SHIPSTATION_API_KEY=env.str('SHIPSTATION_API_KEY')
+SHIPSTATION_SECRET_KEY=env.str('SHIPSTATION_SECRET_KEY')
+
+DEHY_SHIPSTATION_API_KEY = env.str('DEHY_SHIPSTATION_API_KEY')
+DEHY_SHIPSTATION_SECRET_KEY = env.str('DEHY_SHIPSTATION_SECRET_KEY')
+
 HOME_POSTCODE = "78701"
 
 FEDEX_ACCOUNT_NUMBER = env.str('FEDEX_ACCOUNT_NUMBER')
@@ -346,5 +350,7 @@ FEDEX_SECRET_KEY = env.str('FEDEX_TEST_SECRET_KEY')
 FEDEX_API_URL = env.str('FEDEX_TEST_API_URL') if DEBUG else env.str('FEDEX_PRODUCTION_API_URL')
 USPS_USERNAME = env.str('USPS_USERNAME')
 
+GOOGLE_RECAPTCHA_V2_SITE_KEY = env.str('GOOGLE_RECAPTCHA_V2_SITE_KEY')
+GOOGLE_RECAPTCHA_V2_SECRET_KEY = env.str('GOOGLE_RECAPTCHA_V2_SECRET_KEY')
 GOOGLE_RECAPTCHA_V3_SITE_KEY = env.str('GOOGLE_RECAPTCHA_V3_SITE_KEY')
 GOOGLE_RECAPTCHA_V3_SECRET_KEY = env.str('GOOGLE_RECAPTCHA_V3_SECRET_KEY')

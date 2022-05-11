@@ -7,6 +7,7 @@ import datetime
 
 class User(AbstractUser):
 	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
+	is_email_verified = models.BooleanField(default=False)
 
 class FedexAuthToken(models.Model):
 	access_token = models.CharField(_("Token"), max_length=2000, default="")

@@ -20,9 +20,29 @@ dehy.ch = {
 			mx: this.us
 
 		},
-		get_selected_option(selector, text, return_index=true) {
+		// given a list of corrections, attempts to make address corrections in an open form
+		make_address_corrections(corrections) {
+			console.log('corrections: ', corrections);
+			var form = dehy.ch.forms.get();
+
+			for (let [name, val] of Object.entries(corrections)) {
+				var elem = form.querySelector(`[name=${name}]`);
+				if (elem) {
+					console.log('correcting ', elem);
+					if (elem.type == 'select-one') {
+						elem.selectedIndex = dehy.ch.utils.get_selector_option(elem, val);
+					} else {
+						elem.value = val;
+					}
+				}
+			}
+		},
+		get_selector_option(selector, text=null, return_index=true) {
+			var text = (text) ? text : selector.value;
+			text = text.toUpperCase();
 			var options = Array.from(selector.options);
-			var selected_index = options.findIndex(ele=>ele.textContent==text);
+			var selected_index = (text.length==2) ? options.findIndex(option=>option.value==text) : options.findIndex(option=>option.textContent==text);
+            console.log('selected option: ', selected_index)
 			return (return_index) ? selected_index : options[selected_index].value;
 		},
 		get_next_section(section=null) {
@@ -177,6 +197,9 @@ dehy.ch = {
 		},
 		// add the shipping methods to the existing form
 		update_shipping_methods(data) {
+			if (data.corrections) {
+				dehy.ch.utils.make_address_corrections(data.corrections);
+			}
 
 			dehy.ch.shipping.set_city_and_state(data);
 			var form = dehy.ch.forms.get('shipping'),
@@ -853,6 +876,10 @@ dehy.ch.forms = {
 	},
 	success_handler(response, textStatus=null, xhr=null) {
 
+		if (response.corrections) {
+			dehy.ch.utils.make_address_corrections(response.corrections);
+		}
+
 		if (response.order_client_secret) {
 			dehy.ch.stripe.order_client_secret = response.order_client_secret;
 		}
@@ -1075,31 +1102,49 @@ dehy.ch.forms = {
 
 		var form_data_obj = dehy.ch.forms.get_saved_form_data(section);
 
-		for (let [key, val] of Object.entries(form_data_obj)) {
-			var elem = preview_container.querySelector(`*[data-preview=${key}]`);
-			if (elem) {
-				if (elem.tagName=='IMG') {
-					elem.src = val;
-				} else {
-					var text_content = val;
+		if (section == 'user_info') {
+			console.log('user_info section')
+			console.log('form_data_obj: ', form_data_obj);
+			var username_text = form_data_obj.username;
+			if (form_data_obj.hasOwnProperty('name') && form_data_obj.name.length > 1) {
+				username_text = `(${username_text})`;
+				var name_elem = preview_container.querySelector("*[data-preview='name']");
+				if (name_elem) {
+					name_elem.textContent = form_data_obj.name;
+				}
+			}
+			var username_elem = preview_container.querySelector("*[data-preview='username']");
+			if (username_elem) {
+				username_elem.textContent = username_text;
+			}
+			if (form_data_obj.hasOwnProperty('user_avatar') && form_data_obj.user_avatar.length > 1) {
+				var user_avatar_elem = preview_container.querySelector("*[data-preview='user_avatar']");
+				if (user_avatar_elem) {
+					user_avatar_elem.src = form_data_obj.user_avatar;
+					user_avatar_elem.parentElement.classList.remove("d-none");
+				}
+			}
+		} else {
+			for (let [key, val] of Object.entries(form_data_obj)) {
+				var elem = preview_container.querySelector(`*[data-preview=${key}]`);
 
+				if (elem) {
+					var text_content = val;
 					if (val && (elem.dataset.preview=='line4' || elem.dataset.preview=='state')) {
 						if (elem.dataset.preview=='state') {
 							var state = US_States.find(st=>st.text==val);
 							if (state) {
 								text_content = state.attrs.value
 							}
-
 						}
 						text_content += ", "
 					}
-
 					elem.textContent = text_content;
 
 				}
-
 			}
 		}
+
 		if (section=='shipping') {
 			var shipping_form = dehy.ch.forms.saved.shipping;
 			// shipping_form.querySelector(`.shipping-method-container input[value='${form_data_obj.method_code}']`)
@@ -1280,13 +1325,10 @@ dehy.ch.forms = {
 			});
 
 			var saved_address_dropdown = document.getElementById('saved_address_dropdown');
-			console.log('saved_address_dropdown: ', saved_address_dropdown);
 
 			if (saved_address_dropdown) {
-				console.log('saved_address_dropdown: ', saved_address_dropdown);
 				var address_id_elem = document.getElementById('id_address_id');
 				if (address_id_elem) {
-					console.log('address_id_elem: ', address_id_elem);
 					var saved_address = dehy.ch.forms.saved_addresses.find(elem=>elem.id==address_id_elem.value);
 					saved_address_dropdown.selectedIndex = dehy.ch.forms.saved_addresses.indexOf(saved_address);
 

@@ -103,15 +103,15 @@ class BasketMiddleware:
 
 
 		basket_content = request.session.get('basket_content', None)
-		checkout_data = request.session.get('checkout_data')
-		for item in checkout_data.items():
-
-			if item[0] == 'shipping' or item[0] == 'billing':
-				address_fields = item[1].get('new_address_fields', None)
-				if address_fields:
-					country = address_fields.get('country', None)
-					if country and isinstance(country, Country):
-						address_fields['country'] = country.iso_3166_1_a2
+		checkout_data = request.session.get('checkout_data', None)
+		if checkout_data:
+			for item in checkout_data.items():
+				if item[0] == 'shipping' or item[0] == 'billing':
+					address_fields = item[1].get('new_address_fields', None)
+					if address_fields:
+						country = address_fields.get('country', None)
+						if country and isinstance(country, Country):
+							address_fields['country'] = country.iso_3166_1_a2
 
 
 		return response

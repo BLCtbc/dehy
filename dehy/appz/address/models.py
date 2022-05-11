@@ -1,5 +1,5 @@
 from oscar.apps.address.abstract_models import AbstractAddress as BaseAbstractAddress
-from oscar.apps.address.abstract_models import AbstractUserAddress
+from oscar.apps.address.abstract_models import AbstractUserAddress, AbstractShippingAddress
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -27,6 +27,5 @@ class UserAddress(AbstractUserAddress):
 		if st in us_states.keys():
 			st = us_states[state_val]
 		return st
-
 
 from oscar.apps.address.models import *  # noqa isort:skip

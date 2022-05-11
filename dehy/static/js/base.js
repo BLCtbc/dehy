@@ -3,6 +3,7 @@ var dehy = {
 	loading_message: 'Loading...',
 	unfreeze_timeout_id: null,
 	keep_frozen: false,
+	recaptcha_version: 2,
 	init(choice='') {
 		dehy.handlers.init();
 		$( document ).ajaxStart(function(xhr, settings) {
@@ -29,8 +30,6 @@ var dehy = {
 					dehy.utils.unfreeze_forms();
 				}
 			}
-
-
 		});
 
 		$.ajaxSetup({
@@ -272,16 +271,41 @@ var dehy = {
 	},
 	utils: {
 		freeze_submissions: false,
-		recaptcha_verify(token) {
-			console.log('recaptcha token: ', token);
+		get_sitekey(version=dehy.recaptcha_version) {
+			return dehy[`recaptcha_sitekey_v${version}`]
+		},
+		recaptcha_form_intercept_handler() {
+			var requires_recaptcha = document.querySelectorAll(".requires-recaptcha");
 
-			fetch('/recaptcha_verify/?token='+token).then(function(response) {
-                    response.json().then(function(data) {
-						console.log('response from google: ', JSON.stringify(data, null, 4));
+			requires_recaptcha.forEach(elem=>{
+
+				var form = elem.closest('form');
+				if (form) {
+					form.addEventListener('submit', dehy.utils.recaptcha_form_intercept);
+				}
+			});
+		},
+		recaptcha_form_intercept(e) {
+			e.preventDefault();
+			let form = e.target.closest('form');
+			let recaptcha_elem = form.querySelector(".requires-recaptcha");
+
+			grecaptcha.render(recaptcha_elem, {
+				'sitekey' : dehy.utils.get_sitekey(version=2),
+				'callback': function(data) {
+					dehy.utils.recaptcha_verify(data, form);
+				}
+			});
+
+		},
+		recaptcha_verify(token, form) {
+			fetch(`/recaptcha_verify/?version=${dehy.recaptcha_version}&token=`+token).then(function(response) {
+                response.json().then(function(data) {
+					if (data.success) {
+						form.submit();
+					}
                 });
         	});
-
-			// document.getElementById("demo-form").submit();
 		},
 		keep_forms_frozen(tf=true) {
 			dehy.keep_frozen = tf;
@@ -290,7 +314,6 @@ var dehy = {
 		update_loading_modal(message="Success...", icon_selector="#status_loading", delay=1000) {
 			dehy.utils.keep_forms_frozen();
 
-			// var message = (response.hasOwnProperty('message')) ? response.message: response;
 			if (!message) {
 				return
 			}
@@ -337,16 +360,6 @@ var dehy = {
 			}
 
 		},
-		notifyUser(message) {
-			let notificationContainer = ($("<div/>", {
-				class: "notification-container",
-				text: message,
-			}));
-			$("body").append(notificationContainer)
-			setTimeout(() => {
-				$(".notification-container").remove()
-			}, 4500);
-		},
 		freeze_forms(force=true) {
 			document.body.classList.toggle('modal-open', force);
 			if (force) {
@@ -376,7 +389,6 @@ var dehy = {
 			}
 		},
 		unfreeze_forms() {
-			console.log('UN freezing forms')
 			dehy.loading_message = 'Loading...';
 			this.freeze_forms(false);
 			dehy.utils.freeze_submissions = false;
@@ -522,8 +534,17 @@ var dehy = {
   					elem.removeChild(elem.firstChild);
 				}
 			}
-		}
+		},
+		notify_user(message, delay=4500) {
+			let notification_container = dehy.utils.create_element({tag:'div', classes:'notification-container', text:message});
+
+			document.body.append(notification_container);
+			setTimeout(() => {
+				notification_container.remove()
+			}, delay);
+		},
 	}
 }
 
-window.recaptcha_verify = dehy.utils.recaptcha_verify
+window.recaptcha_onload = dehy.utils.recaptcha_form_intercept_handler;
+window.recaptcha_verify = dehy.utils.recaptcha_verify;

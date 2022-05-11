@@ -17,5 +17,15 @@ def order_total(request):
 def basket_contents(request):
 	return {'basket_formset':BasketLineFormSet(queryset=request.basket.all_lines(), strategy=request.basket.strategy)}
 
-def add_recaptcha_site_key(request):
-	return {'recaptcha_site_key': settings.GOOGLE_RECAPTCHA_V3_SITE_KEY}
+def add_recaptcha_site_keys(request):
+	return {'recaptcha_site_key_v2': settings.GOOGLE_RECAPTCHA_V2_SITE_KEY, 'recaptcha_site_key_v3': settings.GOOGLE_RECAPTCHA_V3_SITE_KEY}
+
+def add_notifications(request):
+	print('request.session.items(): ', request.session.items())
+	notifications = request.session.get('notifications', None)
+	if notifications:
+
+		request.session.pop('notifications')
+		return {'notifications': notifications}
+
+	return {'notifications':""}

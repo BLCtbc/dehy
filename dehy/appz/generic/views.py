@@ -27,19 +27,65 @@ FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
 
+ShippingAddressForm = get_class('checkout.forms', 'ShippingAddressForm')
+ShippingAddress = get_model('order', 'ShippingAddress')
+Repository = get_class('shipping.repository', 'Repository')
+Repository = Repository()
+
+
+def get_validated_address(request):
+	data = {}
+	status_code = 200
+	shipping_form = ShippingAddressForm(request.POST)
+
+	address_fields = dict((k, v) for (k, v) in shipping_address_form.instance.__dict__.items() if not k.startswith('_'))
+	phone_number = address_fields.get('phone_number').as_international if address_fields.get('phone_number', None) else None
+	if phone_number:
+		address_fields.update({'phone':phone_number})
+
+	shipping_address = ShippingAddress(**address_fields)
+	data['address'] = Repository.validate_address(shipping_address)
+
+	response = JsonResponse(data)
+	response.status_code = status_code
+	return response
+
+
+
 def recaptcha_verify(request):
 	print('\n attempting to verify recaptcha')
-
-	url = "https://www.google.com/recaptcha/api/siteverify"
-	payload = {
-		'secret': settings.GOOGLE_RECAPTCHA_V3_SECRET_KEY,
-		'response': request.GET.get('token'),
-	}
-	req = requests.request("POST", url, data=json.dumps(payload))
-	print('\n recaptcha: ', req)
-
 	data = {}
+	status_code = 400
+	url = "https://www.google.com/recaptcha/api/siteverify"
+	token = request.GET.get('token', None)
+	if token:
+		secret_key = settings.GOOGLE_RECAPTCHA_V2_SECRET_KEY
+		if request.GET.get('version', '') == 3:
+			secret_key = settings.GOOGLE_RECAPTCHA_V3_SECRET_KEY
+
+		status_code = 200
+
+		payload = {
+			'response': token,
+			'secret': secret_key
+		}
+
+		remote_ip = request.META.get('REMOTE_ADDR')
+		remote_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+
+		if remote_ip:
+			remote_ip = remote_ip.split(',')[0].strip()
+			payload.update({'remoteip': remote_ip})
+
+		recaptcha_response = requests.post("https://www.google.com/recaptcha/api/siteverify", data=payload)
+
+		print('\n recaptcha: ', recaptcha_response)
+		print('\n recaptcha.text: ', json.loads(recaptcha_response.text))
+		data.update(json.loads(recaptcha_response.text))
+
+
 	response = JsonResponse(data)
+	response.status_code = status_code
 	return response
 
 
@@ -58,6 +104,8 @@ class MailingListView(ModelFormMixin, ProcessFormView):
 			status_code = 200
 			message = _("Successfully added email to mailing list: ")
 			message += form.cleaned_data["email"]
+			request.session['notifications'] = message
+
 		else:
 
 			for k,v in form.errors.as_data().items():
@@ -136,7 +184,9 @@ class FAQView(ListView, FormView):
 			subject = f'[CONTACT FORM] FROM: {email} SUBJECT: {subject}'
 			sent = send_mail(subject, message, settings.OSCAR_FROM_EMAIL, recipients, fail_silently=False)
 			print('emails sent: ', sent)
+			request.session['notifications'] = _('Successfully sent message!')
 			response = redirect(self.success_url)
+
 			return response
 
 			# some kind of rate limiting/spam detection, etc. would be good here

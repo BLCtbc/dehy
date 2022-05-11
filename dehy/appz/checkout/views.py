@@ -25,9 +25,9 @@ from .facade import Facade
 Facade = Facade()
 
 from urllib.parse import quote
-import datetime, json, logging, requests, sys, xmltodict, time
+import datetime, json, logging, requests, sys, time
 
-import urllib, hashlib
+import asyncio, urllib, hashlib
 
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
 
@@ -45,6 +45,8 @@ BillingAddressForm, StripeTokenForm, ShippingAddressForm, ShippingMethodForm, Us
 RedirectRequired, UnableToTakePayment, PaymentError = get_classes('payment.exceptions', ['RedirectRequired','UnableToTakePayment','PaymentError'])
 
 Repository = get_class('shipping.repository', 'Repository')
+Repository = Repository()
+
 CheckoutSessionMixin = get_class('checkout.session', 'CheckoutSessionMixin')
 CheckoutSessionData = get_class('checkout.utils', 'CheckoutSessionData')
 OrderDispatcher = get_class('order.utils', 'OrderDispatcher')
@@ -68,30 +70,6 @@ def calculate_tax(price, rate):
 def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
 
-def get_city_and_state(postcode=None):
-	# try:
-	logger.debug(f'USPS API: Attempting to retrieve city/state information ({postcode})')
-	data = {}
-	BASE_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=CityStateLookup'
-
-	if not postcode:
-		data['error'] = 'Bad Request'
-
-	else:
-		xml = f'<CityStateLookupRequest USERID="{settings.USPS_USERNAME}"><ZipCode ID= "0"><Zip5>{postcode}</Zip5></ZipCode></CityStateLookupRequest>'
-		url = f"{BASE_URL}&XML={xml}"
-		xml_response = requests.get(url).content
-		usps_response = json.loads(json.dumps(xmltodict.parse(xml_response)))['CityStateLookupResponse']
-		if 'Error' in usps_response['ZipCode'].keys():
-			data['error'] = usps_response['ZipCode']['Error']
-			logger.debug(f"USPS API [Error]: ({postcode}) {usps_response['ZipCode']['Error']}")
-
-		else:
-			data['city'] = usps_response['ZipCode']['City']
-			data['line4'] = usps_response['ZipCode']['City']
-			data['state'] = usps_response['ZipCode']['State']
-
-		return data
 
 # stripe webhook handler
 @csrf_exempt
@@ -192,6 +170,7 @@ def ajax_set_shipping_method(request):
 def get_shipping_methods(request, shipping_fields={}, frontend_formatted=False, return_status_code=False, form=None):
 	shipping_address_form = form
 	shipping_methods, methods = [], []
+	data = {'status_code':200}
 
 	if type(shipping_fields) is str:
 		print('SHIPPING FIELDS in get_shipping_methods: ', shipping_fields)
@@ -217,9 +196,11 @@ def get_shipping_methods(request, shipping_fields={}, frontend_formatted=False, 
 		# country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
 
 		# shipping_address = ShippingAddress(**address_fields)
-		methods,status_code = Repository().get_shipping_methods(
+		methods,_data = Repository.get_shipping_methods(
 					basket=request.basket, user=request.user,
 					shipping_addr=shipping_address_form.instance, request=request)
+
+		data.update(_data)
 
 		checkout_session = CheckoutSessionData(request)
 		checkout_session.store_shipping_methods(request.basket, methods)
@@ -231,7 +212,7 @@ def get_shipping_methods(request, shipping_fields={}, frontend_formatted=False, 
 		shipping_methods = sorted(shipping_methods, key=lambda x: x['cost'])
 
 		methods = shipping_methods if frontend_formatted else methods
-		methods = [methods, status_code] if return_status_code else methods
+		methods = [methods, data] if return_status_code else methods
 
 
 	return methods
@@ -239,12 +220,13 @@ def get_shipping_methods(request, shipping_fields={}, frontend_formatted=False, 
 # also 'corrects' city and state based on postcode
 def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_response=True):
 	data = {}
+	order_details = {}
 	status_code = 400
 
 	post_data = request.POST.copy()
 
-	if post_data.get('postcode', None) and (correct_city_state or not (post_data.get('line4', None) or post_data.get('state', None))):
-		city_and_state_data = get_city_and_state(request.POST.get('postcode'))
+	if post_data.get('postcode', None) and (correct_city_state or not post_data.get('line4', None) or not post_data.get('state', None)):
+		city_and_state_data = Repository.get_city_and_state(request.POST.get('postcode'))
 		post_data.update(city_and_state_data)
 		data.update(city_and_state_data)
 
@@ -266,14 +248,18 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 		country_obj = Country.objects.get(iso_3166_1_a2=address_fields.get('country_id'))
 		# shipping_address = ShippingAddress(**address_fields)
 		# checkout_session.ship_to_new_address(address_fields)
-		methods, status_code = get_shipping_methods(request, post_data, True, True, shipping_address_form)
+		methods, _data = get_shipping_methods(request, post_data, True, True, shipping_address_form)
+		status_code = _data.get('status_code', None) or status_code
+		data.update(_data)
+		print('\n _data: ', _data)
 		data['shipping_methods'] = []
 
 		if methods:
 
+			checkout_session = CheckoutSessionData(request)
 			data['shipping_methods'] = methods
 			data['shipping_postcode'] = address_fields['postcode']
-			checkout_session = CheckoutSessionData(request)
+
 			selected_shipping_method = data['shipping_methods'][0]
 			selected_code = post_data.get('method_code', None)
 			if selected_code:
@@ -281,10 +267,13 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 				if selected_method_filter:
 					selected_shipping_method = selected_method_filter[0]
 
+			order_details = {'shipping_fields': address_fields, 'shipping_method':{'cost':selected_shipping_method['cost'], 'code':selected_shipping_method['code'], 'name':selected_shipping_method['name']}}
+			if request.user.is_authenticated:
+				order_details.update({'customer': request.user.stripe_customer_id})
 
 			data['shipping_charge'] = selected_shipping_method['cost']
 			checkout_session.use_shipping_method(selected_shipping_method['code'])
-			order = Facade.update_or_create_order(request.basket, shipping_fields=address_fields, shipping_method={'cost':selected_shipping_method['cost'], 'code':selected_shipping_method['code'], 'name':selected_shipping_method['name']})
+			order = Facade.update_or_create_order(request.basket, **order_details)
 
 			checkout_session.set_order_number(str(order.id).replace("order_", ""))
 			data['order_client_secret'] = order.client_secret
@@ -377,6 +366,7 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 				if form.is_valid():
 					email = form.cleaned_data['username']
+					order = Facade.update_or_create_order(request.basket, **order_details)
 
 				else:
 					order_details['customer'] = request.user.stripe_customer_id
@@ -417,7 +407,7 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 						data['saved_addresses'].append(address)
 
-				order = Facade.update_or_create_order(request.basket, **order_details)
+
 
 			else:
 				data['errors'] = form.errors
@@ -594,7 +584,7 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		Returns all applicable shipping method objects for a given basket.
 		"""
 		shipping_addr = shipping_addr_form.instance if shipping_addr_form.is_valid() else self.get_shipping_address(self.request.basket)
-		methods,status_code = Repository().get_shipping_methods(
+		methods,data = Repository.get_shipping_methods(
 			basket=self.request.basket, user=self.request.user,
 			shipping_addr=shipping_addr, request=self.request)
 
@@ -1138,6 +1128,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			shipping_charge=shipping_charge, order_total=order_total,
 			billing_address=billing_address, surcharges=surcharges, **kwargs)
 		basket.submit()
+		asyncio.run(Repository.async_place_shipstation_order(order))
 		return self.handle_successful_order(order)
 
 	def handle_successful_order(self, order):
