@@ -6,8 +6,10 @@ form {
 	right: unset;
 	top: unset;
 }
-button {
+button, .btn {
 	font-variant:all-small-caps;
+	color: black;
+	border-color: inherit;
 }
 select, input {
 	outline: 2px solid var(--gold);
