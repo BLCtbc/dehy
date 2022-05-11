@@ -29,6 +29,7 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		# Check that shipping method has been set
 		if not self.checkout_session.is_shipping_method_set(self.request.basket):
 			pass
+
 			# raise exceptions.FailedPreCondition(
 			# 	url=reverse('checkout:shipping'),
 			# 	message=_("Please choose a shipping method")
@@ -167,8 +168,10 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 			request, *args, **kwargs)
 
 	def check_user_email_is_captured(self, request):
-		if not request.user.is_authenticated \
-				and not self.checkout_session.get_guest_email():
+		print('\n check_user_email_is_captured')
+		if not request.user.is_authenticated and not self.checkout_session.get_guest_email():
+			print('\n no email address captured')
+
 			raise exceptions.FailedPreCondition(
 				url=reverse('checkout:checkout'),
 				message=_(
@@ -179,8 +182,7 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		if not self.checkout_session.get_stripe_customer_id():
 			raise exceptions.FailedPreCondition(
 				url=reverse('checkout:checkout'),
-				message=_(
-					"Please either sign in or enter your email address")
+				message=_("Please either sign in or enter your email address"),
 			)
 
 	def skip_unless_payment_is_required(self, request):

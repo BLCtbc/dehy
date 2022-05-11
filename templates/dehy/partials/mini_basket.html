@@ -7,18 +7,19 @@
 		<div class="row justify-content-end">
 			<button id="close_mini_basket" style="padding: 10px;" type="button" class="btn-close float-right" aria-label="{% trans 'Close mini basket' %}"></button>
 		</div>
-
+		<div id="mini_basket_form_container">
 		{% include "dehy/basket/partials/basket_content.html" %}
-		<div class="col-12">
+		</div>
+		<div class="col-12" style="line-height:1;">
 			<small><span style="font-style:italic; font-size: 12px;">{% trans "Taxes and shipping calculated at checkout" %}</span></small>
 		</div>
-		<div class="col-12 d-inline-flex justify-content-between mb-2">
+		<div class="col-12 d-inline-flex justify-content-between mb-4">
 			<div class="d-inline-block">
-				<a class="btn btn-small" href="{% url 'basket:summary' %}">{% trans "Cart" %}</a>
+				<a class="btn btn-small br-2" href="{% url 'basket:summary' %}">{% trans "Cart" %}</a>
 
 			</div>
 			<div class="d-inline-block">
-				<a class="btn btn-small d-inline-block " href="{% url 'checkout:index' %}">{% trans "Checkout" %}</a>
+				<a class="btn btn-small d-inline-block br-2" href="{% url 'checkout:index' %}">{% trans "Checkout" %}</a>
 			</div>
 		</div>
 

@@ -1,0 +1,57 @@
+{% load widget_tweaks %}
+{% load i18n %}
+
+<form class="p-4 card card-body" id="contact" method="post" action="{% url 'faq' %}">
+	{% csrf_token %}
+	<h3>Waddup!</h3>
+	<div class="form-row">
+		<div class="input-group col">
+			<label class="col-form-label sr-only" for="{{ form.first_name.id_for_label }}">{{form.first_name.label}}</label>
+			{{ form.first_name.errors }}
+			{{ form.first_name }}
+
+		</div>
+		<div class="input-group col">
+			<label class="col-form-label sr-only" for="{{ form.last_name.id_for_label }}">{{form.last_name.label}}</label>
+			{{ form.last_name.errors }}
+			{{ form.last_name }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="input-group col">
+			<label class="col-form-label sr-only" for="{{ form.email.id_for_label }}">{{form.email.label}}</label>
+
+			{{ form.email.errors }}
+			{{ form.email }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="input-group col">
+			<label class="col-form-label sr-only" for="{{ form.subject.id_for_label }}">{{form.subject.label}}</label>
+			{{ form.subject.errors }}
+			{{ form.subject }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="input-group col">
+			<label class="col-form-label required sr-only" for="{{ form.message.id_for_label }}">{{form.message.label}}</label>
+
+			{{ form.message.errors }}
+			{{ form.message }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="requires-recaptcha" style="padding-left: 5px;"></div>
+		<div class="input-group justify-content-end col">
+			<button class="btn btn-lg" name="contact" type="submit" value="contact">{% trans 'Send' %}</button>
+
+			{% comment %}
+			<button class="btn btn-lg g-recaptcha" name="contact" type="submit" value="contact"
+				data-sitekey="{{recaptcha_site_key_v2}}" data-callback='recaptcha_verify' data-action='submit'
+				data-loading-text="{%trans 'Sending Message...' %}">{% trans 'Send' %}
+			</button>
+			{% endcomment %}
+		</div>
+	</div>
+
+</form>

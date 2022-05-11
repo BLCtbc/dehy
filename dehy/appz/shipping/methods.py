@@ -12,6 +12,8 @@ TWOPLACES = D(10) ** -2
 # https://django-oscar.readthedocs.io/en/latest/howto/how_to_configure_shipping.html?highlight=shipping%20method#shipping-methods
 
 class Base(methods.Base):
+	arrival = ''
+	carrier_code = "fedex"
 	def round_two_places(self, value):
 		return D(value).quantize(TWOPLACES)
 
@@ -37,10 +39,12 @@ class FedexGround(methods.FixedPrice, Base):
 			)
 
 class BaseFedex(methods.FixedPrice, Base):
-	def __init__(self, code, name, charge_excl_tax=None, charge_incl_tax=None):
+	def __init__(self, code, name, arrival='', carrier_code="fedex", charge_excl_tax=None, charge_incl_tax=None):
 		super().__init__(charge_excl_tax, charge_incl_tax)
 		self.code = code
 		self.name = name
+		self.arrival = arrival
+		self.carrier_code = carrier_code
 
 	def calculate(self, basket):
 		return prices.Price(

@@ -30,17 +30,14 @@
 
 		</div>
 		{% else %}
-
+		
 		<div class="row">
 			<div class="form-group col">
 				<label class="col-form-label required" for="{{form.username.id_for_label}}">{{form.username.label}}</label>
 				{% render_field form.username class+="form-control" %}
 				<p class="helptext mt-1">{{ form.username.help_text }} Already have an account? <a class="underline" type="button" role="button" id="signin_button" href="{% url 'customer:login' %}?next={% url 'checkout:index' %}">Sign in</a></p>
 			</div>
-
 		</div>
-
-
 
 		{% endif %}
 

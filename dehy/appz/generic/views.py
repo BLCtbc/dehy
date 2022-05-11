@@ -1,6 +1,8 @@
 from django.views.generic import ListView, TemplateView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, ModelFormMixin, ProcessFormView
 from django.views.generic.base import RedirectView
+from django.views.decorators.http import require_POST
+from django.utils.translation import gettext_lazy as _
 
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -18,34 +20,109 @@ from oscar.core.loading import get_class, get_model
 from dehy.appz.checkout import facade
 from dehy.appz.generic import forms
 
-import os
+import json, os, requests
+from dehy.appz.generic.models import Message, MessageUser
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
 
-# class ContactView(RedirectView):
-# 	permanent = True
-# 	query_string = True
-# 	url = reverse_lazy('faq')
-# 	# pattern_name = 'faq'
-#
-# 	def get_redirect_url(self, *args, **kwargs):
-# 		url = super().get_redirect_url(*args, **kwargs)
-# 		print('intial url: ', url)
-#
-# 		print('dir(self): ', dir(self))
-#
-# 		# url = self.request.get_host()+"#contact"
-# 		print('url: ', url)
-#
-# 		print('type(reverse_lazy(faq)): ', type(reverse_lazy(faq)))
-#
-# 		# print(reverse_lazy('faq'))
-# 		# print('dir(url): ', dir(url))
-# 		# print(self.request.get_host())
-#
-# 		return url
+ShippingAddressForm = get_class('checkout.forms', 'ShippingAddressForm')
+ShippingAddress = get_model('order', 'ShippingAddress')
+Repository = get_class('shipping.repository', 'Repository')
+Repository = Repository()
+
+
+def get_validated_address(request):
+	data = {}
+	status_code = 200
+	shipping_form = ShippingAddressForm(request.POST)
+
+	address_fields = dict((k, v) for (k, v) in shipping_address_form.instance.__dict__.items() if not k.startswith('_'))
+	phone_number = address_fields.get('phone_number').as_international if address_fields.get('phone_number', None) else None
+	if phone_number:
+		address_fields.update({'phone':phone_number})
+
+	shipping_address = ShippingAddress(**address_fields)
+	data['address'] = Repository.validate_address(shipping_address)
+
+	response = JsonResponse(data)
+	response.status_code = status_code
+	return response
+
+
+
+def recaptcha_verify(request):
+	print('\n attempting to verify recaptcha')
+	data = {}
+	status_code = 400
+	url = "https://www.google.com/recaptcha/api/siteverify"
+	token = request.GET.get('token', None)
+	if token:
+		secret_key = settings.GOOGLE_RECAPTCHA_V2_SECRET_KEY
+		if request.GET.get('version', '') == 3:
+			secret_key = settings.GOOGLE_RECAPTCHA_V3_SECRET_KEY
+
+		status_code = 200
+
+		payload = {
+			'response': token,
+			'secret': secret_key
+		}
+
+		remote_ip = request.META.get('REMOTE_ADDR')
+		remote_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+
+		if remote_ip:
+			remote_ip = remote_ip.split(',')[0].strip()
+			payload.update({'remoteip': remote_ip})
+
+		recaptcha_response = requests.post("https://www.google.com/recaptcha/api/siteverify", data=payload)
+
+		print('\n recaptcha: ', recaptcha_response)
+		print('\n recaptcha.text: ', json.loads(recaptcha_response.text))
+		data.update(json.loads(recaptcha_response.text))
+
+
+	response = JsonResponse(data)
+	response.status_code = status_code
+	return response
+
+
+class MailingListView(ModelFormMixin, ProcessFormView):
+	success_url = reverse_lazy('home')
+	form_class = forms.MailingListUserForm
+	model = MessageUser
+	def post(self, request, *args, **kwargs):
+
+		status_code = 400
+		message = _('Uh oh, something went wrong...')
+		data = {}
+
+		form = self.form_class(self.request.POST)
+		if form.is_valid() and self.form_valid(form):
+			status_code = 200
+			message = _("Successfully added email to mailing list: ")
+			message += form.cleaned_data["email"]
+			request.session['notifications'] = message
+
+		else:
+
+			for k,v in form.errors.as_data().items():
+				message += ' '.join(v[0])
+
+		data['status_code'] = status_code
+		data['message'] = message
+
+		response = JsonResponse(data)
+		response.status_code = status_code
+
+		return response
+
+
+@require_POST
+def mailing_list(request):
+	pass
 
 def contact_view(request):
 	url = request._current_scheme_host+reverse_lazy('faq')+"#contact"
@@ -69,11 +146,13 @@ class HomeView(TemplateView):
 		data = super().get_context_data(*args, **kwargs)
 		recipes = Recipe.objects.filter(featured=True)
 		products = Product._default_manager.exclude(product_class__name='Merch', structure='child')
-		data.update({'recipes':recipes, 'products':products})
+
+		data.update({'recipes':recipes, 'products':products, 'mailing_list_form': forms.MailingListUserForm})
 		return data
 
 class ReturnsRefundsView(TemplateView):
 	template_name = "dehy/generic/returns.html"
+
 
 class FAQView(ListView, FormView):
 	model = FAQ
@@ -105,7 +184,9 @@ class FAQView(ListView, FormView):
 			subject = f'[CONTACT FORM] FROM: {email} SUBJECT: {subject}'
 			sent = send_mail(subject, message, settings.OSCAR_FROM_EMAIL, recipients, fail_silently=False)
 			print('emails sent: ', sent)
+			request.session['notifications'] = _('Successfully sent message!')
 			response = redirect(self.success_url)
+
 			return response
 
 			# some kind of rate limiting/spam detection, etc. would be good here
@@ -124,7 +205,6 @@ class FAQView(ListView, FormView):
 
 
 
-	#
 	# def form_valid(self, form):
 	# 	form.send_email()
 	# 	return super().form_valid(form)

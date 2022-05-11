@@ -2,8 +2,19 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-body">
-		  <div class="spinner-border" role="status"></div>
-		  <span id="modal_text" role="status" aria-label="Status Loading">Loading...</span>
+		  <div id="loading_status_icon_container" class="d-inline">
+			  <div id="status_loading" class="spinner-border status-icon status-loading" role="status"></div>
+			  <svg id="status_success" class="checkmark status-icon d-none status-success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+  		  		<circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"></circle>
+  				<path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"></path>
+				</svg>
+				<svg id="status_error" class="errormark status-icon d-none status-error" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="stroke-width: 4;/* position: absolute; */">
+  					<circle class="path circle" fill="none" stroke="#D06079" stroke-width="6" stroke-miterlimit="10" cx="26" cy="26" r="23"></circle>
+  					<line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="12" y1="12" x2="40" y2="40"></line>
+  					<line class="path line" fill="none" stroke="#D06079" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" x1="40" y1="12" x2="12" y2="40"></line>
+				</svg>
+		  </div>
+		  <span id="loading_modal_text" role="status" aria-label="Status Loading">Loading...</span>
       </div>
     </div>
   </div>

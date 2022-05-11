@@ -225,23 +225,17 @@ class BasketView(CoreBasketView):
 		data['total_tax'] = D(0.00).quantize(TWO_PLACES)
 		data['order_total'] = data['subtotal']
 
-		order_data = {'basket': request.basket}
-
-
-		shipping_addr = request.POST.get('shipping_addr', None)
-
-		shipping_addr = json.loads(shipping_addr) if shipping_addr else self.get_shipping_address(request.basket)
-
-		fields = ['first_name', 'last_name', 'line1', 'line2', 'line4', 'postcode', 'state', 'country', 'phone_number']
-		shipping_fields = dict(zip(fields, shipping_addr.get_field_values(fields)))
-
-		if len(shipping_fields['country']) > 2:
-			ctry = Country.objects.get(printable_name=shipping_fields['country'])
-			shipping_fields['country'] = ctry.iso_3166_1_a2
-
-		# shipping_form = ShippingAddressForm(shipping_fields)
-		
 		if 'checkout' in self.request.resolver_match.app_names and self.checkout_session.is_shipping_address_set() and self.checkout_session.is_shipping_method_set(request.basket):
+			shipping_addr = request.POST.get('shipping_addr', None)
+
+			shipping_addr = json.loads(shipping_addr) if shipping_addr else self.get_shipping_address(request.basket)
+
+			fields = ['first_name', 'last_name', 'line1', 'line2', 'line4', 'postcode', 'state', 'country', 'phone_number']
+			shipping_fields = dict(zip(fields, shipping_addr.get_field_values(fields)))
+
+			if len(shipping_fields['country']) > 2:
+				ctry = Country.objects.get(printable_name=shipping_fields['country'])
+				shipping_fields['country'] = ctry.iso_3166_1_a2
 
 			data['shipping_methods'] = checkout_views.get_shipping_methods(request, shipping_fields, True)
 			data['method_code'] = self.checkout_session.shipping_method_code(request.basket)

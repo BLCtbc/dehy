@@ -21,7 +21,9 @@
         {% block favicon %}
 			<link rel="shortcut icon" type="image/x-icon" href="{% static "favicon.ico" %}">
         {% endblock %}
-		<script {% if 'checkout' in request.resolver_match.namespaces %}{% else %}async {% endif %}src="https://js.stripe.com/v3/"></script>
+
+		<script {% if 'checkout' in request.resolver_match.namespaces %}{% else %}async defer {% endif %}src="https://js.stripe.com/v3/"></script>
+
 
         {# Block where global CSS will go. #}
         {% block styles %}
@@ -40,26 +42,34 @@
     </head>
 
     <body id="{% block body_id %}default{% endblock %}" class="{% block body_class %}default{% endblock %}">
+		<div class="d-none" id="g-captcha"></div>
 		{% include 'dehy/basket/partials/confirm_item_removal_modal.html' %}
 
         {% block layout %}{% endblock layout %}
 
         {# Scripts loaded from a CDN. #}
         {% block cdn_scripts %}
+			<!-- google recaptcha -->
+			<script src="{% static "js/base.js" %}"></script>
+
+			<!-- <script src="https://www.google.com/recaptcha/api.js"></script> -->
+
+
             <!-- jQuery -->
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 			<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
 				integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
 				crossorigin="anonymous"></script>
+
+
             <!-- <script>window.jQuery || document.write('<script src="{% static "oscar/js/jquery/jquery.min.js" %}"><\/script>')</script> -->
         {% endblock %}
 
         {# Local scripts #}
         {% block scripts %}
-		<script src="{% static "js/base.js" %}"></script>
 		<script src="{% static "js/nav.js" %}"></script>
 		<script src="{% static "js/basket.js" %}"></script>
-        {% endblock %}
+        {% endblock scripts %}
 
         {# Additional JS scripts #}
         {% block extra_scripts %}
@@ -69,13 +79,21 @@
         <script>
             $(function() {
                 {% block onbodyload %}
+				dehy.recaptcha_sitekey_v2 = "{{recaptcha_site_key_v2}}";
+				dehy.recaptcha_sitekey_v3 = "{{recaptcha_site_key_v3}}";
+				var notifications = "{{notifications}}";
+
 				dehy.init('index');
 				var currencySymbol = '{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}';
 				currencySymbol = currencySymbol.slice(0, 1);
 				dehy.basket.init(currencySymbol);
+				if (notifications.length>0) {
+					dehy.utils.notify_user(notifications);
+				}
 				{% endblock %}
             });
         </script>
+		<script src="https://www.google.com/recaptcha/api.js?onload=recaptcha_onload&render=explicit" async defer></script>
 
         {# Page meta-data - this is populated by the 'metadata' template context processor #}
 		{% include "dehy/partials/loading_modal.html" %}

@@ -3,14 +3,15 @@
 {% load i18n %}
 {% load product_tags %}
 {% load image_tags %}
+{% load widget_tweaks %}
 
 {% block title %}
 {{ block.super }} | {% trans "Home" %}
 {% endblock title %}
 
 {% block extrastyles %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}"/>
 <link rel="stylesheet" type="text/css" href="{% static 'css/recipes.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}"/>
 
 {% endblock extrastyles %}
 
@@ -40,6 +41,7 @@
 {% block content_wrapper %}
 {% get_media_prefix as MEDIA_PREFIX %}
 
+	{% block about_us1 %}
 	<section class='about content-section row' id='about'>
 		<div class='container'>
 			<div class='row'>
@@ -51,8 +53,11 @@
 
 		</div>
 	</section>
+	{% endblock about_us1 %}
 
 
+
+	{% block mailing_list %}
 	<section class='content-section row mailing-list-container'>
 		<div class='image-background-overlay'
 			style="background-image: url({% static 'img/p/blood_orange_rough_cuts/blood_orange_rough_cut_jar.jpg' %}); left:0; background-position: center left -20%;">
@@ -62,28 +67,38 @@
 		</div>
 
 		<div class="container row justify-content-center">
-
-			<!-- <div class="col-2">
-				<img class="image-container" src="{% static 'img/product/blood_orange_rough_cuts/blood_orange_rough_cut_jar.jpg' %}">
-			</div> -->
 			<div class="mailing-list col-12 col-sm-8">
 				<p class='subhead fixme'></p>
 				<h2>Drinks worth sipping deserve embellishing.</h2>
 				<p class='monospace'>Get emails about special events, offers, and upcoming promotions. Unsubscribe whenever you want.</p>
-				<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
-					<input type="hidden" name="csrfmiddlewaretoken" value="">
-					<label class="sr-only" for="mailing_list_submit">Sign Up</label>
-					<input type="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
+				<form id="mailing_list" class="form-inline" method="POST" action="{% url 'add_user_to_mailing_list' %}" enctype="application/x-www-form-urlencoded">
+					{% csrf_token %}
+					{{ form.non_field_errors }}
+					<label class="sr-only" for="{{mailing_list_form.email.id_for_label}}">{{mailing_list_form.email.label}}</label>
+					{% render_field mailing_list_form.email class+="form-control mb-2 mr-2" placeholder="Enter Email Address" %}
 			   	 	<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit"><i class="fas fa-paper-plane"></i></button>
 
 					<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
 				</form>
+
+				{# old #}
+				{% comment %}
+				<form id="mailing_list" class="form-inline" method="POST" action="{% url 'add_user_to_mailing_list' %}" enctype="application/x-www-form-urlencoded">
+					<input type="hidden" name="csrfmiddlewaretoken">
+					<label class="sr-only" for="mailing_list_submit">Sign up to our mailing list!</label>
+					<input type="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
+					<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit"><i class="fas fa-paper-plane"></i></button>
+
+					<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
+				</form>
+				{% endcomment %}
 			</div>
-			<!-- <div class="col-2">
-				<img class="section-image-container" src="{% static 'img/product/grapefruit/grapefruit_jar.jpg' %}">
-			</div> -->
 		</div>
 	</section>
+	{% endblock mailing_list %}
+
+	{% block about_us2 %}
+	{# about us containing image split #}
 	<section class='content-section row'>
 
 		<div class='col-12 col-sm-7 d-flex flex-column justify-content-center about' style="background-image: url({% static  'img/custom/dehy_hero.jpeg' %}); background-position: bottom left 100px;">
@@ -99,7 +114,29 @@
 			<img style="border-left: 1px solid #000000a8;" class="section-image-container" src='{% static 'img/custom/dehy_glass_filter.jpeg' %}'>
 		</div>
 	</section>
+	{% endblock about_us2 %}
 
+	{% block mini_shop %}
+	<section class='content-section mini-shop-section row'>
+
+		<div class="shop-link-container" style="position: sticky; top:0; left:10px;">
+			<a role='button' style="position: absolute; top: -3rem;" class="temp shop-link btn btn-black" href="{% url 'shop:index' %}">Shop</a>
+		</div>
+
+		<div class="mini-shop">
+			{% for product in products %}
+				{% if not product.is_child %}
+					{# temporary #}
+					<div class="product-card">
+					{% render_product product %}
+					</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+	</section>
+	{% endblock mini_shop %}
+
+	{% block account_creation %}
 	{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/home/dehy-1279.jpg' %}
 	{% oscar_thumbnail image_url "1500x" upscale=True as thumb %}
 	<section id="wholesale" class='content-section row justify-content-center' style="background-image: url('{{ thumb.url }}')">
@@ -116,23 +153,9 @@
 
 		</div>
 	</section>
+	{% endblock account_creation %}
 
-	{% block recipe_list %}
-	<section class="content-section mini-recipe-section row">
-		<div class="recipe-link-container">
-			<a role='button' class="temp shop-link btn btn-black" href="{% url 'recipes' %}">All Recipes</a>
-		</div>
-		<div class="mini-recipe-list" id="mini_recipe_list">
-			{% for recipe in recipes %}
-			<article class="recipe-card">
-			{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
-			</article>
-			{% endfor %}
-		</div>
-
-	</section>
-	{% endblock recipe_list %}
-
+	{% block mailing_list_split %}
 	<section class='content-section mailing-list-split row'>
 
 			<div class='img-split col-5 d-none d-sm-flex'>
@@ -155,24 +178,23 @@
 
 			</div>
 	</section>
+	{% endblock mailing_list_split %}
 
-	<section class='content-section mini-shop-section row'>
-
-		<div class="shop-link-container" style="position: sticky; top:0; left:10px;">
-			<a role='button' style="position: absolute; top: -3rem;" class="temp shop-link btn btn-black" href="{% url 'shop:index' %}">Shop</a>
+	{% block recipe_list %}
+	<section class="content-section mini-recipe-section row justify-content-end">
+		<div class="recipe-link-container">
+			<a role='button' class="temp shop-link btn btn-black" href="{% url 'recipes' %}">All Recipes</a>
 		</div>
-
-		<div class="mini-shop">
-			{% for product in products %}
-				{% if not product.is_child %}
-					{# temporary #}
-					<div class="product-card">
-					{% render_product product %}
-					</div>
-				{% endif %}
+		<div class="mini-recipe-list" id="mini_recipe_list">
+			{% for recipe in recipes %}
+			<article class="recipe-card preview">
+			{% include "dehy/recipes/partials/recipe_card.html" with recipe=recipe preview=1 %}
+			</article>
 			{% endfor %}
 		</div>
+
 	</section>
+	{% endblock recipe_list %}
 
 
 {% endblock content_wrapper %}

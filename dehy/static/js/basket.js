@@ -120,8 +120,14 @@ dehy.basket = {
 	},
 	create_basket_item(product) {
 
-		var form = document.getElementById('basket_formset'),
-			basket_row = dehy.utils.create_element({tag:'div', classes: 'basket-items row', attrs: {'data-product-id': product.id}}),
+		var form = document.getElementById('basket_formset');
+
+		if (!form) {
+			form = dehy.basket.create_mini_basket_form();
+			let mini_basket_form_container = document.getElementById('mini_basket_form_container');
+			mini_basket_form_container.append(form);
+		}
+		var	basket_row = dehy.utils.create_element({tag:'div', classes: 'basket-items row', attrs: {'data-product-id': product.id}}),
 			form_number = document.querySelectorAll('.basket-items.row').length;
 
 		form.append(basket_row);
@@ -220,11 +226,25 @@ dehy.basket = {
 		return basket_row
 
 	},
+	create_mini_basket_form() {
+		var form_attrs = {
+			"method": "post",
+			"action": "/basket/",
+			"id": "basket_formset",
+		};
+		var form = dehy.utils.create_element({tag:'form', classes:'basket_summary col-12 compact', attrs:form_attrs});
 
+		var csrftoken_elem = dehy.utils.create_element({tag:'input', attrs:{'name':'csrfmiddlewaretoken', 'type': 'hidden', 'value':dehy.utils.getCookie('csrftoken')}});
+		var total_forms = dehy.utils.create_element({tag:'input', attrs:{'id': 'id_form-TOTAL_FORMS', 'name':'form-TOTAL_FORMS', 'type': 'hidden', 'value':1}});
+		var initial_forms = dehy.utils.create_element({tag:'input', attrs:{'id': 'id_form-INITIAL_FORMS', 'name':'form-INITIAL_FORMS', 'type': 'hidden', 'value':1}});
+		var min_forms = dehy.utils.create_element({tag:'input', attrs:{'id': 'id_form-MIN_NUM_FORMS', 'name':'form-MIN_NUM_FORMS', 'type': 'hidden', 'value':0}});
+		var max_forms = dehy.utils.create_element({tag:'input', attrs:{'id': 'id_form-MAX_NUM_FORMS', 'name':'form-MAX_NUM_FORMS', 'type': 'hidden', 'value':1000}});
+		form.append(csrftoken_elem, total_forms, initial_forms, min_forms, max_forms);
+		return form
+
+	},
 	basket_updated_handlers: {
 		success(response, xhr, status) {
-			console.log('response: ', response)
-			console.log('xhr: ', xhr)
 			var subtotal = `${dehy.basket.currency_symbol}${response.subtotal}`;
 			var subtotal_container = document.querySelector('span#subtotal');
 			subtotal_container.textContent = subtotal;
@@ -257,12 +277,10 @@ dehy.basket = {
 				};
 			}
 			if (response.object_list) {
-				console.log('object_list: ', response.object_list);
 				for (let [k,v] of Object.entries(response.object_list)) {
 					var basket_item_element = document.querySelector(`.basket-items[data-product-id='${k}']`);
 					if (!basket_item_element) {
-						console.log('creating basket item: ', v);
-						console.log(dehy.basket.create_basket_item(v));
+						dehy.basket.create_basket_item(v);
 					} else {
 						var quantity_container = basket_item_element.querySelector('.product-quantity');
 						basket_item_element.querySelector('.price-text').textContent = `${dehy.basket.currency_symbol}${v.price}`;

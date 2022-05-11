@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 from dehy.appz.checkout.views import ajax_get_shipping_methods, ajax_set_shipping_method, webhook_submit_order
 
@@ -14,6 +14,10 @@ urlpatterns = [
 	path('ajax/create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
 	path('shipping/location/', ajax_get_shipping_methods, name='get_shipping_methods'),
 	path('shipping/set_method/', ajax_set_shipping_method, name='set_shipping_method'),
+	path('shipping/validate_address/', views.get_validated_address, name='validate_address'),
 	path('webhooks/order_submitted/', webhook_submit_order, name='webhook_submit_order'),
+	path('mailing_list/add', views.MailingListView.as_view(), name='add_user_to_mailing_list'),
+	path('recaptcha_verify/', views.recaptcha_verify, name='recaptcha'),
+	re_path(r'^recaptcha_verify\?token=(?P<token>[\w\-\d\_]+)', views.recaptcha_verify, name='recaptcha_verify'),
 ]
 

@@ -205,19 +205,6 @@
 </article><!-- End of product page -->
 {% endblock content %}
 
-{# Local scripts #}
-{% block scripts %}
-    {{ block.super }}
-    <!-- Twitter Bootstrap -->
-    <script src="{% static "oscar/js/bootstrap4/bootstrap.bundle.min.js" %}"></script>
-    <!-- Oscar -->
-    <script src="{% static "oscar/js/oscar/ui.js" %}"></script>
-	<!-- custom -->
-	<script src="{% static 'js/nav.js' %}"></script>
-	<script src="{% static 'js/base.js' %}"></script>
-
-{% endblock %}
-
 {% block extrascripts %}
     {{ block.super }}
 {% endblock %}
