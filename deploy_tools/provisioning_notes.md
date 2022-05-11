@@ -29,6 +29,7 @@
 11. [downloading and installing a package on debian](#debian_package_install)
 12. [setting up email sending and receiving on AWS SES](#aws_ses_integration)
 13. [enabling ftp access](#enable_ftp)
+14. [adding the ability to create shipping events](#create_shipping_event_type)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1717,3 +1718,17 @@ sudo ufw allow from 104.14.25.32
 issues connecting to RDS instance from EC2 instance (hint: use your private IP address when adding inbound traffic rules to security groups)
 see:
 https://stackoverflow.com/a/40078116/6158303
+
+
+< name="create_shipping_event_type"></a>
+12. ###### adding the ability to create shipping events
+
+	within the `order-detail` page there is a dropdown labeled "Create shipping event" with a default option
+	of "--choose event type --", and no other options
+
+	in order to add additional options to that dropdown list, go to http://127.0.0.1:8000/admin/order/shippingeventtype/
+	and add a shipping event type.
+
+
+12. ###### adding more 'sites' to django
+	go to http://127.0.0.1:8000/admin/sites/site/ and click 'ADD SITE'

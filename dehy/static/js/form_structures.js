@@ -3365,12 +3365,11 @@ const FormStructures = {
 				"elems": [
 					{
 						"tag": "div",
-						"classes":"avatar-img-container",
+						"classes":"avatar-img-container d-none",
 						"elems": [{
 							"tag":"img",
 							"classes": "avatar-img",
 							"attrs": {
-								"src": "",
 								"alt": "user avatar image",
 								"data-preview":"user_avatar"
 							}
@@ -3386,19 +3385,12 @@ const FormStructures = {
 									"data-preview": "name"
 								},
 							},
-							{
-								"tag":"span",
-								"text": " ("
-							},
+
 							{
 								"tag":"span",
 								"attrs": {
 									"data-preview": "username"
 								},
-							},
-							{
-								"tag":"span",
-								"text": ")"
 							},
 						]
 

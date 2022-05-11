@@ -1,5 +1,5 @@
 from oscar.apps.order.abstract_models import AbstractOrder
-from oscar.apps.address.abstract_models import AbstractBillingAddress
+from oscar.apps.address.abstract_models import AbstractBillingAddress, AbstractShippingAddress
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from dehy.appz.address.models import AbstractAddress
@@ -15,6 +15,21 @@ class Order(AbstractOrder):
 
 class BillingAddress(AbstractBillingAddress):
 	phone_number = PhoneNumberField(_("Phone number"), blank=True)
+
+class ShippingAddress(AbstractShippingAddress):
+	is_residential = models.BooleanField(default=True)
+	is_validated = models.BooleanField(default=False)
+
+
+	def save(self, *args, **kwargs):
+
+		if not self.is_validated:
+			# TODO: add a method here that corrects various fields of a shipping addresses before they are
+			# saved using a function similar to validate_address from repository
+			pass
+
+		super().save(*args, **kwargs)
+
 
 
 from oscar.apps.order.models import *  # noqa isort:skip

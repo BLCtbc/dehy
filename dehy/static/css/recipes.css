@@ -10,7 +10,12 @@ header {
 	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
     -webkit-box-shadow: rgb(28 28 28 / 60%) 2px 3px 6px;
 	margin: 0.5rem 0.75rem;
-	padding: 0;
+	background-color: var(--hg);
+	padding: 2rem;
+}
+
+.recipe-card:not(.preview) {
+	padding: 3% 5%;
 }
 
 .recipe-info {
@@ -47,6 +52,7 @@ header {
 	font-family: serif;
 	line-height: 1.2rem;
 	font-size: 1.2rem;
+	margin-top: 1.5rem;
 }
 
 .recipe-card.recipe-preview {
@@ -56,4 +62,8 @@ header {
 
 .recipe-card .card-img {
 	margin-bottom: 1rem;
+}
+
+.recipe-card li {
+	line-height:1;
 }

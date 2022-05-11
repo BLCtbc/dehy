@@ -7,6 +7,7 @@ import datetime
 
 class User(AbstractUser):
 	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
+	is_email_verified = models.BooleanField(default=False)
 
 class FedexAuthToken(models.Model):
 	access_token = models.CharField(_("Token"), max_length=2000, default="")
@@ -63,10 +64,11 @@ class Message(models.Model):
 	def __str__(self):
 		return f"{self.email}, message: {self.message}, created: {self.date_created}"
 
-
+# doubles as model for keeping track of user's subscribed to mailing list
 class MessageUser(models.Model):
 	email = models.EmailField(unique=True, help_text='Email Address')
 	date_created = models.DateField(auto_now_add=True, editable=False)
+	subscribed = models.BooleanField(default=True)
 
 	def __str__(self):
 		return f"{self.email}"

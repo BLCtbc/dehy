@@ -80,6 +80,8 @@ class AdditionalInfoForm(forms.ModelForm):
 		model = AdditionalInfoQuestionaire
 		fields = '__all__'
 
+class GatewayForm(AuthenticationForm):
+	username = forms.EmailField(label=_("My email address is"))
 
 class UserInfoForm(AuthenticationForm):
 	username = forms.EmailField(label=_("Email"), help_text=_("You'll receive receipts and notifications at this email address."))
@@ -100,6 +102,9 @@ class UserInfoForm(AuthenticationForm):
 		return normalise_email(self.cleaned_data['username'])
 
 	def clean(self):
+		print('dir(self): ', dir(self))
+		if 'password' in self.errors:
+			del self.errors['password']
 
 		if 'username' in self.cleaned_data:
 			email = normalise_email(self.cleaned_data['username'])
@@ -109,6 +114,9 @@ class UserInfoForm(AuthenticationForm):
 				self._errors["username"] = self.error_class([msg])
 
 		# return self.cleaned_data
+
+		print('self.cleaned_data:', self.cleaned_data)
+		print('super().clean():', super().clean())
 
 		return super().clean()
 

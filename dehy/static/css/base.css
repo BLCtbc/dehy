@@ -18,6 +18,10 @@
 	--secondary-bg-color: var(--beige);
 }
 
+.grecaptcha-badge {
+	/* position: unset !important; */
+}
+
 #confirm_item_removal .btn-close {
 	align-self: flex-end;
 	padding: 10px;
@@ -28,7 +32,21 @@
 	filter: saturate(0.5) !important;
 }
 
-
+.br-1 {
+	border-radius: 1px !important;
+}
+.br-2 {
+	border-radius: 2px !important;
+}
+.br-3 {
+	border-radius: 3px !important;
+}
+.br-4 {
+	border-radius: 4px !important;
+}
+.br-5 {
+	border-radius: 5px !important;
+}
 
 .bg-hg,
 .bg-hunter-green,
@@ -525,13 +543,10 @@ nav.scrolled-top a.nav-link.active {
 }
 
 footer {
-    /* width: 90% !important; */
-    /* margin: 2rem auto 0 auto; */
-    padding: 2rem 0 0 !important;
-    /* border-top: 1px solid var(--beige); */
+    padding: 3rem 0 0 !important;
     text-align: center;
-    /* display: block !important; */
     color: var(--gold);
+	background-color:var(--dark-hg);
 }
 
 .policies {
@@ -798,7 +813,9 @@ li.breadcrumb-item {
 	justify-content: center;
 }
 
-footer .site-directory {
+
+footer .about-us,
+footer .contact-us {
 	font-family: Futura,serif;
 	font-weight: 400;
 	font-size: 1.2rem;
@@ -807,17 +824,23 @@ footer .site-directory {
 	text-align: left;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	margin-top: 2rem;
+}
+
+footer .about-us h3,
+footer .contact-us h3 {
+	letter-spacing: 0.1em;
+	font-size: 2.25rem;
+	color: var(--beige);
+}
+
+footer .contact-us {
+	margin-bottom: 2rem;
 }
 
 footer .site-directory * {
     text-overflow: ellipsis;
 	overflow: hidden;
-}
-
-footer .site-directory h3 {
-    letter-spacing: 0.1em;
-    font-size: 2.25rem;
-    color: var(--beige);
 }
 
 
@@ -973,6 +996,9 @@ input, select, label {
 	.navbar-brand img {
 		max-height: 35px;
 	}
+	.ig-img-grid {
+		grid-template-columns: repeat(2, 45%);
+	}
 }
 
 
@@ -984,6 +1010,7 @@ input, select, label {
 		grid-template-columns: repeat(auto-fill,minmax(70%, 1fr)) !important;
 		grid-auto-columns: minmax(70%, 1fr) !important;
 	}
+
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -1095,4 +1122,155 @@ thead {
 	position: absolute;
     right: 0.5rem;
     top: 0.5rem;
+}
+
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 4;
+  stroke-miterlimit: 10;
+  stroke: #7ac142;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.spinner-border,
+.checkmark,
+.errormark{
+	width: 2rem;
+	height: 2rem;
+}
+.checkmark {
+  /* width: 56px;
+  height: 56px; */
+  border-radius: 50%;
+  stroke-width: 4;
+  stroke: #fff;
+  stroke-miterlimit: 10;
+  /* margin: 10% auto; */
+  box-shadow: inset 0px 0px 0px #7ac142;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #7ac142;
+  }
+}
+
+
+/* svg {
+  width: 100px;
+  display: block;
+  margin: 40px auto 0;
+} */
+.path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 0;
+}
+.path.circle {
+  -webkit-animation: dash 0.9s ease-in-out;
+  animation: dash 0.9s ease-in-out;
+}
+.path.line {
+  stroke-dashoffset: 1000;
+  -webkit-animation: dash 0.9s 0.35s ease-in-out forwards;
+  animation: dash 0.9s 0.35s ease-in-out forwards;
+}
+.path.check {
+  stroke-dashoffset: -100;
+  -webkit-animation: dash-check 0.9s 0.35s ease-in-out forwards;
+  animation: dash-check 0.9s 0.35s ease-in-out forwards;
+}
+
+p.success {
+  color: #73AF55;
+}
+p.error {
+  color: #D06079;
+}
+@-webkit-keyframes dash {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@-webkit-keyframes dash-check {
+  0% {
+    stroke-dashoffset: -100;
+  }
+  100% {
+    stroke-dashoffset: 900;
+  }
+}
+@keyframes dash-check {
+  0% {
+    stroke-dashoffset: -100;
+  }
+  100% {
+    stroke-dashoffset: 900;
+  }
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.notification-container {
+    position: fixed;
+    font-size: 2rem;
+    color: var(--merrigold);
+    left: 50%;
+    top: 20vh;
+    background-color: rgba(0, 0, 0, 0.600);
+    border-radius: 2px;
+    border: 1px solid black;
+    z-index: 4000;
+    width: 80vw;
+    margin-left: -40vw;
+    user-select: none;
+    pointer-events: none;
+    animation-name: fade-out;
+    animation-duration: 5s;
+    animation-direction: normal;
 }
