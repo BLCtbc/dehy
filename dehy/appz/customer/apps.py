@@ -8,15 +8,18 @@ class CustomerConfig(apps.CustomerConfig):
 
 	def ready(self):
 		super().ready()
-
-		self.billing_info_view = get_class('customer.views', 'BillingInfoView')
+		self.billing_list_view = get_class('customer.views', 'BillingListView')
+		self.billing_edit_view = get_class('customer.views', 'BillingEditView')
+		self.billing_add_view = get_class('customer.views', 'BillingAddView')
 
 
 	def get_urls(self):
 		urls = super().get_urls()
 
 		urls += [
-			path('billing-info/', login_required(self.billing_info_view.as_view()), name='billing-info'),
+			path('billing/', login_required(self.billing_list_view.as_view()), name='billing'),
+			path('billing/edit/', login_required(self.billing_edit_view.as_view()), name='billing-edit'),
+			path('billing/add/', login_required(self.billing_add_view.as_view()), name='billing-add'),
 		]
 
 		return urls

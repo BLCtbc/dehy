@@ -1,4 +1,33 @@
 
+table {
+	font-size: 12px;
+	line-height: 1.1rem;
+	word-break: break-all;
+}
+
+table .badge {
+	border-radius: 1px;
+	margin-bottom: 5px;
+	margin-left: 14px;
+}
+table.table td {
+	padding: 0.75rem;
+}
+.table-header {
+	height:20px;
+	background-color: var(--dark-hg);
+}
+
+table.table .table-header > td {
+	border: 2px solid;
+	border-top: 2px double;
+	border-bottom: 2px double;
+	padding: 0;
+}
+
+.btn,button {
+	border-radius: 1px
+}
 form {
 	font-size: unset;
 }
@@ -9,7 +38,7 @@ form {
 button, .btn {
 	font-variant:all-small-caps;
 	color: black;
-	border-color: inherit;
+	border-color: black;
 }
 select, input {
 	outline: 2px solid var(--gold);

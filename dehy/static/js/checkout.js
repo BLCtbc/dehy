@@ -142,8 +142,6 @@ dehy.ch = {
 				method: "POST",
 				url: '/shipping/location/',
 				data: data,
-				// contentType: false,
-				// processData: false,
 				success: function(data) {
 					dehy.ch.forms.errors.hide();
 					if (data.order_client_secret) {

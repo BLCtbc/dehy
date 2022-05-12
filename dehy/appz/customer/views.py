@@ -1,11 +1,17 @@
 from django.urls import reverse_lazy
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import views as auth_views
+from django.http import JsonResponse
 
 from django.conf import settings
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _
+
 from django.views import generic
+from django.views.generic.base import TemplateView
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 from oscar.apps.customer import views
 from oscar.core.loading import get_class, get_classes, get_model
@@ -19,6 +25,44 @@ PageTitleMixin = get_class('customer.mixins','PageTitleMixin')
 
 EmailAuthenticationForm, EmailUserCreationForm, OrderSearchForm = get_classes('customer.forms', ['EmailAuthenticationForm', 'EmailUserCreationForm','OrderSearchForm'])
 
+@login_required
+@require_POST
+def set_card_default(request):
+	data = {'badge_text': _('Default payment method'), 'message': _('Failed to set card as default.'), 'button_text': _('Set as default payment method')}
+	status_code = 400
+	card_id = request.POST.get("card_id", None)
+	if card_id:
+
+		customer = Facade.stripe.Customer.modify(request.user.stripe_customer_id, default_source=card_id)
+
+		if customer:
+			status_code = 200
+			data['message'] = _('Updated default payment method!')
+			data['card_id'] = customer.default_source
+
+
+	response = JsonResponse(data)
+	response.status_code = status_code
+	return response
+
+@login_required
+@require_POST
+def remove_user_card(request):
+	data = {'message': _('Failed remove card.')}
+	status_code = 400
+	card_id = request.POST.get("card_id", None)
+	if card_id:
+
+		customer = Facade.stripe.Customer.delete_source(request.user.stripe_customer_id, card_id)
+		if customer:
+			status_code = 200
+			data['message'] = _('Successfully removed card!')
+			data['card_id'] = customer.default_source
+
+
+	response = JsonResponse(data)
+	response.status_code = status_code
+	return response
 
 class AccountRegistrationView(views.AccountRegistrationView):
 	form_class = EmailUserCreationForm
@@ -46,77 +90,89 @@ class AccountAuthView(views.AccountAuthView):
 	template_name = 'dehy/customer/login.html'
 
 	def dispatch(self, *args, **kwargs):
-		print('session items(auth view): ', self.request.session.items())
-		print('dispatch1 (auth view): ', self.request.basket)
 		response = super().dispatch(*args, **kwargs)
-		print('dispatch2 (auth view): ', self.request.basket)
 		return response
 
-# class LogoutView(generic.RedirectView):
-# 	url = settings.OSCAR_HOMEPAGE
-# 	permanent = False
-# 	redirect_field_name = 'next'
-#
-# 	# def dispatch(self, *args, **kwargs):
-# 	# 	print('dispatching')
-# 	# 	print('basket1(dispatch): ', self.request.basket)
-# 	# 	response = super().dispatch(*args, **kwargs)
-# 	# 	print('basket2(dispatch): ', self.request.basket)
-# 	#
-# 	# 	return response
-#
-#
-# 	def get(self, request, *args, **kwargs):
-# 		print('get1: ', request.basket)
-#
-# 		auth_logout(request)
-# 		print('get2: ', request.basket)
-#
-# 		response = super().get(request, *args, **kwargs)
-#
-# 		for cookie in settings.OSCAR_COOKIES_DELETE_ON_LOGOUT:
-# 			response.delete_cookie(cookie)
-#
-# 		print('get3: ', request.basket)
-#
-# 		return response
 
 @method_decorator(persist_basket_contents([]), name='dispatch')
 class LogoutView(auth_views.LogoutView):
 	redirect_field_name = 'next'
 
-	# def setup(self, request, *args, **kwargs):
-	# 	print('setup')
-	# 	print('basket1(setup): ', request.basket)
-	# 	response = super().setup(request, *args, **kwargs)
-	# 	print('basket2(setup): ', request.basket)
-	# 	return response
-
 	def dispatch(self, *args, **kwargs):
-		print('logging out')
-		print('dispatch1: ', self.request.basket)
 		response = super().dispatch(*args, **kwargs)
-		print('dispatch2: ', self.request.basket)
-
 		return response
 
 
 class ProfileUpdateView(views.ProfileUpdateView):
 	active_tab = 'profile-update'
 
-#
-class BillingInfoView(PageTitleMixin, generic.FormView):
 
+class BillingAddView(PageTitleMixin, TemplateView):
+	page_title = _('Billing')
+	active_tab = 'billing'
+	template_name = "dehy/customer/card_add.html"
+
+class BillingEditView(PageTitleMixin, TemplateView):
+	page_title = _('Billing')
+	active_tab = 'billing'
+	template_name = "dehy/customer/card_edit.html"
+
+#
+class BillingListView(PageTitleMixin, TemplateView):
+	page_title = _('Billing')
+	active_tab = 'billing'
+	template_name = "dehy/customer/card_list.html"
+
+	def post(self, request, *args, **kwargs):
+		pass
 
 	def get_context_data(self, *args, **kwargs):
 		context_data = super().get_context_data(*args, **kwargs)
 
-		payment_methods = Facade.stripe.PaymentMethod.list(
-			customer=request.user.stripe_customer_id,
-			type="card",
-		)
+		# payment_methods = Facade.stripe.PaymentMethod.list(
+		# 	customer=self.request.user.stripe_customer_id,
+		# 	type="card"
+		# )
+		customer = Facade.stripe.Customer.retrieve(self.request.user.stripe_customer_id)
+		print('customer: ', customer)
 
-		context_data.update({'payment_methods': payment_methods})
+		cards = Facade.stripe.Customer.list_sources(
+			self.request.user.stripe_customer_id,
+			object="card", limit=10
+		)
+		print('cards: ', cards)
+
+		context_data['cards'] = []
+		for card in cards['data']:
+			is_default = True if card['id']==customer.default_source else False
+
+			_card = {
+				'name': card['name'],
+				'billing_address': {
+					'line1': card['address_line1'],
+					'line4': card['address_city'],
+					'state': card['address_state'],
+					'postcode': card['address_zip'],
+					'country': card['address_country'],
+				},
+				'last4': card['last4'],
+				'exp_month': card['exp_month'],
+				'exp_year': card['exp_year'],
+				'brand': card['brand'],
+				'is_default': is_default,
+				'id': card['id']
+			}
+
+			if card['address_line2']:
+				_card['line2'] = card['address_line2']
+
+			_card['billing_address'] = {k: v for k, v in _card['billing_address'].items() if v}
+			_card = {k: v for k, v in _card.items() if v}
+
+			print('adding card: ', _card)
+			context_data['cards'].append(_card)
+
+		# context_data.update({'payment_methods': payment_methods})
 		return context_data
 
 	# def get(self, request, *args, **kwargs):

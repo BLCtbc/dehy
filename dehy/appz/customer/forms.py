@@ -16,10 +16,4 @@ class EmailUserCreationForm(BaseEmailUserCreationForm):
 	email = forms.EmailField(label=_('Email'))
 	field_order = ['first_name', 'last_name', 'email', 'password1', 'password2']
 
-	# class Meta:
 
-
-	# def __init__(self, *args, **kwargs):
-	# 	super().__init__(*args, **kwargs)
-	# 	print(dir(self))
-	# 	print(self.field_order)

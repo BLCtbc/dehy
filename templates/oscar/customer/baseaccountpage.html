@@ -41,13 +41,13 @@
 {% block headertext %}{{ page_title }}{% endblock %}
 
 {% block content_wrapper %}
-	<div class="{% block content_wrapper_classes %}container navbar-padding{% endblock %}">
+	<div class="{% block content_wrapper_classes %}container-fluid navbar-padding{% endblock %} mb-4">
 		<div class="row">
 
 		{% block column_left_outer %}
-			<aside class="col-4 col-lg-3 sidebar">
+			<aside class="col-12 col-sm-4 col-lg-3 ml-sm-3 sidebar">
 				{% block column_left %}
-				    <ul class="nav nav-pills flex-column">
+				    <ul class="nav nav-pills flex-column px-sm-5">
 				        {% block standard_tabs %}
 				            {% include 'oscar/customer/partials/standard_tabs.html' %}
 				        {% endblock %}
@@ -56,7 +56,7 @@
 			</aside> <!-- col -->
 		{% endblock column_left_outer %}
 
-			<div class="col-8 info-container">
+			<div class="col-12 col-sm-8 info-container">
 				{% comment %}
 				{% include "oscar/partials/alert_messages.html" %}
 				{% endcomment %}
@@ -70,3 +70,12 @@
 	</div> <!-- /container -->
 {% endblock content_wrapper %}
 
+{% block extra_scripts %}
+<script src="{% static "js/accounts.js" %}"></script>
+{% endblock extra_scripts %}
+
+{% block onbodyload %}
+	{{block.super}}
+	dehy.accounts.init();
+
+{% endblock onbodyload %}
