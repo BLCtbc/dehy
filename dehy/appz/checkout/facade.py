@@ -485,6 +485,7 @@ class Facade(object):
 			except Exception as e:
 				return self.error_handler(e)
 
+facade = Facade()
 
 def upload_catalog():
 	from django.db.models import Count, Q

@@ -33,10 +33,10 @@ main content area to split it into a sidebar and a content block
                 </div>
                 {% endblock %}
 
-				{% comment %}
-				{% include "oscar/partials/alert_messages.html" %}
-				{% endcomment %}
-				
+				{% block messages %}
+					{{block.super}}
+				{% endblock messages %}
+
                 {% block pre_content %}{% endblock %}
                 {% block content %}{% endblock %}
             </div>

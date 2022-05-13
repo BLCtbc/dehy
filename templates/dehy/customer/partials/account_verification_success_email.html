@@ -1,0 +1,10 @@
+{% extends "dehy/partials/email_base.html" %}
+{% load i18n %}
+
+{% autoescape off %}
+
+{% block body %}
+{% trans "Successfully verified your account!" %}
+{% endblock body %}
+
+{% endautoescape %}

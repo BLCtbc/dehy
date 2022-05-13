@@ -6,6 +6,8 @@ from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 import base64, datetime, json, requests, xmltodict
 from oscar.core.loading import get_class, get_model
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
+
 import asyncio, logging
 from asgiref.sync import sync_to_async
 from decimal import Decimal as D
@@ -198,7 +200,7 @@ class Repository(repository.Repository):
 
 		return all_discounts
 
-	async def async_coerce_shipstation_line_items(self, lines):
+	async def async_coerce_shipstation_line_items(self, lines, base_url=''):
 		line_items = []
 		for line in lines:
 			print('line: ', line)
@@ -221,6 +223,7 @@ class Repository(repository.Repository):
 			image_url = await self.async_get_first_image_url(line)
 			print('image_url: ', image_url)
 			if image_url:
+				image_url = base_url+image_url
 				line_dict.update({'imageUrl': image_url})
 
 			if line.product.is_child:
@@ -256,7 +259,7 @@ class Repository(repository.Repository):
 	def fetch_shipping_cost(self, order):
 		return order.shipping_before_discounts_incl_tax
 
-	async def async_place_shipstation_order(self, order):
+	async def async_place_shipstation_order(self, order, request=None):
 
 		order = await self.async_fetch_order_with_related(order.id)
 		lines = await self.async_fetch_order_lines_with_related(order)
@@ -265,16 +268,15 @@ class Repository(repository.Repository):
 		billing_address = await self.async_coerce_shipstation_address(order.billing_address)
 		shipping_address = await self.async_coerce_shipstation_address(order.shipping_address)
 
-		print('billing_address: ', billing_address)
+		base_url = get_current_site(request) if request else ''
 
-		items = await self.async_coerce_shipstation_line_items(lines)
+		items = await self.async_coerce_shipstation_line_items(lines, base_url)
 		shipping_cost = await self.async_fetch_shipping_cost(order)
 		# total_weight = await self.async_fetch_order_weight(order)
 
 		payload = {
 			"orderNumber": order.id+10000,
 			"orderKey": order.number,
-			"carrierCode":"fedex",
 			"orderDate": datetime.datetime.now().isoformat(),
 			"paymentDate": datetime.datetime.now().isoformat(),
 			"shipByDate": datetime.datetime.now().isoformat(),
@@ -287,7 +289,7 @@ class Repository(repository.Repository):
 			"taxAmount": str(order.total_tax),
 			"shippingAmount": str(shipping_cost),
 			"carrierCode": "fedex",
-			"serviceCode": order.shipping_code,
+			"serviceCode": order.shipping_code.lower(),
 			"weight": {
 				"value": str(D(order.basket.total_weight).quantize(TWOPLACES)),
 				"units": "pounds"
@@ -295,7 +297,6 @@ class Repository(repository.Repository):
 		}
 
 		discounts = await self.async_fetch_discounts_with_related(order)
-		print('discounts')
 
 		if len(discounts):
 			items += await self.coerce_shipstation_discounts(discounts)

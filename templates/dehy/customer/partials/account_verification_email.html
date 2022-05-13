@@ -1,0 +1,17 @@
+{% extends "dehy/partials/email_base.html" %}
+{% load i18n %}
+
+{% autoescape off %}
+
+{% block body %}
+
+{% trans "Hi" %} {% if user.first_name %}{{user.first_name}}{% else %}{{user.email}}{% endif %},
+
+{% trans "Thank you for registering with DEHY!" %}
+{% trans "Please use the link below to verify your account" %}
+
+http://{{domain}}{% url 'verify_account' uidb64=uid token=token %}
+
+{% endblock body %}
+
+{% endautoescape %}

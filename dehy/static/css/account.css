@@ -1,3 +1,6 @@
+:root {
+	--fa-icon-size: 20px;
+}
 
 table {
 	font-size: 12px;
@@ -40,7 +43,7 @@ button, .btn {
 	color: black;
 	border-color: black;
 }
-select, input {
+select, form:not(#basket_formset) input {
 	outline: 2px solid var(--gold);
 	outline-offset: 1px;
 	background-color: rgba(231, 240, 254, 1) !important;
@@ -48,7 +51,7 @@ select, input {
 }
 
 
-select:focus, input:focus {
+select:focus, form:not(#basket_formset) input:focus {
 	outline: 2px solid var(--gold) !important;
 	outline-offset: 1px !important;
 }
@@ -163,4 +166,22 @@ a:hover {
     padding-bottom: 8px;
     margin-bottom: 16px;
     border-bottom: 1px solid #21262d;
+}
+
+.fas.fa-check-square {
+	font-size: var(--fa-icon-size);
+    color: green;
+}
+
+.makeshift-fa-false {
+	width: var(--fa-icon-size);
+	height: var(--fa-icon-size);
+	text-align: center;
+	border-radius: 2px;
+	color: var(--dark-hg);
+}
+
+.makeshift-fa-false i.fa-times {
+	font-size: calc(var(--fa-icon-size) - 2px);
+	line-height: var(--fa-icon-size);
 }

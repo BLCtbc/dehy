@@ -57,9 +57,10 @@
 		{% endblock column_left_outer %}
 
 			<div class="col-12 col-sm-8 info-container">
-				{% comment %}
-				{% include "oscar/partials/alert_messages.html" %}
-				{% endcomment %}
+				{% block messages %}
+				{{block.super}}
+				{% endblock messages %}
+
 
 				{% block pre_content %}{% endblock %}
 				{% block content %}

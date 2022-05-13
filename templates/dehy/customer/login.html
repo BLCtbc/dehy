@@ -2,7 +2,11 @@
 {% load i18n %}
 
 {% block title %}
+	{% if needs_verification %}
+	{% trans 'Validation failed' %} {{ block.super }}
+	{% else %}
     {% trans 'Login' %} {{ block.super }}
+	{% endif %}
 {% endblock %}
 
 
@@ -21,6 +25,7 @@
 {% block content %}
     <div class="row form-container">
         <div class="col-12 col-sm-10 col-md-9 col-lg-5">
+
             <form id="login_form" action="{{ request.get_full_path }}" method="post" class="navbar-margin" >
                 <h2 class="form-title">{% trans 'Login' %}</h2>
                 {% csrf_token %}
@@ -30,12 +35,15 @@
 					<span>{% trans "Forgot your password? " %}</span>
 					<a href="{% url 'password-reset' %}"><span class="underline">{% trans "Reset it" %}</span></a>
 				</p>
+				<div class="requires-recaptcha"></div>
+
 				<div class="form-group text-center">
 					<button name="login_submit" type="submit" value="Sign in" class="btn btn-lg" data-loading-text="{% trans "Logging in..." %}">{% trans 'Sign in' %}</button>
 				</div>
             </form>
         </div>
-		<div class="row"></div>
+		<div class="row">
+		</div>
 		<div class="col-12 col-sm-10 col-md-9 col-lg-6">
 			<p class="text-center"><span>{% trans "Don't have an account? "%}</span><a class="underline" href="{% url 'customer:register' %}">{% trans "Create one" %}</a></p>
 		</div>

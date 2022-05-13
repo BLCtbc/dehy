@@ -71,6 +71,7 @@ var dehy = {
 					},
 					error: function(response) {
 						console.log('error response: ', response);
+						$( "#loading_modal" ).show();
 						dehy.utils.update_loading_modal(response.responseJSON.message, "#status_error", 2000);
 					}
 				});
@@ -425,8 +426,6 @@ var dehy = {
 			}
 		},
 		serialize(form) {
-
-			// Setup our serialized data
 			var serialized = [];
 			var elements = (form.elements) ? form.elements: form.querySelectorAll('input, select, fieldset, button');
 			// Loop through each field in the form
