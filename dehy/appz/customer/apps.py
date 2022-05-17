@@ -8,15 +8,22 @@ class CustomerConfig(apps.CustomerConfig):
 
 	def ready(self):
 		super().ready()
-
-		self.billing_info_view = get_class('customer.views', 'BillingInfoView')
+		self.payment_list_view = get_class('customer.views', 'PaymentMethodListView')
+		self.payment_edit_view = get_class('customer.views', 'PaymentMethodEditView')
+		self.payment_add_view = get_class('customer.views', 'PaymentMethodAddView')
+		self.verification_view = get_class('customer.views', 'VerificationView')
 
 
 	def get_urls(self):
 		urls = super().get_urls()
 
 		urls += [
-			path('billing-info/', login_required(self.billing_info_view.as_view()), name='billing-info'),
+			path('payment/', login_required(self.payment_list_view.as_view()), name='payment'),
+			path('payment/edit/<card_id>', login_required(self.payment_edit_view.as_view()), name='payment-edit'),
+			path('payment/add/', login_required(self.payment_add_view.as_view()), name='payment-add'),
+			# path('verification/', self.verification_view.as_view(), name='verification'),
+			path('verify/<uidb64>/<token>', self.verification_view.as_view(), name='verification')
+
 		]
 
 		return urls

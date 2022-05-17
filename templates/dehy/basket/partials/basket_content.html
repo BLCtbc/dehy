@@ -4,6 +4,7 @@
 {% load purchase_info_tags %}
 {% load widget_tweaks %}
 
+{% with basket=basket|default:request.basket %}
 {% if basket_warnings %}
     <h5>{% trans "Important messages about items in your basket" %}</h5>
     {% for warning in basket_warnings %}
@@ -22,7 +23,7 @@
     </div>
 {% endif %}
 
-{% if not basket.is_empty %}
+{% if basket and not basket.is_empty %}
 
 	{% block basket_form_headers %}
 
@@ -157,6 +158,7 @@
 						<span>{% trans "Subtotal" %}</span>
 					</div>
 					<div class="col text-right">
+
 						<span id="subtotal" class="price-text">{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}</span>
 					</div>
 				</div>
@@ -305,4 +307,6 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% endwith %}
 

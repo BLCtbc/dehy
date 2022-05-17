@@ -45,6 +45,11 @@
 	    {% block content_wrapper %}
 	            {% block breadcrumbs %}{% endblock %}
 	            <div class="content justify-content-center row">
+					
+					{% block messages %}
+					{% include "oscar/partials/alert_messages.html" %}
+					{% endblock messages %}
+
 	                {# Div exists for AJAX updates to entire content section #}
 	                {% block content %}
 					{% endblock content %}

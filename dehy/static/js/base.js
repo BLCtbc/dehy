@@ -71,6 +71,7 @@ var dehy = {
 					},
 					error: function(response) {
 						console.log('error response: ', response);
+						$( "#loading_modal" ).show();
 						dehy.utils.update_loading_modal(response.responseJSON.message, "#status_error", 2000);
 					}
 				});
@@ -270,6 +271,12 @@ var dehy = {
 		},
 	},
 	utils: {
+		generic_handler_setup(selector, event_type="click", callback_fn) {
+			var elems = document.querySelectorAll(selector);
+			elems.forEach(ele=>{
+				ele.addEventListener(event_type, callback_fn);
+			});
+		},
 		freeze_submissions: false,
 		get_sitekey(version=dehy.recaptcha_version) {
 			return dehy[`recaptcha_sitekey_v${version}`]
@@ -425,8 +432,6 @@ var dehy = {
 			}
 		},
 		serialize(form) {
-
-			// Setup our serialized data
 			var serialized = [];
 			var elements = (form.elements) ? form.elements: form.querySelectorAll('input, select, fieldset, button');
 			// Loop through each field in the form

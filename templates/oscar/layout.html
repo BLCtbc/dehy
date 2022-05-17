@@ -53,9 +53,9 @@
                     </div>
                 {% endblock %}
 
-				{% comment %}
-                {% include "oscar/partials/alert_messages.html" %}
-				{% endcomment %}
+				{% block messages %}
+				{% include "oscar/partials/alert_messages.html" %}
+				{% endblock messages %}
 
                 {% block subnavigation %}{% endblock %}
                 <div class="content">

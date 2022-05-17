@@ -21,8 +21,7 @@ from decimal import Decimal as D
 TWO_PLACES = D(10)**-2
 FOUR_PLACES = D(10)**-4
 
-from .facade import Facade
-Facade = Facade()
+from .facade import facade
 
 from urllib.parse import quote
 import datetime, json, logging, requests, sys, time
@@ -79,14 +78,14 @@ def webhook_submit_order(request):
 	place_order_view = PlaceOrderView(request=request)
 	payload = request.body
 
-	endpoint_secret = Facade.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
+	endpoint_secret = facade.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
 	# endpoint_secret = 'whsec_63c2ac70680ad9eb9ceddd981cb1be311fbd0ab114767d63c69c28f0374d8b42'
 
 	event = None
 	sig_header = request.headers['STRIPE_SIGNATURE']
 
 	try:
-		event = Facade.stripe.Webhook.construct_event(
+		event = facade.stripe.Webhook.construct_event(
 			payload, sig_header, endpoint_secret
 		)
 
@@ -101,7 +100,7 @@ def webhook_submit_order(request):
 
 		raise e
 
-	except Facade.stripe.error.SignatureVerificationError as e:
+	except facade.stripe.error.SignatureVerificationError as e:
 		msg = 'Stripe webhook: ⚠️  Webhook signature verification failed.' + str(e)
 		logger.error(msg)
 		data['error'] = msg
@@ -114,7 +113,7 @@ def webhook_submit_order(request):
 
 		order = event['data']['object']
 		basket = get_object_or_404(Basket, id=order.metadata.get('basket_id'))
-		order = Facade.stripe.Order.retrieve(order.id, expand=['customer', 'payment.payment_intent', 'line_items'])
+		order = facade.stripe.Order.retrieve(order.id, expand=['customer', 'payment.payment_intent', 'line_items'])
 		place_order_view.handle_place_order_submission(basket, order)
 		response = JsonResponse({})
 		response.status_code = 200
@@ -148,7 +147,7 @@ def ajax_set_shipping_method(request):
 		status_code = 200
 		checkout_session.use_shipping_method(method_code)
 
-		order = Facade.update_or_create_order(request.basket, shipping_method={'cost':selected_method.calculate(request.basket).excl_tax, 'code':selected_method.code, 'name':selected_method.name})
+		order = facade.update_or_create_order(request.basket, shipping_method={'cost':selected_method.calculate(request.basket).excl_tax, 'code':selected_method.code, 'name':selected_method.name})
 		checkout_session.set_order_number(str(order.id).replace("order_", ""))
 
 		data['subtotal'] = str(D(order.amount_subtotal/100).quantize(TWO_PLACES))
@@ -273,7 +272,7 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 
 			data['shipping_charge'] = selected_shipping_method['cost']
 			checkout_session.use_shipping_method(selected_shipping_method['code'])
-			order = Facade.update_or_create_order(request.basket, **order_details)
+			order = facade.update_or_create_order(request.basket, **order_details)
 
 			checkout_session.set_order_number(str(order.id).replace("order_", ""))
 			data['order_client_secret'] = order.client_secret
@@ -284,9 +283,6 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 
 			request.session['total_tax'] = data['total_tax']
 			request.session['subtotal'] = data['subtotal']
-
-			# request.basket._total_tax = data['total_tax']
-			# request.basket.save()
 
 
 	response = JsonResponse(data)
@@ -366,7 +362,7 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 				if form.is_valid():
 					email = form.cleaned_data['username']
-					order = Facade.update_or_create_order(request.basket, **order_details)
+					order = facade.update_or_create_order(request.basket, **order_details)
 
 				else:
 					order_details['customer'] = request.user.stripe_customer_id
@@ -538,12 +534,8 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 				else:
 					self.checkout_session.ship_to_new_address(address_fields)
 
-				order = Facade.update_or_create_order(request.basket, **order_details)
-
-				print('\n updated order in shipping view: ', order)
-
+				order = facade.update_or_create_order(request.basket, **order_details)
 				status_code = 200
-
 				self.checkout_session.use_shipping_method(shipping_method_form.cleaned_data['method_code'])
 
 				# shipping_address_obj = self.get_shipping_address(self.request.basket)
@@ -619,7 +611,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		return True
 
 	def form_valid(self, form, option=None):
-		print('form_valid called')
 		# Store the address details in the session and redirect to next step
 		address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
 
@@ -670,7 +661,6 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 			'-is_default_for_billing')
 
 	def post(self, request, *args, **kwargs):
-		print('request.session.items(): ', request.session.items())
 		status_code = 400
 		response = super().post(request, *args, **kwargs)
 		data = {'section': 'additional_info', 'same_as_shipping': True}
@@ -721,7 +711,7 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 
 				self.checkout_session.set_questionnaire_response(form.instance)
 
-				data['stripe_pkey'] = Facade.stripe.pkey
+				data['stripe_pkey'] = facade.stripe.pkey
 				status_code = 200
 				print('data: ', data)
 				response = JsonResponse(data)
@@ -806,14 +796,14 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 
 			address_fields.update({'email': email})
 
-			# order = Facade.update_and_process_order(request.basket, billing_fields=address_fields)
-			billing_details = Facade.coerce_to_address_object(address_fields)
+			# order = facade.update_and_process_order(request.basket, billing_fields=address_fields)
+			billing_details = facade.coerce_to_address_object(address_fields)
 			stripe_order_id = f"order_{request.basket.stripe_order_id}"
-			order = Facade.stripe.Order.modify(stripe_order_id, billing_details=billing_details)
+			order = facade.stripe.Order.modify(stripe_order_id, billing_details=billing_details)
 			payment = order.payment
 
 			data['order_client_secret'] = order.client_secret
-			data['stripe_pkey'] = Facade.stripe.pkey
+			data['stripe_pkey'] = facade.stripe.pkey
 			response = JsonResponse(data)
 
 		response.status_code = status_code
@@ -1128,7 +1118,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			shipping_charge=shipping_charge, order_total=order_total,
 			billing_address=billing_address, surcharges=surcharges, **kwargs)
 		basket.submit()
-		asyncio.run(Repository.async_place_shipstation_order(order))
+		asyncio.run(Repository.async_shipstation_place_order(order))
 		return self.handle_successful_order(order)
 
 	def handle_successful_order(self, order):

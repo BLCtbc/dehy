@@ -36,6 +36,7 @@ env.read_env(str(ENV_FILE_LOCATION))
 SECRET_KEY = env.str('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=True)
 
+BASE_URL = "https://www.dehygarnish.net"
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 INTERNAL_IPS = [
 	"127.0.0.1"
@@ -102,7 +103,7 @@ INSTALLED_APPS = [
 ]
 
 
-SITE_ID = 1
+SITE_ID = 2
 
 MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
@@ -240,6 +241,8 @@ AWS_SES_REGION_ENDPOINT = 'email.us-east-2.amazonaws.com'
 AWS_SES_ACCESS_KEY_ID = env.str('AWS_SES_ACCESS_KEY_ID')
 AWS_SES_SECRET_ACCESS_KEY = env.str('AWS_SES_SECRET_ACCESS_KEY')
 OSCAR_FROM_EMAIL = f'mail@{SITE_DOMAIN}'
+AUTO_REPLY_EMAIL_ADDRESS = f'no-reply@{SITE_DOMAIN}'
+
 OSCAR_GOOGLE_ANALYTICS_ID = 'G-W6L54G8SQ1'
 
 LANGUAGE_CODE = 'en-us'
@@ -276,6 +279,7 @@ HAYSTACK_CONNECTIONS = {
 }
 
 AUTH_USER_MODEL = "generic.User"
+OSCAR_SEND_REGISTRATION_EMAIL = False
 OSCAR_ALLOW_ANON_CHECKOUT = True
 OSCAR_INITIAL_ORDER_STATUS = OSCAR_INITIAL_LINE_STATUS = 'Processed'
 OSCAR_ORDER_STATUS_PIPELINE = OSCAR_LINE_STATUS_PIPELINE = {
@@ -292,7 +296,8 @@ OSCAR_ORDER_STATUS_CASCADE = {
 	'Cancelled': 'Cancelled'
 }
 
-OSCAR_ACCOUNTS_REDIRECT_URL = 'customer:profile-update'
+
+OSCAR_ACCOUNTS_REDIRECT_URL = LOGIN_REDIRECT_URL = 'customer:profile-update'
 OSCAR_DEFAULT_CURRENCY = 'USD'
 
 OSCAR_COOKIES_DELETE_ON_LOGOUT = ['oscar_recently_viewed_products', 'oscar_open_basket']
@@ -301,7 +306,7 @@ OSCAR_HOMEPAGE = reverse_lazy('catalogue:index')
 OSCAR_SHOP_NAME = "DEHY"
 OSCAR_SHOP_TAGLINE = ""
 OSCAR_MISSING_IMAGE_URL = MEDIA_ROOT / "image_not_found.jpg"  # relative path from media root
-
+OSCAR_REQUIRED_ADDRESS_FIELDS = ('first_name', 'last_name', 'line1', 'line4', 'postcode', 'country')
 OSCAR_PRODUCTS_PER_PAGE = 10
 
 OSCAR_THUMBNAIL_DEBUG = THUMBNAIL_DEBUG = DEBUG

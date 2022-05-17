@@ -1,0 +1,87 @@
+{% extends "oscar/customer/baseaccountpage.html" %}
+{% load i18n %}
+
+{% block tabcontent %}
+	<div class="subhead">
+		<h2 class="h2">{% trans "Payment Methods" %}</h2>
+	</div>
+    {% if cards %}
+        <table cellpadding="0" cellspacing="0" class="table table-bordered table-hover" id="address_list">
+            <tbody>
+				<tr class="table-header"><td colspan="2"></td></tr>
+                {% for card in cards %}
+                    <tr data-cardid="{{card.id}}">
+                        <td>
+							<a class="btn btn-secondary float-right" href="{% url 'customer:payment-edit' card_id=card.id %}">{% trans 'Edit' %}</a>
+
+							{% if card.is_default %}
+								<span class="badge badge-success">{% trans 'Default payment method' %}</span>
+							{% endif %}
+							<div class="row">
+								<address class="col">
+									<div>
+									{{card.name}}
+									</div>
+									<div>
+									{{card.billing_address.line1}}
+									</div>
+									<div>
+									{{card.billing_address.line2}}
+									</div>
+									<div>
+									{{card.billing_address.line4}} {{card.billing_address.state}} {{card.billing_address.postcode}}
+									</div>
+									<div>
+									{{card.billing_address.country}}
+									</div>
+	                                {% for field in card.billing_address %}
+	                                {% endfor %}
+	                            </address>
+								<div class="col">
+									<div>
+										XXXX-{{card.last4}}
+									</div>
+									<div>
+										<i class="fab fa-cc-{{card.brand|lower}}"></i>
+
+									</div>
+									<div>
+										{% if card.exp_month|make_list|length_is:"1" %}0{% endif %}{{card.exp_month}}/{{card.exp_year}}
+									</div>
+								</div>
+							</div>
+
+                        </td>
+                        <td>
+							<div class="container-fluid" style="height:150px">
+								<div class="row flex-column h-100 justify-content-around">
+									<div class="col">
+									{% if not card.is_default %}
+										<button type="button" class="set-card-default btn btn-primary w-100">
+											{% trans 'Set as default payment method' %}
+										</button>
+									{% endif %}
+									</div>
+
+									<div class="col">
+										<button type="button" class="delete-card btn btn-danger bg-danger float-right">
+											{% trans 'Delete' %}
+										</button>
+									</div>
+								</div>
+							</div>
+
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include "oscar/partials/pagination.html" %}
+    {% else %}
+        <p>{% trans 'No saved payment methods found.' %}</p>
+    {% endif %}
+    <p>
+        <a aria-disabled='true' href="{% url 'customer:payment-add' %}" class="btn disabled btn-primary">{% trans 'Add a payment method' %}</a>
+    </p>
+
+{% endblock tabcontent %}

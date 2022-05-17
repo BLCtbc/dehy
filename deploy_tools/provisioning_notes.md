@@ -1732,3 +1732,14 @@ https://stackoverflow.com/a/40078116/6158303
 
 12. ###### adding more 'sites' to django
 	go to http://127.0.0.1:8000/admin/sites/site/ and click 'ADD SITE'
+
+	note: deleting the default site, which is normally 'example.com', does NOT screw anything up
+
+
+	```py
+	# setting.py
+	...
+	SITE_ID = 2
+	...
+
+	```

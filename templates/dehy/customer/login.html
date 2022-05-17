@@ -1,8 +1,13 @@
 {% extends "oscar/customer/baseaccountpage.html" %}
 {% load i18n %}
+{% load widget_tweaks %}
 
 {% block title %}
+	{% if needs_verification %}
+	{% trans 'Account verification failed' %} {{ block.super }}
+	{% else %}
     {% trans 'Login' %} {{ block.super }}
+	{% endif %}
 {% endblock %}
 
 
@@ -19,23 +24,40 @@
 {% endblock column_left_outer %}
 
 {% block content %}
-    <div class="row form-container">
-        <div class="col-12 col-sm-10 col-md-9 col-lg-6">
+    <div class="row justify-content-center form-container">
+        <div class="col-12 col-sm-10 col-md-9 col-lg-5">
+
             <form id="login_form" action="{{ request.get_full_path }}" method="post" class="navbar-margin" >
                 <h2 class="form-title">{% trans 'Login' %}</h2>
                 {% csrf_token %}
-                {% include "oscar/partials/form_fields.html" with form=login_form %}
 
+				<div class="row">
+					<div class="form-group col">
+						<label class="col-form-label required" for="{{ login_form.username.id_for_label }}">{{ login_form.username.label }}</label>
+						{% render_field login_form.username class+="form-control" autocomplete="username" %}
+						{{ login_form.username.errors }}
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col">
+						<label class="col-form-label required" for="{{ login_form.password.id_for_label }}">{{ login_form.password.label }}</label>
+						<a role="button" class="password-toggle" data-for="{{ login_form.password.id_for_label }}" type="button" aria-label="Show password as plain text. Warning: this will display your password on the screen.">{% trans "Show password" %}</a>
+						{% render_field login_form.password class+="form-control" autocomplete="current-password" %}
+						{{ login_form.password.errors }}
+					</div>
+				</div>
                 <p class="text-center">
 					<span>{% trans "Forgot your password? " %}</span>
 					<a href="{% url 'password-reset' %}"><span class="underline">{% trans "Reset it" %}</span></a>
 				</p>
+				<div class="requires-recaptcha"></div>
 				<div class="form-group text-center">
 					<button name="login_submit" type="submit" value="Sign in" class="btn btn-lg" data-loading-text="{% trans "Logging in..." %}">{% trans 'Sign in' %}</button>
 				</div>
             </form>
         </div>
-		<div class="row"></div>
+		<div class="row">
+		</div>
 		<div class="col-12 col-sm-10 col-md-9 col-lg-6">
 			<p class="text-center"><span>{% trans "Don't have an account? "%}</span><a class="underline" href="{% url 'customer:register' %}">{% trans "Create one" %}</a></p>
 		</div>

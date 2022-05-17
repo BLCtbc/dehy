@@ -20,6 +20,7 @@ selector = Selector()
 class BasketMiddleware:
 
 	def __init__(self, get_response):
+
 		self.get_response = get_response
 
 	def __call__(self, request):
@@ -130,7 +131,6 @@ class BasketMiddleware:
 		return settings.OSCAR_BASKET_COOKIE_OPEN
 
 	def process_template_response(self, request, response):
-		# print('process_template_response(): ', request.basket)
 		if hasattr(response, 'context_data'):
 			if response.context_data is None:
 				response.context_data = {}
