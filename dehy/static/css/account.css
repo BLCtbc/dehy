@@ -2,6 +2,10 @@
 	--fa-icon-size: 20px;
 }
 
+.password-toggle {
+	float: right;
+}
+
 table {
 	font-size: 12px;
 	line-height: 1.1rem;
@@ -28,9 +32,6 @@ table.table .table-header > td {
 	padding: 0;
 }
 
-.btn,button {
-	border-radius: 1px
-}
 form {
 	font-size: unset;
 }
@@ -38,11 +39,16 @@ form {
 	right: unset;
 	top: unset;
 }
-button, .btn {
+
+
+.info-container button,
+.info-container .btn {
 	font-variant:all-small-caps;
 	color: black;
 	border-color: black;
+	border-radius: 1px
 }
+
 select, form:not(#basket_formset) input {
 	outline: 2px solid var(--gold);
 	outline-offset: 1px;
@@ -82,29 +88,15 @@ select:focus, form:not(#basket_formset) input:focus {
 	margin-bottom: 1rem;
 }
 
-a:hover {
+.info-container a:hover {
 	text-decoration: underline;
 	opacity: 0.8;
 }
-
-.row {
-	justify-content: center;
-}
-
 
 .info-container {
 	font-size: 1.25rem;
 	padding-left: 0;
 }
-
-/* .nav-pills .nav-link:hover {
-	border-left: 4px solid;
-}
-
-.nav-pills .nav-link.active,
-.nav-pills .show > .nav-link {
-	border-left: 4px solid;
-} */
 
 .sidebar {
 	padding-left: 7px;
@@ -184,4 +176,13 @@ a:hover {
 .makeshift-fa-false i.fa-times {
 	font-size: calc(var(--fa-icon-size) - 2px);
 	line-height: var(--fa-icon-size);
+}
+
+@media (max-width: 992px) {
+	table.table td {
+		padding: 0.25rem;
+	}
+	.set-card-default.btn, .delete-card {
+		padding: 0.25rem;
+	}
 }

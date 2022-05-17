@@ -18,7 +18,7 @@
 {% endblock column_left_outer %}
 
 {% block content %}
-    <div class="row form-container">
+    <div class="row justify-content-center form-container">
 		<div class="col-12 col-sm-10 col-md-9 col-lg-5">
             <form id="register_form" method="post" class="navbar-margin">
 				<h2 class="form-title">{% trans 'Create Account' %}</h2>
@@ -33,7 +33,6 @@
 						<label class="col-form-label" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
 						{% render_field form.last_name class+="form-control" %}
 						{{ form.last_name.errors }}
-
 					</div>
 				</div>
 				<div class="row">
@@ -41,21 +40,21 @@
 						<label class="col-form-label required" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
 						{% render_field form.email class+="form-control" autofill="username" %}
 						{{ form.email.errors }}
-
 					</div>
 				</div>
 				<div class="row">
 					<div class="form-group col">
 						<label class="col-form-label required" for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
-						{% render_field form.password1 class+="form-control" %}
+						<a role="button" class="password-toggle" data-for="{{ form.password1.id_for_label }}" type="button" aria-label="{% trans 'Show password as plain text. Warning: this will display your password on the screen.' %}">{% trans "Show password" %}</a>
+						{% render_field form.password1 class+="form-control" autocomplete="new-password" %}
 						{{ form.password1.errors }}
-
 					</div>
 				</div>
 				<div class="row">
 					<div class="form-group col">
 						<label class="col-form-label required" for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
-						{% render_field form.password2 class+="form-control" %}
+						<a role="button" class="password-toggle" data-for="{{ form.password2.id_for_label }}" type="button" aria-label="{% trans 'Show password as plain text. Warning: this will display your password on the screen.' %}">{% trans "Show password" %}</a>
+						{% render_field form.password2 class+="form-control" autocomplete="new-password" %}
 						{{ form.password2.errors }}
 
 					</div>

@@ -82,8 +82,13 @@
 				dehy.recaptcha_sitekey_v2 = "{{recaptcha_site_key_v2}}";
 				dehy.recaptcha_sitekey_v3 = "{{recaptcha_site_key_v3}}";
 				var notifications = "{{notifications}}";
-
 				dehy.init('index');
+				dehy.translations = {
+					show_password: "{% trans 'Show Password' %}",
+					hide_password: "{% trans 'Hide Password' %}",
+					show_password_aria: "{% trans 'Show password as plain text. Warning: this will display your password on the screen.' %}",
+					hide_password_aria: "{% trans 'Hide Password' %}"
+				};
 				var currencySymbol = '{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}';
 				currencySymbol = currencySymbol.slice(0, 1);
 				dehy.basket.init(currencySymbol);

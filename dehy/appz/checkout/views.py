@@ -535,11 +535,7 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 					self.checkout_session.ship_to_new_address(address_fields)
 
 				order = facade.update_or_create_order(request.basket, **order_details)
-
-				print('\n updated order in shipping view: ', order)
-
 				status_code = 200
-
 				self.checkout_session.use_shipping_method(shipping_method_form.cleaned_data['method_code'])
 
 				# shipping_address_obj = self.get_shipping_address(self.request.basket)
@@ -615,7 +611,6 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		return True
 
 	def form_valid(self, form, option=None):
-		print('form_valid called')
 		# Store the address details in the session and redirect to next step
 		address_fields = dict((k, v) for (k, v) in form.instance.__dict__.items() if not k.startswith('_'))
 
@@ -1123,7 +1118,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			shipping_charge=shipping_charge, order_total=order_total,
 			billing_address=billing_address, surcharges=surcharges, **kwargs)
 		basket.submit()
-		asyncio.run(Repository.async_place_shipstation_order(order))
+		asyncio.run(Repository.async_shipstation_place_order(order))
 		return self.handle_successful_order(order)
 
 	def handle_successful_order(self, order):

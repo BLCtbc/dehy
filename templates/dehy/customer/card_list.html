@@ -12,7 +12,7 @@
                 {% for card in cards %}
                     <tr data-cardid="{{card.id}}">
                         <td>
-							<a class="btn btn-secondary float-right" href="{% url 'customer:billing-edit' %}">{% trans 'Edit' %}</a>
+							<a class="btn btn-secondary float-right" href="{% url 'customer:payment-edit' card_id=card.id %}">{% trans 'Edit' %}</a>
 
 							{% if card.is_default %}
 								<span class="badge badge-success">{% trans 'Default payment method' %}</span>
@@ -42,7 +42,8 @@
 										XXXX-{{card.last4}}
 									</div>
 									<div>
-										{{card.brand}}
+										<i class="fab fa-cc-{{card.brand|lower}}"></i>
+
 									</div>
 									<div>
 										Exp {{card.exp_month}}/{{card.exp_year}}
@@ -80,7 +81,7 @@
         <p>{% trans 'No saved payment methods found.' %}</p>
     {% endif %}
     <p>
-        <a href="{% url 'customer:billing-add' %}" class="btn btn-primary">{% trans 'Add a payment method' %}</a>
+        <a href="{% url 'customer:payment-add' %}" class="btn btn-primary">{% trans 'Add a payment method' %}</a>
     </p>
 
 {% endblock tabcontent %}

@@ -1,0 +1,83 @@
+{% load widget_tweaks %}
+{% load i18n %}
+
+<form id="payment_method_form" method="post">
+	{% csrf_token %}
+	{{ form.non_field_errors }}
+	<div class="form-group row" id="stripe_payment_container">
+	</div>
+	<input type="hidden" name="card_id" value="{{card_id}}">
+	<div class="form-container">
+
+		<div class="row">
+			<div class="form-group col">
+				<h2>
+					<span>
+						<i class="fab fa-cc-{{form.card_brand.value|lower}}"></i>
+					</span>
+					<span>XXXX-{{form.last4.value}}</span>
+				</h2>
+
+			</div>
+
+			<div class="form-group col-6 col-md-4 col-lg-2">
+				<label class="col-form-label {% if form.exp_month.field.required %}required{% endif %}" for="{{form.exp_month.id_for_label}}">{{form.exp_month.label}}</label>
+				{% render_field form.exp_month class+="form-control" %}
+			</div>
+			<div class="form-group col-6 col-md-4 col-lg-2">
+				<label class="col-form-label {% if form.exp_year.field.required %}required{% endif %}" for="{{form.exp_year.id_for_label}}">{{form.exp_year.label}}</label>
+				{% render_field form.exp_year class+="form-control" %}
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label {% if form.first_name.field.required %}required{% endif %}" for="{{form.first_name.id_for_label}}">{{form.first_name.label}}</label>
+				{% render_field form.first_name class+="form-control" %}
+			</div>
+			<div class="form-group col">
+				<label class="col-form-label {% if form.last_name.field.required %}required{% endif %}" for="{{form.last_name.id_for_label}}">{{form.last_name.label}}</label>
+				{% render_field form.last_name class+="form-control" %}
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label {% if form.line1.field.field.required %}required{% endif %}" for="{{form.line1.id_for_label}}">{{form.line1.label}}</label>
+				{% render_field form.line1 class+="form-control" %}
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label {% if form.line2.field.required %}required{% endif %}" for="{{form.line2.id_for_label}}">{{form.line2.label}}</label>
+				{% render_field form.line2 class+="form-control" %}
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label {% if form.country.field.required %}required{% endif %}" for="{{form.country.id_for_label}}">{{form.country.label}}</label>
+				{% render_field form.country class+="form-control" %}
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label {% if form.postcode.field.required %}required{% endif %}" for="{{form.postcode.id_for_label}}">{{form.postcode.label}}</label>
+				{% render_field form.postcode class+="form-control" %}
+			</div>
+			<div class="form-group col">
+				<label class="col-form-label {% if form.line4.field.required %}required{% endif %}" for="{{form.line4.id_for_label}}">{{form.line4.label}}</label>
+				{% render_field form.line4 class+="form-control" %}
+			</div>
+			<div class="form-group col">
+				<label class="col-form-label {% if form.state.field.required %}required{% endif %}" for="{{form.state.id_for_label}}">{{form.state.label}}</label>
+				{% render_field form.state class+="form-control" %}
+			</div>
+		</div>
+
+
+		<div class="form-group row">
+	        <div class="offset-sm-4 col-sm-8">
+	            <button class="btn btn-lg btn-primary" type="submit" data-loading-text="Saving...">Save</button>
+	            or <a href="#" onclick="window.history.go(-1);return false">cancel</a>.
+	        </div>
+	    </div>
+</form>

@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load widget_tweaks %}
 {% block title %}
-    {% trans 'Validation failed' %} {{ block.super }}
+    {% trans 'Account verification failed' %} {{ block.super }}
 {% endblock %}
 
 {% block header %}
@@ -18,7 +18,7 @@
 {% endblock column_left_outer %}
 
 {% block content %}
-    <div class="row form-container">
+    <div class="row justify-content-center form-container">
 		<div class="col-12 col-sm-10 col-md-9 col-lg-5">
 			{% if needs_verification %}
 			<form id="resend_verification" action="{{ request.get_full_path }}" method="post" class="navbar-margin" >
@@ -33,6 +33,7 @@
 	                	<input type="email" name="username" value="{{user.email}}" maxlength="254" class="form-control" required="" id="id_username">
 	                </div>
         		</div>
+				<div class="requires-recaptcha"></div>
 
 				<div class="form-group text-center">
 					<button name="resend_verification" type="submit" value="Resend verification" class="btn btn-lg">{% trans 'Send Verification' %}</button>

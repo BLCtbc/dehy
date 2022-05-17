@@ -1,6 +1,7 @@
 #mini_basket a.btn {
 	color: white;
 	background-color: var(--hg);
+	padding: 0.375rem 3rem;
 }
 
 .basket_title * {

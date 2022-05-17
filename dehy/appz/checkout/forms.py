@@ -29,12 +29,37 @@ class StripeTokenForm(forms.Form):
 	stripeEmail = forms.EmailField(widget=forms.HiddenInput())
 	stripeToken = forms.CharField(widget=forms.HiddenInput())
 
-class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
+class BaseAddressForm(PhoneNumberMixin, AbstractAddressForm):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		self.fields['first_name'].widget.attrs['placeholder'] = _('First name')
+		self.fields['last_name'].widget.attrs['placeholder'] = _('Last name')
+		self.fields['state'].widget.attrs['placeholder'] = _('State')
+		self.fields['line1'].widget.attrs['placeholder'] = _('Address 1')
+		self.fields['line2'].widget.attrs['placeholder'] = _('Address 2')
+		self.fields['line4'].widget.attrs['placeholder'] = _('City')
+		self.fields['country'].widget.attrs['placeholder'] = _('Country')
+		self.fields['postcode'].widget.attrs['placeholder'] = _('ZIP Code')
+		self.fields['phone_number'].widget.attrs['placeholder'] = _('Phone Number')
+
+class ShippingAddressForm(BaseAddressForm):
+	required_fields = []
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
 		self.adjust_country_field()
+		self.adjust_required_fields()
 		# self.fields['phone_number'].required = False
+
+	def get_required_fields(self):
+		return self.required_fields
+
+	def adjust_required_fields(self):
+		required_fields = self.get_required_fields()
+		if required_fields:
+			for field_name,field in self.fields.items():
+				self.fields[field_name].required = True if field_name in required_fields else False
 
 	def adjust_country_field(self):
 		countries = Country._default_manager.filter(Q(iso_3166_1_a2='US')|Q(iso_3166_1_a2='CA'))
@@ -57,11 +82,7 @@ class ShippingAddressForm(PhoneNumberMixin, AbstractAddressForm):
 		]
 
 class CountryAndPostcodeForm(ShippingAddressForm):
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		required_fields = ['country', 'postcode']
-		for field_name,field in self.fields.items():
-			self.fields[field_name].required = True if field_name in required_fields else False
+	required_fields = ['country', 'postcode']
 
 class ShippingMethodForm(forms.Form):
 
@@ -113,23 +134,19 @@ class UserInfoForm(AuthenticationForm):
 				msg = _("A user with that email address already exists")
 				self._errors["username"] = self.error_class([msg])
 
-		# return self.cleaned_data
-
-		print('self.cleaned_data:', self.cleaned_data)
-		print('super().clean():', super().clean())
 
 		return super().clean()
 
 
 
-class BillingAddressForm(payment_forms.BillingAddressForm):
+class BaseBillingAddressForm(payment_forms.BillingAddressForm):
 
-	same_as_shipping = forms.BooleanField(required=False, initial=True, label='Use shipping address')
-	# city = forms.CharField(required=True, max_length=100, min_length=2)
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		print('attrs: ', self.fields['first_name'].widget.attrs)
+		print('required: ', self.fields['first_name'].required)
+		print('visible_fields: ', self.visible_fields())
 
-		self.adjust_country_field()
 
 		self.fields['first_name'].widget.attrs['placeholder'] = _('First name')
 		self.fields['last_name'].widget.attrs['placeholder'] = _('Last name')
@@ -139,13 +156,12 @@ class BillingAddressForm(payment_forms.BillingAddressForm):
 		self.fields['line4'].widget.attrs['placeholder'] = _('City')
 		self.fields['country'].widget.attrs['placeholder'] = _('Country')
 		self.fields['postcode'].widget.attrs['placeholder'] = _('ZIP Code')
-		self.fields['phone_number'].widget.attrs['placeholder'] = _('Phone Number')
-		self.fields['phone_number'].required = False
+
 
 
 	def adjust_country_field(self):
 
-		countries = Country._default_manager.filter(is_shipping_country=True)
+		countries = Country._default_manager.all()
 
 		# No need to show country dropdown if there is only one option
 		if len(countries) == 1:
@@ -158,10 +174,32 @@ class BillingAddressForm(payment_forms.BillingAddressForm):
 	class Meta:
 		model = BillingAddress
 		fields = [
+			'first_name', 'last_name',
+			'line1', 'line2', 'line4',
+			'state', 'postcode', 'country'
+		]
+
+class BillingAddressForm(BaseBillingAddressForm):
+	same_as_shipping = forms.BooleanField(required=False, initial=True, label='Use shipping address')
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['phone_number'].widget.attrs['placeholder'] = _('Phone Number')
+		self.fields['phone_number'].required = False
+
+	class Meta:
+		model = BillingAddress
+		fields = [
 			'same_as_shipping',
 			'first_name', 'last_name',
 			'line1', 'line2', 'line4',
 			'state', 'postcode', 'country'
 		]
 
-# The BillingAddress form is in oscar.apps.payment.forms
+
+	# def __init__(self, *args, **kwargs):
+	# 	super().__init__(*args, **kwargs)
+	# 	required_fields = ['country', 'postcode']
+	# 	for field_name,field in self.fields.items():
+	# 		self.fields[field_name].required = True if field_name in required_fields else False
+

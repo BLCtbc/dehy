@@ -1,16 +1,25 @@
 dehy.accounts = {
 	init() {
-		dehy.accounts.handlers.set_card_as_default_handler();
-		dehy.accounts.handlers.remove_card_handler();
+		dehy.utils.generic_handler_setup(".password-toggle", "click", dehy.accounts.handlers.toggle_password_visibility);
+		dehy.utils.generic_handler_setup(".set-card-default", "click", dehy.accounts.handlers.set_card_as_default);
+		dehy.utils.generic_handler_setup(".delete-card", "click", dehy.accounts.handlers.remove_card);
+
+
+		// dehy.accounts.handlers.set_card_as_default_handler();
 	},
 	handlers: {
-		remove_card_handler() {
-			var remove_card_buttons = document.querySelectorAll('.delete-card');
-			console.log('remove_card_handler: ', remove_card_buttons)
-
-			remove_card_buttons.forEach(btn=>{
-				btn.addEventListener('click', dehy.accounts.handlers.remove_card);
-			})
+		toggle_password_visibility(e) {
+			e.preventDefault();
+			var password_field = document.getElementById(e.target.dataset.for);
+			if (password_field) {
+				if (password_field.type=='password') {
+					password_field.type = 'text';
+					e.target.textContent = dehy.translations.hide_password
+				} else {
+					password_field.type = 'password';
+					e.target.textContent = dehy.translations.show_password
+				}
+			}
 		},
 		remove_card(e) {
 			var card_id = e.target.closest('tr').dataset.cardid;
@@ -18,7 +27,7 @@ dehy.accounts = {
 
 			$.ajax({
 				method: "POST",
-				url: '/accounts/billing/remove-card/',
+				url: '/accounts/payment/remove-card/',
 				data: data,
 				success: function(data) {
 					let row = document.querySelector(`tr[data-cardid='${data.card_id}']`);
@@ -38,7 +47,7 @@ dehy.accounts = {
 
 			$.ajax({
 				method: "POST",
-				url: '/accounts/billing/set-default/',
+				url: '/accounts/payment/set-default/',
 				data: data,
 				success: function(data) {
 					var old_badges = document.querySelectorAll('.badge-success');
@@ -67,15 +76,5 @@ dehy.accounts = {
 				},
 			});
 		},
-		set_card_as_default_handler() {
-
-			var default_buttons = document.querySelectorAll('.set-card-default');
-			console.log('set_card_as_default: ', default_buttons)
-
-			default_buttons.forEach(btn=> {
-				btn.addEventListener('click', dehy.accounts.handlers.set_card_as_default);
-			});
-
-		}
 	}
 }

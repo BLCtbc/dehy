@@ -271,6 +271,12 @@ var dehy = {
 		},
 	},
 	utils: {
+		generic_handler_setup(selector, event_type="click", callback_fn) {
+			var elems = document.querySelectorAll(selector);
+			elems.forEach(ele=>{
+				ele.addEventListener(event_type, callback_fn);
+			});
+		},
 		freeze_submissions: false,
 		get_sitekey(version=dehy.recaptcha_version) {
 			return dehy[`recaptcha_sitekey_v${version}`]

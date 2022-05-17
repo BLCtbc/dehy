@@ -19,6 +19,7 @@ from django.views import generic
 from django.views.generic.base import TemplateView
 from django.views.decorators.http import require_POST
 
+from django.template import RequestContext
 from django.template.loader import render_to_string
 
 from oscar.apps.customer import views
@@ -29,10 +30,12 @@ from .decorators import persist_basket_contents
 from oscar.apps.customer import signals
 
 from dehy.appz.checkout.facade import facade
-from dehy.utils import generate_token
+from dehy.utils import clear_empty_dict_items, generate_token
 
-EmailAuthenticationForm, EmailUserCreationForm, OrderSearchForm = get_classes('customer.forms', ['EmailAuthenticationForm', 'EmailUserCreationForm','OrderSearchForm'])
+PaymentUpdateForm, EmailAuthenticationForm, EmailUserCreationForm, OrderSearchForm = get_classes('customer.forms', ['PaymentUpdateForm', 'EmailAuthenticationForm', 'EmailUserCreationForm','OrderSearchForm'])
+
 PageTitleMixin = get_class('customer.mixins','PageTitleMixin')
+Country = get_model('address', 'Country')
 User = get_user_model()
 
 def verify_account(request, uidb64, token):
@@ -42,8 +45,8 @@ def verify_account(request, uidb64, token):
 	except Exception as e:
 		user = None
 
-
-	if user and generate_token.check_token(user, token):
+	needs_verification = not user.is_email_verified
+	if user and generate_token.check_token(user, token) and needs_verification:
 		user.is_email_verified = True
 		user.save()
 
@@ -63,24 +66,26 @@ def verify_account(request, uidb64, token):
 		return redirect(reverse(settings.OSCAR_ACCOUNTS_REDIRECT_URL))
 
 
-	return render('dehy/customer/login.html', {'user': user, 'needs_verification': True})
+	messages.info(request, _("That user is already verified."))
+
+	return render(request, 'dehy/customer/login.html', {'user': user, 'needs_verification': needs_verification, 'request': request})
 
 
 
-def send_verification_email(user, request):
-	if not user.is_email_verified:
-		current_site = get_current_site(request)
-		email_subject = _('Activate your account')
-		email_body = render_to_string('dehy/customer/partials/account_verification_email.html', {
-			'user': user,
-			'domain': current_site,
-			'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-			'token': generate_token.make_token(user)
-		})
-		email = EmailMessage(subject=email_subject, body=email_body,
-			from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=[user.email])
+def send_verification_email(request, user):
 
-		email.send()
+	current_site = get_current_site(request)
+	email_subject = _('Activate your account')
+	email_body = render_to_string('dehy/customer/partials/account_verification_email.html', {
+		'user': user,
+		'domain': current_site,
+		'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+		'token': generate_token.make_token(user)
+	})
+	email = EmailMessage(subject=email_subject, body=email_body,
+		from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=[user.email])
+
+	email.send()
 
 	messages.info(request, _("An account verification email has been sent to the email address provided, if such an email account exists. Please check your inbox."))
 
@@ -128,9 +133,36 @@ def remove_user_card(request):
 class VerificationView(generic.TemplateView):
 	template_name = 'dehy/customer/verification.html'
 
-	# def get(self, request, *args, **kwargs):
-	# 	context = self.get_context_data(*args, **kwargs)
-	# 	return render(request, self.template_name, context)
+	def get(self, request, uidb64, token, *args, **kwargs):
+		context = self.get_context_data(*args, **kwargs)
+		try:
+			uid = force_text(urlsafe_base64_decode(uidb64))
+			user = User.objects.get(pk=uid)
+		except Exception as e:
+			user = None
+
+		needs_verification = not user.is_email_verified
+		if user and generate_token.check_token(user, token) and needs_verification:
+			user.is_email_verified = True
+			user.save()
+
+			messages.success(request, _("Successfully verified account"))
+			current_site = get_current_site(request)
+			email_subject = _('Account verified!')
+			email_body = render_to_string('dehy/customer/partials/account_verification_success_email.html', {
+				'user': user,
+				'domain': current_site,
+				'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+				'token': generate_token.make_token(user)
+			})
+			email = EmailMessage(subject=email_subject, body=email_body,
+				from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=[user.email])
+
+			email.send()
+			return redirect(reverse(settings.OSCAR_ACCOUNTS_REDIRECT_URL))
+
+		context.update({'user': user})
+		return self.render_to_response(context)
 
 	def get_context_data(self, *args, **kwargs):
 		context = super().get_context_data(*args, **kwargs)
@@ -141,11 +173,15 @@ class VerificationView(generic.TemplateView):
 		email = request.POST.get('username', None)
 		if email and User._default_manager.filter(email__iexact=email).exists():
 			user = User._default_manager.filter(email__iexact=email).first()
-			send_verification_email(user, request)
+			if not user.is_email_verified:
+				send_verification_email(request, user)
+			else:
+				messages.info(self.request, _("That account is already verified."))
+
 		else:
 			messages.info(self.request, _("An account verification email has been sent to the email address provided, if such an email account exists. Please check your inbox."))
 
-		return redirect(reverse('customer:verification'))
+		return redirect(reverse('customer:login'))
 
 
 class AccountRegistrationView(views.AccountRegistrationView):
@@ -164,7 +200,7 @@ class AccountRegistrationView(views.AccountRegistrationView):
 		user.stripe_customer_id = customer.id
 		user.save()
 
-		send_verification_email(user, self.request)
+		send_verification_email(self.request, user)
 
 		messages.success(self.request, _("Successfully created account"), extra_tags='safe noicon')
 
@@ -207,10 +243,12 @@ class AccountAuthView(views.AccountAuthView, UserPassesTestMixin):
 					sender=self, request=self.request, user=user,
 					old_session_key=old_session_key)
 
+
 				msg = self.get_login_success_message(form)
 				if msg:
 					messages.success(self.request, msg)
 
+				print('get_login_success_url: ', self.get_login_success_url(form))
 				return redirect(self.get_login_success_url(form))
 
 			else:
@@ -220,37 +258,6 @@ class AccountAuthView(views.AccountAuthView, UserPassesTestMixin):
 
 		ctx = self.get_context_data(login_form=form)
 		return self.render_to_response(ctx)
-
-	# def dispatch(self, *args, **kwargs):
-	# 	response = super().dispatch(*args, **kwargs)
-	# 	return response
-
-# old
-# @method_decorator(persist_basket_contents([]), name='dispatch')
-# class AccountAuthView(views.AccountAuthView):
-# 	form_class = EmailAuthenticationForm
-#
-# 	template_name = 'dehy/customer/login.html'
-#
-# 	def get(self, request, *args, **kwargs):
-# 		print('get: ', self.request.GET)
-# 		print('request.user.is_authenticated: ', request.user.is_authenticated)
-# 		if request.user.is_authenticated:
-# 			return redirect(settings.LOGIN_REDIRECT_URL)
-# 		return super().get(request, *args, **kwargs)
-#
-# 	def post(self, request, *args, **kwargs):
-# 		print('post: ', self.request.POST)
-# 		# Use the name of the submit button to determine which form to validate
-# 		if 'login_submit' in request.POST:
-# 			return self.validate_login_form()
-# 		elif 'registration_submit' in request.POST:
-# 			return self.validate_registration_form()
-# 		return http.HttpResponseBadRequest()
-#
-# 	def dispatch(self, *args, **kwargs):
-# 		response = super().dispatch(*args, **kwargs)
-# 		return response
 
 
 @method_decorator(persist_basket_contents([]), name='dispatch')
@@ -266,20 +273,138 @@ class ProfileUpdateView(views.ProfileUpdateView):
 	active_tab = 'profile-update'
 
 
-class BillingAddView(PageTitleMixin, TemplateView):
-	page_title = _('Billing')
-	active_tab = 'billing'
+class PaymentMethodAddView(PageTitleMixin, TemplateView):
+	page_title = _('Payment')
+	active_tab = 'payment'
 	template_name = "dehy/customer/card_add.html"
+	def post(self, request, *args, **kwargs):
 
-class BillingEditView(PageTitleMixin, TemplateView):
-	page_title = _('Billing')
-	active_tab = 'billing'
+		pass
+
+
+class PaymentMethodEditView(PageTitleMixin, generic.FormView):
+	page_title = _('Payment')
+	active_tab = 'payment'
+	form_class = PaymentUpdateForm
+	success_url = reverse_lazy('customer:payment')
 	template_name = "dehy/customer/card_edit.html"
 
+	def get(self, request, *args, **kwargs):
+		response = super().get(request, *args, **kwargs)
+		print(*args, **kwargs)
+		return response
 
-class BillingListView(PageTitleMixin, TemplateView):
-	page_title = _('Billing')
-	active_tab = 'billing'
+	def get_context_data(self, *args, **kwargs):
+		ctx = super().get_context_data(*args, **kwargs)
+		ctx.update({'card_id': self.kwargs.get('card_id', None)})
+		return ctx
+
+	def get_initial(self):
+		initial = super().get_initial()
+
+		card_id = self.kwargs.get('card_id', None)
+		if card_id:
+
+			card = facade.stripe.Customer.retrieve_source(
+	  			self.request.user.stripe_customer_id,
+	  			card_id
+			)
+
+			if card:
+				first_name,last_name = card.name.split(' ')
+				initial.update({
+					'first_name': first_name,
+					'last_name': last_name,
+					'line1': card.address_line1,
+					'line2': card.address_line2,
+					'line4': card.address_city,
+					'state': card.address_state,
+					'postcode': card.address_zip,
+					'country': card.country,
+					'exp_month': card.exp_month,
+					'exp_year': card.exp_year,
+					'card_brand': card.brand,
+					'last4': card.last4
+				})
+
+		return initial
+
+
+
+	# def get(self, request, card_id, *args, **kwargs):
+	# 	context = self.get_context_data(request, *args, **kwargs)
+	# 	print('context: ', context)
+	# 	return self.render_to_response(context)
+	#
+	def form_valid(self, form):
+		card_id = self.request.POST.get('card_id', None)
+		card_id = self.kwargs.get('card_id', None)
+
+		if card_id and form.is_valid():
+
+			fields = {
+				'name': f"{form.cleaned_data['first_name']} {form.cleaned_data['last_name']}",
+				'address_line1': form.cleaned_data['line1'],
+				'address_line2': form.cleaned_data['line2'],
+				'address_state': form.cleaned_data['state'],
+				'address_country': form.cleaned_data['country'],
+				'address_city': form.cleaned_data['line4'],
+				'address_zip': form.cleaned_data['postcode'],
+			}
+			fields = clear_empty_dict_items(fields)
+			if fields.get('address_country', None) and isinstance(country, Country):
+				fields['address_country'] = ields['address_country'].iso_3166_1_a2
+
+			card = facade.stripe.Customer.modify_source(
+				request.user.stripe_customer_id,
+				card_id, **fields
+			)
+
+			if card:
+				msg = _('Successfully updated billing info!')
+				messages.success(request, msg)
+
+			return super().form_valid(form)
+
+		return redirect(reverse('customer:payment'))
+
+
+	#
+	# def post(self, request, *args, **kwargs):
+	# 	status_code = 400
+	# 	context_data = self.get_context_data(*args, **kwargs)
+	# 	msg = _('Failed to remove card.')
+	# 	card_id = request.POST.get('card_id', None)
+	# 	form = self.form_class(request.POST)
+	# 	if card_id and form.is_valid():
+	# 		print('form: ', form)
+	# 		card_parameters = {
+	# 			"name": "",
+	#
+	# 		}
+	# 		#
+	# 		# card = facade.stripe.Customer.modify_source(
+	# 		# 	request.user.stripe_customer_id,
+	# 		# 	card_id,
+	# 		# )
+	# 		if card:
+	# 			status_code = 200
+	# 			msg = _('Successfully updated billing info!')
+	# 			messages.success(request, msg)
+	#
+	# 			# return redirect(reverse('customer:billing'))
+	# 		else:
+	# 			pass
+	#
+	# 	context_data.update({'message': msg})
+
+
+
+
+
+class PaymentMethodListView(PageTitleMixin, TemplateView):
+	page_title = _('Payment')
+	active_tab = 'payment'
 	template_name = "dehy/customer/card_list.html"
 
 	def post(self, request, *args, **kwargs):
@@ -318,8 +443,10 @@ class BillingListView(PageTitleMixin, TemplateView):
 			if card['address_line2']:
 				_card['line2'] = card['address_line2']
 
-			_card['billing_address'] = {k: v for k, v in _card['billing_address'].items() if v}
-			_card = {k: v for k, v in _card.items() if v}
+			# _card['billing_address'] = {k: v for k, v in _card['billing_address'].items() if v}
+			# _card = {k: v for k, v in _card.items() if v}
+			_card['billing_address'] = clear_empty_dict_items(_card['billing_address'])
+			_card = clear_empty_dict_items(_card)
 
 			context_data['cards'].append(_card)
 

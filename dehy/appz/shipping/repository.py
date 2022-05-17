@@ -1,5 +1,4 @@
 from oscar.apps.shipping import repository
-from dehy.appz.shipping import methods as _shipping_methods
 from dehy.appz.shipping.methods import BaseFedex, FreeShipping
 from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 
@@ -30,7 +29,7 @@ class Repository(repository.Repository):
 		if shipping_addr and shipping_addr.country.code in ['US', 'CA', 'MX']:
 
 			weight = basket.total_weight
-			# methods += self.get_shipstation_shipping_methods(basket, weight)
+			# methods += self.shipstation_get_shipping_methods(basket, weight)
 			methods,data = self.fedex_get_rates_and_transit_times(basket, weight, shipping_addr)
 			###############################################################################
 			## will need to implement some sort of API here to properly configure which  ##
@@ -67,13 +66,13 @@ class Repository(repository.Repository):
 
 	def get_postcode(self, address):
 		zip5 = None
-		BASE_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=ZipCodeLookup'
+		BASE_API_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=ZipCodeLookup'
 
 		xml = f'<ZipCodeLookupRequest USERID="{settings.USPS_USERNAME}"><Address ID= "1"><Address1/><Address2>{address.line1}</Address2><City>{address.line4}</City>'
 
 		xml += f'<State>{address.state}</State></Address></ZipCodeLookupRequest>'
 
-		url = f"{BASE_URL}&XML={xml}"
+		url = f"{BASE_API_URL}&XML={xml}"
 		xml_response = requests.get(url).content
 		usps_response = json.loads(json.dumps(xmltodict.parse(xml_response)))['ZipCodeLookupResponse']
 
@@ -128,7 +127,7 @@ class Repository(repository.Repository):
 
 
 	def validate_address(self, address):
-		BASE_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=Verify'
+		BASE_API_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=Verify'
 
 		xml = f'<AddressValidateRequest USERID="{settings.USPS_USERNAME}"><Revision>1</Revision><Address ID="0">'
 		address1 = f'<Address1>{address.line2}</Address1>' if address.line2 else "<Address1/>"
@@ -140,7 +139,7 @@ class Repository(repository.Repository):
 
 		xml += '</Address></AddressValidateRequest>'
 
-		url = f"{BASE_URL}&XML={xml}"
+		url = f"{BASE_API_URL}&XML={xml}"
 		xml_response = requests.get(url).content
 		usps_response = json.loads(json.dumps(xmltodict.parse(xml_response)))['AddressValidateResponse']['Address']
 		print('validate_address response: ', usps_response)
@@ -181,7 +180,7 @@ class Repository(repository.Repository):
 
 		return img.original.url
 
-	def coerce_shipstation_discounts(self, discounts):
+	def shipstation_coerce_discounts(self, discounts):
 		all_discounts = []
 		for _discount in discounts:
 			discount = {
@@ -223,7 +222,7 @@ class Repository(repository.Repository):
 			image_url = await self.async_get_first_image_url(line)
 			print('image_url: ', image_url)
 			if image_url:
-				image_url = base_url+image_url
+				image_url = settings.BASE_URL+image_url
 				line_dict.update({'imageUrl': image_url})
 
 			if line.product.is_child:
@@ -259,7 +258,7 @@ class Repository(repository.Repository):
 	def fetch_shipping_cost(self, order):
 		return order.shipping_before_discounts_incl_tax
 
-	async def async_place_shipstation_order(self, order, request=None):
+	async def async_shipstation_place_order(self, order, request=None):
 
 		order = await self.async_fetch_order_with_related(order.id)
 		lines = await self.async_fetch_order_lines_with_related(order)
@@ -299,25 +298,21 @@ class Repository(repository.Repository):
 		discounts = await self.async_fetch_discounts_with_related(order)
 
 		if len(discounts):
-			items += await self.coerce_shipstation_discounts(discounts)
+			items += await self.shipstation_coerce_discounts(discounts)
 			payload.update({'items': items})
 
 		if order.shipping_address.notes:
 			payload.update({'internalNotes': order.shipping_address.notes})
 
 		url = "https://ssapi.shipstation.com/orders/createorder"
-		headers = self.get_shipstation_headers()
-
-		print('url: ', url)
-		print('headers: ', headers)
-		print('payload: ', payload)
+		headers = self.shipstation_get_headers()
 
 		shipstation_response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
 
 		return shipstation_response
 
 	async_get_first_image_url = sync_to_async(get_first_image_url)
-	async_coerce_shipstation_discounts = sync_to_async(coerce_shipstation_discounts)
+	async_shipstation_coerce_discounts = sync_to_async(shipstation_coerce_discounts)
 	async_coerce_shipstation_address = sync_to_async(coerce_shipstation_address)
 	async_validate_address = sync_to_async(validate_address)
 	async_fetch_order_with_related = sync_to_async(fetch_order_with_related)
@@ -326,20 +321,54 @@ class Repository(repository.Repository):
 	async_fetch_shipping_cost = sync_to_async(fetch_shipping_cost)
 	async_fetch_basket_with_related = sync_to_async(fetch_basket_with_related)
 
-	async def get_shipstation_response(url, payload, headers, data):
+	async def shipstation_get_response(url, payload, headers, data):
 		pass
+
+	def fedex_get_customs_clearance_details(self, basket):
+		total_cost = str(basket.total_excl_tax_excl_discounts)
+		weight = basket.total_weight
+		customs_obj = {
+			'commercialInvoice': {
+				'shipmentPurpose': 'SOLD',
+			},
+			'freightOnValue': 'CARRIER_RISK',
+			'dutiesPayment': {
+				'paymentType': 'SENDER'
+			},
+			'commodities': [{
+				'description': 'DRIED COCKTAIL GARNISHES',
+				'weight': {
+					'units': 'LB',
+					'value': weight,
+				},
+				'quantity': 1,
+				'customsValue': {
+					'amount': total_cost,
+					'currency': 'USD',
+				},
+				'numberOfPieces': 1,
+				'countryOfManufacture': 'US',
+				'harmonizedCode': '080510',
+				'name': 'DRIED GARNISHES',
+
+			}]
+		}
+		return customs_obj
+
+		# https://developer.fedex.com/api/en-us/catalog/rate/v1/docs.html#operation/Rate%20and%20Transit%20times
 
 	def get_free_shipping(self):
 		return FreeShipping()
 
 	def fedex_get_rates_and_transit_times(self, basket, weight, shipping_addr, max_retries=1):
 		print('getting_fedex_rates:')
-		asyncio.run(self.async_validate_address(shipping_addr))
+		# shipping_addr = validate_address(shipping_addr)
 		methods = []
 		data = {'status_code': 200}
 		retries = 0
 		street_lines = [x for x in [shipping_addr.line1, shipping_addr.line2, shipping_addr.line3] if x]
-		if not shipping_addr.is_validated:
+		if not shipping_addr.is_validated and shipping_addr.country.iso_3166_1_a2.upper()=='US':
+
 
 			shipping_addr,corrections = self.make_address_corrections(shipping_addr)
 			if corrections:
@@ -403,10 +432,13 @@ class Repository(repository.Repository):
 			}
 		}
 
+		if shipping_addr.country.code != 'US':
+			payload['requestedShipment'].update({'customsClearanceDetail': self.fedex_get_customs_clearance_details(basket)})
+
 		headers = {
 			'Content-Type': "application/json",
 			'X-locale': "en_US",
-			'Authorization': "Bearer " + self.get_fedex_auth_token()
+			'Authorization': "Bearer " + self.fedex_get_auth_token()
 		}
 		url = settings.FEDEX_API_URL + "rate/v1/rates/quotes"
 		response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
@@ -423,8 +455,12 @@ class Repository(repository.Repository):
 					continue
 
 				cost = rate['ratedShipmentDetails'][0]['totalNetCharge']
-				arrival = datetime.datetime.fromisoformat(rate['commit']['dateDetail']['dayFormat'])
-				print('\ncode: ', rate['serviceType'], ' arrival: ', arrival, '\n')
+				try:
+					arrival = datetime.datetime.fromisoformat(rate['commit']['dateDetail']['dayFormat'])
+				except Exception as e:
+					print('dateDetail not found... this is what the object contains: ', rate['commit'])
+					arrival = datetime.datetime.now().isoformat()
+
 
 				methods.append(
 					BaseFedex(code=rate['serviceType'], arrival=arrival, name=rate['serviceName'], charge_excl_tax=cost, charge_incl_tax=cost)
@@ -470,7 +506,7 @@ class Repository(repository.Repository):
 
 				print(' *** ATTEMPTING TO GET METHODS FROM SHIPSTATION ***')
 
-				methods, _data = self.get_shipstation_shipping_methods(basket, weight, shipping_addr)
+				methods, _data = self.shipstation_get_shipping_methods(weight, shipping_addr)
 				if _data:
 					data.update(_data)
 
@@ -479,7 +515,7 @@ class Repository(repository.Repository):
 
 
 
-	def update_fedex_auth_token(self, FedexAuthToken=FedexAuthTokenModel.objects.first()):
+	def fedex_update_auth_token(self, FedexAuthToken=FedexAuthTokenModel.objects.first()):
 
 		payload = f"grant_type=client_credentials&client_id={settings.FEDEX_API_KEY}&client_secret={settings.FEDEX_SECRET_KEY}"
 		url = settings.FEDEX_API_URL + "oauth/token"
@@ -525,21 +561,21 @@ class Repository(repository.Repository):
 
 		return FedexAuthToken
 
-	def get_fedex_auth_token(self):
+	def fedex_get_auth_token(self):
 
 		FedexAuthToken = FedexAuthTokenModel.objects.first()
 
 		if not FedexAuthToken:
 			FedexAuthToken = FedexAuthTokenModel.objects.create()
 			FedexAuthToken.save()
-			self.update_fedex_auth_token(FedexAuthToken)
+			self.fedex_update_auth_token(FedexAuthToken)
 
 		if FedexAuthToken.expired:
-			self.update_fedex_auth_token(FedexAuthToken)
+			self.fedex_update_auth_token(FedexAuthToken)
 
 		return FedexAuthToken.access_token
 
-	def get_shipstation_headers(self):
+	def shipstation_get_headers(self):
 		SHIPSTATION_AUTH_STR = bytes(f"{settings.SHIPSTATION_API_KEY}:{settings.SHIPSTATION_SECRET_KEY}", encoding='utf-8')
 		SHIPSTATION_AUTH_KEY = base64.b64encode(SHIPSTATION_AUTH_STR)
 		AUTH_TOKEN = f"Basic {SHIPSTATION_AUTH_KEY.decode()}"
@@ -552,13 +588,13 @@ class Repository(repository.Repository):
 
 		return headers
 
-	def get_shipstation_response(self, url, payload, headers=None):
-		headers = self.get_shipstation_headers() if not headers else headers
-		shipstation_response = requests.request("POST", url, headers=self.get_shipstation_headers(), data=json.dumps(payload))
+	def shipstation_get_response(self, url, payload, headers=None):
+		headers = self.shipstation_get_headers() if not headers else headers
+		shipstation_response = requests.request("POST", url, headers=self.shipstation_get_headers(), data=json.dumps(payload))
 		response = requests.post(url, headers=headers, data=json.dumps(payload))
 		return response
 
-	def get_shipstation_shipping_methods(self, basket, weight, shipping_addr):
+	def shipstation_get_shipping_methods(self, weight, shipping_addr):
 
 		# documentation: https://www.shipstation.com/docs/api/shipments/get-rates/
 		methods = []
@@ -582,14 +618,14 @@ class Repository(repository.Repository):
 		#
 		url = "https://ssapi.shipstation.com/shipments/getrates"
 		#
-		# shipstation_response = requests.request("POST", url, headers=self.get_shipstation_headers(), data=json.dumps(payload))
-		response = self.get_shipstation_response(url, payload)
+		# shipstation_response = requests.request("POST", url, headers=self.shipstation_get_headers(), data=json.dumps(payload))
+		response = self.shipstation_get_response(url, payload)
 
-		status_code = shipstation_response.status_code
+		status_code = response.status_code
 		# request was good, create the methods
 		if status_code == 200:
 
-			response_list = json.loads(shipstation_response.text)
+			response_list = json.loads(response.text)
 			for item in response_list:
 
 				methods.append(
@@ -597,7 +633,7 @@ class Repository(repository.Repository):
 				)
 
 		else:
-			response_text = json.loads(shipstation_response.text)
+			response_text = json.loads(response.text)
 			error = response_text['errors'][0]
 			logger.error(f'Shipstation API: Error retrieving shipping methods ({status_code}). \n{error["message"]}')
 

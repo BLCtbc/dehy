@@ -22,6 +22,6 @@ urlpatterns = [
 	re_path(r'^recaptcha_verify\?token=(?P<token>[\w\-\d\_]+)', views.recaptcha_verify, name='recaptcha_verify'),
 	path('accounts/billing/set-default/', customer_views.set_card_default, name='billing-set-card-default'),
 	path('accounts/billing/remove-card/', customer_views.remove_user_card, name='billing-remove-user-card'),
-	path('accounts/verify/<uidb64>/<token>', customer_views.verify_account, name='verify_account')
+	# path('accounts/verify/<uidb64>/<token>', customer_views.verify_account, name='verify_account')
 ]
 

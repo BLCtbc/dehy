@@ -218,7 +218,7 @@ class Facade(object):
 				stripe_order_id = f"order_{basket.stripe_order_id}"
 				order = self.stripe.Order.modify(stripe_order_id, line_items=self.get_line_items(basket), **order_details)
 
-				print('updated order: ', order)
+				# print('updated order: ', order)
 
 
 			# basket not tied to an order, create the order

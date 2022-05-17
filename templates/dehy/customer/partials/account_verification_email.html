@@ -10,7 +10,7 @@
 {% trans "Thank you for registering with DEHY!" %}
 {% trans "Please use the link below to verify your account" %}
 
-http://{{domain}}{% url 'verify_account' uidb64=uid token=token %}
+http://{{domain}}{% url 'customer:verification' uidb64=uid token=token %}
 
 {% endblock body %}
 

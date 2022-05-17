@@ -36,6 +36,7 @@ env.read_env(str(ENV_FILE_LOCATION))
 SECRET_KEY = env.str('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=True)
 
+BASE_URL = "https://www.dehygarnish.net"
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 INTERNAL_IPS = [
 	"127.0.0.1"
@@ -295,7 +296,8 @@ OSCAR_ORDER_STATUS_CASCADE = {
 	'Cancelled': 'Cancelled'
 }
 
-OSCAR_ACCOUNTS_REDIRECT_URL = 'customer:profile-update'
+
+OSCAR_ACCOUNTS_REDIRECT_URL = LOGIN_REDIRECT_URL = 'customer:profile-update'
 OSCAR_DEFAULT_CURRENCY = 'USD'
 
 OSCAR_COOKIES_DELETE_ON_LOGOUT = ['oscar_recently_viewed_products', 'oscar_open_basket']
@@ -304,7 +306,7 @@ OSCAR_HOMEPAGE = reverse_lazy('catalogue:index')
 OSCAR_SHOP_NAME = "DEHY"
 OSCAR_SHOP_TAGLINE = ""
 OSCAR_MISSING_IMAGE_URL = MEDIA_ROOT / "image_not_found.jpg"  # relative path from media root
-
+OSCAR_REQUIRED_ADDRESS_FIELDS = ('first_name', 'last_name', 'line1', 'line4', 'postcode', 'country')
 OSCAR_PRODUCTS_PER_PAGE = 10
 
 OSCAR_THUMBNAIL_DEBUG = THUMBNAIL_DEBUG = DEBUG
