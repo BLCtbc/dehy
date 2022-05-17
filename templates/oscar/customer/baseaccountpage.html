@@ -45,9 +45,9 @@
 		<div class="row justify-content-center">
 
 		{% block column_left_outer %}
-			<aside class="col-12 col-sm-4 col-lg-3 ml-sm-3 sidebar">
+			<aside class="col-12 col-md-4 col-lg-3 ml-lg-3 sidebar">
 				{% block column_left %}
-				    <ul class="nav nav-pills flex-column px-sm-5">
+				    <ul class="nav nav-pills flex-column px-lg-5">
 				        {% block standard_tabs %}
 				            {% include 'oscar/customer/partials/standard_tabs.html' %}
 				        {% endblock %}
@@ -56,7 +56,7 @@
 			</aside> <!-- col -->
 		{% endblock column_left_outer %}
 
-			<div class="col-12 col-sm-8 info-container">
+			<div class="col-12 col-md-8 info-container">
 				{% block messages %}
 				{{block.super}}
 				{% endblock messages %}

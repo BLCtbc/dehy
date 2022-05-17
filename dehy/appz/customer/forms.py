@@ -22,7 +22,7 @@ class EmailUserCreationForm(BaseEmailUserCreationForm):
 	email = forms.EmailField(label=_('Email'))
 	field_order = ['first_name', 'last_name', 'email', 'password1', 'password2']
 
-def year_choices(max_year=0):
+def get_year_choices(max_year=0):
 	current_year = datetime.date.today().year
 	max_year = max_year if max_year else current_year+10
 	return [(r,r) for r in range(current_year, max_year)]
@@ -30,8 +30,9 @@ def year_choices(max_year=0):
 class PaymentUpdateForm(ShippingAddressForm):
 	required_fields = ['first_name', 'last_name', 'country', 'postcode', 'line4']
 	month_choices = [(r,r) for r in range(1, 13)]
-	exp_year = forms.ChoiceField(label=_('Expiration year'), choices=year_choices())
-	exp_month = forms.ChoiceField(label=_('Expiration year'), choices=month_choices)
+	year_choices = get_year_choices()
+	exp_year = forms.ChoiceField(label=_('Expiration year'), choices=year_choices)
+	exp_month = forms.ChoiceField(label=_('Expiration month'), choices=month_choices)
 	card_brand = forms.CharField(widget=forms.HiddenInput(), required=False)
 	last4 = forms.CharField(widget=forms.HiddenInput(), required=False)
 

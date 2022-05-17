@@ -291,7 +291,6 @@ class PaymentMethodEditView(PageTitleMixin, generic.FormView):
 
 	def get(self, request, *args, **kwargs):
 		response = super().get(request, *args, **kwargs)
-		print(*args, **kwargs)
 		return response
 
 	def get_context_data(self, *args, **kwargs):
@@ -350,19 +349,21 @@ class PaymentMethodEditView(PageTitleMixin, generic.FormView):
 				'address_country': form.cleaned_data['country'],
 				'address_city': form.cleaned_data['line4'],
 				'address_zip': form.cleaned_data['postcode'],
+				'exp_month': form.cleaned_data['exp_month'],
+				'exp_year': form.cleaned_data['exp_year'],
 			}
 			fields = clear_empty_dict_items(fields)
-			if fields.get('address_country', None) and isinstance(country, Country):
-				fields['address_country'] = ields['address_country'].iso_3166_1_a2
+			if fields.get('address_country', None) and isinstance(form.cleaned_data['country'], Country):
+				fields['address_country'] = fields['address_country'].iso_3166_1_a2
 
 			card = facade.stripe.Customer.modify_source(
-				request.user.stripe_customer_id,
+				self.request.user.stripe_customer_id,
 				card_id, **fields
 			)
 
 			if card:
 				msg = _('Successfully updated billing info!')
-				messages.success(request, msg)
+				messages.success(self.request, msg)
 
 			return super().form_valid(form)
 

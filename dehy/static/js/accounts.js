@@ -3,11 +3,18 @@ dehy.accounts = {
 		dehy.utils.generic_handler_setup(".password-toggle", "click", dehy.accounts.handlers.toggle_password_visibility);
 		dehy.utils.generic_handler_setup(".set-card-default", "click", dehy.accounts.handlers.set_card_as_default);
 		dehy.utils.generic_handler_setup(".delete-card", "click", dehy.accounts.handlers.remove_card);
+		dehy.accounts.handlers.initialize_stripe_card();
 
 
 		// dehy.accounts.handlers.set_card_as_default_handler();
 	},
 	handlers: {
+		initialize_stripe_card() {
+			var stripe_payment_container = document.getElementById('stripe_payment_container');
+			if (stripe_payment_container) {
+				//
+			}
+		}
 		toggle_password_visibility(e) {
 			e.preventDefault();
 			var password_field = document.getElementById(e.target.dataset.for);

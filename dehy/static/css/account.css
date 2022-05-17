@@ -155,9 +155,12 @@ select:focus, form:not(#basket_formset) input:focus {
 }
 
 .subhead {
+	padding: 0 0 8px 0;
     padding-bottom: 8px;
     margin-bottom: 16px;
     border-bottom: 1px solid #21262d;
+	margin: 16px 15px;
+
 }
 
 .fas.fa-check-square {

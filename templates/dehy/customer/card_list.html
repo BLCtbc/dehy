@@ -46,7 +46,7 @@
 
 									</div>
 									<div>
-										Exp {{card.exp_month}}/{{card.exp_year}}
+										{% if card.exp_month|make_list|length_is:"1" %}0{% endif %}{{card.exp_month}}/{{card.exp_year}}
 									</div>
 								</div>
 							</div>
@@ -81,7 +81,7 @@
         <p>{% trans 'No saved payment methods found.' %}</p>
     {% endif %}
     <p>
-        <a href="{% url 'customer:payment-add' %}" class="btn btn-primary">{% trans 'Add a payment method' %}</a>
+        <a aria-disabled='true' href="{% url 'customer:payment-add' %}" class="btn disabled btn-primary">{% trans 'Add a payment method' %}</a>
     </p>
 
 {% endblock tabcontent %}

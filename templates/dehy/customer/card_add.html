@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block tabcontent %}
-    {% with style='horizontal' %}
-        {% include "oscar/partials/form.html" %}
-    {% endwith %}
+	<div class="row">
+		{% include "dehy/customer/partials/billing_card_form.html" %}
+	</div>
 {% endblock tabcontent %}

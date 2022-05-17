@@ -18,6 +18,9 @@
 	--secondary-bg-color: var(--beige);
 }
 
+p {
+	font-size: 1rem;
+}
 .fab {
 	font-size: 20px;
 }
