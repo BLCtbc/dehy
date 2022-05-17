@@ -38,7 +38,7 @@
                 {% include "oscar/partials/form_fields.html" with form=form style='horizontal' %}
                 <div class="form-group row">
                     <div class="offset-sm-4 col-sm-8">
-                        <button type="submit" class="btn btn-primary" data-loading-text="{% trans 'Filtering...' %}">{% trans 'Filter results' %}</button>
+                        <button type="submit" class="btn btn-primary" data-loading-text="{% trans 'Filtering...' %}">{% trans 'Apply filter' %}</button>
                         <a href="{% url 'customer:order-list' %}" class="btn btn-secondary">{% trans 'Reset' %}</a>
                     </div>
                 </div>
@@ -63,9 +63,8 @@
                     <td colspan="3"><a href="{% url 'customer:order' order_number=order.number %}">{{ order.number }}</a></td>
                     <td>{{ order.num_items }}</td>
                     <td colspan="2">{{ order.total_incl_tax|currency:order.currency }}</td>
-                    <td colspan="2">{{ order.date_placed.date }}</td>
+                    <td colspan="2">{{ order.date_placed.date|date:"M d, Y" }}</td>
 					<td colspan="2">{{ order.status }}</td>
-
                 </tr>
             {% endfor %}
         </table>

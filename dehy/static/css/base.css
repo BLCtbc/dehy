@@ -18,6 +18,17 @@
 	--secondary-bg-color: var(--beige);
 }
 
+p {
+	font-size: 1rem;
+}
+.fab {
+	font-size: 20px;
+}
+
+.requires-recaptcha {
+	padding-left: 5px;
+}
+
 .grecaptcha-badge {
 	/* position: unset !important; */
 }
@@ -334,7 +345,7 @@ li {
 }
 
 nav#navbar {
-	padding: 2vw 4vw;
+	padding: 3vh 4vw;
 }
 
 #navbar a.nav-link {

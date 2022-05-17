@@ -8,24 +8,52 @@
         <tbody>
             <tr>
                 <th>{% trans 'Name' %}</th>
-                <td>{{ user.get_full_name|default:'--' }}</td>
+                <td colspan="2">{{ user.get_full_name|default:'--' }}</td>
             </tr>
             <tr>
                 <th>{% trans 'Email' %}</th>
-                <td>{{ user.email }}</td>
+                <td colspan="2">{{ user.email }}</td>
             </tr>
-            {% block profile_fields %}
-                {% for field in profile_fields %}
-                    <tr>
-                        <th>{{ field.name }}</th>
-                        <td>{{ field.value|default:"--" }}</td>
-                    </tr>
-                {% endfor %}
-            {% endblock %}
+			<tr>
+				<th>{% trans 'Verified' %}</th>
+				<td colspan="2">
+					{% if user.is_email_verified %}
+					<span><i class="fas fa-check-square"></i></span>
+					{% else %}
+					<div class="bg-danger makeshift-fa-false"><span><i class="fas fa-times"></i></span></div>
+					{% endif %}
+				</td>
+			</tr>
+			{% if user.is_staff or user.is_superuser %}
+			<tr>
+				<th>{% trans 'Staff' %}</th>
+				<td colspan="2">
+					{% if user.is_staff %}
+					<span><i class="fas fa-check-square"></i></span>
+					{% else %}
+					<div class="bg-danger makeshift-fa-false"><span><i class="fas fa-times"></i></span></div>
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{% trans 'Admin' %}</th>
+				<td colspan="2">
+					{% if user.is_superuser %}
+					<span><i class="fas fa-check-square"></i></span>
+					{% else %}
+					<div class="bg-danger makeshift-fa-false"><span><i class="fas fa-times"></i></span></div>
+					{% endif %}
+				</td>
+			</tr>
+			{% endif %}
             <tr>
                 <th>{% trans 'Joined' %}</th>
-                <td>{{ user.date_joined }}</td>
+                <td colspan="2">{{ user.date_joined }}</td>
             </tr>
+			<tr>
+				<th>{% trans 'Last Login' %}</th>
+				<td colspan="2">{{ user.last_login }}</td>
+			</tr>
         </tbody>
     </table>
 </div>
@@ -33,14 +61,13 @@
 <a href="{% url 'customer:change-password' %}" class="btn">{% trans 'Change password' %}</a>
 <a href="{% url 'customer:profile-update' %}" class="btn">{% trans 'Edit profile' %}</a>
 
-<div class="row mt-2">
+<div class="row mt-5">
 	<div class="col subhead">
 		<h2 class="text-danger h2">{% trans "Delete account" %}</h2>
 	</div>
 	<p>{% trans "Once you delete your account, there is no going back. Please be certain." %}</p>
 	<div class="col">
-		<a id="delete_profile" href="{% url 'customer:profile-delete' %}" class="btn bg-danger btn-danger">{% trans 'Delete profile' %}</a>
-
+		<a id="delete_profile" href="{% url 'customer:profile-delete' %}" class="btn bg-danger btn-danger">{% trans 'Delete your account' %}</a>
 	</div>
 
 </div>

@@ -21,7 +21,6 @@ def add_recaptcha_site_keys(request):
 	return {'recaptcha_site_key_v2': settings.GOOGLE_RECAPTCHA_V2_SITE_KEY, 'recaptcha_site_key_v3': settings.GOOGLE_RECAPTCHA_V3_SITE_KEY}
 
 def add_notifications(request):
-	print('request.session.items(): ', request.session.items())
 	notifications = request.session.get('notifications', None)
 	if notifications:
 

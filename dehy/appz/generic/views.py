@@ -79,8 +79,6 @@ def recaptcha_verify(request):
 
 		recaptcha_response = requests.post("https://www.google.com/recaptcha/api/siteverify", data=payload)
 
-		print('\n recaptcha: ', recaptcha_response)
-		print('\n recaptcha.text: ', json.loads(recaptcha_response.text))
 		data.update(json.loads(recaptcha_response.text))
 
 
