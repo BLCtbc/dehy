@@ -1,0 +1,41 @@
+{% load currency_filters i18n %}
+<table style="border-collapse:collapse; width:500px; margin-bottom:20px" cellpadding="0" cellspacing="0" class="table" id="order_receipt_table">
+	<tbody>
+		<tr>
+			<td style="vertical-align:top">
+				<div><span style="font-size: 18px; font-variant-caps:all-petite-caps;font-weight:bold">BILLED TO</span></div>
+				<div>{{order.billing_address.phone_number}}</div>
+				<div>{{order.billing_address.first_name}} {{order.billing_address.last_name}}</div>
+				<div>{{order.billing_address.line1}}</div>
+				<div>{{order.billing_address.line2}}</div>
+				<div>{{order.billing_address.line3}}</div>
+				<div>{{order.billing_address.line4}}, {{order.billing_address.state}}, {{order.billing_address.postcode}}</div>
+				<div>{{order.billing_address.country}}</div>
+				<div>CC: {{order.sources.first.label}}</div>
+				{% with email_addr=order.user|default:order.guest_email %}
+				<a href="mailto:{{email_addr}}" target="_blank">{{email_addr}}</a>
+				{% endwith %}
+			</td>
+
+			<td style="vertical-align:top">
+					<div><span style="font-size:18px;font-variant-caps:all-petite-caps;font-weight:bold">SHIPPING TO</span></div>
+					<div>{{order.shipping_address.first_name}} {{order.shipping_address.last_name}}</div>
+					<div>{{order.shipping_address.line1}}</div>
+					<div>{{order.shipping_address.line2}}</div>
+					<div>{{order.shipping_address.line3}}</div>
+					<div>{{order.shipping_address.line4}}, {{order.shipping_address.state}}, {{order.shipping_address.postcode}}</div>
+					<div>{{order.shipping_address.country}}</div>
+					<div>{{order.shipping_address.phone_number}}</div>
+					<div>{{order.shipping_method}}</div>
+			</td>
+		</tr>
+		<tr style="height: 20px">
+		</tr>
+		<tr>
+			<td colspan="2">
+				<div><span class="cell-title">{% trans "Tracking:" %}</span></div>
+				<div><a class="btn btn-primary" href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.number}}</a></div>
+			</td>
+		</tr>
+	</tbody>
+</table>
