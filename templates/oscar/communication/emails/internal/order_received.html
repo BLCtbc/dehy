@@ -1,0 +1,40 @@
+{% extends "oscar/communication/emails/base.html" %}
+{% load currency_filters i18n %}
+
+{% block tbody %}
+<tr>
+    <td align="center">
+		<h2>
+			{% blocktrans with order_number=order.number %}DEHY: A New Order has Arrived ({{order_number}}){% endblocktrans %}
+		</h2>
+    </td>
+</tr>
+
+<tr>
+    <td align="center">
+		<p>
+			{% trans "After shipping the package, mark the order as fulfilled in the Orders panel." %}
+		</p>
+    </td>
+</tr>
+
+<tr>
+    <td align="center">
+		<p>
+			{% blocktrans with order_number=order.number date_placed=order.date_placed %}Order #{{order_number}}. Placed on {{date_placed}}{% endblocktrans %}
+		</p>
+    </td>
+</tr>
+
+<tr>
+	<td align="center">
+		{% include "oscar/communication/emails/order_info_table.html" %}
+	</td>
+</tr>
+<tr>
+	<td align="center">
+		{% include "oscar/communication/emails/order_contents_table.html" %}
+	</td>
+</tr>
+
+{% endblock %}

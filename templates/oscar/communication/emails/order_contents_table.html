@@ -1,0 +1,73 @@
+{% load currency_filters i18n %}
+{% load image_tags %}
+<table style="border-collapse:collapse; width:500px;" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td>
+				<h2 style="margin-bottom:0; font-weight:200">{% trans "Order Summary" %}</h2>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table style="border-collapse:collapse; width:500px; margin-bottom:20px" cellpadding="0" cellspacing="0">
+	<thead style="border-bottom:2px solid;">
+		<tr class="basket-title">
+			<th align="left" colspan="4"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Item" %}</span></th>
+			<th align="right" colspan="1"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Qty" %}</span></th>
+			<th align="right" colspan="1"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Total" %}</span></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for line in order.lines.all %}
+		<tr>
+			<td style="padding-left:0;" colspan="1">
+			{% with image=line.product.primary_image %}
+				{% oscar_thumbnail image.original "300x" as thumb %}
+				<a class="image-link" href="{{site.name}}{{ line.product.get_absolute_url }}">
+					<div class="image-container">
+						<img src="{{site.name}}{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
+					</div>
+				</a>
+			{% endwith %}
+			</td>
+			<td colspan="3">
+				<a href="{{site.name}}{{ line.product.get_absolute_url }}">{{ line.product.parent.title|default:line.product.title }}
+					{% if line.product.is_child %}
+					<br>
+					<span class="size-variant">Size: {{line.product.title}}</span>
+					{% endif %}
+				</a>
+			</td>
+			<td align="right">{{line.quantity}}</td>
+			<td align="right" colspan="1">{{ line.line_price_before_discounts_excl_tax|currency:order.currency }}</td>
+		</tr>
+		{% endfor %}
+		<tr style="border-top: double 2px; height: 10px">
+			<td colspan="6"></td>
+		</tr>
+		<tr style="border-top: double 2px">
+			<td colspan="4"></td>
+			<td align="right"><span>Subtotal</span></td>
+			<td align="right"><span>{{order.total_excl_tax|currency:order.currency}}</span></td>
+		</tr>
+		<tr>
+			<td colspan="4"></td>
+			<td align="right"><span>Shipping</span></td>
+			<td align="right"><span>{{order.shipping_excl_tax|currency:order.currency}}</span></td>
+		</tr>
+		<tr>
+			<td colspan="4"></td>
+			<td align="right"><span>Sales Tax</span></td>
+			<td align="right"><span>{{order.total_tax|currency:order.currency}}</span></td>
+		</tr>
+		<tr style="border-top: double 2px">
+			<td colspan="4"></td>
+			<td align="right"><span>Total</span></td>
+			<td align="right"><span>{{order.total_incl_tax|currency:order.currency}}</span></td>
+		</tr>
+
+	</tbody>
+	<tfoot>
+
+	</tfoot>
+</table>
