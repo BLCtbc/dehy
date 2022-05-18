@@ -14,7 +14,7 @@ dehy.accounts = {
 			if (stripe_payment_container) {
 				//
 			}
-		}
+		},
 		toggle_password_visibility(e) {
 			e.preventDefault();
 			var password_field = document.getElementById(e.target.dataset.for);
