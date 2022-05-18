@@ -662,3 +662,5 @@ class Repository(repository.Repository):
 
 		data.update({'status_code': status_code})
 		return methods, data
+
+repository = Repository()

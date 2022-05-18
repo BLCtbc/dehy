@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
 from django.http import JsonResponse
 from django.conf import settings
 from django.urls import reverse_lazy
@@ -20,17 +22,68 @@ from oscar.core.loading import get_class, get_model
 from dehy.appz.checkout import facade
 from dehy.appz.generic import forms
 
-import json, os, requests
+import json, logging, os, requests
 from dehy.appz.generic.models import Message, MessageUser
 
 FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
+Order = get_model('order', 'Order')
 
 ShippingAddressForm = get_class('checkout.forms', 'ShippingAddressForm')
 ShippingAddress = get_model('order', 'ShippingAddress')
 Repository = get_class('shipping.repository', 'Repository')
 Repository = Repository()
+logger = logging.getLogger(__name__)
+
+
+@require_POST
+def shipstation_webhook_order_received(request):
+	try:
+		resource_url = request.POST.get('resource_url')
+		if resource_url:
+			headers = Repository.shipstation_get_headers()
+			response = requests.get(resource_url, headers=headers)
+
+			status_code = response.status_code
+			# request was good, create the methods
+			if status_code == 200:
+				response_list = json.loads(response.text)
+				logger.debug(f"received response from shipstation webhook: {response_list}")
+				print(f"received response from shipstation webhook: {response_list}")
+				for item in response_list:
+					msg = f"orderId: {item['orderId']}, orderNumber: {item['orderNumber']}, orderKey: {item['orderKey']}"
+					print(msg)
+					logger.debug(msg)
+
+					order_id = item['orderId'] - 10000
+					order = Order.objects.get(id=order_id)
+
+					email_subject = f"DEHY: A New Order has Arrived {order.number}"
+					email_body = render_to_string('oscar/communication/emails/internal/order_received.html', {
+						'order': order
+					})
+
+					# this should be a queryset of users with is_staff=True and a custom permission...
+					# something like receive_new_order_notifcs
+					recipients = ['kjt1987@gmail.com', 'orders@dehygarnish.net']
+
+					email = EmailMessage(subject=email_subject, body=email_body,
+								from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=recipients)
+
+					email.send()
+
+			else:
+				error_msg = f"{status_code} - A problem occurred while retrieving shipstation webhook"
+				print(error_msg)
+				logger.error(error_msg)
+
+
+
+	except Exception as e:
+		error_msg = f"Error retrieving shipstation webhook: {e}"
+		print(error_msg)
+		logger.error(error_msg)
 
 
 def get_validated_address(request):
