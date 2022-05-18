@@ -30,6 +30,7 @@
 12. [setting up email sending and receiving on AWS SES](#aws_ses_integration)
 13. [enabling ftp access](#enable_ftp)
 14. [adding the ability to create shipping events](#create_shipping_event_type)
+15. [creating oscar email template via backend](#create_oscar_email_template)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1743,3 +1744,23 @@ https://stackoverflow.com/a/40078116/6158303
 	...
 
 	```
+
+< name="create_oscar_email_template"></a>
+12. ###### Adding the ability to create/customize an email template from the dashboard
+
+	from: https://django-oscar.readthedocs.io/en/3.1/howto/how_to_customise_oscar_communications.html?highlight=email#customising-through-the-database
+
+	for this example, we'll be adding the ORDER_PLACED communication event type to the dashboard.
+
+	1. go to /admin/communication/communicationeventtype/add/
+
+	2. edit the fields using the following values:
+		- Code: `ORDER_PLACED`
+		- Name: `Order Placed`
+		- Category: `Order related`
+		- Email Subject Template: `{% load i18n %}{% blocktrans with number=order.number %}Confirmation of order {{ number }}{% endblocktrans %}` - copy pasted from `templates/oscar/communication/emails/commtype_order_placed_subject.txt`
+		- Email Body Template: copy the contents from `templates/oscar/communication/emails/commtype_order_placed_body.txt`
+		- Email Body HTML: copy the contents from `templates/oscar/communication/emails/commtype_order_placed_body.html`
+		- SMS Template: left it blank
+
+
