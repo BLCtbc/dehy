@@ -19,7 +19,6 @@ from django.views import generic
 from django.views.generic.base import TemplateView
 from django.views.decorators.http import require_POST
 
-from django.template import RequestContext
 from django.template.loader import render_to_string
 
 from oscar.apps.customer import views
