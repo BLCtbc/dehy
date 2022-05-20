@@ -1,0 +1,77 @@
+{% extends "oscar/communication/emails/base.html" %}
+{% load currency_filters i18n %}
+
+{% block header %}
+{{block.super}}
+<tr>
+	<td align="center">
+		<table style="border-collapse:collapse; width:500px;" cellpadding="0" cellspacing="0">
+			<tbody>
+
+			{% block header_content %}
+					<tr>
+						<td>
+							<a href="{{site.name}}{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">
+								<span style="text-decoration:underline;font-size:18px;font-weight:500">{% blocktrans with order_number=order.number %}ORDER NUMBER: {{order_number}}{% endblocktrans %}</span>
+							</a>
+						</td>
+					</tr>
+			{% endblock header_content %}
+
+			</tbody>
+		</table>
+	</td>
+</tr>
+{% endblock header %}
+
+{% block body %}
+	<tr>
+		<td align="center">
+			<table style="border-collapse:collapse; width:500px;" cellpadding="0" cellspacing="0">
+				<tbody>
+					{% block order_text_content %}
+				    <tr>
+						<td>
+							<p xmlns="http://www.w3.org/1999/html">{% blocktrans with user_name=user.name|default:"" %}Hello {{user_name}},</p>
+				            <p>We are pleased to confirm your order has been received and will be processed shortly.{% endblocktrans %}</p>
+						</td>
+					</tr>
+					{% endblock order_text_content %}
+				</tbody>
+			</table>
+		</td>
+	</tr>
+
+	{% block order_summary_block %}
+	<tr>
+		<td align="center">
+			{% include "oscar/communication/partials/order_info_table.html" %}
+		</td>
+	</tr>
+	{% endblock order_summary_block %}
+
+
+	{% block order_contents %}
+	<tr>
+		<td align="center">
+			{% include "oscar/communication/partials/order_contents_table.html" %}
+		</td>
+	</tr>
+	{% endblock order_contents %}
+
+	{% block order_discounts %}
+	<tr>
+		<td align="center">
+		</td>
+	</tr>
+	{% endblock order_discounts %}
+
+
+	{% block order_additional_info %}
+	<tr>
+		<td align="center">
+		</td>
+	</tr>
+	{% endblock order_additional_info %}
+
+{% endblock body %}

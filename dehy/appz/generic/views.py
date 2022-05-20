@@ -59,13 +59,17 @@ def shipstation_webhook_order_received(request):
 					order_id = item['orderId'] - 10000
 					order = Order.objects.get(id=order_id)
 
+					print('found the order: ', order)
+					logger.debug(msg)
+
 					email_subject = f"DEHY: A New Order has Arrived {order.number}"
 					email_body = render_to_string('oscar/communication/emails/internal/order_received.html', {
-						'order': order
+						'order': order,
+						'ship_by': item['shipByDate']
 					})
 
-					# this should be a queryset of users with is_staff=True and a custom permission...
-					# something like receive_new_order_notifcs
+					# this should be a queryset of users with is_staff=True and a custom BOOLEAN setting on their account
+					# that can only be set by someone with superuser status, ie. a permission like can_change_order_notifcation
 					recipients = ['kjt1987@gmail.com', 'orders@dehygarnish.net']
 
 					email = EmailMessage(subject=email_subject, body=email_body,

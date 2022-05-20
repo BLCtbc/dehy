@@ -1,0 +1,15 @@
+{% if order %}
+{% load i18n %}
+<div><span style="font-size: 18px; font-variant-caps:all-petite-caps;font-weight:bold">{% trans "Billed to"|upper %}</span></div>
+<div>{{order.billing_address.phone_number}}</div>
+<div>{{order.billing_address.first_name}} {{order.billing_address.last_name}}</div>
+<div>{{order.billing_address.line1}}</div>
+<div>{{order.billing_address.line2}}</div>
+<div>{{order.billing_address.line3}}</div>
+<div>{{order.billing_address.line4}}, {{order.billing_address.state}}, {{order.billing_address.postcode}}</div>
+<div>{{order.billing_address.country}}</div>
+<div>CC: {{order.sources.first.label}}</div>
+{% with email_addr=order.user|default:order.guest_email %}
+<a href="mailto:{{email_addr}}" target="_blank">{{email_addr}}</a>
+{% endwith %}
+{% endif %}
