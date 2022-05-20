@@ -1,0 +1,12 @@
+{% if order %}
+{% load i18n %}
+<div><span style="font-size:18px;font-variant-caps:all-petite-caps;font-weight:bold">{% trans "Shipping to"|upper %}</span></div>
+<div>{{order.shipping_address.first_name}} {{order.shipping_address.last_name}}</div>
+<div>{{order.shipping_address.line1}}</div>
+<div>{{order.shipping_address.line2}}</div>
+<div>{{order.shipping_address.line3}}</div>
+<div>{{order.shipping_address.line4}}, {{order.shipping_address.state}}, {{order.shipping_address.postcode}}</div>
+<div>{{order.shipping_address.country}}</div>
+<div>{{order.shipping_address.phone_number}}</div>
+<div>{{order.shipping_method}}</div>
+{% endif %}

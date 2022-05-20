@@ -281,8 +281,9 @@ HAYSTACK_CONNECTIONS = {
 AUTH_USER_MODEL = "generic.User"
 OSCAR_SEND_REGISTRATION_EMAIL = False
 OSCAR_ALLOW_ANON_CHECKOUT = True
-OSCAR_INITIAL_ORDER_STATUS = OSCAR_INITIAL_LINE_STATUS = 'Processed'
+OSCAR_INITIAL_ORDER_STATUS = OSCAR_INITIAL_LINE_STATUS = 'Pending'
 OSCAR_ORDER_STATUS_PIPELINE = OSCAR_LINE_STATUS_PIPELINE = {
+	'Pending': ('Processed', 'Cancelled',),
 	'Processed': ('Shipped', 'Cancelled',),
 	'Shipped': ('Delivered', 'Cancelled',),
 	'Delivered': (),
@@ -290,6 +291,7 @@ OSCAR_ORDER_STATUS_PIPELINE = OSCAR_LINE_STATUS_PIPELINE = {
 }
 
 OSCAR_ORDER_STATUS_CASCADE = {
+	
 	'Processed': 'Processed',
 	'Shipped': 'Shipped',
 	'Delivered': 'Delivered',

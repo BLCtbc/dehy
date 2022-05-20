@@ -1,0 +1,26 @@
+{% extends "oscar/communication/emails/orders_base.html" %}
+{% load currency_filters i18n %}
+
+{% block header_content %}
+	{{block.super}}
+	<tr>
+		<td>
+
+			<span style="text-decoration:underline;font-size:18px;font-weight:500">
+				{% blocktrans with order_number=order.number %}Estimated Delivery: {% endblocktrans %}
+			</span>
+
+		</td>
+	</tr>
+
+{% endblock header_content %}
+
+{% block order_text_content %}
+<tr>
+	<td>
+		<p xmlns="http://www.w3.org/1999/html">{% blocktrans with user_name=user.name|default:"" %}Hello {{user_name}},</p>
+		<p>We are pleased to confirm your order has been received and will be processed shortly.{% endblocktrans %}</p>
+	</td>
+</tr>
+
+{% endblock order_text_content %}

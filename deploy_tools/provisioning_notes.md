@@ -31,6 +31,7 @@
 13. [enabling ftp access](#enable_ftp)
 14. [adding the ability to create shipping events](#create_shipping_event_type)
 15. [creating oscar email template via backend](#create_oscar_email_template)
+16. [adding new/custom communication event type](#adding_new_communication_event_type)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1734,7 +1735,9 @@ https://stackoverflow.com/a/40078116/6158303
 12. ###### adding more 'sites' to django
 	go to http://127.0.0.1:8000/admin/sites/site/ and click 'ADD SITE'
 
-	note: deleting the default site, which is normally 'example.com', does NOT screw anything up
+	note: deleting the default site, which is normally 'example.com', does NOT screw anything up, but it may leave some `Order` objects without an attached `Site` object - the side effects to this remain uncertain, other than sending order related emails
+
+	how to delete the default site: go into the admin site, find `Sites`, and delete the default/unused `Site` objects
 
 
 	```py
@@ -1750,7 +1753,8 @@ https://stackoverflow.com/a/40078116/6158303
 
 	from: https://django-oscar.readthedocs.io/en/3.1/howto/how_to_customise_oscar_communications.html?highlight=email#customising-through-the-database
 
-	for this example, we'll be adding the ORDER_PLACED communication event type to the dashboard.
+	for this example, we'll be adding the ORDER_PLACED communication event type to the dashboard,
+	which is a preexisting event type within oscar
 
 	1. go to /admin/communication/communicationeventtype/add/
 
@@ -1758,9 +1762,75 @@ https://stackoverflow.com/a/40078116/6158303
 		- Code: `ORDER_PLACED`
 		- Name: `Order Placed`
 		- Category: `Order related`
-		- Email Subject Template: `{% load i18n %}{% blocktrans with number=order.number %}Confirmation of order {{ number }}{% endblocktrans %}` - copy pasted from `templates/oscar/communication/emails/commtype_order_placed_subject.txt`
-		- Email Body Template: copy the contents from `templates/oscar/communication/emails/commtype_order_placed_body.txt`
-		- Email Body HTML: copy the contents from `templates/oscar/communication/emails/commtype_order_placed_body.html`
-		- SMS Template: left it blank
+		- Email Subject Template: `{% load i18n %}{% blocktrans with order_number=order.number %}DEHY: We have received your order! ({{ order_number }}){% endblocktrans %}` - copy/pasted/modified version of: `templates/oscar/communication/emails/commtype_order_placed_subject.txt`
+		- Email Body Template: copied the contents from `templates/oscar/communication/emails/commtype_order_placed_body.txt`
+		- Email Body HTML:
+			```html
+			{% extends "oscar/communication/emails/base.html" %}
+				{% load currency_filters i18n %}
 
+				{% block tbody %}
+				<tr>
+				    <td align="center" class="content-block">
+				     <table style="border-collapse:collapse; width:500px;" cellpadding="0" cellspacing="0">
+					<tbody>
+					    <tr>
+						<td>
+							<p xmlns="http://www.w3.org/1999/html">{% trans 'Hello,' %}</p>
+				                        <p>{% blocktrans with order_number=order.number %}We are pleased to confirm your order {{ order_number }} has been received and will be processed shortly.{% endblocktrans %}</p>
+						</td>
+					</tr>
+					</tbody>
+					</table>
+				    </td>
+				</tr>
+
+				<tr>
+				    <td align="center" class="content-block">
+				        {% include "oscar/communication/emails/order_info_table.html" %}
+				    </td>
+				</tr>
+
+				<tr>
+				    <td align="center" class="content-block">
+				        {% include "oscar/communication/emails/order_contents_table.html" %}
+				    </td>
+				</tr>
+
+				{% endblock %}
+			```
+		- SMS Template:
+
+< name="adding_new_communication_event_type"></a>
+12. ####### Adding a new/custom communication event type to Oscar in order to allow emails to be sent when an order has shipped
+
+	This follows the instructions from the example in the previous section, except the event type we're
+	adding does not come standard within Oscar
+
+	1. go to /admin/communication/communicationeventtype/add/
+
+	2. edit the fields using the following values:
+		- Code: `ORDER_SHIPPED`
+		- Name: `Order Shipped`
+		- Category: `Order related`
+		- Email Subject Template: `{% load i18n %}{% blocktrans with order_number=order.number %}  DEHY: Great news, your order has shipped! ({{ order_number }}) {% endblocktrans %}`
+		- Email Body Template:
+		- Email Body HTML:
+			```html
+				{% extends "oscar/communication/emails/orders_base.html" %}
+				{% load currency_filters i18n %}
+
+				{% block header %}
+				{{block.super}}
+				{% endblock header %}
+
+				{% block body %}
+				{{block.super}}
+				{% endblock body %}
+			```
+		- SMS Template:
+
+		- Code:
+		- Name:
+		- Email Subject Template:
 

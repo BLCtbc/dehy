@@ -148,7 +148,7 @@
             }
 
             a {
-              color: #348eda;
+              color: #348eda !important;
               text-decoration: underline;
             }
 
@@ -297,34 +297,31 @@
                         <tr>
                             <td class="content-wrap">
                                 <table style="border:2px double #bca263;" width="100%" cellpadding="0" cellspacing="0">
-                                    {% block header %}
+									{% block header %}
 									<tr>
 										<td align="center">
 											<table style="border-collapse:collapse; width:500px; margin:30px" cellpadding="0" cellspacing="0">
 												<tbody>
 													<tr>
 														<td>
-															<div class="brand-container">
-																<a class="navbar-brand" href="{% url 'home' %}" title="dehygarnish.com">
-																	<img style="max-height: 45px; width:auto;" src="{{site.name}}/static/img/brand.png" alt="Dehy logo">
-																</a>
-															</div>
+															{% include "oscar/communication/partials/brand.html" %}
 														</td>
 													</tr>
 												</tbody>
 											</table>
-
 										</td>
 									</tr>
 									{% endblock header %}
 
-                                    {% block tbody %}
-                                    <tr>
-                                        <td align="center" class="content-block">
-                                            {% block body %}{% endblock %}
-                                        </td>
-                                    </tr>
-                                    {% endblock %}
+                                {% block tbody %}
+
+									{% block body %}
+										<tr>
+										</tr>
+									{% endblock body %}
+
+                                {% endblock tbody %}
+
                                     {% block footer %}
                                         <tr>
                                             <td align="center">
@@ -333,7 +330,7 @@
 														<tr>
 															<td>
 																<p>{% trans "Thanks for using our site!" %}</p>
-															    <p>{% blocktrans with name=site.name %}The {{ name }} team{% endblocktrans %}</p>
+															    <p>{% blocktrans with name="DEHY" %}The {{name}} team{% endblocktrans %}</p>
 															</td>
 														</tr>
 													</tbody>
