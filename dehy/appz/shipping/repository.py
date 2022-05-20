@@ -524,7 +524,7 @@ class Repository(repository.Repository):
 			'Content-Type': "application/x-www-form-urlencoded"
 		}
 
-		response = requests.request("POST", url, data=payload, headers=headers)
+		response = requests.post(url, data=payload, headers=headers)
 		response_text = json.loads(response.text)
 
 		status_code = response.status_code
