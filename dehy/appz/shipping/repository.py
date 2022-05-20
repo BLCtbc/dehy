@@ -407,7 +407,7 @@ class Repository(repository.Repository):
 						"streetLines": [
 							"512 Rio Grande St"
 						],
-						"city":"Austin",
+						"city":"AUSTIN",
 						"stateOrProvinceCode":"TX",
 						"postalCode": int(settings.HOME_POSTCODE),
 						"countryCode": "US",
@@ -432,7 +432,7 @@ class Repository(repository.Repository):
 			}
 		}
 
-		if shipping_addr.country.code != 'US':
+		if shipping_addr.country.code.upper() != 'US':
 			payload['requestedShipment'].update({'customsClearanceDetail': self.fedex_get_customs_clearance_details(basket)})
 
 		headers = {
@@ -441,7 +441,7 @@ class Repository(repository.Repository):
 			'Authorization': "Bearer " + self.fedex_get_auth_token()
 		}
 		url = settings.FEDEX_API_URL + "rate/v1/rates/quotes"
-		response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
+		response = requests.post(url, data=json.dumps(payload), headers=headers)
 
 		status_code = response.status_code
 		if status_code == 200:
