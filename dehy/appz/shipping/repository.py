@@ -374,16 +374,16 @@ class Repository(repository.Repository):
 			if corrections:
 				data.update({'corrections':corrections})
 
-		residential = shipping_addr.is_residential
-
 		to_address = {
 			"streetLines": street_lines,
 			"postalCode": shipping_addr.postcode,
 			"city": shipping_addr.line4,
 			"stateOrProvinceCode":shipping_addr.state,
-			"countryCode": shipping_addr.country.code,
-			"residential": residential
+			"countryCode": shipping_addr.country.code
 		}
+
+		if hasattr(shipping_addr, 'is_residential'):
+			to_address.update({'residential', shipping_addr.is_residential})
 
 		ship_date = datetime.date.today()
 		if datetime.datetime.now().hour > 19:
