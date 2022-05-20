@@ -536,6 +536,8 @@ class Repository(repository.Repository):
 			FedexAuthToken.save()
 
 		else:
+
+			error = response_text['errors'][0]
 			logger.error(f'Fedex API: Error authorizing ({status_code}). \n{error["message"]}')
 
 			if status_code == 400:
