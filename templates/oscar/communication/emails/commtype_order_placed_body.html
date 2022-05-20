@@ -1,0 +1,11 @@
+{% extends "oscar/communication/emails/orders_base.html" %}
+{% load currency_filters i18n %}
+
+{% block order_text_content %}
+<tr>
+	<td>
+		<p xmlns="http://www.w3.org/1999/html">{% blocktrans with user_name=user.name|default:"" %}Hello {{user_name}},</p>
+		<p>We are pleased to confirm your order has been received and will be processed shortly.{% endblocktrans %}</p>
+	</td>
+</tr>
+{% endblock order_text_content %}

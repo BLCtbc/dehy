@@ -1,40 +1,40 @@
-{% extends "oscar/communication/emails/base.html" %}
+{% extends "oscar/communication/emails/orders_base.html" %}
 {% load currency_filters i18n %}
 
-{% block tbody %}
-<tr>
-    <td align="center">
-		<h2>
-			{% blocktrans with order_number=order.number %}DEHY: A New Order has Arrived ({{order_number}}){% endblocktrans %}
-		</h2>
-    </td>
-</tr>
+{% block header_content %}
 
+	<tr>
+		<td>
+			<h2>
+				{% blocktrans with order_number=order.number %}DEHY: A New Order has Arrived ({{order_number}}){% endblocktrans %}
+			</h2>
+		</td>
+	</tr>
+
+{% endblock header_content %}
+
+{% block order_text_content %}
 <tr>
-    <td align="center">
+	<td>
 		<p>
 			{% trans "After shipping the package, mark the order as fulfilled in the Orders panel." %}
 		</p>
-    </td>
+	</td>
 </tr>
-
 <tr>
-    <td align="center">
+    <td>
 		<p>
 			{% blocktrans with order_number=order.number date_placed=order.date_placed %}Order #{{order_number}}. Placed on {{date_placed}}{% endblocktrans %}
 		</p>
     </td>
 </tr>
+{% endblock order_text_content %}
 
-<tr>
-	<td align="center">
-		{% include "oscar/communication/emails/order_info_table.html" %}
-	</td>
-</tr>
-<tr>
-	<td align="center">
-		{% include "oscar/communication/emails/order_contents_table.html" %}
-	</td>
-</tr>
 
-{% endblock %}
+{% block order_summary_block %}
+{{ block.super }}
+{% endblock order_summary_block %}
+
+{% block order_contents %}
+{{ block.super }}
+{% endblock order_contents %}
