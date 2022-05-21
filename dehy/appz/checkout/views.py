@@ -330,9 +330,8 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 		response = super().get(request, *args, **kwargs)
 
-		print('\n stripe_order_id: ', self.request.basket.stripe_order_id)
 		if self.request.user.is_authenticated:
-			print('user is auth')
+			pass
 
 		return response
 
@@ -713,12 +712,10 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 
 				data['stripe_pkey'] = facade.stripe.pkey
 				status_code = 200
-				print('data: ', data)
 				response = JsonResponse(data)
 
 		response.status_code = status_code
 
-		print('about to return response')
 		return response
 
 
@@ -1247,7 +1244,7 @@ class ThankYouView(generic.DetailView):
 					order = order_.first()
 
 
-					response = asyncio.run(Repository.async_shipstation_place_order(order))
+					asyncio.run(Repository.async_shipstation_place_order(order))
 
 
 					#
