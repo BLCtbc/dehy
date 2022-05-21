@@ -50,7 +50,7 @@ def shipstation_webhook_order_received(request):
 			if status_code == 200:
 				response_list = json.loads(response.text)
 				logger.debug(f"received response from shipstation webhook: {response_list}")
-				print(f"received response from shipstation webhook: {response_list}")
+				print(f"\n received response from shipstation webhook: {response_list}")
 				for item in response_list:
 					msg = f"orderId: {item['orderId']}, orderNumber: {item['orderNumber']}, orderKey: {item['orderKey']}"
 					print(msg)
