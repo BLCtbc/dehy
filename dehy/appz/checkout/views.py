@@ -1205,7 +1205,6 @@ class ThankYouView(generic.DetailView):
 		if not self.object:
 			template_name = 'dehy/checkout/thank_you_error.html'
 
-		print('template_name:', template_name)
 		return template_name
 
 	def get_object(self, queryset=None):
@@ -1246,9 +1245,14 @@ class ThankYouView(generic.DetailView):
 				order_ = Order._default_manager.filter(number=order_id, basket=basket)
 				if order_:
 					order = order_.first()
+					print('attempting to place shipstation order')
+					logger.debug('attempting to place shipstation order')
+
 					response = asyncio.run(Repository.async_shipstation_place_order(order))
-					print('shipstation order placed: ', response)
-					print(response.text)
+					msg = f'shipstation order placed: {response.text}'
+					logger.debug(msg)
+					print(msg)
+					
 					#
 					# try:
 					# 	print('attempting to place shipstation order')
