@@ -1,0 +1,49 @@
+{% extends "dehy/checkout/layout_v2.html" %}
+{% load currency_filters %}
+{% load i18n %}
+{% load image_tags %}
+
+{% block title %}
+    {% blocktrans %}
+	Error retrieving order info
+    {% endblocktrans %}
+{% endblock title %}
+
+{% block checkout_nav %}
+{% endblock %}
+
+
+{% block content %}
+<div class="col-12 col-md-11 col-lg-10">
+	<p class="lead">
+		{% blocktrans %}
+		An error occurred when placing your order. Please wait a moment then refresh the page.
+		<strong>{{ number }}</strong>
+		{% endblocktrans %}
+	</p>
+</div>
+	{% block order_info %}
+	<div class="col-12 col-md-11 col-lg-10">
+	</div>
+	{% endblock order_info %}
+
+	{% block order_contents %}
+	<div class="col-12 col-md-11 col-lg-10">
+	</div>
+
+	<div class="col-12 col-md-11 col-lg-10">
+		<div class="row justify-content-end">
+			<div class="col-6 col-lg-3 text-right"><a role="button" href="{{ homepage_url }}" class="btn">{% trans "Continue shopping" %}</a></div>
+		</div>
+	</div>
+
+    {% endblock order_contents %}
+
+{% endblock content %}
+
+
+{% block tracking %}
+    {% if send_analytics_event %}
+        {% include "oscar/partials/google_analytics_transaction.html" %}
+    {% endif %}
+{% endblock %}

@@ -215,7 +215,7 @@ if not DEBUG:
 			'file': {
 				'level': 'DEBUG',
 				'class': 'logging.FileHandler',
-				'filename': 'django.log',
+				'filename': 'logs/django.log',
 			},
 		},
 		'loggers': {
