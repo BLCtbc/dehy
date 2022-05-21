@@ -213,7 +213,7 @@ if not DEBUG:
 		'disable_existing_loggers': False,
 		'handlers': {
 			'file': {
-				'level': 'WARN',
+				'level': 'DEBUG',
 				'class': 'logging.FileHandler',
 				'filename': 'logs/django.log',
 			},
@@ -221,12 +221,12 @@ if not DEBUG:
 		'loggers': {
 			'django': {
 				'handlers': ['file'],
-				'level': 'WARN',
+				'level': 'DEBUG',
 				'propagate': True,
 			},
 			'django.request': {
 				'handlers': ['file'],
-				'level': 'WARN',
+				'level': 'DEBUG',
 				'propagate': True,
 			}
 		},
