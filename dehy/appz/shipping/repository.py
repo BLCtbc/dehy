@@ -269,7 +269,10 @@ class Repository(repository.Repository):
 		items = await self.async_coerce_shipstation_line_items(lines, base_url)
 		shipping_cost = await self.async_fetch_shipping_cost(order)
 		# total_weight = await self.async_fetch_order_weight(order)
-
+		shipping_code = order.shipping_code.lower()
+		if shipping_code == 'ground_home_delivery':
+			shipping_code = 'fedex_home_delivery'
+			
 		payload = {
 			"orderNumber": order.id+10000,
 			"orderKey": order.number,
@@ -284,7 +287,7 @@ class Repository(repository.Repository):
 			"taxAmount": str(order.total_tax),
 			"shippingAmount": str(shipping_cost),
 			"carrierCode": "fedex",
-			"serviceCode": order.shipping_code.lower(),
+			"serviceCode": shipping_code,
 			"weight": {
 				"value": str(D(order.basket.total_weight).quantize(TWOPLACES)),
 				"units": "pounds"
