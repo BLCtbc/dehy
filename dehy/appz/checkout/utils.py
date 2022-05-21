@@ -18,7 +18,6 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		"""
 		Use a manually entered address as the shipping address
 		"""
-		print("\n ship_to_new_address: \n", address_fields)
 
 		self._unset('shipping', 'new_address_fields')
 		phone_number = address_fields.get('phone_number')
@@ -31,7 +30,6 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		country = address_fields.get('country', None)
 
 		if country and isinstance(country, Country):
-			print("\n resetting country obj \n")
 
 			address_fields = address_fields.copy()
 			address_fields['country'] = address_fields['country'].iso_3166_1_a2
@@ -42,7 +40,6 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		"""
 		Store address fields for a billing address.
 		"""
-		print("\n bill_to_new_address: \n", address_fields)
 
 		self._unset('billing', 'new_address_fields')
 
@@ -62,7 +59,6 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		self._set('billing', 'new_address_fields', address_fields)
 
 	def set_questionnaire_response(self, additional_info):
-		print('additional_info: ', additional_info)
 		self._set('questionnaire', 'purchase_business_type', additional_info.purchase_business_type)
 		self._set('questionnaire', 'business_name', additional_info.business_name)
 		self._set('questionnaire', 'additional_info_id', additional_info.id)
