@@ -269,6 +269,7 @@ class Repository(repository.Repository):
 		items = await self.async_coerce_shipstation_line_items(lines, base_url)
 		shipping_cost = await self.async_fetch_shipping_cost(order)
 		# total_weight = await self.async_fetch_order_weight(order)
+
 		payload = {
 			"orderNumber": order.id+10000,
 			"orderKey": order.number,
@@ -300,7 +301,9 @@ class Repository(repository.Repository):
 			payload.update({'internalNotes': order.shipping_address.notes})
 
 		url = "https://ssapi.shipstation.com/orders/createorder"
+		print('shipstation payload: ', payload)
 		headers = self.shipstation_get_headers()
+		print('shipstation headers: ', headers)
 		print('attempting to place shipstation order')
 		logger.debug('attempting to place shipstation order')
 
