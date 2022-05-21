@@ -218,9 +218,7 @@ class Repository(repository.Repository):
 				'adjustment': False
 			}
 
-			print('line_dict: ', line_dict)
 			image_url = await self.async_get_first_image_url(line)
-			print('image_url: ', image_url)
 			if image_url:
 				image_url = settings.BASE_URL+image_url
 				line_dict.update({'imageUrl': image_url})
@@ -253,7 +251,7 @@ class Repository(repository.Repository):
 		return list(order.discounts.prefetch_related('offers').all())
 
 	def fetch_order_with_related(self, order_id):
-		return Order.objects.select_related('billing_address__country', 'shipping_address__country', 'basket').prefetch_related('lines', 'discounts', 'basket__lines__product').get(id=order_id)
+		return Order.objects.select_related('billing_address__country', 'shipping_address__country', 'basket', 'user').prefetch_related('lines', 'discounts', 'basket__lines__product').get(id=order_id)
 
 	def fetch_shipping_cost(self, order):
 		return order.shipping_before_discounts_incl_tax
@@ -278,7 +276,7 @@ class Repository(repository.Repository):
 			"orderKey": order.number,
 			"orderDate": datetime.datetime.now().isoformat(),
 			"paymentDate": datetime.datetime.now().isoformat(),
-			"shipByDate": datetime.datetime.now().isoformat(),
+			"shipByDate": datetime.datetime.now().isoformat(), #TODO: dynamic based on chosen shipping method(est arrival) and current time of day
 			"orderStatus": "awaiting_shipment",
 			"customerEmail": customer_email,
 			"billTo": billing_address,

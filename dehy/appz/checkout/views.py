@@ -953,7 +953,6 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 		)
 
 		for line in basket.all_lines():
-
 			stripe_line = list(filter(lambda x: x['product']==line.product.upc, order.line_items.data))[0]
 			tax_rate = D(stripe_line['amount_tax']/stripe_line['amount_subtotal']).quantize(FOUR_PLACES)
 			price_incl_tax = line.price_excl_tax + calculate_tax(line.price_excl_tax, tax_rate)
@@ -1023,8 +1022,8 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			order_kwargs = {}
 		order_number = basket.stripe_order_id
 		# self.checkout_session.set_order_number(order_number)
-		logger.info("Order #%s: beginning submission process for basket #%d",
-					basket.stripe_order_id, basket.id)
+		print("Order #%s: beginning submission process for basket #%d",basket.stripe_order_id, basket.id)
+		logger.info("Order #%s: beginning submission process for basket #%d",basket.stripe_order_id, basket.id)
 
 		self.freeze_basket(basket)
 		# self.checkout_session.set_submitted_basket(basket)
@@ -1117,8 +1116,9 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			shipping_address=shipping_address, shipping_method=shipping_method,
 			shipping_charge=shipping_charge, order_total=order_total,
 			billing_address=billing_address, surcharges=surcharges, **kwargs)
+
 		basket.submit()
-		asyncio.run(Repository.async_shipstation_place_order(order))
+
 		return self.handle_successful_order(order)
 
 	def handle_successful_order(self, order):
@@ -1147,6 +1147,7 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 
 		response = HttpResponseRedirect(self.get_success_url())
 		self.send_signal(self.request, response, order)
+
 		return response
 
 	def send_order_placed_email(self, order):
@@ -1169,32 +1170,56 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 
 
 
-class ThankYouView(views.ThankYouView):
+class ThankYouView(generic.DetailView):
 	"""
 	Displays the 'thank you' page which summarises the order just submitted.
 	"""
 	template_name = 'dehy/checkout/thank_you.html'
 	max_wait = 20
+
+	def get_context_data(self, *args, **kwargs):
+		ctx = super().get_context_data(*args, **kwargs)
+		# Remember whether this view has been loaded.
+		# Only send tracking information on the first load.
+		if ctx.get('order'):
+
+			key = 'order_{}_thankyou_viewed'.format(ctx['order'].pk)
+			if not self.request.session.get(key, False):
+				self.request.session[key] = True
+				ctx['send_analytics_event'] = True
+			else:
+				ctx['send_analytics_event'] = False
+
+		return ctx
+
 	def get(self, request, *args, **kwargs):
 		self.object = self.get_object()
-		if self.object is None:
-			return redirect(settings.OSCAR_HOMEPAGE)
+		# if self.object is None:
+		# 	return redirect(settings.OSCAR_HOMEPAGE)
 		context = self.get_context_data(object=self.object)
 		context.update({'lg_col_size': 10, 'md_col_size':"col-md-11"})
 		return self.render_to_response(context)
+
+	def get_template_names(self):
+		template_name = self.template_name
+		if not self.object:
+			template_name = 'dehy/checkout/thank_you_error.html'
+
+		print('template_name:', template_name)
+		return template_name
 
 	def get_object(self, queryset=None):
 
 		order = None
 		# We allow superusers to force an order thank-you page for testing
-		if self.request.user.is_superuser:
-			kwargs = {}
-			if 'order_number' in self.request.GET:
-				kwargs['number'] = self.request.GET['order_number']
-			elif 'order_id' in self.request.GET:
-				kwargs['id'] = self.request.GET['order_id']
-			order = Order._default_manager.filter(**kwargs).first()
-			print('super user order found: ', order)
+		# if self.request.user.is_superuser and settings.DEBUG:
+		# 	kwargs = {}
+		# 	if 'order_number' in self.request.GET:
+		# 		kwargs['number'] = self.request.GET['order_number']
+		# 	elif 'order_id' in self.request.GET:
+		# 		kwargs['id'] = self.request.GET['order_id']
+		# 	order = Order._default_manager.filter(**kwargs).first()
+		# 	print('super user order found: ', order)
 
 		stripe_order_id = self.request.GET.get('order', None)
 		order_client_secret = self.request.GET.get('order_client_secret', None)
@@ -1214,8 +1239,6 @@ class ThankYouView(views.ThankYouView):
 					time.sleep(0.5)
 					basket.refresh_from_db()
 					submitted = basket.is_submitted
-
-
 					if time.time() - start_time > self.max_wait:
 						return order
 
@@ -1223,23 +1246,14 @@ class ThankYouView(views.ThankYouView):
 				order_ = Order._default_manager.filter(number=order_id, basket=basket)
 				if order_:
 					order = order_.first()
-
+					shipstation_order = asyncio.run(Repository.async_shipstation_place_order(order))
+					print('shipstation order placed: ', shipstation_order)
+					#
+					# try:
+					# 	print('attempting to place shipstation order')
+					# 	asyncio.run(Repository.async_shipstation_place_order(order))
+					# except Exception as e:
+					# 	print('error placing shipstation order: ', e)
 
 		return order
 
-#
-# class ShippingAddressRedirectView(RedirectView):
-#
-# 	permanent = True
-# 	pattern_name = 'checkout:shipping'
-#
-# 	def get_redirect_url(self, *args, **kwargs):
-# 		return reverse_lazy('checkout:shipping')
-#
-# class ShippingMethodRedirectView(RedirectView):
-#
-# 	permanent = True
-# 	pattern_name = 'checkout:shipping'
-#
-# 	def get_redirect_url(self, *args, **kwargs):
-# 		return reverse_lazy('checkout:shipping')

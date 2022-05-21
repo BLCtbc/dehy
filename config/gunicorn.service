@@ -8,8 +8,8 @@ User=admin
 Group=www-data
 WorkingDirectory=/home/admin/dehy
 ExecStart=/home/admin/dehy/venv/bin/gunicorn \
---access-logfile access.log \
---error-logfile error.log \
+--access-logfile logs/access.log \
+--error-logfile logs/error.log \
 --workers 3 \
 --bind unix:/run/gunicorn.sock \
 --capture_output \
