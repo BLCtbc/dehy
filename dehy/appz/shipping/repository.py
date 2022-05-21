@@ -301,8 +301,13 @@ class Repository(repository.Repository):
 
 		url = "https://ssapi.shipstation.com/orders/createorder"
 		headers = self.shipstation_get_headers()
+		print('attempting to place shipstation order')
+		logger.debug('attempting to place shipstation order')
 
 		shipstation_response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
+		msg = f'shipstation order placed: {shipstation_response} {shipstation_response.text}'
+		logger.debug(msg)
+		print(msg)
 
 		return shipstation_response
 

@@ -212,11 +212,6 @@ class BasketView(CoreBasketView):
 	def post(self, request, *args, **kwargs):
 		data = {'object_list': {}}
 		response = super().post(request, *args, **kwargs)
-		print('response: ', response)
-		print(dir(response))
-		# print(response.content)
-		print(response.items())
-		print(dir(response.items()))
 
 		for line in self.object_list:
 			data['object_list'][line.product_id] = {'quantity': line.quantity, 'price': line.line_price_excl_tax}
@@ -275,8 +270,6 @@ class BasketView(CoreBasketView):
 		# django.contrib.messages as we may be returning an AJAX response in
 		# which case we pass the messages back in a JSON payload.
 		flash_messages = ajax.FlashMessages()
-
-		print('flash_messages: ', flash_messages)
 
 		for form in formset:
 			if (hasattr(form, 'cleaned_data')
