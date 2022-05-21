@@ -85,7 +85,7 @@ class Repository(repository.Repository):
 
 
 	def is_residential(self, address):
-		validated_address = self.validate_address(address)
+		validated_address = self.usps_validate_address(address)
 		residential = True
 		if validated_address.get('Business', None) and validated_address['Business']=='Y':
 			residential = False
@@ -94,7 +94,7 @@ class Repository(repository.Repository):
 
 	def make_address_corrections(self, address):
 		corrections = {}
-		validated_address = self.validate_address(address)
+		validated_address = self.usps_validate_address(address)
 
 		if not validated_address:
 			return [address, None]
@@ -126,7 +126,7 @@ class Repository(repository.Repository):
 		return address,corrections
 
 
-	def validate_address(self, address):
+	def usps_validate_address(self, address):
 		BASE_API_URL = 'https://secure.shippingapis.com/ShippingAPI.dll?API=Verify'
 
 		xml = f'<AddressValidateRequest USERID="{settings.USPS_USERNAME}"><Revision>1</Revision><Address ID="0">'
@@ -142,7 +142,6 @@ class Repository(repository.Repository):
 		url = f"{BASE_API_URL}&XML={xml}"
 		xml_response = requests.get(url).content
 		usps_response = json.loads(json.dumps(xmltodict.parse(xml_response)))['AddressValidateResponse']['Address']
-		print('validate_address response: ', usps_response)
 
 		if usps_response.get('Error'):
 			return None
@@ -270,13 +269,11 @@ class Repository(repository.Repository):
 		items = await self.async_coerce_shipstation_line_items(lines, base_url)
 		shipping_cost = await self.async_fetch_shipping_cost(order)
 		# total_weight = await self.async_fetch_order_weight(order)
-
 		payload = {
 			"orderNumber": order.id+10000,
 			"orderKey": order.number,
 			"orderDate": datetime.datetime.now().isoformat(),
 			"paymentDate": datetime.datetime.now().isoformat(),
-			"shipByDate": datetime.datetime.now().isoformat(), #TODO: dynamic based on chosen shipping method(est arrival) and current time of day
 			"orderStatus": "awaiting_shipment",
 			"customerEmail": customer_email,
 			"billTo": billing_address,
@@ -312,7 +309,7 @@ class Repository(repository.Repository):
 	async_get_first_image_url = sync_to_async(get_first_image_url)
 	async_shipstation_coerce_discounts = sync_to_async(shipstation_coerce_discounts)
 	async_coerce_shipstation_address = sync_to_async(coerce_shipstation_address)
-	async_validate_address = sync_to_async(validate_address)
+	async_usps_validate_address = sync_to_async(usps_validate_address)
 	async_fetch_order_with_related = sync_to_async(fetch_order_with_related)
 	async_fetch_order_lines_with_related = sync_to_async(fetch_order_lines_with_related)
 	async_fetch_discounts_with_related = sync_to_async(fetch_discounts_with_related)
@@ -358,9 +355,34 @@ class Repository(repository.Repository):
 	def get_free_shipping(self):
 		return FreeShipping()
 
+	def fedex_validate_address(self, shipping_addr):
+		street_lines = [x for x in [shipping_addr.line1, shipping_addr.line2, shipping_addr.line3] if x]
+		to_address = {
+			"streetLines": street_lines,
+			"postalCode": shipping_addr.postcode,
+			"city": shipping_addr.line4,
+			"stateOrProvinceCode":shipping_addr.state,
+			"countryCode": shipping_addr.country.code,
+		}
+		payload = {
+			'addressesToValidate': [
+				{
+					'address': to_address
+				}
+			]
+		}
+
+		headers = {
+			'Content-Type': "application/json",
+			'X-locale': "en_US",
+			'Authorization': "Bearer " + self.fedex_get_auth_token()
+		}
+		url = settings.FEDEX_API_URL + "address/v1/addresses/resolve"
+		response = requests.post(url, data=json.dumps(payload), headers=headers)
+		status_code = response.status_code
+
 	def fedex_get_rates_and_transit_times(self, basket, weight, shipping_addr, max_retries=1):
-		print('getting_fedex_rates:')
-		# shipping_addr = validate_address(shipping_addr)
+		# shipping_addr = usps_validate_address(shipping_addr)
 		methods = []
 		data = {'status_code': 200}
 		retries = 0
