@@ -16,6 +16,7 @@ generate_token = TokenGenerator()
 # takes a dict and returns it without any items containing empty values
 def clear_empty_dict_items(_dict):
 	return {k: v for k, v in _dict.items() if v}
+	
 
 class Fedex(object):
 

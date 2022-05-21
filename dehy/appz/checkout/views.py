@@ -1246,8 +1246,9 @@ class ThankYouView(generic.DetailView):
 				order_ = Order._default_manager.filter(number=order_id, basket=basket)
 				if order_:
 					order = order_.first()
-					shipstation_order = asyncio.run(Repository.async_shipstation_place_order(order))
-					print('shipstation order placed: ', shipstation_order)
+					response = asyncio.run(Repository.async_shipstation_place_order(order))
+					print('shipstation order placed: ', response)
+					print(response.text)
 					#
 					# try:
 					# 	print('attempting to place shipstation order')
