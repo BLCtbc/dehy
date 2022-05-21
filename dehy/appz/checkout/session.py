@@ -168,9 +168,7 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 			request, *args, **kwargs)
 
 	def check_user_email_is_captured(self, request):
-		print('\n check_user_email_is_captured')
 		if not request.user.is_authenticated and not self.checkout_session.get_guest_email():
-			print('\n no email address captured')
 
 			raise exceptions.FailedPreCondition(
 				url=reverse('checkout:checkout'),
@@ -206,7 +204,6 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 		)
 		total = self.get_order_totals(request.basket, shipping_charge, surcharges)
 		if total.excl_tax == D('0.00'):
-			print("total.excl_tax: ", total.excl_tax)
 
 			raise exceptions.PassedSkipCondition(
 				url=reverse('checkout:place_order')
@@ -346,7 +343,6 @@ class CheckoutSessionMixin(session.CheckoutSessionMixin):
 
 
 		form_structure.append(FormStructure().get_submit_button_error_container())
-		# print(f"\n form structure for {self.form_class} : {json.dumps(form_structure)}")
 
 		return form_structure
 
