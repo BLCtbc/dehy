@@ -42,6 +42,8 @@ def shipstation_webhook_order_received(request):
 
 	# try:
 	resource_url = request.POST.get('resource_url')
+	print('shipstation webhook POST: ', request.POST)
+	logger.debug(f'shipstation webhook POST: {request.POST}')
 	if resource_url:
 		headers = Repository.shipstation_get_headers()
 		response = requests.get(resource_url, headers=headers)
