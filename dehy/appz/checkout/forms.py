@@ -123,7 +123,6 @@ class UserInfoForm(AuthenticationForm):
 		return normalise_email(self.cleaned_data['username'])
 
 	def clean(self):
-		print('dir(self): ', dir(self))
 		if 'password' in self.errors:
 			del self.errors['password']
 
