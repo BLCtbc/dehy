@@ -80,6 +80,7 @@ def shipstation_webhook_order_received(request):
 			else:
 				error_msg = f"{status_code} - A problem occurred while retrieving shipstation webhook"
 				print(error_msg)
+				logger.debug(error_msg)
 				logger.error(error_msg)
 
 
@@ -87,6 +88,7 @@ def shipstation_webhook_order_received(request):
 	except Exception as e:
 		error_msg = f"Error retrieving shipstation webhook: {e}"
 		print(error_msg)
+		logger.debug(error_msg)
 		logger.error(error_msg)
 
 

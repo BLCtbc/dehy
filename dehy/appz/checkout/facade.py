@@ -170,6 +170,9 @@ class Facade(object):
 
 	def update_or_create_order(self, basket, customer=None, shipping_fields={}, shipping_method={}, discounts=[], billing_fields={}, metadata={}, **kwargs):
 
+		if basket.status != 'Open':
+			return False
+
 		order = ''
 		shipping_cost = self.coerce_shipping_cost_object(shipping_method)
 
