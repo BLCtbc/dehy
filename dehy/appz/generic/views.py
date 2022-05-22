@@ -36,7 +36,7 @@ Repository = get_class('shipping.repository', 'Repository')
 Repository = Repository()
 logger = logging.getLogger(__name__)
 
-
+@csrf_exempt
 @require_POST
 def shipstation_webhook_order_received(request):
 	try:
