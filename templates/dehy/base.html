@@ -87,7 +87,10 @@
 					show_password: "{% trans 'Show Password' %}",
 					hide_password: "{% trans 'Hide Password' %}",
 					show_password_aria: "{% trans 'Show password as plain text. Warning: this will display your password on the screen.' %}",
-					hide_password_aria: "{% trans 'Hide Password' %}"
+					hide_password_aria: "{% trans 'Hide Password' %}",
+					basket_empty: "{% trans 'Your cart is empty. ' %}",
+					continue_shopping: "{% trans 'Continue shopping' %}",
+					size: "{% trans 'Size' %}"
 				};
 				var currencySymbol = '{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}';
 				currencySymbol = currencySymbol.slice(0, 1);

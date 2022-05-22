@@ -123,7 +123,8 @@ dehy.basket = {
 		var form = document.getElementById('basket_formset');
 
 		if (!form) {
-			form = dehy.basket.create_mini_basket_form();
+			form = dehy.basket.create_mini_basket_formset();
+
 			let mini_basket_form_container = document.getElementById('mini_basket_form_container');
 			mini_basket_form_container.append(form);
 		}
@@ -165,7 +166,7 @@ dehy.basket = {
 		title_col.append(h3);
 
 		if (product.size) {
-			let size = dehy.utils.create_element({tag:'p', classes: 'size-variant', text: product.size});
+			let size = dehy.utils.create_element({tag:'p', classes: 'size-variant', text: `${dehy.translations.size}: ${product.size}`});
 			title_col.append(size);
 		}
 
@@ -214,9 +215,8 @@ dehy.basket = {
 
 
 		quantity_select_container.append(minus_container, input_label, input_container, plus_container);
-
 		let remove_container = dehy.utils.create_element({tag:'p', classes: 'remove-container'}),
-			remove_button = dehy.utils.create_element({tag:'a', classes: 'remove-basket-item', text:"Remove", attrs:{"role":"button", "data-id":product.id, "data-behaviors":"remove"}});
+			remove_button = dehy.utils.create_element({tag:'a', classes: 'remove-basket-item', text:"Remove", attrs:{"role":"button", "data-id":form_number, "data-behaviors":"remove"}});
 
 		remove_container.append(remove_button);
 
@@ -226,7 +226,7 @@ dehy.basket = {
 		return basket_row
 
 	},
-	create_mini_basket_form() {
+	create_mini_basket_formset() {
 		var form_attrs = {
 			"method": "post",
 			"action": "/basket/",
@@ -245,9 +245,16 @@ dehy.basket = {
 	},
 	basket_updated_handlers: {
 		success(response, xhr, status) {
+
 			var subtotal = `${dehy.basket.currency_symbol}${response.subtotal}`;
 			var subtotal_container = document.querySelector('span#subtotal');
-			subtotal_container.textContent = subtotal;
+
+			if (subtotal_container) {
+				subtotal_container.textContent = subtotal;
+			} else {
+				// create it
+			}
+
 
 			if (window.location.pathname.includes("checkout")) {
 
@@ -275,8 +282,8 @@ dehy.basket = {
 				if (order_total_container) {
 					order_total_container.textContent = order_total;
 				};
-			}
-			if (response.object_list) {
+			};
+			if (response.hasOwnProperty('object_list')) {
 				for (let [k,v] of Object.entries(response.object_list)) {
 					var basket_item_element = document.querySelector(`.basket-items[data-product-id='${k}']`);
 					if (!basket_item_element) {
@@ -292,6 +299,14 @@ dehy.basket = {
 			dehy.utils.update_cart_quantity(response.basket_num_items);
 			document.querySelector('#id_form-TOTAL_FORMS').value = form_count
 			document.querySelector('#id_form-INITIAL_FORMS').value = form_count
+
+			if (form_count == 0) {
+				// create
+				var p_elem = dehy.utils.create_element({tag:'p', text:dehy.translations.basket_empty, attrs:{id:'basket_empty_container'}}),
+					a_elem = dehy.utils.create_element({tag:'a', text:dehy.translations.continue_shopping, attrs:{'href':"/shop/"}});
+				p_elem.append(a_elem);
+				document.getElementById('mini_basket_form_container').append(p_elem);
+			}
 
 		},
 		error(error, xhr, status) {

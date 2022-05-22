@@ -244,7 +244,7 @@
 
 {% else %}
     {% block emptybasket %}
-        <p>
+        <p id="basket_empty_container">
             {% trans "Your basket is empty." %}
             <a href="{{ homepage_url }}">{% trans "Continue shopping" %}</a>
         </p>

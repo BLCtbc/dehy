@@ -65,7 +65,6 @@ var dehy = {
 					processData: false,
 					data: form_data,
 					success: function(response) {
-						console.log('success response: ', response);
 
 						dehy.utils.update_loading_modal(response.message, "#status_success", 2000);
 					},
@@ -115,7 +114,8 @@ var dehy = {
 				dehy.utils.update_cart_quantity(response.basket_items);
 				try {
 					dehy.basket.basket_updated_handlers.success(response);
-				} catch {
+				} catch(error) {
+					console.error(error);
 					return false
 				};
 			},

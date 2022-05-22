@@ -1,0 +1,9 @@
+/home/admin/dehy/dehy/logs/* {
+        daily
+        missingok
+        rotate 14
+        compress
+        delaycompress
+        notifempty
+        create 0640 www-data adm
+}
