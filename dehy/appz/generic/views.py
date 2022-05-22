@@ -50,7 +50,13 @@ def shipstation_webhook_order_received(request):
 
 		status_code = response.status_code
 		# request was good, create the methods
-		if status_code == 200:
+		if status_code != 200:
+			error_msg = f"{status_code} - A problem occurred while retrieving shipstation webhook"
+			print(error_msg)
+			logger.debug(error_msg)
+			logger.error(error_msg)
+			
+		else:
 			response_list = json.loads(response.text)
 			logger.debug(f"received response from shipstation webhook: {response_list}")
 			print(f"\n received response from shipstation webhook: {response_list}")
@@ -80,19 +86,15 @@ def shipstation_webhook_order_received(request):
 
 				email.send()
 
-			# else:
-			# 	error_msg = f"{status_code} - A problem occurred while retrieving shipstation webhook"
-			# 	print(error_msg)
-			# 	logger.debug(error_msg)
-			# 	logger.error(error_msg)
 
 
 
-	except Exception as e:
-		error_msg = f"Error retrieving shipstation webhook: {e}"
-		print(error_msg)
-		logger.debug(error_msg)
-		logger.error(error_msg)
+	#
+	# except Exception as e:
+	# 	error_msg = f"Error retrieving shipstation webhook: {e}"
+	# 	print(error_msg)
+	# 	logger.debug(error_msg)
+	# 	logger.error(error_msg)
 
 
 def get_validated_address(request):
