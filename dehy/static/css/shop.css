@@ -181,9 +181,16 @@ input#id_quantity {
 }
 
 .add-item-to-cart-btn,
-#size_selector {
+#size_selector,
+.variant-size-selector {
 	outline-color: var(--gold) !important;
 	border: 2px solid var(--gold);
+	border-radius: 5px;
+	transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.variant-size-selector:focus {
+	outline: 0;
 }
 
 .add-item-to-cart-btn {
