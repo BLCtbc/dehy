@@ -8,6 +8,7 @@ from django.core.mail import EmailMessage, send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import QueryDict, JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.forms.models import model_to_dict
 from django.urls import reverse, reverse_lazy
