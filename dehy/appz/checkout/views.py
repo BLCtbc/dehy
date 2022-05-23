@@ -83,7 +83,7 @@ def shipstation_webhook_order_received(request):
 
 	# try:
 	body = request.body
-	data = json.loads(qq.decode())
+	data = json.loads(body.decode())
 
 	print('shipstation webhook body: ', request.body)
 	logger.debug(f'request.body: {request.body}')
