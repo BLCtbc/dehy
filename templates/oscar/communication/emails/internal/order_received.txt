@@ -1,0 +1,38 @@
+{% load currency_filters i18n %}
+
+{% block header_content %}
+
+	<tr>
+		<td>
+			<h2>
+				{% blocktrans with order_number=order.number %}DEHY: A New Order has Arrived ({{order_number}}){% endblocktrans %}
+			</h2>
+		</td>
+	</tr>
+
+{% endblock header_content %}
+
+{% block order_text_content %}
+<tr>
+	<td>
+		<p>
+			{% trans "After shipping the package, mark the order as fulfilled in the Orders panel." %}
+		</p>
+	</td>
+</tr>
+<tr>
+    <td>
+		<p>
+			{% blocktrans with order_number=order.number date_placed=order.date_placed %}Order #{{order_number}}. Placed on {{date_placed}}{% endblocktrans %}
+		</p>
+    </td>
+</tr>
+{% endblock order_text_content %}
+
+{% block order_summary_block %}
+{{ block.super }}
+{% endblock order_summary_block %}
+
+{% block order_contents %}
+{{ block.super }}
+{% endblock order_contents %}
