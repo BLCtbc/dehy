@@ -69,10 +69,15 @@ def calculate_tax(price, rate):
 def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
 
+def get_webhook_info(request):
+	print('shipstation webhook body: ', request.body)
+	logger.debug(f'request.body: {request.body}')
+	print('shipstation webhook POST: ', request.POST)
 
+	logging.debug(f'shipstation webhook POST: {request.POST}')
+	logger.debug(f'shipstation webhook POST: {request.POST}')
 
 @csrf_exempt
-@require_POST
 def shipstation_webhook_order_received(request):
 
 	# try:
@@ -80,6 +85,7 @@ def shipstation_webhook_order_received(request):
 	print('shipstation webhook body: ', request.body)
 	logger.debug(f'request.body: {request.body}')
 	print('shipstation webhook POST: ', request.POST)
+	get_webhook_info(request)
 
 	logging.debug(f'shipstation webhook POST: {request.POST}')
 	logger.debug(f'shipstation webhook POST: {request.POST}')
