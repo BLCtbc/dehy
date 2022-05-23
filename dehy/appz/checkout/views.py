@@ -73,6 +73,7 @@ def get_webhook_info(request):
 	print('*** get_webhook_info')
 	print('print: request.body: ', request.body)
 	logger.debug(f'logger: request.body: {request.body}')
+
 	logging.debug(f'logging: request.body: {request.body}')
 
 	print('request.POST: ', request.POST)
@@ -86,11 +87,16 @@ def shipstation_webhook_order_received(request):
 	# try:
 	get_webhook_info(request)
 	body = request.body
+	data = ''
 	msg = f'body: {body}'
 	print('print: ', msg)
 	logger.debug('logger: '+msg)
 	logging.debug('logging: '+msg)
-	data = json.loads(body.decode())
+	if type(body) == bytes:
+		data = body.decode()
+
+	if type(body) == str:
+		data = json.loads(body)
 
 	print('shipstation webhook body: ', request.body)
 	logger.debug(f'request.body: {request.body}')
@@ -120,12 +126,12 @@ def shipstation_webhook_order_received(request):
 			response_list = json.loads(response.text)
 			logger.debug(f"received response from shipstation webhook: {response_list}")
 			print(f"\n received response from shipstation webhook: {response_list}")
-			for item in response_list:
+			for item in response_list['orders']:
 				msg = f"orderId: {item['orderId']}, orderNumber: {item['orderNumber']}, orderKey: {item['orderKey']}"
 				print(msg)
 				logger.debug(msg)
 
-				order_id = item['orderId'] - 10000
+				order_id = item['orderNumber'] - 10000
 				order = Order.objects.get(id=order_id)
 
 				print('found the order: ', order)

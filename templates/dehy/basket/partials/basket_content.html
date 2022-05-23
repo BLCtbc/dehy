@@ -37,7 +37,9 @@
             </div>
         </div>
 	{% else %}
-	<h2>{% trans "Order Summary" %}</h2>
+	<div id="basket_status_container">
+		<h2>{% trans "Order Summary" %}</h2>
+	</div>
 	{% endif %}
 	{% endblock %}
 
@@ -244,10 +246,12 @@
 
 {% else %}
     {% block emptybasket %}
-        <p id="basket_empty_container">
+	<div id="basket_status_container">
+		<p id="basket_empty_container">
             {% trans "Your basket is empty." %}
             <a href="{{ homepage_url }}">{% trans "Continue shopping" %}</a>
         </p>
+	</div>
     {% endblock %}
 {% endif %}
 

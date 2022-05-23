@@ -295,18 +295,25 @@ dehy.basket = {
 				}
 			}
 
-			var form_count = document.querySelectorAll('.basket-items').length
+			var form_count = document.querySelectorAll('.basket-items').length;
 			dehy.utils.update_cart_quantity(response.basket_num_items);
-			document.querySelector('#id_form-TOTAL_FORMS').value = form_count
-			document.querySelector('#id_form-INITIAL_FORMS').value = form_count
-
-			if (form_count == 0) {
-				// create
-				var p_elem = dehy.utils.create_element({tag:'p', text:dehy.translations.basket_empty, attrs:{id:'basket_empty_container'}}),
-					a_elem = dehy.utils.create_element({tag:'a', text:dehy.translations.continue_shopping, attrs:{'href':"/shop/"}});
-				p_elem.append(a_elem);
-				document.getElementById('mini_basket_form_container').append(p_elem);
+			document.querySelector('#id_form-TOTAL_FORMS').value = form_count;
+			document.querySelector('#id_form-INITIAL_FORMS').value = form_count;
+			var basket_status_container = document.getElementById('basket_status_container');
+			if (basket_status_container) {
+				dehy.utils.remove_children(basket_status_container);
+				if (form_count == 0) {
+					// create
+					var p_elem = dehy.utils.create_element({tag:'p', text:dehy.translations.basket_empty, attrs:{id:'basket_empty_container'}}),
+						a_elem = dehy.utils.create_element({tag:'a', text:dehy.translations.continue_shopping, attrs:{'href':"/shop/"}});
+					p_elem.append(a_elem);
+					basket_status_container.append(p_elem);
+				} else {
+					var h2_elem = dehy.utils.create_element({tag:'h2', text:dehy.translations.order_summary});
+					basket_status_container.append(h2_elem);
+				}
 			}
+
 
 		},
 		error(error, xhr, status) {
