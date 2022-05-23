@@ -30,9 +30,120 @@
 {% endblock order_text_content %}
 
 {% block order_summary_block %}
-{{ block.super }}
+<table style="border-collapse:collapse; width:500px; margin-bottom:20px" cellpadding="0" cellspacing="0" class="table" id="order_receipt_table">
+	<tbody>
+		<tr>
+			<td style="vertical-align:top">
+				<div><span style="font-size: 18px; font-variant-caps:all-petite-caps;font-weight:bold">{% trans "Billed to"|upper %}</span></div>
+				<div>{{order.billing_address.phone_number}}</div>
+				<div>{{order.billing_address.first_name}} {{order.billing_address.last_name}}</div>
+				<div>{{order.billing_address.line1}}</div>
+				<div>{{order.billing_address.line2}}</div>
+				<div>{{order.billing_address.line3}}</div>
+				<div>{{order.billing_address.line4}}, {{order.billing_address.state}}, {{order.billing_address.postcode}}</div>
+				<div>{{order.billing_address.country}}</div>
+				<div>CC: {{order.sources.first.label}}</div>
+				{% with email_addr=order.user|default:order.guest_email %}
+				<a href="mailto:{{email_addr}}" target="_blank">{{email_addr}}</a>
+				{% endwith %}
+			</td>
+
+			<td style="vertical-align:top">
+				<div><span style="font-size:18px;font-variant-caps:all-petite-caps;font-weight:bold">{% trans "Shipping to"|upper %}</span></div>
+				<div>{{order.shipping_address.first_name}} {{order.shipping_address.last_name}}</div>
+				<div>{{order.shipping_address.line1}}</div>
+				<div>{{order.shipping_address.line2}}</div>
+				<div>{{order.shipping_address.line3}}</div>
+				<div>{{order.shipping_address.line4}}, {{order.shipping_address.state}}, {{order.shipping_address.postcode}}</div>
+				<div>{{order.shipping_address.country}}</div>
+				<div>{{order.shipping_address.phone_number}}</div>
+				<div>{{order.shipping_method}}</div>
+			</td>
+		</tr>
+		<tr style="height: 20px">
+		</tr>
+		<tr>
+			<td colspan="2">
+				<div><span class="cell-title">{% trans "Tracking:" %}</span></div>
+				<div><a class="btn btn-primary" href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.number}}</a></div>
+			</td>
+		</tr>
+	</tbody>
+</table>
 {% endblock order_summary_block %}
 
 {% block order_contents %}
-{{ block.super }}
+{% load currency_filters %}
+{% load image_tags %}
+<table style="border-collapse:collapse; width:500px;" cellpadding="0" cellspacing="0">
+	<tbody>
+		<tr>
+			<td>
+				<h2 style="margin-bottom:0; font-weight:200">{% trans "Order Summary" %}</h2>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<table style="border-collapse:collapse; width:500px; margin-bottom:20px" cellpadding="0" cellspacing="0">
+	<thead style="border-bottom:2px solid;">
+		<tr class="basket-title">
+			<th align="left" colspan="4"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Item" %}</span></th>
+			<th align="right" colspan="1"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Qty" %}</span></th>
+			<th align="right" colspan="1"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Total" %}</span></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for line in order.lines.all %}
+		<tr>
+			<td style="padding-left:0;" colspan="1">
+			{% with image=line.product.primary_image %}
+				{% oscar_thumbnail image.original "300x" as thumb %}
+				<a class="image-link" href="{{site.name}}{{ line.product.get_absolute_url }}">
+					<div class="image-container">
+						<img style="max-height:75px;width:auto;border:1px solid #ded0b1;margin-top:5px;" src="{{site.name}}{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
+					</div>
+				</a>
+			{% endwith %}
+			</td>
+			<td colspan="3">
+				<a href="{{site.name}}{{ line.product.get_absolute_url }}">{{ line.product.parent.title|default:line.product.title }}
+					{% if line.product.is_child %}
+					<br>
+					<span class="size-variant">Size: {{line.product.title}}</span>
+					{% endif %}
+				</a>
+			</td>
+			<td align="right">{{line.quantity}}</td>
+			<td align="right" colspan="1">{{ line.line_price_before_discounts_excl_tax|currency:order.currency }}</td>
+		</tr>
+		{% endfor %}
+		<tr style="border-top: double 2px; height: 10px">
+			<td colspan="6"></td>
+		</tr>
+		<tr style="border-top: double 2px">
+			<td colspan="4"></td>
+			<td align="right"><span>Subtotal</span></td>
+			<td align="right"><span>{{order.total_excl_tax|currency:order.currency}}</span></td>
+		</tr>
+		<tr>
+			<td colspan="4"></td>
+			<td align="right"><span>Shipping</span></td>
+			<td align="right"><span>{{order.shipping_excl_tax|currency:order.currency}}</span></td>
+		</tr>
+		<tr>
+			<td colspan="4"></td>
+			<td align="right"><span>Sales Tax</span></td>
+			<td align="right"><span>{{order.total_tax|currency:order.currency}}</span></td>
+		</tr>
+		<tr style="border-top: double 2px">
+			<td colspan="4"></td>
+			<td align="right"><span>Total</span></td>
+			<td align="right"><span>{{order.total_incl_tax|currency:order.currency}}</span></td>
+		</tr>
+
+	</tbody>
+	<tfoot>
+
+	</tfoot>
+</table>
 {% endblock order_contents %}
