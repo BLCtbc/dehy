@@ -71,8 +71,10 @@ def Deb(msg=''):
 
 def get_webhook_info(request):
 	print('*** get_webhook_info')
-	print('request.body: ', request.body)
-	logger.debug(f'request.body: {request.body}')
+	print('print: request.body: ', request.body)
+	logger.debug(f'logger: request.body: {request.body}')
+	logging.debug(f'logging: request.body: {request.body}')
+
 	print('request.POST: ', request.POST)
 
 	logging.debug(f'shipstation webhook POST: {request.POST}')
@@ -82,6 +84,7 @@ def get_webhook_info(request):
 def shipstation_webhook_order_received(request):
 
 	# try:
+	get_webhook_info(request)
 	body = request.body
 	msg = f'body: {body}'
 	print('print: ', msg)
