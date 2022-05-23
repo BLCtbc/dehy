@@ -39,16 +39,6 @@ logger = logging.getLogger('__name__')
 logging.debug('generic views file')
 
 
-
-
-	#
-	# except Exception as e:
-	# 	error_msg = f"Error retrieving shipstation webhook: {e}"
-	# 	print(error_msg)
-	# 	logger.debug(error_msg)
-	# 	logger.error(error_msg)
-
-
 def get_validated_address(request):
 	data = {}
 	status_code = 200
