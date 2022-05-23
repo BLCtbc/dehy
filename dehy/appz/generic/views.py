@@ -34,7 +34,7 @@ ShippingAddressForm = get_class('checkout.forms', 'ShippingAddressForm')
 ShippingAddress = get_model('order', 'ShippingAddress')
 Repository = get_class('shipping.repository', 'Repository')
 Repository = Repository()
-logger = logging.getLogger('__name__')
+logger = logging.getLogger('oscar.checkout')
 
 @csrf_exempt
 @require_POST

@@ -15,8 +15,8 @@ table {
 table .badge {
 	border-radius: 1px;
 	margin-bottom: 5px;
-	margin-left: 14px;
 }
+
 table.table td {
 	padding: 0.75rem;
 }
@@ -187,5 +187,20 @@ select:focus, form:not(#basket_formset) input:focus {
 	}
 	.set-card-default.btn, .delete-card {
 		padding: 0.25rem;
+	}
+	.address-action, .account-action {
+		padding: 5px 2px;
+		line-height: 1;
+		font-size: 12px;
+	}
+	.edit-btn {
+    	padding: 5px;
+    	margin-bottom: 5px;
+	}
+	.info-container {
+		padding-right: 0;
+	}
+		td:nth-of-type(2) .col {
+	    padding: 0 5px;
 	}
 }
