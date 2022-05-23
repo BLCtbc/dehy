@@ -70,6 +70,74 @@ def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
 
 
+
+@csrf_exempt
+@require_POST
+def shipstation_webhook_order_received(request):
+
+	# try:
+
+	print('shipstation webhook body: ', request.body)
+	logger.debug(f'request.body: {request.body}')
+	print('shipstation webhook POST: ', request.POST)
+
+	logging.debug(f'shipstation webhook POST: {request.POST}')
+	logger.debug(f'shipstation webhook POST: {request.POST}')
+	resource_url = request.POST.get('resource_url')
+
+	if resource_url:
+		headers = Repository.shipstation_get_headers()
+		response = requests.get(resource_url, headers=headers)
+
+		status_code = response.status_code
+		# request was good, create the methods
+		if status_code != 200:
+			error_msg = f"{status_code} - A problem occurred while retrieving shipstation webhook"
+			print(error_msg)
+			logger.debug(error_msg)
+			logger.error(error_msg)
+
+		else:
+			response_list = json.loads(response.text)
+			logger.debug(f"received response from shipstation webhook: {response_list}")
+			print(f"\n received response from shipstation webhook: {response_list}")
+			for item in response_list:
+				msg = f"orderId: {item['orderId']}, orderNumber: {item['orderNumber']}, orderKey: {item['orderKey']}"
+				print(msg)
+				logger.debug(msg)
+
+				order_id = item['orderId'] - 10000
+				order = Order.objects.get(id=order_id)
+
+				print('found the order: ', order)
+				logger.debug(msg)
+
+				email_subject = f"DEHY: A New Order has Arrived {order.number}"
+				email_body = render_to_string('oscar/communication/emails/internal/order_received.html', {
+					'order': order,
+					'ship_by': item['shipByDate']
+				})
+
+				# this should be a queryset of users with is_staff=True and a custom BOOLEAN setting on their account
+				# that can only be set by someone with superuser status, ie. a permission like can_change_order_notifcation
+				recipients = ['kjt1987@gmail.com', 'orders@dehygarnish.net']
+
+				email = EmailMessage(subject=email_subject, body=email_body,
+							from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=recipients)
+
+				email.send()
+
+	response = HttpResponse("Testing order received webhook")
+	return response
+
+	#
+	# except Exception as e:
+	# 	error_msg = f"Error retrieving shipstation webhook: {e}"
+	# 	print(error_msg)
+	# 	logger.debug(error_msg)
+	# 	logger.error(error_msg)
+
+
 # stripe webhook handler
 @csrf_exempt
 @require_POST
