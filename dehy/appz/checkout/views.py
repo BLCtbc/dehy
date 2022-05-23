@@ -143,12 +143,14 @@ def shipstation_webhook_order_received(request):
 				email_subject = f"DEHY: A New Order has Arrived {order.number}"
 				email_body = render_to_string('oscar/communication/emails/internal/order_received.txt', {
 					'order': order,
-					'ship_by': item['shipByDate']
+					'ship_by': item['shipByDate'],
+					'site': get_current_site(request)
 				})
 
 				email_body_html = render_to_string('oscar/communication/emails/internal/order_received.html', {
 					'order': order,
-					'ship_by': item['shipByDate']
+					'ship_by': item['shipByDate'],
+					'site': get_current_site(request)
 				})
 
 				# this should be a queryset of users with is_staff=True and a custom BOOLEAN setting on their account
