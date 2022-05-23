@@ -95,7 +95,7 @@ def shipstation_webhook_order_received(request):
 	if type(body) == bytes:
 		data = body.decode()
 
-	if type(body) == str:
+	if type(data) == str:
 		data = json.loads(body)
 
 	print('shipstation webhook body: ', request.body)
