@@ -5,5 +5,5 @@
         compress
         delaycompress
         notifempty
-        create 0640 www-data adm
+        create 0644 admin www-data
 }

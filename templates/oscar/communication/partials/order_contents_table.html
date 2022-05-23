@@ -25,7 +25,7 @@
 				{% oscar_thumbnail image.original "300x" as thumb %}
 				<a class="image-link" href="{{site.name}}{{ line.product.get_absolute_url }}">
 					<div class="image-container">
-						<img src="{{site.name}}{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
+						<img style="max-height:75px;width:auto;border:1px solid #ded0b1;margin-top:5px;" src="{{site.name}}{{ thumb.url }}" alt="{{ product.get_title }}" class="img-thumbnail p-0 w-auto">
 					</div>
 				</a>
 			{% endwith %}
