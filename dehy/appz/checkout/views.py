@@ -81,6 +81,8 @@ def get_webhook_info(request):
 	logging.debug(f'shipstation webhook POST: {request.POST}')
 	logger.debug(f'shipstation webhook POST: {request.POST}')
 
+from django.template.loader import render_to_string
+
 @csrf_exempt
 def shipstation_webhook_order_received(request):
 
