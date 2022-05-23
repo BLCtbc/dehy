@@ -11,7 +11,7 @@
 			<div class="variant-option col-12 col-lg-6 order-lg-2 order-first">
 				<div class="variant-select-container" data-text="Size">
 					<label for="size_selector_{{product.id}}" class="sr-only">{% trans "Size" %}</label>
-					<select required id="size_selector" class="custom-select variant-size-selector" aria-label="Select Size" data-variant-option-name="Size">
+					<select required id="size_selector" class="variant-size-selector" aria-label="Select Size" data-variant-option-name="Size">
 						<option value>Size</option>
 						{% for child in product.children.public %}
 						  {% purchase_info_for_product request child as child_session %}

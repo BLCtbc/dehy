@@ -34,7 +34,7 @@ ShippingAddressForm = get_class('checkout.forms', 'ShippingAddressForm')
 ShippingAddress = get_model('order', 'ShippingAddress')
 Repository = get_class('shipping.repository', 'Repository')
 Repository = Repository()
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('__name__')
 
 @csrf_exempt
 @require_POST
@@ -55,7 +55,7 @@ def shipstation_webhook_order_received(request):
 			print(error_msg)
 			logger.debug(error_msg)
 			logger.error(error_msg)
-			
+
 		else:
 			response_list = json.loads(response.text)
 			logger.debug(f"received response from shipstation webhook: {response_list}")

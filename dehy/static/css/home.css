@@ -83,6 +83,9 @@
 	line-height: 2rem;
 }
 
+.shop-link:hover {
+	opacity: 1;
+}
 
 .btn:hover {
 	background-color: var(--beige);
