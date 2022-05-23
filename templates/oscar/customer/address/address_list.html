@@ -6,19 +6,20 @@
 		<h2 class="h2">{% trans "Addresses" %}</h2>
 	</div>
     {% if addresses %}
-        <table cellpadding="0" cellspacing="0" class="table table-bordered table-hover" id="address_list">
+        <table cellpadding="0" cellspacing="0" class="table table-bordered table-hover" id="address_list" style="max-width:700px">
             <tbody>
-				<tr class="table-header"><td colspan="2"></td></tr>
+				<tr class="table-header"><td></td></tr>
                 {% for address in addresses %}
                     <tr>
                         <td>
-							<a class="btn btn-secondary float-right" href="{% url 'customer:address-detail' pk=address.id %}">{% trans 'Edit' %}</a>
+							<a class="btn btn-secondary float-right address-action edit-btn" href="{% url 'customer:address-detail' pk=address.id %}">{% trans 'Edit' %}</a>
 
 							{% if address.is_default_for_shipping %}
 								<span class="badge badge-success">{% trans 'Default shipping address' %}</span>
 							{% endif %}
 							{% if address.is_default_for_billing %}
 								<span class="badge badge-info">{% trans 'Default billing address' %}</span>
+
 							{% endif %}
 
                             <address>
@@ -29,14 +30,28 @@
                                 {% endfor %}
 
                             </address>
+							{% if not address.is_default_for_shipping %}
+							<a class="btn btn-primary address-action mb-2" href="{% url 'customer:address-change-status' pk=address.id action='default_for_shipping' %}">
+								{% trans 'Set as default shipping address' %}
+							</a>
+							{% endif %}
+							{% if not address.is_default_for_billing %}
+							<a class="btn btn-primary address-action mb-2" href="{% url 'customer:address-change-status' pk=address.id action='default_for_billing' %}">
+								{% trans 'Set as default billing address' %}
+							</a>
+							{% endif %}
+							{# style="position:absolute;bottom:10px;right:10px;" #}
+							<a class="btn btn-danger bg-danger float-right address-action" href="{% url 'customer:address-delete' pk=address.id %}">
+								{% trans 'Delete' %}
+							</a>
                         </td>
-                        <td>
+                        <!-- <td>
 							<div class="container-fluid" style="height:150px">
 								<div class="row flex-column h-100 justify-content-around">
 
 									<div class="col">
 									{% if address.country.is_shipping_country and not address.is_default_for_shipping %}
-										<a class="btn btn-primary w-100" href="{% url 'customer:address-change-status' pk=address.id action='default_for_shipping' %}">
+										<a class="btn btn-primary w-100 address-action" href="{% url 'customer:address-change-status' pk=address.id action='default_for_shipping' %}">
 											{% trans 'Set as default shipping address' %}
 										</a>
 									{% endif %}
@@ -44,21 +59,21 @@
 
 									<div class="col">
 									{% if not address.is_default_for_billing %}
-										<a class="btn btn-primary w-100" href="{% url 'customer:address-change-status' pk=address.id action='default_for_billing' %}">
+										<a class="btn btn-primary w-100 address-action" href="{% url 'customer:address-change-status' pk=address.id action='default_for_billing' %}">
 											{% trans 'Set as default billing address' %}
 										</a>
 									{% endif %}
 									</div>
 
 									<div class="col">
-										<a class="btn btn-danger bg-danger float-right" href="{% url 'customer:address-delete' pk=address.id %}">
+										<a class="btn btn-danger bg-danger float-right address-action" href="{% url 'customer:address-delete' pk=address.id %}">
 											{% trans 'Delete' %}
 										</a>
 									</div>
 								</div>
 							</div>
 
-                        </td>
+                        </td> -->
                     </tr>
                 {% endfor %}
             </tbody>

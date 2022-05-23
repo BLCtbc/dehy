@@ -17,7 +17,7 @@ CoreBillingAddressForm = get_class('payment.forms', 'BillingAddressForm')
 BillingAddress = get_model('order', 'BillingAddress')
 
 class PurchaseConfirmationForm(forms.Form):
-	create_new_account = forms.BooleanField(label=_("Create an account for faster checkout"), required=True, initial=False)
+	create_new_account = forms.BooleanField(label=_("Create an account for faster checkout"), required=False, initial=False)
 	remember_payment_info = forms.BooleanField(label=_("Remember my payment information"), required=False, initial=False)
 
 	def __init__(self, *args, **kwargs):

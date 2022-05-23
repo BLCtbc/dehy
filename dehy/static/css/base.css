@@ -18,6 +18,10 @@
 	--secondary-bg-color: var(--beige);
 }
 
+.clear {
+	clear: both;
+}
+
 p {
 	font-size: 1rem;
 }
@@ -1095,6 +1099,7 @@ td {
 
 th, td {
 	border-color: var(--gold-half-opacity);
+	position: relative;
 }
 
 thead {
