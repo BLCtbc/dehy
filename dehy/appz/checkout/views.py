@@ -4,7 +4,7 @@ from oscar.core.loading import get_class, get_classes, get_model
 from oscar.apps.checkout import exceptions
 from oscar.core import prices
 
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
