@@ -131,7 +131,7 @@ def shipstation_webhook_order_received(request):
 				print(msg)
 				logger.debug(msg)
 
-				order_id = item['orderNumber'] - 10000
+				order_id = int(item['orderNumber']) - 10000
 				order = Order.objects.get(id=order_id)
 
 				print('found the order: ', order)
