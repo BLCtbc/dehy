@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.core.mail import send_mail
@@ -34,15 +34,19 @@ ShippingAddressForm = get_class('checkout.forms', 'ShippingAddressForm')
 ShippingAddress = get_model('order', 'ShippingAddress')
 Repository = get_class('shipping.repository', 'Repository')
 Repository = Repository()
-logger = logging.getLogger('oscar.checkout')
+logging.basicConfig(format='%(asctime)s %(message)s')
+logger = logging.getLogger('__name__')
+logging.debug('generic views file')
 
 @csrf_exempt
 @require_POST
 def shipstation_webhook_order_received(request):
 
 	# try:
+
 	resource_url = request.POST.get('resource_url')
 	print('shipstation webhook POST: ', request.POST)
+	logging.debug(f'shipstation webhook POST: {request.POST}')
 	logger.debug(f'shipstation webhook POST: {request.POST}')
 	if resource_url:
 		headers = Repository.shipstation_get_headers()
@@ -86,6 +90,8 @@ def shipstation_webhook_order_received(request):
 
 				email.send()
 
+	response = HttpResponse("Testing order received webhook")
+	return response
 
 
 
