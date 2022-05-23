@@ -141,7 +141,12 @@ def shipstation_webhook_order_received(request):
 				logger.debug(msg)
 
 				email_subject = f"DEHY: A New Order has Arrived {order.number}"
-				email_body = render_to_string('oscar/communication/emails/internal/order_received.html', {
+				email_body = render_to_string('oscar/communication/emails/internal/order_received.txt', {
+					'order': order,
+					'ship_by': item['shipByDate']
+				})
+
+				email_body_html = render_to_string('oscar/communication/emails/internal/order_received.html', {
 					'order': order,
 					'ship_by': item['shipByDate']
 				})
@@ -149,11 +154,12 @@ def shipstation_webhook_order_received(request):
 				# this should be a queryset of users with is_staff=True and a custom BOOLEAN setting on their account
 				# that can only be set by someone with superuser status, ie. a permission like can_change_order_notifcation
 				recipients = ['kjt1987@gmail.com', 'orders@dehygarnish.net']
-
-				email = EmailMessage(subject=email_subject, body=email_body,
-							from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=recipients)
-
-				email.send()
+				#
+				# email = EmailMessage(subject=email_subject, body=email_body,
+				# 			from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=recipients)
+				# email.send()
+				sent = send_mail(email_subject, email_body, settings.AUTO_REPLY_EMAIL_ADDRESS, recipients, fail_silently=False, html_message=email_body_html)
+				print('emails sent: ', sent)
 
 	response = HttpResponse("Testing order received webhook")
 	return response
