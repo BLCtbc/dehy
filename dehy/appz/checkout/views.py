@@ -70,9 +70,10 @@ def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
 
 def get_webhook_info(request):
-	print('shipstation webhook body: ', request.body)
+	print('*** get_webhook_info')
+	print('request.body: ', request.body)
 	logger.debug(f'request.body: {request.body}')
-	print('shipstation webhook POST: ', request.POST)
+	print('request.POST: ', request.POST)
 
 	logging.debug(f'shipstation webhook POST: {request.POST}')
 	logger.debug(f'shipstation webhook POST: {request.POST}')
@@ -81,6 +82,8 @@ def get_webhook_info(request):
 def shipstation_webhook_order_received(request):
 
 	# try:
+	body = request.body
+	data = json.loads(qq.decode())
 
 	print('shipstation webhook body: ', request.body)
 	logger.debug(f'request.body: {request.body}')
@@ -89,12 +92,15 @@ def shipstation_webhook_order_received(request):
 
 	logging.debug(f'shipstation webhook POST: {request.POST}')
 	logger.debug(f'shipstation webhook POST: {request.POST}')
-	resource_url = request.POST.get('resource_url')
+	resource_url = data.get('resource_url', None)
 
 	if resource_url:
 		headers = Repository.shipstation_get_headers()
 		response = requests.get(resource_url, headers=headers)
-
+		msg = f'response: {response}'
+		print('print: ', msg)
+		logging.debug('logging: '+msg)
+		logger.debug('logger: '+msg)
 		status_code = response.status_code
 		# request was good, create the methods
 		if status_code != 200:
