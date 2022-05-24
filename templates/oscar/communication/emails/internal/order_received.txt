@@ -9,7 +9,6 @@
 			</h2>
 		</td>
 	</tr>
-
 {% endblock header_content %}
 
 {% block order_text_content %}
@@ -17,13 +16,14 @@
 	<td>
 		<p>
 			{% trans "After shipping the package, mark the order as fulfilled in the Orders panel." %}
+			<span>Shipstation id: {{order.id}}</span>
 		</p>
 	</td>
 </tr>
 <tr>
     <td>
 		<p>
-			{% blocktrans with order_number=order.number date_placed=order.date_placed %}Order #{{order_number}}. Placed on {{date_placed}}{% endblocktrans %}
+			<span>Order #<a href="{{site.name}}/dashboard/orders/{{order.number}}/"></a> Placed on {{order.date_placed}}</span>
 		</p>
     </td>
 </tr>

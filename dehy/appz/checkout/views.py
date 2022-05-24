@@ -8,8 +8,7 @@ from django.core.mail import EmailMessage, send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.sites.shortcuts import get_current_site
-from django.http import QueryDict, JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import QueryDict, JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.forms.models import model_to_dict
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import redirect, render, get_object_or_404
@@ -82,97 +81,6 @@ def get_webhook_info(request):
 
 	logging.debug(f'shipstation webhook POST: {request.POST}')
 	logger.debug(f'shipstation webhook POST: {request.POST}')
-
-from django.template.loader import render_to_string
-
-@csrf_exempt
-def shipstation_webhook_order_received(request):
-
-	# try:
-	get_webhook_info(request)
-	body = request.body
-	data = ''
-	msg = f'body: {body}'
-	print('print: ', msg)
-	logger.debug('logger: '+msg)
-	logging.debug('logging: '+msg)
-	if type(body) == bytes:
-		data = body.decode()
-
-	if type(data) == str:
-		data = json.loads(body)
-
-	print('shipstation webhook body: ', request.body)
-	logger.debug(f'request.body: {request.body}')
-	print('shipstation webhook POST: ', request.POST)
-	get_webhook_info(request)
-
-	logging.debug(f'shipstation webhook POST: {request.POST}')
-	logger.debug(f'shipstation webhook POST: {request.POST}')
-	resource_url = data.get('resource_url', None)
-
-	if resource_url:
-		headers = Repository.shipstation_get_headers()
-		response = requests.get(resource_url, headers=headers)
-		msg = f'response: {response}'
-		print('print: ', msg)
-		logging.debug('logging: '+msg)
-		logger.debug('logger: '+msg)
-		status_code = response.status_code
-		# request was good, create the methods
-		if status_code != 200:
-			error_msg = f"{status_code} - A problem occurred while retrieving shipstation webhook"
-			print(error_msg)
-			logger.debug(error_msg)
-			logger.error(error_msg)
-
-		else:
-			response_list = json.loads(response.text)
-			logger.debug(f"received response from shipstation webhook: {response_list}")
-			print(f"\n received response from shipstation webhook: {response_list}")
-			for item in response_list['orders']:
-				msg = f"orderId: {item['orderId']}, orderNumber: {item['orderNumber']}, orderKey: {item['orderKey']}"
-				print(msg)
-				logger.debug(msg)
-
-				order_id = int(item['orderNumber']) - 10000
-				order = Order.objects.get(id=order_id)
-
-				print('found the order: ', order)
-				logger.debug(msg)
-
-				email_subject = f"DEHY: A New Order has Arrived {order.number}"
-				email_body = render_to_string('oscar/communication/emails/internal/order_received.txt', {
-					'order': order,
-					'ship_by': item['shipByDate'],
-					'site': get_current_site(request)
-				})
-
-				email_body_html = render_to_string('oscar/communication/emails/internal/order_received.html', {
-					'order': order,
-					'ship_by': item['shipByDate'],
-					'site': get_current_site(request)
-				})
-
-				# this should be a queryset of users with is_staff=True and a custom BOOLEAN setting on their account
-				# that can only be set by someone with superuser status, ie. a permission like can_change_order_notifcation
-				recipients = ['kjt1987@gmail.com', 'orders@dehygarnish.net']
-				#
-				# email = EmailMessage(subject=email_subject, body=email_body,
-				# 			from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=recipients)
-				# email.send()
-				sent = send_mail(email_subject, email_body, settings.AUTO_REPLY_EMAIL_ADDRESS, recipients, fail_silently=False, html_message=email_body_html)
-				print('emails sent: ', sent)
-
-	response = HttpResponse("Testing order received webhook")
-	return response
-
-	#
-	# except Exception as e:
-	# 	error_msg = f"Error retrieving shipstation webhook: {e}"
-	# 	print(error_msg)
-	# 	logger.debug(error_msg)
-	# 	logger.error(error_msg)
 
 
 # stripe webhook handler
