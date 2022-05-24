@@ -15,5 +15,5 @@ class EventHandler(BaseEventHandler):
 		print('event_type: ', event_type)
 		# Example implementation
 		self.validate_shipping_event(order, event_type, lines, line_quantities, **kwargs)
-
+		self.create_communication_event(order, event_type)
 		return self.create_shipping_event(order, event_type, lines, line_quantities, **kwargs)
