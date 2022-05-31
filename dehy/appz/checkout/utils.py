@@ -4,6 +4,9 @@ from oscar.core.loading import get_class, get_model
 
 BaseFedex = get_class('shipping.methods', 'BaseFedex')
 Country = get_model('address', 'Country')
+ConditionalOffer = get_model('offer', 'ConditionalOffer')
+OfferDiscount = get_class('shipping.methods', 'OfferDiscount')
+TaxExclusiveOfferDiscount = get_class('shipping.methods', 'TaxExclusiveOfferDiscount')
 
 class CheckoutSessionData(utils.CheckoutSessionData):
 	def _set(self, namespace, key, value):
@@ -112,21 +115,33 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 		return self.get_stripe_client_secret() is not None
 
 	def get_stored_shipping_methods(self):
+		free_ground_shipping = ConditionalOffer.objects.get(slug='free-ground-shipping')
+
 		self._check_namespace('shipping_methods')
 		shipping_methods = []
 
 		for method_code, val in self.request.session[self.SESSION_KEY]['shipping_methods'].items():
 			method = BaseFedex(code=method_code, name=val['name'], charge_excl_tax=val['cost'], charge_incl_tax=val['cost'])
+			if val.get('discount'):
+				method.charge_excl_tax = val.get('discount')
+				method.charge_incl_tax = val.get('discount')
+
+				method = TaxExclusiveOfferDiscount(method, free_ground_shipping)
+
 			shipping_methods.append(method)
 
 		return shipping_methods
 
 	def store_shipping_methods(self, basket, methods):
+		print('storing shipping methods: ', methods)
 		self._flush_namespace('shipping_methods')
 		for method in methods:
-			self.request.session[self.SESSION_KEY]['shipping_methods'][method.code] = {
-				'name': method.name, 'cost': str(method.calculate(basket).excl_tax)
-			}
+			method_data = {'name': method.name, 'cost':str(method.calculate(basket).excl_tax)}
+			if hasattr(method, 'discount') and method.discount(basket) > 0:
+				method_data['discount'] = str(method.discount(basket))
+				method_data['cost'] = str(method.discount(basket))
+
+			self.request.session[self.SESSION_KEY]['shipping_methods'][method.code] = method_data
 
 
 	def new_shipping_address_fields(self):

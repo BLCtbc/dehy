@@ -22,7 +22,9 @@ var dehy = {
 
 		$( document ).ajaxStop(function(xhr, settings) {
 			if (!dehy.keep_frozen) {
-				if (window.performance.now() - dehy.loadStart < 500) {
+
+				var request_time = window.performance.now() - dehy.loadStart;
+				if (request_time < 500) { // the request took less than half a second
 					dehy.unfreeze_timeout_id = setTimeout(function() {
 						dehy.utils.unfreeze_forms();
 					}, (dehy.loadStart + 500) - window.performance.now());
@@ -39,8 +41,8 @@ var dehy = {
 				}
 			},
 			complete: function(xhr, status) {
-				console.log('ajax complete, xhr: ', xhr);
-				console.log('ajax complete, status: ', status);
+				console.info('ajax complete, xhr: ', xhr);
+				console.info('ajax complete, status: ', status);
 			},
 		});
 	},

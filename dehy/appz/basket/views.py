@@ -59,15 +59,16 @@ class BasketAddView(FormView):
 		data = {'object_list': {}}
 
 		self.product = shortcuts.get_object_or_404(self.product_model, pk=kwargs['pk'])
-
+		response = super().post(request, *args, **kwargs)
+		line = self.request.basket.all_lines().filter(product__id=self.product.id).first()
 
 		data['object_list'][self.product.id] = {
-			'quantity': quantity,
+			'quantity': line.quantity,
 			'url': self.product.get_absolute_url(),
-			'price': self.product.stockrecords.first().price * D(quantity),
+			'price': self.product.stockrecords.first().price * D(line.quantity),
 			'id': self.product.id,
+			'line_id': line.id
 		}
-
 
 		img = self.product.primary_image()
 
@@ -75,8 +76,6 @@ class BasketAddView(FormView):
 			img = img.original
 			thumbnail = get_thumbnail(img, '200', crop='center', quality=99)
 			data['object_list'][self.product.id].update({'img_url':thumbnail.url})
-
-		response = super().post(request, *args, **kwargs)
 
 		data['basket_num_items'] = request.basket.num_items
 		title =  self.product.title
@@ -111,16 +110,15 @@ class BasketAddView(FormView):
 	def form_valid(self, form):
 
 		offers_before = self.request.basket.applied_offers()
-
 		self.request.basket.add_product(
 			form.product, form.cleaned_data['quantity'],
 			form.cleaned_options())
 
-		messages.success(self.request, self.get_success_message(form),
-						 extra_tags='safe noicon')
+		# messages.success(self.request, self.get_success_message(form),
+		# 				 extra_tags='safe noicon')
 
 		# Check for additional offer messages
-		BasketMessageGenerator().apply_messages(self.request, offers_before)
+		# BasketMessageGenerator().apply_messages(self.request, offers_before)
 
 		# Send signal for basket addition
 		self.add_signal.send(
@@ -159,6 +157,14 @@ class BasketView(CoreBasketView):
 	def get_shipping_address(self, basket):
 
 		addr_data = self.checkout_session.new_shipping_address_fields()
+		if addr_data and addr_data.get('country', None) and addr_data['country'] and not isinstance(addr_data['country'], Country):
+			if len(addr_data['country']) > 2:
+				ctry = Country.objects.get(printable_name=addr_data['country'])
+				addr_data['country'] = ctry
+			else:
+				ctry = Country.objects.get(iso_3166_1_a2=addr_data['country'])
+				addr_data['country'] = ctry
+
 		if addr_data:
 			# Load address data into a blank shipping address model
 			return ShippingAddress(**addr_data)
@@ -177,20 +183,9 @@ class BasketView(CoreBasketView):
 
 	def get_shipping_methods(self, basket):
 		pass
-		# if 'checkout' in self.request.resolver_match.app_names:
-		# 	return Repository().get_shipping_methods(
-		# 		basket=self.request.basket, user=self.request.user,
-		# 		request=self.request)
 
 	def get_default_shipping_method(self, basket):
-		# if 'checkout' in self.request.resolver_match.app_names:
-		# 	return Repository().get_default_shipping_method(
-		# 		basket=self.request.basket, user=self.request.user,
-		# 		request=self.request, shipping_addr=self.get_default_shipping_address())
-		#
-		# else:
-
-		return Repository().get_free_shipping()
+		return Repository().get_default_shipping_method()
 
 
 	def dispatch(self, request, *args, **kwargs):
@@ -211,6 +206,8 @@ class BasketView(CoreBasketView):
 
 	def post(self, request, *args, **kwargs):
 		data = {'object_list': {}}
+		from django.contrib.sites.shortcuts import get_current_site
+		print(get_current_site(request))
 		response = super().post(request, *args, **kwargs)
 
 		for line in self.object_list:
@@ -224,11 +221,15 @@ class BasketView(CoreBasketView):
 		data['total_tax'] = D(0.00).quantize(TWO_PLACES)
 		data['order_total'] = data['subtotal']
 
-		if 'checkout' in self.request.resolver_match.app_names and self.checkout_session.is_shipping_address_set() and self.checkout_session.is_shipping_method_set(request.basket):
-			shipping_addr = request.POST.get('shipping_addr', None)
+		app_name = request.POST.get('app_name', 'basket')
+		if 'Referer' in self.request.headers.keys() and 'checkout' in self.request.headers['Referer']:
+			app_name = 'checkout'
 
-			shipping_addr = json.loads(shipping_addr) if shipping_addr else self.get_shipping_address(request.basket)
+		should_update_shipping = request.POST.get('update_shipping', None)
 
+		if app_name=='checkout' and should_update_shipping and self.checkout_session.is_shipping_address_set() and self.checkout_session.is_shipping_method_set(request.basket):
+
+			shipping_addr = self.get_shipping_address(request.basket)
 			fields = ['first_name', 'last_name', 'line1', 'line2', 'line4', 'postcode', 'state', 'country', 'phone_number']
 			shipping_fields = dict(zip(fields, shipping_addr.get_field_values(fields)))
 
@@ -250,11 +251,33 @@ class BasketView(CoreBasketView):
 					request.basket._total_tax = data['total_tax']
 					request.basket.save()
 					data['order_total'] += (D(data['shipping_charge']).quantize(TWO_PLACES) + data['total_tax'])
+
+					if request.basket.has_shipping_discounts or request.basket.offer_discounts or request.basket.voucher_discounts:
+
+						if request.basket.has_shipping_discounts:
+							print('request.basket.shipping_discounts: ', request.basket.shipping_discounts)
+							offer = request.basket.shipping_discounts[0]['offer']
+							print('offer.benefit: ', offer.benefit)
+							print(dir(offer.benefit))
+							print(offer.benefit.__class__)
+							print('offer.benefit.shipping_discount: ', offer.benefit.shipping_discount(15))
+
+							print('dir(result): ', dir(request.basket.shipping_discounts[0]['result']))
+							print('\nresult.discount: ', request.basket.shipping_discounts[0]['result'].discount)
+
+							print('\n', dir(offer))
+
+						data['discounts'] = {'total': request.basket.total_discount}
+						if shipping_method['discount'] > 0:
+
+							data['discounts']['shipping'] = str(shipping_method['discount'])
+							data['discounts']['total'] += shipping_method['discount']
 					# data['order_total'] = str(data['order_total'])
 
 		# remove empty dict
 		if 'shipping_methods' in data.keys() and not data['shipping_methods']:
 			data.pop('shipping_methods')
+
 
 		response = JsonResponse(data)
 		return response

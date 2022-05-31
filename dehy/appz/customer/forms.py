@@ -5,12 +5,27 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 
 from oscar.core.loading import get_class, get_model
+from oscar.core.compat import existing_user_fields, get_user_model
 
 from oscar.apps.customer.forms import EmailAuthenticationForm as BaseEmailAuthenticationForm
 from oscar.apps.customer.forms import EmailUserCreationForm as BaseEmailUserCreationForm
 from dehy.appz.checkout.forms import ShippingAddressForm
 
 Country = get_model('address', 'Country')
+BaseProfileForm = get_class('customer.forms','ProfileForm')
+User = get_user_model()
+
+class ProfileForm(BaseProfileForm):
+
+	def __init__(self, user, *args, **kwargs):
+		super().__init__(user, *args, **kwargs)
+
+		if not user.is_staff or not user.has_perm('generic.can_receive_new_order_notifications'):
+			del self.fields['receive_new_order_notifications']
+
+	class Meta:
+		model = User
+		fields = existing_user_fields(['first_name', 'last_name', 'email', 'receive_new_order_notifications', 'subscribed_to_mailing_list'])
 
 class EmailAuthenticationForm(BaseEmailAuthenticationForm):
 	username = forms.EmailField(label=_('Email'))

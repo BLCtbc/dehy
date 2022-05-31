@@ -11,8 +11,9 @@ Recipe = get_model('recipes', 'Recipe')
 
 RecipeCreateUpdateForm = get_class('dashboard.recipes.forms', 'RecipeCreateUpdateForm')
 RecipeSearchForm = get_class('dashboard.recipes.forms', 'RecipeSearchForm')
+RecipesTable = get_class('dashboard.recipes.tables', 'RecipesTable')
 
-class RecipeListView(generic.ListView):
+class RecipeListView(SingleTableView):
 	"""
 	Dashboard view of the recipe list.
 	Supports the permission-based dashboard.
@@ -20,8 +21,9 @@ class RecipeListView(generic.ListView):
 
 	model = Recipe
 	template_name = 'dehy/dashboard/recipes/recipe_list.html'
-	context_object_name = "recipe_list"
+	# context_object_name = "recipe_list"
 	context_table_name = 'recipes'
+	table_class = RecipesTable
 	paginate_by = 20
 	filterform_class = RecipeSearchForm
 	form_class = RecipeSearchForm

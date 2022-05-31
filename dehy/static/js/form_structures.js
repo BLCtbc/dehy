@@ -2278,7 +2278,19 @@ const FormStructures = {
 								"attrs": {
 									"for": "id_purchase_business_type"
 								},
-								"text": "Business or Home:"
+								"text": "Select*"
+							},
+							{
+								"tag": "div",
+								"elems": [
+									{
+										"tag": "span",
+										"attrs": {
+											"class": "helptext"
+										},
+										"text": "Is this for home or commercial use?"
+									},
+								]
 							},
 							{
 								"tag": "select",
@@ -2312,13 +2324,6 @@ const FormStructures = {
 									}
 								]
 							},
-							{
-								"tag": "span",
-								"attrs": {
-									"class": "helptext"
-								},
-								"text": "Is this for home or commercial use?"
-							}
 						]
 					}
 				]
@@ -2337,7 +2342,7 @@ const FormStructures = {
 								"attrs": {
 									"for": "id_business_name"
 								},
-								"text": "Business name:"
+								"text": "What is the name of your Bar/Restaurant/Business?"
 							},
 							{
 								"tag": "input",
@@ -2351,13 +2356,6 @@ const FormStructures = {
 									"placeholder": "Business name",
 									"autofill": "text"
 								}
-							},
-							{
-								"tag": "span",
-								"attrs": {
-									"class": "helptext"
-								},
-								"text": "What is the name of your Bar/Restaurant/Business?"
 							}
 						]
 					}
@@ -2731,14 +2729,14 @@ const FormStructures = {
 					"elems": [
 						{
 							"tag": "button",
-							"text": "Continue",
+							"text": "Pay now",
 							"classes": "col-10",
 							"attrs": {
 								"type": "submit",
 								"hidden": "",
 								"disabled": "",
 								"ariaDisabled": true,
-								"aria-label": "Continue"
+								"aria-label": "Place Order"
 							}
 						}
 					]

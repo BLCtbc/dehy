@@ -13,6 +13,7 @@ class Basket(AbstractBasket):
 	stripe_order_status = models.CharField(max_length=50, help_text='Stripe Order Status', blank=True, null=True)
 	payment_intent_client_secret = models.CharField(max_length=255, help_text='Payment Intent Client Secret (Stripe)', blank=True, null=True)
 	stripe_order_client_secret = models.CharField(max_length=255, help_text='Order Client Secret (Stripe)', blank=True, null=True)
+	shipping_method_code =  models.CharField(max_length=50, help_text='The selected shipping method code', blank=True, null=True)
 	# _total_tax = models.DecimalField(_('Price excl. Tax'), decimal_places=2, max_digits=12, null=True)
 
 	@property
@@ -43,6 +44,9 @@ class Line(AbstractLine):
 			return
 
 		return
+
+	class Meta:
+		ordering = ['date_updated']
 
 		############################
 		### This part of the function is generating "price increased" warnings after tax is calculated,

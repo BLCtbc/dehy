@@ -19,7 +19,7 @@ class Base(methods.Base):
 
 class FreeShipping(methods.FixedPrice, Base):
 	code = 'free_shipping'
-	name = _('Free Shipping')
+	name = 'Free Shipping'
 
 	def calculate(self, basket):
 		return prices.Price(
@@ -28,11 +28,17 @@ class FreeShipping(methods.FixedPrice, Base):
 
 class FedexGround(methods.FixedPrice, Base):
 
-	code = 'standard_ground'
-	name = _('FedEx Ground®')
+	code = 'FEDEX_GROUND'
+	name = 'FedEx Ground®'
 
 	def calculate(self, basket):
-		pp = 5 if basket.total_weight < 10 else 15
+		pp = 5
+		if 7.5 > basket.total_weight > 5:
+			pp = 12
+
+		elif basket.total_weight > 7.5:
+			pp = 15
+
 		return prices.Price(
 			currency=basket.currency,
 			excl_tax=self.round_two_places(pp), incl_tax=self.round_two_places(pp)

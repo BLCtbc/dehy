@@ -716,6 +716,7 @@ span.ig{
 	border-radius: 1px;
 	font-size: 1.3rem;
 	font-weight: 400;
+	min-height: 50px;
 }
 
 
@@ -1289,4 +1290,12 @@ p.error {
     animation-name: fade-out;
     animation-duration: 5s;
     animation-direction: normal;
+}
+
+.helptext {
+	font-size: smaller;
+	font-size: 12px;
+	line-height: 20px;
+	letter-spacing: 0.01em;
+	/* margin-left: 0.5rem !important; */
 }

@@ -10,9 +10,6 @@ class EventHandler(BaseEventHandler):
 		You will generally want to override this method to implement the
 		specifics of you order processing pipeline.
 		"""
-		print('\n handling shipping event \n')
-		print('order: ', order.number)
-		print('event_type: ', event_type)
 		# Example implementation
 		self.validate_shipping_event(order, event_type, lines, line_quantities, **kwargs)
 		self.create_communication_event(order, event_type)

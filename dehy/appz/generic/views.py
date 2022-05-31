@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string
-
+from oscar.core.compat import get_user_model
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.urls import reverse_lazy
@@ -19,6 +19,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from pathlib import Path
 
 from oscar.core.loading import get_class, get_model
+from oscar.core.compat import get_user_model
 
 from dehy.appz.checkout import facade
 from dehy.appz.generic import forms
@@ -30,6 +31,7 @@ FAQ = get_model('generic', 'FAQ')
 Product = get_model('catalogue', 'Product')
 Recipe = get_model('recipes', 'Recipe')
 Order = get_model('order', 'Order')
+User = get_user_model()
 
 ShippingAddressForm = get_class('checkout.forms', 'ShippingAddressForm')
 ShippingAddress = get_model('order', 'ShippingAddress')
@@ -74,7 +76,6 @@ def shipstation_webhook_order_received(request):
 	# try:
 	body,data = request.body,''
 	msg = f'body: {body}'
-	print('print: ', msg)
 	logger.debug('logger: '+msg)
 	logging.debug('logging: '+msg)
 	if type(body) == bytes:
@@ -121,34 +122,28 @@ def shipstation_webhook_order_received(request):
 				order = Order.objects.filter(id=order_id)
 				if order:
 					order = order.first()
-					order.status = 'Processed'
-					order.save()
+					order.set_status('Processed')
 
-					print('found the order: ', order)
 					logger.debug(msg)
-
+					current_site = get_current_site(request)
 					email_subject = f"DEHY: A New Order has Arrived ({order.number})"
 					email_body = render_to_string('oscar/communication/emails/internal/order_received.txt', {
 						'order': order,
 						'ship_by': item['shipByDate'],
-						'site': get_current_site(request)
+						'site': current_site
 					})
 
 					email_body_html = render_to_string('oscar/communication/emails/internal/order_received.html', {
 						'order': order,
 						'ship_by': item['shipByDate'],
-						'site': get_current_site(request)
+						'site': current_site
 					})
 
-					# this should be a queryset of users with is_staff=True and a custom BOOLEAN setting on their account
-					# that can only be set by someone with superuser status, ie. a permission like can_change_order_notifcation
-					recipients = ['kjt1987@gmail.com', 'orders@dehygarnish.net']
-					#
-					# email = EmailMessage(subject=email_subject, body=email_body,
-					# 			from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=recipients)
-					# email.send()
+
+					recipients = list(user.email for user in User.objects.filter(receive_new_order_notifications=True))
+					recipients += [f'orders@${current_site}']
+
 					sent = send_mail(email_subject, email_body, settings.AUTO_REPLY_EMAIL_ADDRESS, recipients, fail_silently=False, html_message=email_body_html)
-					print('emails sent: ', sent)
 
 	response = HttpResponse("Testing order received webhook")
 	return response

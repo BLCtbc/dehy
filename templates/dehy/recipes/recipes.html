@@ -13,7 +13,11 @@
 
 
 {% block header %}
-{{block.super}}
+<header class="row header">
+	{% block navigation %}
+	<nav id="nav_primary"></nav>
+	{% endblock %}
+</header>
 {% endblock header %}
 
 {% block content_wrapper %}

@@ -35,24 +35,10 @@
 	right: 25px;
 }
 
-/* .dropdown-container::after{
-	position: absolute;
-	right: 0;
-	line-height: 1;
-	background-color: blue;
-	color: red;
-	z-index: 1350;
-	height: 20px;
-	font-family: "Font Awesome 5 Free";
-	width: 20px;
-	font-size: 22px;
-	-webkit-font-smoothing: antialiased;
-	display: inline-block;
-	font-style: normal;
-	font-variant: normal;
-	text-rendering: auto;
-	line-height: 1;
-} */
+.shipping-method-option {
+    align-self: center;
+    margin-bottom: 0.5rem;
+}
 
 #logout {
 	text-decoration: underline;
@@ -115,6 +101,10 @@ h2 {
 	font-weight: 400;
     font-size: 24px;
     margin-bottom: 20px;
+}
+
+h3 {
+	font-size: 24px;
 }
 
 input,select {
@@ -226,14 +216,6 @@ button.edit span {
 	color: white;
 	font-weight: 500;
 	font-size: 1rem;
-}
-
-.helptext {
-	font-size: smaller;
-	font-size: 12px;
-	line-height: 20px;
-	letter-spacing: 0.01em;
-	/* margin-left: 0.5rem !important; */
 }
 
 .basket-items {

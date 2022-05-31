@@ -48,6 +48,7 @@
 
             {% csrf_token %}
             {{ formset.management_form }}
+			<input type="hidden" name="app_name" id="app_name" value="{{request.resolver_match.app_names|first}}">
 
             {% for form in formset %}
                 {% with line=form.instance product=form.instance.product %}
@@ -155,7 +156,7 @@
         <div id="basket_totals" class="col-12 {% if 'basket' in request.resolver_match.app_names %}col-lg-10{% endif %}">
 
 				{% block subtotal %}
-				<div class="row">
+				<div class="row" id="subtotal_container">
 					<div class="col">
 						<span>{% trans "Subtotal" %}</span>
 					</div>
@@ -169,7 +170,7 @@
 
 				{% if request.resolver_match.url_name == 'checkout' %}
 					{% block sales_tax %}
-					<div class="row">
+					<div class="row" id="sales_tax_container">
 						<div class="col">
 							<span>{% trans "Sales Tax" %}</span>
 						</div>
@@ -187,7 +188,7 @@
 					{% endblock sales_tax %}
 
 					{% block shipping_charges %}
-					<div class="row">
+					<div class="row" id="shipping_charge_container">
 						<div class="col">
 							<span>{% trans "Shipping" %}</span><span id="shipping_postcode"></span>
 						</div>
@@ -198,16 +199,17 @@
 					{% endblock shipping_charges %}
 
 					{% block discounts %}
+					<div class="row" id="discounts_container">
 					{% if basket.offer_discounts or basket.grouped_voucher_discounts %}
-						<div class="row">
 							<div class="col text-right">
 								<span>{% trans "Discounts" %}</span>
 							</div>
 							<div class="col">
 								<span id="discounts" class="price-text">{{ basket.total_discount|currency:basket.currency }}</span>
 							</div>
-						</div>
 					{% endif %}
+					</div>
+
 					{% endblock discounts %}
 
 					{% block total_cost %}
