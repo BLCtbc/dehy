@@ -1,9 +1,9 @@
 from oscar.apps.shipping import repository
-from dehy.appz.shipping.methods import BaseFedex, FreeShipping
+from dehy.appz.shipping import methods as shipping_methods
 from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 
 import base64, datetime, json, requests, xmltodict
-from oscar.core.loading import get_class, get_model
+from oscar.core.loading import get_class, get_model, get_classes
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 
@@ -14,6 +14,7 @@ TWOPLACES = D(10) ** -2
 
 Order = get_model('order', 'Order')
 Basket = get_model('basket', 'Basket')
+(TaxExclusiveOfferDiscount, TaxInclusiveOfferDiscount) = get_classes('shipping.methods', ['TaxExclusiveOfferDiscount', 'TaxInclusiveOfferDiscount'])
 
 logger = logging.getLogger(__name__)
 # https://django-oscar.readthedocs.io/en/latest/howto/how_to_configure_shipping.html?highlight=shipping%20method#shipping-methods
@@ -22,8 +23,54 @@ logger = logging.getLogger(__name__)
 # 	methods = (shipping_methods.Standard(), shipping_methods.Express())
 
 class Repository(repository.Repository):
+	methods = [shipping_methods.FedexGround()]
+
+	def apply_shipping_offer(self, basket, method, offer):
+		"""
+		Wrap a shipping method with an offer discount wrapper (as long as the
+		shipping charge is non-zero).
+		"""
+		# If the basket has qualified for shipping discount, wrap the shipping
+		# method with a decorating class that applies the offer discount to the
+		# shipping charge.
+		charge = method.calculate(basket)
+
+		if charge.excl_tax == D('0.00') or method.code.lower() != 'fedex_ground':
+			# No need to wrap zero shipping charges
+			return method
+
+		if charge.is_tax_known:
+
+			offer_discount = TaxInclusiveOfferDiscount(method, offer)
+			return offer_discount
+		else:
+			# When returning a tax exclusive discount, it is assumed
+			# that this will be used to calculate taxes which will then
+			# be assigned directly to the method instance.
+			return TaxExclusiveOfferDiscount(method, offer)
+
+	def get_default_shipping_method(self):
+		return self.methods[0]
+
+	def get_shipping_methods(self, basket, shipping_addr=None, **kwargs):
+		"""
+		Return a list of all applicable shipping method instances for a given
+		basket, address etc.
+		"""
+		if not basket.is_shipping_required():
+			# Special case! Baskets that don't require shipping get a special
+			# shipping method.
+			return [NoShippingRequired()]
+
+		methods,data = self.get_available_shipping_methods(basket=basket, shipping_addr=shipping_addr, **kwargs)
+
+		if basket.has_shipping_discounts:
+			methods = self.apply_shipping_offers(basket, methods)
+
+		return methods, data
+
 	def get_available_shipping_methods(self, basket, user=None, shipping_addr=None, request=None, **kwargs):
-		methods = [FreeShipping()]
+		methods = [shipping_methods.FedexGround()]
 		data = {'status_code':200}
 		# print('repository: get_available_shipping_methods \n ')
 		if shipping_addr and shipping_addr.country.code in ['US', 'CA', 'MX']:
@@ -35,11 +82,19 @@ class Repository(repository.Repository):
 			## will need to implement some sort of API here to properly configure which  ##
 			## shipping methods are available to a user based on their geo location      ##
 			###############################################################################
+			methods+=[shipping_methods.FedexGround()]
 			return methods,data
 
 		return methods
 
-	def get_city_and_state(self, postcode=None):
+	def get_city_and_state(self, postcode=None, country=None):
+		if not country or country.lower() == 'us':
+			return self.usps_get_city_and_state(postcode)
+		else:
+			return None
+			# return fedex_get_city_and_state(postcode)
+
+	def usps_get_city_and_state(self, postcode=None):
 		# try:
 		logger.debug(f'USPS API: Attempting to retrieve city/state information ({postcode})')
 		data = {}
@@ -76,7 +131,6 @@ class Repository(repository.Repository):
 		xml_response = requests.get(url).content
 		usps_response = json.loads(json.dumps(xmltodict.parse(xml_response)))['ZipCodeLookupResponse']
 
-		print('get_postcode usps_response: ', usps_response)
 		if usps_response.get('Address') and usps_response['Address'].get('Zip5'):
 			zip5 = usps_response['Address']['Zip5']
 
@@ -97,29 +151,25 @@ class Repository(repository.Repository):
 		validated_address = self.usps_validate_address(address)
 
 		if not validated_address:
+
 			return [address, None]
 
 		if validated_address.get('Address2', None) and address.line1 != validated_address['Address2']:
-			print(f'correcting line1 from {address.line1} to {validated_address["Address2"]}')
 			address.line1 = corrections['line1'] = validated_address['Address2']
 
 		if validated_address.get('City', None) and address.line4 != validated_address['City']:
-			print(f'correcting city from {address.line4} to {validated_address["City"]}')
 			address.line4 = corrections['line4'] = validated_address['City']
 
 		if validated_address.get('Zip5', None) and address.postcode != validated_address['Zip5']:
-			print(f'correcting postcode from {address.postcode} to {validated_address["Zip5"]}')
 			address.postcode = corrections['postcode'] = validated_address['Zip5']
 
 		if validated_address.get('State', None) and address.state and address.state != validated_address['State']:
-			print(f'correcting State from {address.state} to {validated_address["State"]}')
 			address.state = corrections['state'] = validated_address['State']
 
 		residential = validated_address.get('Business', None)
 		if residential:
 			residential = True if residential == 'N' else False
 			if hasattr(address, 'is_residential') and address.is_residential != residential:
-				print(f'correcting residential status {address.is_residential} to {residential}')
 				address.is_residential = residential
 
 
@@ -201,7 +251,6 @@ class Repository(repository.Repository):
 	async def async_coerce_shipstation_line_items(self, lines, base_url=''):
 		line_items = []
 		for line in lines:
-			print('line: ', line)
 			line_dict = {
 				'lineItemKey':line.partner_sku,
 				'sku':line.partner_sku,
@@ -226,8 +275,6 @@ class Repository(repository.Repository):
 				line_dict.update({'name':line.product.parent.title, 'options':[{'name':'Size', 'value':line.product.title}]})
 
 			line_items.append(line_dict)
-
-		print('line_items: ', line_items)
 
 		return line_items
 
@@ -272,7 +319,7 @@ class Repository(repository.Repository):
 		shipping_code = order.shipping_code.lower()
 		if shipping_code == 'ground_home_delivery':
 			shipping_code = 'fedex_home_delivery'
-			
+
 		payload = {
 			"orderNumber": order.id+10000,
 			"orderKey": order.number,
@@ -304,16 +351,11 @@ class Repository(repository.Repository):
 			payload.update({'internalNotes': order.shipping_address.notes})
 
 		url = "https://ssapi.shipstation.com/orders/createorder"
-		print('shipstation payload: ', payload)
 		headers = self.shipstation_get_headers()
-		print('shipstation headers: ', headers)
-		print('attempting to place shipstation order')
 		logger.debug('attempting to place shipstation order')
-
 		shipstation_response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
 		msg = f'shipstation order placed: {shipstation_response} {shipstation_response.text}'
 		logger.debug(msg)
-		print(msg)
 
 		return shipstation_response
 
@@ -364,7 +406,7 @@ class Repository(repository.Repository):
 		# https://developer.fedex.com/api/en-us/catalog/rate/v1/docs.html#operation/Rate%20and%20Transit%20times
 
 	def get_free_shipping(self):
-		return FreeShipping()
+		return shipping_methods.FreeShipping()
 
 	def fedex_validate_address(self, shipping_addr):
 		street_lines = [x for x in [shipping_addr.line1, shipping_addr.line2, shipping_addr.line3] if x]
@@ -489,12 +531,11 @@ class Repository(repository.Repository):
 				try:
 					arrival = datetime.datetime.fromisoformat(rate['commit']['dateDetail']['dayFormat'])
 				except Exception as e:
-					print('dateDetail not found... this is what the object contains: ', rate['commit'])
 					arrival = datetime.datetime.now().isoformat()
 
 
 				methods.append(
-					BaseFedex(code=rate['serviceType'], arrival=arrival, name=rate['serviceName'], charge_excl_tax=cost, charge_incl_tax=cost)
+					shipping_methods.BaseFedex(code=rate['serviceType'], arrival=arrival, name=rate['serviceName'], charge_excl_tax=cost, charge_incl_tax=cost)
 				)
 		else:
 			response_text = json.loads(response.text)
@@ -508,8 +549,9 @@ class Repository(repository.Repository):
 			if error['code'] == 'CRSVZIP.CODE.INVALID':
 				print('invalid zip code')
 				if retries < max_retries:
+					retries -= 1
 					shipping_addr,corrections = self.make_address_corrections(shipping_addr)
-					methods,_data = self.fedex_get_rates_and_transit_times(basket, weight, shipping_addr)
+					methods,_data = self.fedex_get_rates_and_transit_times(basket, weight, shipping_addr, max_retries=retries)
 					if _data:
 						data.update(_data)
 
@@ -662,7 +704,7 @@ class Repository(repository.Repository):
 			for item in response_list:
 
 				methods.append(
-					BaseFedex(item['serviceCode'], item['serviceName'], item['shipmentCost'], item['shipmentCost'])
+					shipping_methods.BaseFedex(item['serviceCode'], item['serviceName'], item['shipmentCost'], item['shipmentCost'])
 				)
 
 		else:

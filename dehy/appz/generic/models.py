@@ -8,6 +8,13 @@ import datetime
 class User(AbstractUser):
 	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
 	is_email_verified = models.BooleanField(default=False)
+	receive_new_order_notifications = models.BooleanField(default=False)
+	subscribed_to_mailing_list = models.BooleanField(_('Subscribed to our mailing list'), default=False, help_text=_('Check this option to receive updates about upcoming events, product availability, and exclusive offers.'))
+
+	class Meta:
+		permissions = [
+            ("can_receive_new_order_notifications", "Gives the user permission to receive notification emails anytime a new order is placed."),
+        ]
 
 class FedexAuthToken(models.Model):
 	access_token = models.CharField(_("Token"), max_length=2000, default="")
@@ -59,7 +66,7 @@ class Message(models.Model):
 	subject = models.CharField(_('Subject'), blank=True, null=True, help_text=_("What is the nature if your inquiry?"), max_length=50)
 	first_name = models.CharField(_("First Name"), blank=True, null=True, max_length=50)
 	last_name = models.CharField(_("Last Name"), blank=True, null=True, max_length=50)
-	date_created = models.DateField(auto_now_add=True, editable=False)
+	date_created = models.DateTimeField(auto_now_add=True, editable=False)
 
 	def __str__(self):
 		return f"{self.email}, message: {self.message}, created: {self.date_created}"

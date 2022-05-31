@@ -1,0 +1,7 @@
+{% load image_tags %}
+
+{% if record.description %}
+	{{ record.description|linebreaks }}
+{% else %}
+    —
+{% endif %}

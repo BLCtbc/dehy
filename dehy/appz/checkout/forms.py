@@ -130,7 +130,7 @@ class UserInfoForm(AuthenticationForm):
 			email = normalise_email(self.cleaned_data['username'])
 			if User._default_manager.filter(email__iexact=email).exists():
 
-				msg = _("A user with that email address already exists")
+				msg = _("A user with that email address already exists. Please sign in or use a different email address.")
 				self._errors["username"] = self.error_class([msg])
 
 
@@ -142,11 +142,6 @@ class BaseBillingAddressForm(payment_forms.BillingAddressForm):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		print('attrs: ', self.fields['first_name'].widget.attrs)
-		print('required: ', self.fields['first_name'].required)
-		print('visible_fields: ', self.visible_fields())
-
-
 		self.fields['first_name'].widget.attrs['placeholder'] = _('First name')
 		self.fields['last_name'].widget.attrs['placeholder'] = _('Last name')
 		self.fields['state'].widget.attrs['placeholder'] = _('State')

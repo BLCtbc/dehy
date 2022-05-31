@@ -1,8 +1,62 @@
 {% extends "oscar/customer/baseaccountpage.html" %}
 {% load i18n %}
+{% load widget_tweaks %}
 
 {% block tabcontent %}
-    {% include 'oscar/partials/form.html' with form_id="profile_form" %}
+	<form id="profile_form" class="" method="post">
+    {% csrf_token %}
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+				{% render_field form.first_name class+="form-control" %}
+				{{ form.first_name.errors }}
+			</div>
+			<div class="form-group col">
+				<label class="col-form-label" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+				{% render_field form.last_name class+="form-control" %}
+				{{ form.last_name.errors }}
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+				{% render_field form.email class+="form-control" %}
+				{{ form.email.errors }}
+			</div>
+		</div>
+
+		{% if form.receive_new_order_notifications %}
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label" for="{{ form.receive_new_order_notifications.id_for_label }}">
+					{% render_field form.receive_new_order_notifications %}
+					{{ form.receive_new_order_notifications.label }}
+				</label>
+				{{ form.receive_new_order_notifications.errors }}
+			</div>
+		</div>
+		{% endif %}
+		<div class="row">
+			<div class="form-group col">
+				<label class="col-form-label" for="{{ form.subscribed_to_mailing_list.id_for_label }}">
+					{% render_field form.subscribed_to_mailing_list %}
+					{{ form.subscribed_to_mailing_list.label }}
+				</label>
+				{{ form.subscribed_to_mailing_list.errors }}
+				<div><small class="helptext">{{form.subscribed_to_mailing_list.help_text}}</small></div>
+			</div>
+
+		</div>
+
+		<div class="row">
+			<div class="form-group">
+		        <div class="">
+		            <button class="btn btn-lg btn-primary" type="submit" data-loading-text="Saving...">Save</button>
+		            or <a href="#" onclick="window.history.go(-1);return false">cancel</a>.
+		        </div>
+		    </div>
+		</div>
+</form>
 	<a id="logout" href="{% url 'customer:logout' %}" class="btn btn-lg btn-primary">{% trans 'Logout' %}</a>
 {% endblock tabcontent %}
 

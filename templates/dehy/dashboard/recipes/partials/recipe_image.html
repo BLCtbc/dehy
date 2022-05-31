@@ -1,0 +1,12 @@
+{% load image_tags %}
+
+{% if record.image %}
+	<div class="image-container">
+	{% with image=record.image %}
+	{% oscar_thumbnail image "200x" as thumb %}
+		<img src="{{thumb.url}}" alt="{{ image.name }}">
+	</div>
+	{% endwith %}
+{% else %}
+    —
+{% endif %}

@@ -32,6 +32,7 @@
 14. [adding the ability to create shipping events](#create_shipping_event_type)
 15. [creating oscar email template via backend](#create_oscar_email_template)
 16. [adding new/custom communication event type](#adding_new_communication_event_type)
+17. [creating a custom conditional for specific shipping code and value requirement](#custom_shipping_condition)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1722,7 +1723,7 @@ see:
 https://stackoverflow.com/a/40078116/6158303
 
 
-< name="create_shipping_event_type"></a>
+<name="create_shipping_event_type"></a>
 12. ###### adding the ability to create shipping events
 
 	within the `order-detail` page there is a dropdown labeled "Create shipping event" with a default option
@@ -1748,7 +1749,7 @@ https://stackoverflow.com/a/40078116/6158303
 
 	```
 
-< name="create_oscar_email_template"></a>
+<name="create_oscar_email_template"></a>
 12. ###### Adding the ability to create/customize an email template from the dashboard
 
 	from: https://django-oscar.readthedocs.io/en/3.1/howto/how_to_customise_oscar_communications.html?highlight=email#customising-through-the-database
@@ -1801,7 +1802,7 @@ https://stackoverflow.com/a/40078116/6158303
 			```
 		- SMS Template:
 
-< name="adding_new_communication_event_type"></a>
+<name="adding_new_communication_event_type"></a>
 12. ####### Adding a new/custom communication event type to Oscar in order to allow emails to be sent when an order has shipped
 
 	This follows the instructions from the example in the previous section, except the event type we're
@@ -1834,3 +1835,43 @@ https://stackoverflow.com/a/40078116/6158303
 		- Name:
 		- Email Subject Template:
 
+
+
+<a name='custom_shipping_condition'></a>
+12. ###### creating a custom conditional for specific shipping code and value requirement
+
+	```py
+		from oscar.apps.offer.custom import create_condition
+		from dehy.appz.offer.custom import FreeFedexGroundShippingCondition
+		from oscar.core.loading import get_class, get_model
+		from decimal import Decimal as D
+
+		Range = get_model('offer', 'Range')
+		all_products_range = Range.objects.get(name='All Products')
+
+		create_condition(FreeFedexGroundShippingCondition, value=50.00, range=all_products_range, type='Value')
+	```
+
+
+13. ###### implementing a custom benefit
+
+
+	```py
+		from oscar.core.loading import get_class, get_model
+		from oscar.apps.offer.custom import create_benefit
+		from dehy.appz.offer.custom import FreeFedexGroundShippingCondition, FreeGroundShippingBenefit
+		Condition = get_model('offer', 'Condition')
+		ConditionalOffer = get_model('offer', 'ConditionalOffer')
+		Range = get_model('offer', 'Range')
+		condition = Condition.objects.get(proxy_class='dehy.appz.offer.custom.FreeFedexGroundShippingCondition')
+		ShippingPercentageDiscountBenefit = get_class('offer.benefits', 'ShippingPercentageDiscountBenefit')
+		all_products_range = Range.objects.get(name='All Products')
+		FreeGroundShippingBenefit = create_benefit(FreeGroundShippingBenefit, range=all_products_range, type='Shipping percentage', value=100)
+		free_ground_shipping_offer,created = ConditionalOffer.objects.get_or_create(
+			name='Ground shipping - FREE For Orders Over $50', condition=condition, offer_type="Site", benefit=FreeGroundShippingBenefit,
+			max_basket_applications=1,
+			defaults={'name':"FedEx Ground - FREE For Orders Over $50", 'offer_type':"Site", 'benefit':FreeGroundShippingBenefit,
+				'max_basket_applications':1
+			}
+		)
+	```

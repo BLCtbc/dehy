@@ -14,8 +14,8 @@ class Recipe(models.Model):
 
 	steps = dbaa.ArrayField(models.CharField(max_length=300), default=list, help_text='Directions list', verbose_name='Directions')
 	slug = models.SlugField(max_length=50, unique=True, editable=True)
-	date_created = models.DateField(auto_now_add=True, editable=False)
-	last_modified = models.DateField(auto_now=True, editable=False)
+	date_created = models.DateTimeField(auto_now_add=True, editable=False)
+	last_modified = models.DateTimeField(auto_now=True, editable=False)
 	featured = models.BooleanField(default=False, help_text='Feature this recipe on the homepage?')
 	image = models.ImageField(upload_to=upload_to_slug, blank=True)
 
@@ -25,7 +25,7 @@ class Recipe(models.Model):
 	def __str__(self):
 		return f"{self.name}, Date created: {self.date_created}, Last edited: {self.last_modified}"
 
-# 
+#
 # class RecipeCategory(models.Model):
 # 	name = models.CharField(max_length=100, default="", help_text="Name of the category, eg. whiskey, wine, etc.")
 #

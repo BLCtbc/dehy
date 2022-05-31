@@ -23,7 +23,7 @@
 			</div>
 		{% endif %}
 
-		<section id="user_info" class="card card-body mb-lg-4 mb-sm-2 col-12 customer-info">
+		<section id="user_info" class="card card-body mb-lg-4 mb-sm-2 col-12 customer-info active">
 			<div class="section-header">
 				<h2>{% trans "1. Contact information" %}</h2>
 				<button class="edit" disabled hidden aria-label="Edit Customer Information"><span>Edit</span></button>
@@ -58,7 +58,7 @@
 
 		<section id="billing" class="card card-body mb-lg-4 mb-sm-2 col-12 billing">
 			<div class="section-header">
-				<h2>{% trans "4. Billing" %}</h2>
+				<h2>{% trans "4. Payment" %}</h2>
 				<button class="edit" disabled hidden aria-label="Edit Billing Information"><span>Edit</span></button>
 			</div>
 
@@ -67,6 +67,7 @@
 		</section>
 
 
+		{% comment %}
 		<section id="place_order" class="card card-body mb-lg-4 mb-sm-2 col-12 place-order">
 			<div class="section-header">
 				<h2>{% trans "5. Review & Purchase" %}</h2>
@@ -74,6 +75,7 @@
 			{% block place_order %}
 			{% endblock place_order %}
 		</section>
+		{% endcomment %}
     </div>
 
 	{% endblock checkout_flow %}

@@ -70,28 +70,18 @@ def calculate_tax(price, rate):
 def Deb(msg=''):
 	print(f"Debug {sys._getframe().f_back.f_lineno}: {msg}")
 
-def get_webhook_info(request):
-	print('*** get_webhook_info')
-	print('print: request.body: ', request.body)
-	logger.debug(f'logger: request.body: {request.body}')
-
-	logging.debug(f'logging: request.body: {request.body}')
-
-	print('request.POST: ', request.POST)
-
-	logging.debug(f'shipstation webhook POST: {request.POST}')
-	logger.debug(f'shipstation webhook POST: {request.POST}')
-
 
 # stripe webhook handler
 @csrf_exempt
 @require_POST
 def webhook_submit_order(request):
 	data = {'test': 123}
-	place_order_view = PlaceOrderView(request=request)
+	# place_order_view = PlaceOrderView(request=request)
+	place_order_view = BillingView(request=request)
 	payload = request.body
-
 	endpoint_secret = facade.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
+	if settings.DEBUG:
+		endpoint_secret = facade.STRIPE_CLI_WEBHOOK_SIGNING_SECRET
 	# endpoint_secret = 'whsec_63c2ac70680ad9eb9ceddd981cb1be311fbd0ab114767d63c69c28f0374d8b42'
 
 	event = None
@@ -122,7 +112,7 @@ def webhook_submit_order(request):
 		response.status_code = 403
 		return response
 
-	if event['type'] == 'order.payment_completed':
+	if event['type'] == 'order.payment_completed' or (settings.DEBUG and event['type'] == 'payment_intent.succeeded'):
 
 		order = event['data']['object']
 		basket = get_object_or_404(Basket, id=order.metadata.get('basket_id'))
@@ -156,10 +146,13 @@ def ajax_set_shipping_method(request):
 
 	method_codes = [method.code for method in shipping_methods]
 	if method_code and method_code in method_codes:
+		print('method_code: ', method_code)
+
+		request.basket.shipping_method_code = method_code
+		request.basket.save()
 		selected_method = list(filter(lambda x: getattr(x, 'code', None)==method_code, shipping_methods))[0]
 		status_code = 200
 		checkout_session.use_shipping_method(method_code)
-
 		order = facade.update_or_create_order(request.basket, shipping_method={'cost':selected_method.calculate(request.basket).excl_tax, 'code':selected_method.code, 'name':selected_method.name})
 		checkout_session.set_order_number(str(order.id).replace("order_", ""))
 
@@ -167,6 +160,13 @@ def ajax_set_shipping_method(request):
 		data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWO_PLACES))
 		data['shipping_charge'] = str(D(order.total_details.amount_shipping/100).quantize(TWO_PLACES))
 		data['order_total'] = str(D(order.amount_total/100).quantize(TWO_PLACES))
+		if request.basket.has_shipping_discounts or request.basket.offer_discounts or request.basket.voucher_discounts:
+
+			data['discounts'] = {'total': request.basket.total_discount}
+			if selected_method.discount(request.basket) > 0:
+
+				data['discounts']['shipping'] = str(selected_method.discount(request.basket))
+				data['discounts']['total'] += selected_method.discount(request.basket)
 
 		# request.basket._total_tax = data['total_tax']
 		# request.basket.save()
@@ -185,7 +185,6 @@ def get_shipping_methods(request, shipping_fields={}, frontend_formatted=False, 
 	data = {'status_code':200}
 
 	if type(shipping_fields) is str:
-		print('SHIPPING FIELDS in get_shipping_methods: ', shipping_fields)
 		shipping_fields = json.loads(shipping_fields)
 
 	if shipping_fields:
@@ -219,10 +218,17 @@ def get_shipping_methods(request, shipping_fields={}, frontend_formatted=False, 
 
 		for method in methods:
 			cost = method.calculate(request.basket).excl_tax
-			shipping_methods.append({'name': method.name, 'cost':cost, 'code':method.code})
+			_method = {'name': method.name, 'cost':cost, 'code':method.code}
+
+
+			if method.discount and method.discount(request.basket) > 0:
+				_method['discount'] = method.discount(request.basket)
+
+
+			shipping_methods.append(_method)
+
 
 		shipping_methods = sorted(shipping_methods, key=lambda x: x['cost'])
-
 		methods = shipping_methods if frontend_formatted else methods
 		methods = [methods, data] if return_status_code else methods
 
@@ -234,9 +240,7 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 	data = {}
 	order_details = {}
 	status_code = 400
-
 	post_data = request.POST.copy()
-
 	if post_data.get('postcode', None) and (correct_city_state or not post_data.get('line4', None) or not post_data.get('state', None)):
 		city_and_state_data = Repository.get_city_and_state(request.POST.get('postcode'))
 		post_data.update(city_and_state_data)
@@ -247,7 +251,6 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 
 	if not shipping_address_form.is_valid():
 
-		print(f'\n form.errors: {shipping_address_form.errors}')
 		data['errors'] = shipping_address_form.errors.as_json()
 
 	if 'postcode' in shipping_address_form.cleaned_data.keys() and 'country' in shipping_address_form.cleaned_data.keys():
@@ -263,8 +266,8 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 		methods, _data = get_shipping_methods(request, post_data, True, True, shipping_address_form)
 		status_code = _data.get('status_code', None) or status_code
 		data.update(_data)
-		print('\n _data: ', _data)
 		data['shipping_methods'] = []
+
 
 		if methods:
 
@@ -273,9 +276,9 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 			data['shipping_postcode'] = address_fields['postcode']
 
 			selected_shipping_method = data['shipping_methods'][0]
-			selected_code = post_data.get('method_code', None)
-			if selected_code:
-				selected_method_filter = list(filter(lambda x: x['code']==selected_code, data['shipping_methods']))
+			method_code = post_data.get('method_code', None) or checkout_session.shipping_method_code(request.basket)
+			if method_code:
+				selected_method_filter = list(filter(lambda x: x['code']==method_code, data['shipping_methods']))
 				if selected_method_filter:
 					selected_shipping_method = selected_method_filter[0]
 
@@ -283,8 +286,14 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 			if request.user.is_authenticated:
 				order_details.update({'customer': request.user.stripe_customer_id})
 
+
+
 			data['shipping_charge'] = selected_shipping_method['cost']
+			data['method_code'] = selected_shipping_method['code']
 			checkout_session.use_shipping_method(selected_shipping_method['code'])
+			request.basket.shipping_method_code = selected_shipping_method['code']
+			print('method_code: ', selected_shipping_method['code'])
+			request.basket.save()
 			order = facade.update_or_create_order(request.basket, **order_details)
 
 			checkout_session.set_order_number(str(order.id).replace("order_", ""))
@@ -293,9 +302,21 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 			data['order_total'] = str(D(order.amount_total/100).quantize(TWO_PLACES))
 			data['subtotal'] = str(D(order.amount_subtotal/100).quantize(TWO_PLACES))
 			data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWO_PLACES))
+			if request.basket.has_shipping_discounts or request.basket.offer_discounts or request.basket.voucher_discounts:
+
+				data['discounts'] = {'total': request.basket.total_discount}
+				if selected_shipping_method.get('discount') and selected_shipping_method['discount'] > 0:
+
+					data['discounts']['shipping'] = str(selected_shipping_method['discount'])
+					data['discounts']['total'] += selected_shipping_method['discount']
 
 			request.session['total_tax'] = data['total_tax']
 			request.session['subtotal'] = data['subtotal']
+
+
+			print('request.basket.has_shipping_discounts: ', request.basket.has_shipping_discounts)
+			print('request.basket.offer_discounts: ', request.basket.offer_discounts)
+			print('request.basket.total_discount: ', request.basket.total_discount)
 
 
 	response = JsonResponse(data)
@@ -349,11 +370,9 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 		return response
 
 	def get_available_addresses(self):
-
 		# Include only addresses where the country is flagged as valid for
 		# shipping. Also, use ordering to ensure the default address comes
 		# first.
-
 		return self.request.user.addresses.filter(
 			country__is_shipping_country=True).order_by(
 			'-is_default_for_shipping')
@@ -365,7 +384,6 @@ class CheckoutIndexView(CheckoutSessionMixin, generic.FormView):
 
 		response = super().post(request, *args, **kwargs)
 		form = self.form_class(request, request.POST)
-
 		if request.is_ajax():
 
 			email = None
@@ -509,8 +527,7 @@ class ShippingView(CheckoutSessionMixin, generic.FormView):
 		data = {'section': 'shipping'}
 		if request.is_ajax():
 
-			shipping_method_code = request.POST.get('method_code', None)
-			shipping_method_code = shipping_method_code if shipping_method_code else self.checkout_session.shipping_method_code
+			shipping_method_code = request.POST.get('method_code', None) or self.checkout_session.shipping_method_code
 
 			shipping_address_form = ShippingAddressForm(request.POST)
 
@@ -749,6 +766,27 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 	]
 
 	preview = False
+	def dispatch(self, request, *args, **kwargs):
+		# Assign the checkout session manager so it's available in all checkout
+		# views.
+		self.checkout_session = CheckoutSessionData(request)
+
+		# Check if this view should be skipped
+		try:
+			self.check_skip_conditions(request)
+		except exceptions.PassedSkipCondition as e:
+			return HttpResponseRedirect(e.url)
+
+		# Enforce any pre-conditions for the view.
+		try:
+			self.check_pre_conditions(request)
+		except exceptions.FailedPreCondition as e:
+			for message in e.messages:
+				messages.warning(request, message)
+			return HttpResponseRedirect(e.url)
+
+		return super().dispatch(request, *args, **kwargs)
+
 
 	def get(self, request, *args, **kwargs):
 		status_code = 302
@@ -805,21 +843,292 @@ class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):
 				self.checkout_session.bill_to_shipping_address()
 
 			address_fields.update({'email': email})
-
-			# order = facade.update_and_process_order(request.basket, billing_fields=address_fields)
 			billing_details = facade.coerce_to_address_object(address_fields)
 			stripe_order_id = f"order_{request.basket.stripe_order_id}"
 			order = facade.stripe.Order.modify(stripe_order_id, billing_details=billing_details)
 			payment = order.payment
-
 			data['order_client_secret'] = order.client_secret
 			data['stripe_pkey'] = facade.stripe.pkey
 			response = JsonResponse(data)
+			# return reverse('checkout:thank_you')
 
 		response.status_code = status_code
+		return response
 
+	def coerce_from_address_object(self, address_details):
+		# 'phone' becomes 'phone_number'
+		# convert name to first_name + last_name
+		# 'city' becomes 'line4'
+		# 'postal_code' becomes 'postcode'
+		first_name,last_name = address_details.name.split(" ")
+		country_obj = Country.objects.get(iso_3166_1_a2=address_details.address.country)
+		address = {
+			'first_name': first_name,
+			'last_name': last_name,
+			'line1': address_details.address.line1,
+			'line4': address_details.address.city,
+			'country': country_obj,
+			'state': address_details.address.state,
+			'postcode': address_details.address.postal_code,
+		}
+		if address_details.address.line2:
+			address.update({'line2': address_details.address.line2})
+
+		if address_details.phone:
+			address.update({'phone_number':address_details.phone})
+
+		return address
+
+	def handle_place_order_submission(self, basket, order):
+
+		basket._set_strategy(self.request.strategy)
+
+		user = User.objects.get(id=basket.owner_id) if basket.owner_id else AnonymousUser()
+
+		print('-- associated order: ', order)
+		# shipping_address (should be an instance of ShippingAddressForm)
+		# use shipping address form
+		shipping_address = ShippingAddress(**self.coerce_from_address_object(order.shipping_details))
+
+		# shipping_charge
+		shipping_charge = prices.Price(
+			currency=basket.currency,
+			excl_tax=D(order.shipping_cost.amount_subtotal/100).quantize(TWO_PLACES),
+			incl_tax=D(order.shipping_cost.amount_total/100).quantize(TWO_PLACES)
+		)
+
+		# shipping_method
+		from dehy.appz.shipping.methods import BaseFedex
+		shipping_method = BaseFedex(code=order.metadata['shipping_code'], name=order.metadata['shipping_name'], charge_excl_tax=shipping_charge, charge_incl_tax=shipping_charge)
+
+
+		# billing_address (should be an instance of BillingAddress)
+		billing_address = BillingAddress(**self.coerce_from_address_object(order.billing_details))
+
+		# order_total
+		order_total = prices.Price(
+			currency=basket.currency,
+			excl_tax=D(order.amount_subtotal/100).quantize(TWO_PLACES),
+			incl_tax=D(order.amount_total/100).quantize(TWO_PLACES)
+		)
+
+		for line in basket.all_lines():
+			stripe_line = list(filter(lambda x: x['product']==line.product.upc, order.line_items.data))[0]
+			tax_rate = D(stripe_line['amount_tax']/stripe_line['amount_subtotal']).quantize(FOUR_PLACES)
+			price_incl_tax = line.price_excl_tax + calculate_tax(line.price_excl_tax, tax_rate)
+			line.purchase_info.price.tax = calculate_tax(line.price_excl_tax, tax_rate)
+			line.save()
+		# Need to put card info on the order info and then pass it along on
+		# the order receipt + order receipt email
+
+		payment_kwargs = {
+			'total_tax': D(order.total_details.amount_tax/100).quantize(TWO_PLACES),
+			'payment_intent_id': order.payment.payment_intent.id,
+			'charge_id': order.payment.payment_intent.charges.data[0]['id'],
+			'order_total': {
+				'amount': D(order.payment.payment_intent.charges.data[0]['amount']/100).quantize(TWO_PLACES),
+				'amount_captured': D(order.payment.payment_intent.charges.data[0]['amount_captured']/100).quantize(TWO_PLACES)
+			},
+			'card': {
+				'brand': order.payment.payment_intent.charges.data[0]['payment_method_details']['card']['brand'],
+				'exp': f"{order.payment.payment_intent.charges.data[0]['payment_method_details']['card']['exp_month']:0>2}/{order.payment.payment_intent.charges.data[0]['payment_method_details']['card']['exp_year']}",
+				'last4': order.payment.payment_intent.charges.data[0]['payment_method_details']['card']['last4']
+			}
+		}
+
+			# could update the customer info here
+
+		email = order.customer.email if order.customer else order.billing_details.email
+		order_kwargs = {'guest_email': email}
+
+		order_details = {
+			'user': user,
+			'basket': basket,
+			'shipping_address': shipping_address,
+			'shipping_method': shipping_method,
+			'shipping_charge': shipping_charge,
+			'billing_address': billing_address,
+			'order_total': order_total,
+			'payment_kwargs': payment_kwargs,
+			'order_kwargs': order_kwargs
+		}
+
+		return self.submit(**order_details)
+
+	# noqa (too complex (10))
+	def submit(self, user, basket, shipping_address, shipping_method, shipping_charge, billing_address, order_total, payment_kwargs=None, order_kwargs=None, surcharges=None):
+		"""
+		Submit a basket for order placement.
+		The process runs as follows:
+		 * Generate an order number
+		 * Freeze the basket so it cannot be modified any more (important when
+		   redirecting the user to another site for payment as it prevents the
+		   basket being manipulated during the payment process).
+		 * Attempt to take payment for the order
+		   - If payment is successful, place the order
+		   - If a redirect is required (e.g. PayPal, 3D Secure), redirect
+		   - If payment is unsuccessful, show an appropriate error message
+		:basket: The basket to submit.
+		:payment_kwargs: Additional kwargs to pass to the handle_payment
+						 method. It normally makes sense to pass form
+						 instances (rather than model instances) so that the
+						 forms can be re-rendered correctly if payment fails.
+		:order_kwargs: Additional kwargs to pass to the place_order method
+		"""
+
+		if payment_kwargs is None:
+			payment_kwargs = {}
+		if order_kwargs is None:
+			order_kwargs = {}
+		order_number = basket.stripe_order_id
+		# self.checkout_session.set_order_number(order_number)
+		print("Order #%s: beginning submission process for basket #%d",basket.stripe_order_id, basket.id)
+		logger.info("Order #%s: beginning submission process for basket #%d",basket.stripe_order_id, basket.id)
+
+		self.freeze_basket(basket)
+		# self.checkout_session.set_submitted_basket(basket)
+
+		# We define a general error message for when an unanticipated payment
+		# error occurs.
+		error_msg = _("A problem occurred while processing payment for this "
+					  "order - no payment has been taken.  Please "
+					  "contact customer services if this problem persists")
+
+		signals.pre_payment.send_robust(sender=self, view=self)
+
+		try:
+			self.handle_payment(order_number, order_total, **payment_kwargs)
+		except Exception as e:
+			# Unhandled exception - as all payment is handling is client-side, this will be the only exception seen
+			print(f"\n -- Order #{order_number}: unhandled exception while taking payment: ({e})")
+			logger.exception(
+				"Order #%s: unhandled exception while taking payment (%s)",
+				order_number, e)
+			# self.restore_frozen_basket()
+			# return self.render_preview(self.request, error=error_msg, **payment_kwargs)
+
+		signals.post_payment.send_robust(sender=self, view=self)
+
+		# If all is ok with payment, try and place order
+		logger.info("Order #%s: payment successful, placing order",
+					order_number)
+		try:
+			return self.handle_order_placement(
+				order_number, user, basket, shipping_address, shipping_method,
+				shipping_charge, billing_address, order_total, surcharges=surcharges, **order_kwargs)
+
+
+		except UnableToPlaceOrder as e:
+			# It's possible that something will go wrong while trying to
+			# actually place an order.  Not a good situation to be in as a
+			# payment transaction may already have taken place, but needs
+			# to be handled gracefully.
+			msg = str(e)
+			print(f"\n -- Order #{order_number}: unable to place order - ({msg})")
+			logger.error("Order #%s: unable to place order - %s",
+						 order_number, msg, exc_info=True)
+			# self.restore_frozen_basket()
+			# return self.render_preview(self.request, error=msg, **payment_kwargs)
+		except Exception as e:
+			# Hopefully you only ever reach this in development
+			logger.exception("Order #%s: unhandled exception while placing order (%s)", order_number, e)
+			error_msg = _("A problem occurred while placing this order. Please contact customer services.")
+			# self.restore_frozen_basket()
+			# return self.render_preview(self.request, error=error_msg, **payment_kwargs)
+
+	def handle_payment(self, order_number, total, *args, **kwargs):
+		"""
+		Handle any payment processing and record payment sources and events.
+		This method is designed to be overridden within your project.  The
+		default is to do nothing as payment is domain-specific.
+		This method is responsible for handling payment and recording the
+		payment sources (using the add_payment_source method) and payment
+		events (using add_payment_event) so they can be
+		linked to the order when it is saved later on.
+		"""
+
+		source_type,__ = SourceType.objects.get_or_create(name=PAYMENT_METHOD_STRIPE)
+
+		source = Source(
+			source_type=source_type,
+			currency=settings.STRIPE_CURRENCY,
+			amount_allocated=total.incl_tax,
+			amount_debited=total.incl_tax,
+			reference=kwargs.get('payment_intent_id', None),
+			label=f"{kwargs['card']['brand']} XXXX-{kwargs['card']['last4']}"
+		)
+
+		self.add_payment_source(source)
+		self.add_payment_event(PAYMENT_EVENT_PURCHASE, total.incl_tax)
+
+	def handle_order_placement(self, order_number, user, basket, shipping_address, shipping_method,
+		shipping_charge, billing_address, order_total, surcharges=None, **kwargs):
+
+		"""
+		Write out the order models and return the appropriate HTTP response
+		We deliberately pass the basket in here as the one tied to the request
+		isn't necessarily the correct one to use in placing the order.  This
+		can happen when a basket gets frozen.
+		"""
+
+		order = self.place_order(
+			order_number=order_number, user=user, basket=basket,
+			shipping_address=shipping_address, shipping_method=shipping_method,
+			shipping_charge=shipping_charge, order_total=order_total,
+			billing_address=billing_address, surcharges=surcharges, **kwargs)
+
+		basket.submit()
+
+		return self.handle_successful_order(order)
+
+	def handle_successful_order(self, order):
+		"""
+		Handle the various steps required after an order has been successfully
+		placed.
+		Override this view if you want to perform custom actions when an
+		order is submitted.
+		"""
+
+		# Send confirmation message (normally an email)
+		try:
+			self.send_order_placed_email(order)
+
+		except Exception as e:
+			print('Error sending order placed email: ', str(e))
+
+		# Flush all session data
+		try:
+			self.checkout_session.flush()
+		except AttributeError as e:
+			print(e)
+
+		# Save order id in session so thank-you page can load it
+		self.request.session['checkout_order_id'] = order.id
+
+		response = HttpResponseRedirect(self.get_success_url())
+		self.send_signal(self.request, response, order)
 
 		return response
+
+	def send_order_placed_email(self, order):
+		extra_context = self.get_message_context(order)
+		dispatcher = OrderDispatcher(logger=logger)
+		dispatcher.send_order_placed_email_for_user(order, extra_context)
+
+	def payment_description(self, intent, order_number, total, **kwargs):
+
+		return f"payment_intent:{intent['id']} customer: {intent['customer']}, card info: [last4:{intent['charges']['data'][0]['last4']}]"
+
+	def payment_metadata(self, order_number, total, **kwargs):
+		return {'order_number': order_number}
+
+	def get_pre_conditions(self, request):
+		return super().get_pre_conditions(request)
+
+	def get_success_url(self):
+		return reverse('checkout:thank_you')
+
+
 
 class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 	template_name = 'dehy/checkout/checkout_v2.html'
@@ -895,7 +1204,6 @@ class PlaceOrderView(views.PaymentDetailsView, CheckoutSessionMixin):
 			# if it hasn't, place it here:
 
 			# then return a redirect
-			# return self.get_success_url()
 			response = JsonResponse(data)
 			response.status_code = 200
 
@@ -1204,6 +1512,7 @@ class ThankYouView(generic.DetailView):
 
 	def get(self, request, *args, **kwargs):
 		self.object = self.get_object()
+
 		# if self.object is None:
 		# 	return redirect(settings.OSCAR_HOMEPAGE)
 		context = self.get_context_data(object=self.object)

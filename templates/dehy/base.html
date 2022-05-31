@@ -92,6 +92,7 @@
 					continue_shopping: "{% trans 'Continue shopping' %}",
 					size: "{% trans 'Size' %}",
 					order_summary: "{% trans 'Order Summary' %}",
+					discounts: "{% trans 'Discounts' %}",
 				};
 				var currencySymbol = '{{ basket.total_excl_tax_excl_discounts|currency:basket.currency }}';
 				currencySymbol = currencySymbol.slice(0, 1);
