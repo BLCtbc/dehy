@@ -8,7 +8,7 @@ import datetime
 class User(AbstractUser):
 	stripe_customer_id = models.CharField(_('Stripe Customer ID'), max_length=255, blank=True)
 	is_email_verified = models.BooleanField(default=False)
-	receive_new_order_notifications = models.BooleanField(default=False)
+	receive_new_order_notifications = models.BooleanField(default=False, help_text=_('Internal Only: Check this option to receive an email notification when a new order is placed.'))
 	subscribed_to_mailing_list = models.BooleanField(_('Subscribed to our mailing list'), default=False, help_text=_('Check this option to receive updates about upcoming events, product availability, and exclusive offers.'))
 
 	class Meta:

@@ -154,6 +154,11 @@ class BasketView(CoreBasketView):
 
 	template_name = 'dehy/basket/basket.html'
 
+	def get(self, request, *args, **kwargs):
+		response = super().get(request, *args, **kwargs)
+		print('dir(response): ', dir(response))
+		return response
+
 	def get_shipping_address(self, basket):
 
 		addr_data = self.checkout_session.new_shipping_address_fields()
@@ -207,7 +212,6 @@ class BasketView(CoreBasketView):
 	def post(self, request, *args, **kwargs):
 		data = {'object_list': {}}
 		from django.contrib.sites.shortcuts import get_current_site
-		print(get_current_site(request))
 		response = super().post(request, *args, **kwargs)
 
 		for line in self.object_list:
@@ -255,17 +259,7 @@ class BasketView(CoreBasketView):
 					if request.basket.has_shipping_discounts or request.basket.offer_discounts or request.basket.voucher_discounts:
 
 						if request.basket.has_shipping_discounts:
-							print('request.basket.shipping_discounts: ', request.basket.shipping_discounts)
 							offer = request.basket.shipping_discounts[0]['offer']
-							print('offer.benefit: ', offer.benefit)
-							print(dir(offer.benefit))
-							print(offer.benefit.__class__)
-							print('offer.benefit.shipping_discount: ', offer.benefit.shipping_discount(15))
-
-							print('dir(result): ', dir(request.basket.shipping_discounts[0]['result']))
-							print('\nresult.discount: ', request.basket.shipping_discounts[0]['result'].discount)
-
-							print('\n', dir(offer))
 
 						data['discounts'] = {'total': request.basket.total_discount}
 						if shipping_method['discount'] > 0:

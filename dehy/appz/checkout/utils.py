@@ -6,7 +6,7 @@ BaseFedex = get_class('shipping.methods', 'BaseFedex')
 Country = get_model('address', 'Country')
 ConditionalOffer = get_model('offer', 'ConditionalOffer')
 OfferDiscount = get_class('shipping.methods', 'OfferDiscount')
-TaxExclusiveOfferDiscount = get_class('shipping.methods', 'TaxExclusiveOfferDiscount')
+TaxInclusiveOfferDiscount = get_class('shipping.methods', 'TaxInclusiveOfferDiscount')
 
 class CheckoutSessionData(utils.CheckoutSessionData):
 	def _set(self, namespace, key, value):
@@ -126,14 +126,13 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 				method.charge_excl_tax = val.get('discount')
 				method.charge_incl_tax = val.get('discount')
 
-				method = TaxExclusiveOfferDiscount(method, free_ground_shipping)
+				method = TaxInclusiveOfferDiscount(method, free_ground_shipping)
 
 			shipping_methods.append(method)
 
 		return shipping_methods
 
 	def store_shipping_methods(self, basket, methods):
-		print('storing shipping methods: ', methods)
 		self._flush_namespace('shipping_methods')
 		for method in methods:
 			method_data = {'name': method.name, 'cost':str(method.calculate(basket).excl_tax)}

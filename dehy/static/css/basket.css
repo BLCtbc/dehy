@@ -4,6 +4,11 @@
 	padding: 0.375rem 3rem;
 }
 
+#upsell_messages {
+	font-size: 14px;
+	padding-bottom: 8px;
+}
+
 .basket_title * {
     text-transform: uppercase;
     font-variant-caps: all-petite-caps;
@@ -117,12 +122,27 @@ form {
 	height: 100%;
 	width: 100%;
 	background-color: rgba(0, 0, 0, 0.35);
-	overflow-y: scroll;
-	display: none;
+	overflow: hidden;
 }
 
+
 #mini_basket_container.show {
-	display: block;
+	overflow-y: scroll;
+}
+
+.slide-in.from-right .slide-in-content {
+  transform: translateX(100%);
+  -webkit-transform: translateX(100%);
+}
+
+.slide-in.show .slide-in-content {
+  transform: translateX(0);
+  -webkit-transform: translateX(0);
+}
+
+.slide-in-content {
+    transition: transform .5s ease;
+	-webkit-transition: transform .5s ease
 }
 
 #mini_basket {
@@ -132,8 +152,13 @@ form {
     position: fixed;
     z-index: 1101;
     right: 0;
+	font-size: 20px;
+	padding: 0 20px;
 }
 
+#basket_status_container {
+	border-bottom: 1px solid #ced4da;
+}
 
 @media (max-width: 768px) {
 

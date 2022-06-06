@@ -3,6 +3,7 @@
 {% load currency_filters %}
 {% load purchase_info_tags %}
 {% load widget_tweaks %}
+{% load math_extra %}
 
 {% with basket=basket|default:request.basket %}
 {% if basket_warnings %}
@@ -12,6 +13,47 @@
     {% endfor %}
 {% endif %}
 
+<div class="row" id="upsell_messages">
+{% if upsell_messages %}
+    {% for upsell in upsell_messages %}
+		{% if 'shipping' in upsell.message.lower %}
+		<div class="col free-shipping-container">
+				{% if upsell.offer.condition.value|subtract:order_total.excl_tax > 0 %}
+					{% blocktrans with delta=upsell.offer.condition.value|subtract:order_total.excl_tax %}
+					Spend ${{delta}} or more to get FREE SHIPPING!
+					{% endblocktrans %}
+				{% else %}
+					{% trans "You've unlocked free shipping!" %}
+				{% endif %}
+				<div class="free-shipping-bar">
+					<span style="width: {% widthratio order_total.excl_tax upsell.offer.condition.value 100 %}%">
+						<span></span>
+					</span>
+				</div>
+		</div>
+		{% else %}
+		<div class="col">
+            {% blocktrans with message=upsell.message url=upsell.offer.get_absolute_url offer_name=upsell.offer.name %}
+                <span class="warning">{{ message }}</span>
+            {% endblocktrans %}
+		</div>
+		{% endif %}
+    {% endfor %}
+{% else %}
+<div class="col free-shipping-container">
+	{% trans "You've unlocked FREE SHIPPING!" %}
+	<div class="free-shipping-bar d-none">
+		<span style="width: 0">
+			<span></span>
+		</span>
+	</div>
+</div>
+
+{% endif %}
+</div>
+
+{# old upsell_messages #}
+{% comment %}
 {% if upsell_messages %}
     <div class="card card-body">
         <h3>{% trans "You could be missing out on offers!" %}</h3>
@@ -22,6 +64,7 @@
         {% endfor %}
     </div>
 {% endif %}
+{% endcomment %}
 
 {% if basket and not basket.is_empty %}
 
@@ -38,12 +81,12 @@
         </div>
 	{% else %}
 	<div id="basket_status_container">
-		<h2>{% trans "Order Summary" %}</h2>
 	</div>
 	{% endif %}
 	{% endblock %}
 
     {% block basket_form_main %}
+		<div class="row">
 		<form method="post" class="basket_summary col-12 {% if 'basket' in request.resolver_match.app_names %}col-lg-10{% else %}compact{% endif %}" id="basket_formset" action="{% url 'basket:summary' %}">
 
             {% csrf_token %}
@@ -126,12 +169,13 @@
                 {% endwith %}
             {% endfor %}
         </form>
+		</div>
     {% endblock %}
 
         {% block vouchers %}
             {# Hide the entire section if a custom BasketView doesn't pass in a voucher form #}
 
-		<div class="col-12 {% if 'basket' in request.resolver_match.app_names %}col-lg-10{% endif %}">
+		<div class="{% if 'basket' in request.resolver_match.app_names %}col-lg-10{% endif %}">
         {% if voucher_form %}
 
                 <div id="voucher_form_container">
@@ -153,7 +197,7 @@
         {% endblock vouchers %}
 
         {% block baskettotals %}
-        <div id="basket_totals" class="col-12 {% if 'basket' in request.resolver_match.app_names %}col-lg-10{% endif %}">
+        <div id="basket_totals" class="{% if 'basket' in request.resolver_match.app_names %}col-lg-10{% endif %}">
 
 				{% block subtotal %}
 				<div class="row" id="subtotal_container">

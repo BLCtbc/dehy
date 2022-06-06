@@ -143,24 +143,22 @@ def ajax_set_shipping_method(request):
 	checkout_session = CheckoutSessionData(request)
 	method_code = request.POST.get('method_code', None)
 	shipping_methods = checkout_session.get_stored_shipping_methods()
-
 	method_codes = [method.code for method in shipping_methods]
 	if method_code and method_code in method_codes:
-		print('method_code: ', method_code)
 
 		request.basket.shipping_method_code = method_code
 		request.basket.save()
 		selected_method = list(filter(lambda x: getattr(x, 'code', None)==method_code, shipping_methods))[0]
 		status_code = 200
+
 		checkout_session.use_shipping_method(method_code)
 		order = facade.update_or_create_order(request.basket, shipping_method={'cost':selected_method.calculate(request.basket).excl_tax, 'code':selected_method.code, 'name':selected_method.name})
 		checkout_session.set_order_number(str(order.id).replace("order_", ""))
-
 		data['subtotal'] = str(D(order.amount_subtotal/100).quantize(TWO_PLACES))
 		data['total_tax'] = str(D(order.total_details.amount_tax/100).quantize(TWO_PLACES))
 		data['shipping_charge'] = str(D(order.total_details.amount_shipping/100).quantize(TWO_PLACES))
 		data['order_total'] = str(D(order.amount_total/100).quantize(TWO_PLACES))
-		if request.basket.has_shipping_discounts or request.basket.offer_discounts or request.basket.voucher_discounts:
+		if request.basket.has_shipping_discounts or request.basket.offer_discounts or request.basket.voucher_discounts or selected_method.discount(request.basket):
 
 			data['discounts'] = {'total': request.basket.total_discount}
 			if selected_method.discount(request.basket) > 0:
@@ -248,6 +246,7 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 
 	checkout_session = CheckoutSessionData(request)
 	shipping_address_form = form if (form and form.is_valid()) else CountryAndPostcodeForm(post_data)
+	print('request.basket.has_shipping_discounts: ', request.basket.has_shipping_discounts)
 
 	if not shipping_address_form.is_valid():
 
@@ -292,7 +291,6 @@ def ajax_get_shipping_methods(request, correct_city_state=False, form=None, as_r
 			data['method_code'] = selected_shipping_method['code']
 			checkout_session.use_shipping_method(selected_shipping_method['code'])
 			request.basket.shipping_method_code = selected_shipping_method['code']
-			print('method_code: ', selected_shipping_method['code'])
 			request.basket.save()
 			order = facade.update_or_create_order(request.basket, **order_details)
 

@@ -217,7 +217,6 @@ var dehy = {
 			toggle_mini_basket_handler() {
 				var cart_icon = document.getElementById("cart_icon");
 				if (cart_icon) {
-
 					var close_button = document.getElementById("close_mini_basket"),
 						mini_basket = document.getElementById("mini_basket"),
 						mini_basket_container = document.getElementById("mini_basket_container");
@@ -227,6 +226,9 @@ var dehy = {
 							document.body.classList.toggle("modal-open", false);
 							if (mini_basket_container) {
 								mini_basket_container.classList.toggle("show", false);
+								setTimeout(function(){
+									mini_basket_container.classList.toggle("d-none", true);
+								}, 500);
 							}
 						}
 					});
@@ -236,12 +238,18 @@ var dehy = {
 							e.stopPropagation();
 							document.body.classList.toggle("modal-open", false);
 							mini_basket_container.classList.toggle("show", false);
+							setTimeout(function(){
+								mini_basket_container.classList.toggle("d-none", true);
+							}, 500);
 						});
 
 						cart_icon.addEventListener("click", e=>{
 							e.stopPropagation();
-							mini_basket_container.classList.toggle("show");
-							document.body.classList.toggle("modal-open");
+							mini_basket_container.classList.toggle("d-none", false);
+							setTimeout(function(){
+								mini_basket_container.classList.toggle("show");
+								document.body.classList.toggle("modal-open");
+							}, 100);
 						});
 					}
 
