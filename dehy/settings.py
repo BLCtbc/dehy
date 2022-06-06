@@ -131,6 +131,7 @@ TEMPLATES = [
 				'django.contrib.auth.context_processors.auth',
 				'django.contrib.messages.context_processors.messages',
 				'dehy.context_processors.add_ig_images_to_context',
+				'dehy.context_processors.add_upsell_messages',
 				'dehy.context_processors.basket_contents',
 				'dehy.context_processors.order_total',
 				'dehy.context_processors.add_recaptcha_site_keys',
@@ -350,6 +351,7 @@ DEHY_SHIPSTATION_API_KEY = env.str('DEHY_SHIPSTATION_API_KEY')
 DEHY_SHIPSTATION_SECRET_KEY = env.str('DEHY_SHIPSTATION_SECRET_KEY')
 
 HOME_POSTCODE = "78701"
+FREE_SHIPPING_AMOUNT = 50
 
 FEDEX_ACCOUNT_NUMBER = env.str('FEDEX_ACCOUNT_NUMBER') if DEBUG else env.str('FEDEX_PRODUCTION_ACCOUNT_NUMBER')
 FEDEX_API_KEY = env.str('FEDEX_TEST_API_KEY') if DEBUG else env.str('FEDEX_PRODUCTION_API_KEY')

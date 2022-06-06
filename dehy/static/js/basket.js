@@ -227,11 +227,25 @@ dehy.basket = {
 	basket_updated_handlers: {
 		success(response, xhr, status) {
 
-			var subtotal = (response.hasOwnProperty('subtotal')) ? `${dehy.basket.currency_symbol}${response.subtotal}`: null;
+			var subtotal = (response.hasOwnProperty('subtotal')) ? response.subtotal: null;
 			var subtotal_container = document.querySelector('span#subtotal');
 
 			if (subtotal && subtotal_container) {
-				subtotal_container.textContent = subtotal;
+				subtotal_container.textContent =  `${dehy.basket.currency_symbol}${response.subtotal}`;
+				var free_shipping_bar = document.querySelector(".free-shipping-bar");
+				var free_shipping_container = document.querySelector('.free-shipping-container');
+				if (parseFloat(subtotal) < 50) {
+					free_shipping_container.firstChild.textContent = `Spend $${50-parseFloat(subtotal)} or more to get FREE SHIPPING!`
+
+					var delta = parseInt(100*(parseFloat(subtotal)/50));
+					free_shipping_bar.classList.toggle('d-none', false);
+					free_shipping_bar.firstElementChild.style.width = `${delta}%`;
+				} else {
+					free_shipping_container.firstChild.textContent = `You've unlocked FREE SHIPPING!`
+					free_shipping_bar.classList.toggle('d-none', true);
+					free_shipping_bar.firstElementChild.style.width = "100%";
+
+				}
 			} else {
 				// create subtotal container?
 			}
@@ -315,8 +329,8 @@ dehy.basket = {
 					p_elem.append(a_elem);
 					basket_status_container.append(p_elem);
 				} else {
-					var h2_elem = dehy.utils.create_element({tag:'h2', text:dehy.translations.order_summary});
-					basket_status_container.append(h2_elem);
+					// var h2_elem = dehy.utils.create_element({tag:'h2', text:dehy.translations.order_summary});
+					// basket_status_container.append(h2_elem);
 				}
 			}
 			if (response.hasOwnProperty('basket_num_items')) {

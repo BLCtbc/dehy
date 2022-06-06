@@ -15,7 +15,7 @@
 		<tr>
 			<td colspan="2">
 				<div><span class="cell-title">{% trans "Tracking:" %}</span></div>
-				<div><a class="btn btn-primary" href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.number}}</a></div>
+				<div><a href="{% url 'customer:anon-order' order_number=order.number hash=order.verification_hash %}">{{order.number}}</a></div>
 			</td>
 		</tr>
 	</tbody>
