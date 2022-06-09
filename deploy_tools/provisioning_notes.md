@@ -1855,7 +1855,7 @@ https://stackoverflow.com/a/40078116/6158303
 
 13. ###### implementing a custom benefit
 
-
+	if haven't done yet, follow the instructions in the above step
 	```py
 		from oscar.core.loading import get_class, get_model
 		from oscar.apps.offer.custom import create_benefit
