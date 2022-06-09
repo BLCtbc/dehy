@@ -10,8 +10,10 @@
 	--dark-gray: rgba(0,0,0,0.8);
 	--global-font-size: calc(1.5 * 1rem);
 	--global-line-height: 1.2em;
-	--main-navbar-padding-top: 2vw;
-	--main-navbar-height: calc(var(--main-navbar-padding-top)*2 + var(--global-font-size) + var(--global-line-height));
+	--logo-max-height: 45px;
+	--logo-padding-y: 0.625rem;
+	--main-navbar-padding-top: 3vh;
+	--main-navbar-height: calc(var(--main-navbar-padding-top)*2 + var(--logo-max-height) + var(--logo-padding-y));
 	--main-accent-color: var(--gold);
 	--secondary-accent-color: darkred;
 	--main-bg-color: var(--hunter-green);
@@ -428,7 +430,7 @@ nav#navbar .navbar-toggler-icon i {
 
 .navbar-brand img {
 	width: auto;
-	max-height: 45px;
+	max-height: var(--logo-max-height);
 }
 
 .buttons-container {
@@ -1120,11 +1122,12 @@ form {
 	font-family:'itc-avant-garde-gothic-pro';
 }
 
+/*
 table {
 	word-break: break-all;
 	table-layout: fixed;
 	font-size: 1rem;
-}
+} */
 
 
 td {
