@@ -82,7 +82,6 @@ def webhook_submit_order(request):
 	endpoint_secret = facade.STRIPE_ORDER_SUBMITTED_SIGNING_SECRET
 	if settings.DEBUG:
 		endpoint_secret = facade.STRIPE_CLI_WEBHOOK_SIGNING_SECRET
-	# endpoint_secret = 'whsec_63c2ac70680ad9eb9ceddd981cb1be311fbd0ab114767d63c69c28f0374d8b42'
 
 	event = None
 	sig_header = request.headers['STRIPE_SIGNATURE']
@@ -98,9 +97,7 @@ def webhook_submit_order(request):
 		data['error'] = msg
 		logger.error(msg)
 		response = JsonResponse(data)
-
 		response.status_code = 403
-
 		raise e
 
 	except facade.stripe.error.SignatureVerificationError as e:
@@ -113,7 +110,6 @@ def webhook_submit_order(request):
 		return response
 
 	if event['type'] == 'order.payment_completed' or (settings.DEBUG and event['type'] == 'payment_intent.succeeded'):
-
 		order = event['data']['object']
 		basket = get_object_or_404(Basket, id=order.metadata.get('basket_id'))
 		order = facade.stripe.Order.retrieve(order.id, expand=['customer', 'payment.payment_intent', 'line_items'])

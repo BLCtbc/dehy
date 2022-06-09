@@ -207,31 +207,36 @@ AUTH_PASSWORD_VALIDATORS = [
 	},
 ]
 
-if not DEBUG:
 
-	LOGGING = {
-		'version': 1,
-		'disable_existing_loggers': False,
-		'handlers': {
-			'file': {
-				'level': 'DEBUG',
-				'class': 'logging.FileHandler',
-				'filename': 'logs/django.log',
-			},
+LOGGING = {
+	'version': 1,
+	'disable_existing_loggers': False,
+	'handlers': {
+		'file': {
+			'level': 'CRITICAL',
+			'class': 'logging.FileHandler',
+			'filename': 'logs/django.log',
 		},
-		'loggers': {
-			'django': {
-				'handlers': ['file'],
-				'level': 'DEBUG',
-				'propagate': True,
-			},
-			'django.request': {
-				'handlers': ['file'],
-				'level': 'DEBUG',
-				'propagate': True,
-			}
+	},
+	'loggers': {
+		'django': {
+			'handlers': ['file'],
+			'level': 'CRITICAL',
+			'propagate': True,
 		},
-	}
+		'django.request': {
+			'handlers': ['file'],
+			'level': 'CRITICAL',
+			'propagate': True,
+		}
+	},
+}
+
+if DEBUG:
+	LOGGING['handlers']['file']['level'] = 'DEBUG'
+	LOGGING['loggers']['django']['level'] = 'DEBUG'
+	LOGGING['loggers']['django.request']['level'] = 'DEBUG'
+	
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
