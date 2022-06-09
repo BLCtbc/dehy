@@ -11,7 +11,8 @@ import environ
 from pathlib import Path
 from pygit2 import Repository
 from django.utils.translation import gettext_lazy as _
-
+import logging
+from sorl.thumbnail.log import ThumbnailLogHandler
 
 ENV_FILE = '.env-prod' if Repository('.').head.shorthand == 'main' else '.env'
 
@@ -207,36 +208,42 @@ AUTH_PASSWORD_VALIDATORS = [
 	},
 ]
 
+handler = ThumbnailLogHandler()
+handler.setLevel(logging.CRITICAL)
+logging.getLogger('sorl.thumbnail').addHandler(handler)
 
-LOGGING = {
-	'version': 1,
-	'disable_existing_loggers': False,
-	'handlers': {
-		'file': {
-			'level': 'CRITICAL',
-			'class': 'logging.FileHandler',
-			'filename': 'logs/django.log',
-		},
-	},
-	'loggers': {
-		'django': {
-			'handlers': ['file'],
-			'level': 'CRITICAL',
-			'propagate': True,
-		},
-		'django.request': {
-			'handlers': ['file'],
-			'level': 'CRITICAL',
-			'propagate': True,
-		}
-	},
-}
+if not DEBUG:
 
-if DEBUG:
-	LOGGING['handlers']['file']['level'] = 'DEBUG'
-	LOGGING['loggers']['django']['level'] = 'DEBUG'
-	LOGGING['loggers']['django.request']['level'] = 'DEBUG'
-	
+
+	LOGGING = {
+		'version': 1,
+		'disable_existing_loggers': False,
+		'handlers': {
+			'file': {
+				'level': 'WARNING',
+				'class': 'logging.FileHandler',
+				'filename': 'logs/django.log',
+			},
+		},
+		'loggers': {
+			'django': {
+				'handlers': ['file'],
+				'level': 'WARNING',
+				'propagate': True,
+			},
+			'django.request': {
+				'handlers': ['file'],
+				'level': 'WARNING',
+				'propagate': True,
+			}
+		},
+	}
+
+# if DEBUG:
+# 	LOGGING['handlers']['file']['level'] = 'DEBUG'
+# 	LOGGING['loggers']['django']['level'] = 'DEBUG'
+# 	LOGGING['loggers']['django.request']['level'] = 'DEBUG'
+#
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
