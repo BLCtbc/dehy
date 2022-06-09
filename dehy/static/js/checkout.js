@@ -553,6 +553,7 @@ dehy.ch.stripe = {
 					},
 				})
 				.then(function(result) {
+					dehy.utils.freeze_forms();
 					if (result.error) {
 					// Inform the customer that there was an error.
 					dehy.ch.forms.errors.display(result.error);

@@ -120,13 +120,12 @@
     <!-- Twitter Bootstrap -->
     <script src="{% static "oscar/js/bootstrap4/bootstrap.bundle.min.js" %}"></script>
     <!-- Oscar -->
+    <script src="{% static "oscar/js/oscar/ui.js" %}"></script>
 	<script src="{% static "js/dashboard.js" %}"></script>
 
-    <script src="{% static "oscar/js/oscar/ui.js" %}"></script>
-{% endblock %}
+{% endblock scripts %}
 
 {% block extrascripts %}
-    {{ block.super }}
 
     {# jQuery plugins #}
     <script src="{% static "oscar/js/mousewheel/jquery.mousewheel.js" %}"></script>
@@ -139,7 +138,8 @@
     <script src="{% static "oscar/js/oscar/RelatedObjectLookups.js" %}"></script>
     <script src="{% static "oscar/js/tinymce/tinymce.min.js" %}"></script>
     <script src="{% static "oscar/js/tinymce/jquery.tinymce.min.js" %}"></script>
-{% endblock %}
+	{{ block.super }}
+{% endblock extrascripts %}
 
 {% block onbodyload %}
     {{ block.super }}
