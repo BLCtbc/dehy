@@ -20,6 +20,7 @@
 
 {% block headertext %}
     {% blocktrans with number=order.number %}Order #{{ number }}{% endblocktrans %}
+	<div class="float-right pr-5"><a title="{% trans 'Print Invoice' %}" target="_blank" href="{% url 'invoice' order.id %}" ><span style="font-size:24px"><i class="fas fa-print"></i></span><a></div>
 {% endblock  %}
 
 {% block dashboard_content %}
@@ -490,8 +491,9 @@
                             {% endif %}
                         </table>
                     {% endwith %}
-                {% endblock %}
+                {% endblock payment_events %}
             </div>
+
 
             <div class="tab-pane fade {% if active_tab == 'shipping' %}show active{% endif %}" id="shipping" role="tabpanel">
                 {% block tab_shipping %}
@@ -726,6 +728,11 @@
             </div>
 
             {% block extra_tabs %}{% endblock %}
+			<div>
+				<div class="float-right"><a target="_blank" href="{% url 'invoice' order.id %}" ><span style="font-size:24px"><i class="fas fa-print"></i></span><a></div>
+			</div>
+
+
         </div>
     </div>
 {% endblock dashboard_content %}

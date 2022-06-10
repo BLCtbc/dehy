@@ -93,12 +93,13 @@
                         <th></th>
                         <th>{% anchor 'number' _("Order number") %}</th>
                         <th>{% anchor 'total_incl_tax' _("Total inc tax") %}</th>
-                        <th>{% trans "Number of items" %}</th>
+                        <th>{% anchor 'num_items' _("Number of items") %}</th>
                         <th>{% trans "Status" %}</th>
                         <th>{% trans "Customer" %}</th>
                         <th>{% trans "Shipping address" %}</th>
                         <th>{% trans "Billing address" %}</th>
-                        <th>{% trans "Date of purchase" %}</th>
+                        <th>{% anchor 'date' _("Date of purchase") %}</th>
+						<th>{% trans "Print Invoice" %}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -122,6 +123,7 @@
                         <td>{{ order.shipping_address|default:"-" }}</td>
                         <td>{{ order.billing_address|default:"-" }}</td>
                         <td>{{ order.date_placed }}</td>
+						<td style="text-align:center;vertical-align:middle;"><a target="_blank" href="{% url 'invoice' order.id %}" ><span style="font-size:24px"><i class="fas fa-print"></i></span><a></td>
                         <td>
                             <a class="btn btn-secondary" href="{% url 'dashboard:order-detail' number=order.number %}">{% trans "View" %}</a>
                         </td>
