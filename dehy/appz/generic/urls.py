@@ -11,6 +11,7 @@ urlpatterns = [
 	path('privacy-policy/', views.PrivacyPolicyView.as_view(), name='privacy_policy'),
 	path('contact/', views.contact_view, name='contact'),
 	path('terms-of-service/', views.TermsOfServiceView.as_view(), name='terms_of_service'),
+	path('invoice/<int:pk>/', views.InvoiceView.as_view(), name='invoice'),
 	path('ajax/get_cart_quantity/', views.get_cart_quantity, name='get_cart_quantity'),
 	path('ajax/create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
 	path('shipping/location/', checkout_views.ajax_get_shipping_methods, name='get_shipping_methods'),

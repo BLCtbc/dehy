@@ -96,10 +96,12 @@ class ShippingMethodForm(forms.Form):
 
 class AdditionalInfoForm(forms.ModelForm):
 	# purchase_source = forms.ChoiceField(widget=forms.widgets.RadioSelect)
+	def __init__(self, basket, *args, **kwargs):
+		super().__init__(basket, *args, **kwargs)
 
 	class Meta:
 		model = AdditionalInfoQuestionaire
-		fields = '__all__'
+		fields = ['purchase_business_type', 'business_name']
 
 class GatewayForm(AuthenticationForm):
 	username = forms.EmailField(label=_("My email address is"))

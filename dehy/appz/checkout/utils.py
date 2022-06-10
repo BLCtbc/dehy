@@ -61,19 +61,6 @@ class CheckoutSessionData(utils.CheckoutSessionData):
 
 		self._set('billing', 'new_address_fields', address_fields)
 
-	def set_questionnaire_response(self, additional_info):
-		self._set('questionnaire', 'purchase_business_type', additional_info.purchase_business_type)
-		self._set('questionnaire', 'business_name', additional_info.business_name)
-		self._set('questionnaire', 'additional_info_id', additional_info.id)
-
-	def get_questionnaire_response(self, field='id'):
-		return self._get('questionnaire', field)
-
-	def is_questionnaire_response_set(self, basket):
-		"""
-		Test if additional info object id is stored in the session
-		"""
-		return self.get_questionnaire_response() is not None
 
 	def set_stripe_customer(self, customer):
 		self._set('stripe', 'customer', customer)

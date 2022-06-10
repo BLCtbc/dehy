@@ -30,6 +30,7 @@
             <form id="login_form" action="{{ request.get_full_path }}" method="post" class="navbar-margin" >
                 <h2 class="form-title">{% trans 'Login' %}</h2>
                 {% csrf_token %}
+				{% render_field login_form.redirect_url %}
 
 				<div class="row">
 					<div class="form-group col">

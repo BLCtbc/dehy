@@ -676,6 +676,15 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 		response.status_code = status_code
 		return response
 
+	def get_form(self, form_class=None):
+		form = self.form_class(self.request.POST, self.request.basket)
+		return form
+
+	# def get_form_kwargs(self):
+	# 	kwargs = super().get_form_kwargs()
+	# 	kwargs.update({'basket': self.request.basket})
+	# 	return kwargs
+
 	def get_available_addresses(self):
 		# Include only addresses where the country is flagged as valid for
 		# shipping. Also, use ordering to ensure the default address comes
@@ -732,7 +741,8 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 						data['saved_addresses'].append(address)
 
 
-				self.checkout_session.set_questionnaire_response(form.instance)
+				self.request.basket.questionnaire = form.instance
+				self.request.basket.save()
 
 				data['stripe_pkey'] = facade.stripe.pkey
 				status_code = 200
@@ -741,6 +751,8 @@ class AdditionalInfoView(CheckoutSessionMixin, generic.FormView):
 		response.status_code = status_code
 
 		return response
+
+
 
 
 class BillingView(views.PaymentDetailsView, CheckoutSessionMixin):

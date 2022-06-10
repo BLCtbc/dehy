@@ -220,6 +220,7 @@ class AccountAuthView(views.AccountAuthView, UserPassesTestMixin):
 			return redirect(settings.LOGIN_REDIRECT_URL)
 		return super().get(request, *args, **kwargs)
 
+
 	def post(self, request, *args, **kwargs):
 		return self.validate_login_form()
 
@@ -304,8 +305,8 @@ class PaymentMethodEditView(PageTitleMixin, generic.FormView):
 		if card_id:
 
 			card = facade.stripe.Customer.retrieve_source(
-	  			self.request.user.stripe_customer_id,
-	  			card_id
+				self.request.user.stripe_customer_id,
+				card_id
 			)
 
 			if card:

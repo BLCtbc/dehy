@@ -2,12 +2,18 @@
 {% load currency_filters i18n %}
 
 {% block header_content %}
-
 	<tr>
 		<td>
-			<h2>
-				{% blocktrans with order_number=order.number %}DEHY: A New Order has Arrived ({{order_number}}){% endblocktrans %}
+			<h2 style="font-weight: 200">
+				{% trans "Order Invoice"}
 			</h2>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<p>
+				{% blocktrans with order_number=order.number %}DEHY: A New Order has Arrived ({{order_number}}){% endblocktrans %}
+			</p>
 		</td>
 	</tr>
 
@@ -17,15 +23,15 @@
 <tr>
 	<td>
 		<p>
-			{% trans "After shipping the package, mark the order as fulfilled in the Orders panel." %}
-			<span>Shipstation id: {{order.id}}</span>
+			<a href="{{site.name}}/invoice/{{order.id}}/"<span>Click here to print invoice</span></a>
+			<a target="_blank" href="{{site.name}}{% url 'invoice' order.id %}"<span>Click here to print invoice</span></a>
 		</p>
 	</td>
 </tr>
 <tr>
     <td>
 		<p>
-			<span>Order #<a href="{{site.name}}/dashboard/orders/{{order.number}}/"></a> Placed on {{order.date_placed}}</span>
+			<span>Order: {{ order.number }} (placed on {{order.date_placed}})</span>
 		</p>
     </td>
 </tr>
