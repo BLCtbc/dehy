@@ -4,8 +4,6 @@ dehy.accounts = {
 		dehy.utils.generic_handler_setup(".set-card-default", "click", dehy.accounts.handlers.set_card_as_default);
 		dehy.utils.generic_handler_setup(".delete-card", "click", dehy.accounts.handlers.remove_card);
 		dehy.accounts.handlers.initialize_stripe_card();
-
-
 		// dehy.accounts.handlers.set_card_as_default_handler();
 	},
 	handlers: {

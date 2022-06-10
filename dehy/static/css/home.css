@@ -1,3 +1,7 @@
+#mini_shop {
+	transition: all 300ms ease;
+}
+
 .header {
 	background-image: url('/static/img/custom/dehy_hero.jpeg');
 	padding-top: 0;
@@ -6,6 +10,25 @@
 .product-figure {
 	margin-top: 0;
 	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
+}
+
+#about {
+	background-image: url('/static/img/custom/dehy_hero.jpeg');
+}
+
+.carousel-control {
+	pointer-events: all;
+	width: auto;
+	height: 75px;
+	top: 30%;
+}
+
+.carousel-btn-container {
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	left: 0;
+	z-index: 2;
 }
 
 .section-image-container {

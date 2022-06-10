@@ -327,7 +327,6 @@ input.quantity:focus
 }
 
 .carousel-scroll {
-	position: absolute;
 	z-index: 2;
 	border-radius: 50%;
 	background: 0 0;
@@ -340,12 +339,17 @@ input.quantity:focus
 	opacity: 1;
 	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
 }
+.carousel-scroll * {
+	pointer-events: none;
+}
 
+.carousel-control-next:hover > .carousel-scroll-right,
 .carousel-scroll-right:hover {
 	transform: scale(-1.1, 1.1);
 	opacity: 1
 }
 
+.carousel-control-prev:hover > .carousel-scroll-left,
 .carousel-scroll-left:hover {
 	transform: scale(1.1, 1.1);
 	opacity: 1
