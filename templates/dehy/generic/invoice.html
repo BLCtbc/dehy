@@ -1,0 +1,207 @@
+{% load currency_filters i18n static %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<style type="text/css">
+			body {
+				font-family: 'Helvetica Neue','Helvetica','Arial',sans-serif;
+				font-size: 14px;
+				line-height: 22px;
+				max-width: 600px;
+				color: #3E3E3E;
+			}
+			span {
+				font-size: 11px;
+			}
+		</style>
+    </head>
+
+	<body onload="window.print()">
+
+	    <table style="width:100%;background-color:#EDEDED;padding:10px;">
+			<tr>
+				<td>
+					{% include "oscar/communication/partials/brand.html" %}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h1 style="font-weight: 200">
+						{% trans "Order Invoice" %}
+					</h1>
+				</td>
+			</tr>
+			<tr style="margin-bottom:14px;">
+				<td>
+					{% if request.user.is_staff or request.user.is_superuser %}
+					<span>Order: <a href="{{site.name}}/dashboard/orders/{{order.number}}/">{{ order.number }} </a></span><span>{% blocktrans with dt=order.date_placed|date:"DATETIME_FORMAT" %}(placed on {{dt}}){% endblocktrans %}</span>
+					{% else %}
+					<span>Order: {{ order.number }}{% blocktrans with dt=order.date_placed|date:"DATETIME_FORMAT" %} (placed on {{dt}}){% endblocktrans %}</span>
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="border-collapse:collapse; width:500px; margin-bottom:20px; line-height:18px;" cellpadding="0" cellspacing="0">
+						<tbody>
+							<tr>
+								<th style="border-bottom: 10px solid transparent;" align="left" colspan="2"></th>
+							</tr>
+							<tr>
+								<td style="vertical-align:top">
+									<div><span style="font-size: 14px; font-variant-caps:all-petite-caps;font-weight:bold">{% trans "Billed to"|upper %}</span></div>
+									<div><span>{{order.billing_address.phone_number}}</span></div>
+									<div><span>{{order.billing_address.first_name}} {{order.billing_address.last_name}}</span></div>
+									<div><span>{{order.billing_address.line1}}</span></div>
+									<div><span>{{order.billing_address.line2}}</span></div>
+									<div><span>{{order.billing_address.line3}}</span></div>
+									<div><span>{{order.billing_address.line4}}, {{order.billing_address.state}}, {{order.billing_address.postcode}}</span></div>
+									<div><span>{{order.billing_address.country}}</span></div>
+									<div><span>CC: {{order.sources.first.label}}</span></div>
+									{% with email_addr=order.user|default:order.guest_email %}
+									<a href="mailto:{{email_addr}}" target="_blank"><span>{{email_addr}}</span></a>
+									{% endwith %}
+								</td>
+
+								<td style="vertical-align:top">
+									<div><span style="font-size:14px;font-variant-caps:all-petite-caps;font-weight:bold">{% trans "Shipping to"|upper %}</span></div>
+									<div><span>{{order.shipping_address.first_name}} {{order.shipping_address.last_name}}</span></div>
+									<div><span>{{order.shipping_address.line1}}</span></div>
+									<div><span>{{order.shipping_address.line2}}</span></div>
+									<div><span>{{order.shipping_address.line3}}</span></div>
+									<div><span>{{order.shipping_address.line4}}, {{order.shipping_address.state}}, {{order.shipping_address.postcode}}</span></div>
+									<div><span>{{order.shipping_address.country}}</span></div>
+									<div><span>{{order.shipping_address.phone_number}}</span></div>
+									<div><span>{{order.shipping_method}}</span></div>
+								</td>
+							</tr>
+							<tr style="height: 20px">
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h2 style="font-weight: 200">
+						{% trans "Order Summary" %}
+					</h2>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table style="border-collapse:collapse; width:500px;margin-bottom:20px;line-height:18px;" cellpadding="0" cellspacing="0">
+						<thead style="border-bottom:1px solid;">
+							<tr>
+								<th align="left" colspan="3"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Item" %}</span></th>
+								<th align="right" colspan="1"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Qty" %}</span></th>
+								<th align="right" colspan="1"><span style="font-size:16px;font-variant-caps:all-petite-caps;">{% trans "Total" %}</span></th>
+							</tr>
+
+						</thead>
+						<tbody>
+							<tr>
+								<th style="border-bottom: 10px solid transparent;" align="left" colspan="5"></th>
+							</tr>
+							{% for line in order.lines.all %}
+							<tr>
+								<td style="padding-bottom: 10px" colspan="3">
+									<div><span style="font-weight:600">{{ line.product.parent.title|default:line.product.title }}</span></div>
+									<span>
+										{{line.product.upc}}
+										{% if line.product.is_child %}
+										<br>
+										{{line.product.title}}
+										{% endif %}
+									</span>
+								</td>
+								<td align="right" style="vertical-align:top"><span>{{line.quantity}}</span></td>
+								<td align="right" style="vertical-align:top"><span>{{ line.line_price_before_discounts_excl_tax|currency:order.currency }}</span></td>
+							</tr>
+							{% endfor %}
+							<tr style="border-top: double 2px; height: 10px">
+								<td colspan="5"></td>
+							</tr>
+							<tr style="border-top: double 2px">
+								<td colspan="3"></td>
+								<td align="right"><span>Subtotal</span></td>
+								<td align="right"><span>{{order.total_excl_tax|currency:order.currency}}</span></td>
+							</tr>
+							<tr>
+								<td colspan="3"></td>
+								<td align="right"><span>Shipping</span></td>
+								<td align="right"><span>{{order.shipping_excl_tax|currency:order.currency}}</span></td>
+							</tr>
+							<tr>
+								<td colspan="3"></td>
+								<td align="right"><span>Sales Tax</span></td>
+								<td align="right"><span>{{order.total_tax|currency:order.currency}}</span></td>
+							</tr>
+							<tr style="border-top: double 2px">
+								<td colspan="3"></td>
+								<td align="right"><span>Total</span></td>
+								<td align="right"><span>{{order.total_incl_tax|currency:order.currency}}</span></td>
+							</tr>
+
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			{% block discounts %}
+			{% if order.has_shipping_discounts or order.basket.contains_a_voucher or order.basket.offer_discounts %}
+			<tr>
+				<td>
+					<h2 style="font-weight: 200">
+						{% trans "Discounts" %}
+					</h2>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					{% include "oscar/communication/partials/order_discounts_table.html" %}
+				</td>
+			</tr>
+			{% endif %}
+			{% endblock discounts %}
+
+			{% block additional_info %}
+			{% if order.questionnaire %}
+			<tr>
+				<td>
+					<h2 style="font-weight: 200">
+						{% trans "Additional Information" %}
+					</h2>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					{% include "oscar/communication/partials/order_questionnaire_table.html" %}
+				</td>
+			</tr>
+			{% endif %}
+			{% endblock additional_info %}
+	    </table>
+    </body>
+</html>
+
+{% block body %}
+
+
+	{% block order_discounts %}
+	<tr>
+		<td>
+		</td>
+	</tr>
+	{% endblock order_discounts %}
+
+
+	{% block order_additional_info %}
+	<tr>
+		<td>
+		</td>
+	</tr>
+	{% endblock order_additional_info %}
+
+{% endblock body %}

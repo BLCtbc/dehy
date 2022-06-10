@@ -10,7 +10,6 @@ from oscar.core.compat import existing_user_fields, get_user_model
 from oscar.apps.customer.forms import EmailAuthenticationForm as BaseEmailAuthenticationForm
 from oscar.apps.customer.forms import EmailUserCreationForm as BaseEmailUserCreationForm
 from dehy.appz.checkout.forms import ShippingAddressForm
-
 Country = get_model('address', 'Country')
 BaseProfileForm = get_class('customer.forms','ProfileForm')
 User = get_user_model()
@@ -29,6 +28,7 @@ class ProfileForm(BaseProfileForm):
 
 class EmailAuthenticationForm(BaseEmailAuthenticationForm):
 	username = forms.EmailField(label=_('Email'))
+	redirect_url = forms.CharField(widget=forms.HiddenInput, required=False)
 
 class EmailUserCreationForm(BaseEmailUserCreationForm):
 

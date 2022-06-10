@@ -1,9 +1,10 @@
 from django.views.generic import ListView, TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, ModelFormMixin, ProcessFormView
 from django.views.generic.base import RedirectView
 from django.views.decorators.http import require_POST
 from django.utils.translation import gettext_lazy as _
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -15,6 +16,7 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from pathlib import Path
 
@@ -84,9 +86,7 @@ def shipstation_webhook_order_received(request):
 	if type(data) == str:
 		data = json.loads(body)
 
-	print('shipstation webhook body: ', request.body)
 	logger.debug(f'request.body: {request.body}')
-	print('shipstation webhook POST: ', request.POST)
 
 	logging.debug(f'shipstation webhook POST: {request.POST}')
 	logger.debug(f'shipstation webhook POST: {request.POST}')
@@ -96,25 +96,16 @@ def shipstation_webhook_order_received(request):
 		headers = Repository.shipstation_get_headers()
 		response = requests.get(resource_url, headers=headers)
 		msg = f'response: {response}'
-		print('print: ', msg)
-		logging.debug('logging: '+msg)
-		logger.debug('logger: '+msg)
 		status_code = response.status_code
 		# request was good, create the methods
 		if status_code != 200:
 			error_msg = f"{status_code} - A problem occurred while retrieving shipstation webhook"
-			print(error_msg)
-			logger.debug(error_msg)
 			logger.error(error_msg)
 
 		else:
 			response_list = json.loads(response.text)
-			logger.debug(f"received response from shipstation webhook: {response_list}")
-			print(f"\n received response from shipstation webhook: {response_list}")
 			for item in response_list['orders']:
 				msg = f"orderId: {item['orderId']}, orderNumber: {item['orderNumber']}, orderKey: {item['orderKey']}"
-				print(msg)
-				logger.debug(msg)
 
 				shipstation_order_id = item['orderNumber']
 				order_id = int(shipstation_order_id) - 10000
@@ -124,7 +115,6 @@ def shipstation_webhook_order_received(request):
 					order = order.first()
 					order.set_status('Processed')
 
-					logger.debug(msg)
 					current_site = get_current_site(request)
 					email_subject = f"DEHY: A New Order has Arrived ({order.number})"
 					email_body = render_to_string('oscar/communication/emails/internal/order_received.txt', {
@@ -252,6 +242,19 @@ def contact_view(request):
 	return redirect(url)
 	# pattern_name = 'faq'
 
+class InvoiceView(LoginRequiredMixin, DetailView):
+	login_url = reverse_lazy('customer:login')
+	redirect_field_name = 'next'
+	model = Order
+	template_name = "dehy/generic/invoice.html"
+
+	def get_object(self, queryset=None):
+		object = super().get_object(queryset)
+		print('object: ', object)
+		print(object.user and object.user == self.request.user)
+		if self.request.user.is_superuser or self.request.user.is_superuser or (object.user and object.user == self.request.user):
+			return object
+
 class WholesaleView(TemplateView):
 	template_name = "dehy/generic/wholesale.html"
 
@@ -267,7 +270,7 @@ class HomeView(TemplateView):
 	def get_context_data(self, *args, **kwargs):
 		data = super().get_context_data(*args, **kwargs)
 		recipes = Recipe.objects.filter(featured=True)
-		products = Product._default_manager.exclude(product_class__name='Merch', structure='child')
+		products = Product._default_manager.filter(featured=True).exclude(product_class__name='Merch', structure='child')
 
 		data.update({'recipes':recipes, 'products':products, 'mailing_list_form': forms.MailingListUserForm})
 		return data

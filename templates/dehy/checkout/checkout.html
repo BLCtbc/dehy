@@ -136,7 +136,7 @@
 						<p class="size"><small>Size: {{line.description}}</small></p>
 						{% endif %}
 
-        
+
                     </div>
                     <div class="col-sm-1 text-center">
                         {{ line.quantity }}
@@ -177,11 +177,11 @@
 
 {% endblock content %}
 
-{% block extra_scripts %}
+{% block extrascripts %}
 {{ stripe_data|json_script:"stripe-data" }}
 <script>
 </script>
 <script src="{% static "js/checkout.js" %}"></script>
 <script src="{% static "js/payments.js" %}"></script>
 
-{% endblock extra_scripts %}
+{% endblock extrascripts %}

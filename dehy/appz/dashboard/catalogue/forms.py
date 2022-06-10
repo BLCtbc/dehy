@@ -7,9 +7,10 @@ class ProductForm(base_forms.ProductForm):
 	class Meta(base_forms.ProductForm.Meta):
 		model = Product
 		fields = [
-			'title', 'upc', 'description', 'length', 'width', 'height', 'weight', 'is_public',
+			'title', 'upc', 'description', 'length', 'width', 'height', 'weight', 'is_public', 'featured',
 			'is_discountable', 'structure', 'slug', 'meta_title',
-			'meta_description']
+			'meta_description'
+		]
 		widgets = {
 			'structure': forms.HiddenInput(),
 			'meta_description': forms.Textarea(attrs={'class': 'no-widget-init'})

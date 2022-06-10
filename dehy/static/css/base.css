@@ -258,6 +258,7 @@ button[type='submit'] {
 	font-display:auto;
 }
 
+
 html {
     font-family: sans-serif;
     -ms-text-size-adjust: 100%;
@@ -919,9 +920,12 @@ footer .site-directory * {
 }
 
 .font-lydia {
-	font-family: 'lydiacondensed-bold';
+	font-family: 'lydiacondensed-bold' !important;
 }
 
+.font-avant-garde {
+	font-family: var(--avant-garde) !important;
+}
 .font-serif {
 	font-family: Futura,serif;
 }

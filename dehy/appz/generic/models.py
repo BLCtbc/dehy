@@ -94,6 +94,8 @@ class AdditionalInfoQuestionnaire(models.Model):
 	purchase_business_type = models.CharField(_("Business or Home"), choices=CHOICES, default=BAR_OR_RESTAURANT, max_length=3, help_text="Is this for home or commercial use?")
 	business_name = models.CharField(max_length=100, help_text="What is the name of your Bar/Restaurant/Business?")
 	date_created = models.DateField(auto_now_add=True, editable=False)
+	basket = models.OneToOneField('basket.Basket', on_delete=models.SET_NULL, blank=True, null=True)
+
 
 	# need a way of identifying who took the questionaire, ie. record user email, username, etc.
 	# email = models.EmailField(unique=True, help_text='Email Address')

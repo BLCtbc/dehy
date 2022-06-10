@@ -33,7 +33,8 @@ class Product(AbstractProduct):
 	width = models.FloatField(_('Width'), help_text=_("inches"), null=True, blank=True, default=None)
 	height = models.FloatField(_('Height'), help_text=_("inches"), null=True, blank=True, default=None)
 	weight = models.FloatField(_('Weight'), help_text=_("lbs"), null=True, blank=True, default=None)
-
+	featured = models.BooleanField(default=False, help_text='Feature this recipe on the homepage?')
+	
 	meta_description = models.TextField(_('Meta description'), help_text='Leave blank to copy product description',
 		blank=True, null=True
 	)

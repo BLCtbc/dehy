@@ -91,7 +91,7 @@
 {% endblock content %}
 
 
-{% block extra_scripts %}
+{% block extrascripts %}
 
 {% comment %}{{ stripe_data|json_script:"stripe-data" }}{% endcomment %}
 
@@ -100,7 +100,7 @@
 <!-- <script>
 	const stripe = Stripe("{{stripe_data.publishable_key}}");
 </script> -->
-{% endblock extra_scripts %}
+{% endblock extrascripts %}
 
 {% block onbodyload %}
     {{ block.super }}

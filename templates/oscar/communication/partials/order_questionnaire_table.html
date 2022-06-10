@@ -1,0 +1,30 @@
+{% load currency_filters i18n %}
+<table style="border-collapse:collapse; width:500px; margin-bottom:20px" cellpadding="0" cellspacing="0" class="table" id="order_receipt_table">
+	<tbody>
+		<tr>
+			<td>
+				{% trans "Business, Home, or Other?" %}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{{order.questionnaire.purchase_business_type}}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{{order.questionnaire.business_name}}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{% trans "What is the name of your Bar/Restaurant/Business?" %}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{{order.questionnaire.business_name}}
+			</td>
+		</tr>
+	</tbody>
+</table>

@@ -22,8 +22,7 @@
 		style='background-image: url({% static "img/custom/dehy_jars2_filter.jpeg" %}); background-size:cover;'>
 		<div class="row mx-auto justify-content-center">
 			<div class="col-10 my-5">
-				<h1>CATCHY PUNCHLINE</h1>
-				<h1>NOW YOU FINNA BUY SHIT</h1>
+				<h1>Modern, refined garnishes.</h1>
 				<a class='shop-link btn btn-white' href="{% url 'shop:index' %}">Shop Now</a>
 			</div>
 		</div>
@@ -40,7 +39,6 @@
 
 {% block content_wrapper %}
 {% get_media_prefix as MEDIA_PREFIX %}
-
 	{% block about_us1 %}
 	<section class='about content-section row' id='about'>
 		<div class='container'>
@@ -54,9 +52,32 @@
 		</div>
 	</section>
 	{% endblock about_us1 %}
+	{% block mailing_list_split %}
+	<section class='content-section mailing-list-split row'>
 
+			<div class='img-split col-5 d-none d-sm-flex'>
+				<img class="section-image-container" src='{% static 'img/custom/dehy_ice2_filter.jpeg' %}'>
+			</div>
+			<div class="mailing-list mailing-list-container col-12 col-sm-7">
+				<div class="col-10">
 
+					<h2 class="font-lydia">SUBSCRIBE FOR INSIDE ACCESS</h2>
+					<p class="font-avant-garde">Get emails about special events, offers, and upcoming promotions. Unsubscribe whenever you want.</p>
+					<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
+						<input type="hidden" name="csrfmiddlewaretoken" value="">
+						<label class="sr-only" for="mailing_list_submit">Sign Up</label>
+						<input type="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
+						<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit"><i class="fas fa-paper-plane"></i></button>
 
+						<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
+					</form>
+				</div>
+
+			</div>
+	</section>
+	{% endblock mailing_list_split %}
+
+	{% comment %}
 	{% block mailing_list %}
 	<section class='content-section row mailing-list-container'>
 		<div class='image-background-overlay'
@@ -77,26 +98,15 @@
 					<label class="sr-only" for="{{mailing_list_form.email.id_for_label}}">{{mailing_list_form.email.label}}</label>
 					{% render_field mailing_list_form.email class+="form-control mb-2 mr-2" placeholder="Enter Email Address" %}
 			   	 	<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit"><i class="fas fa-paper-plane"></i></button>
-
-					<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
 				</form>
-
-				{# old #}
-				{% comment %}
-				<form id="mailing_list" class="form-inline" method="POST" action="{% url 'add_user_to_mailing_list' %}" enctype="application/x-www-form-urlencoded">
-					<input type="hidden" name="csrfmiddlewaretoken">
-					<label class="sr-only" for="mailing_list_submit">Sign up to our mailing list!</label>
-					<input type="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
-					<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit"><i class="fas fa-paper-plane"></i></button>
-
-					<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
-				</form>
-				{% endcomment %}
 			</div>
 		</div>
 	</section>
 	{% endblock mailing_list %}
+	{% endcomment %}
 
+
+	{% comment %}
 	{% block about_us2 %}
 	{# about us containing image split #}
 	<section class='content-section row'>
@@ -115,15 +125,31 @@
 		</div>
 	</section>
 	{% endblock about_us2 %}
+	{% endcomment %}
 
 	{% block mini_shop %}
-	<section class='content-section mini-shop-section row'>
 
+	<section class='content-section mini-shop-section row'>
 		<div class="shop-link-container" style="position: sticky; top:0; left:10px;">
 			<a role='button' style="position: absolute; top: -3rem;" class="temp shop-link btn btn-black" href="{% url 'shop:index' %}">Shop</a>
 		</div>
-
-		<div class="mini-shop">
+		<div class="position-sticky carousel-btn-container" style="top:0;left:0;right:0">
+			<a class="carousel-control carousel-control-prev" role="button" data-slide="prev">
+				<button type="button" role="presentation" class="carousel-scroll carousel-scroll-left">
+					<svg xmlns="http://www.w3.org/2000/svg" width="54.26" height="54.26" viewBox="0 0 54.26 54.26">
+						<g id="Group_1689" data-name="Group 1689" transform="translate(-99.871 -1987.87)">
+							<g id="Decorative_Arrow" data-name="Decorative Arrow" transform="translate(99.871 1987.87)">
+								<path id="Path_146" data-name="Path 146" d="M299.1-65.334,271.967-38.2,299.1-11.074,326.227-38.2ZM274.139-38.2,299.1-63.16,324.051-38.2,299.1-13.248Z" transform="translate(-271.967 65.334)" fill="peachpuff"></path>
+								<path id="Path_147" data-name="Path 147" d="M294.993-61.71l-19.4,19.4,19.4,19.4,19.4-19.4Zm-17.25,19.4,17.25-17.25,17.25,17.25-17.25,17.251Z" transform="translate(-267.864 69.438)" fill="peachpuff"></path>
+								<path id="Path_149" data-name="Path 149" d="M301.958-45.208h-17.79l9.407-9.478-1.052-1.044-11.19,11.273,11.153,11.362,1.058-1.039-9.346-9.52h17.761Z" transform="translate(-265.909 71.547)" fill="green"></path>
+							</g>
+						</g>
+					</svg>
+				</button>
+				<span class="sr-only">{% trans "Previous" %}</span>
+			</a>
+		</div>
+		<div id="mini_shop" class="mini-shop">
 			{% for product in products %}
 				{% if not product.is_child %}
 					{# temporary #}
@@ -132,6 +158,25 @@
 					</div>
 				{% endif %}
 			{% endfor %}
+		</div>
+
+
+		<div class="position-sticky carousel-btn-container" style="top:0;right:0">
+			<a class="carousel-control carousel-control-next" role="button" data-slide="next">
+				<span class="sr-only">{% trans "Next" %}</span>
+				<button type="button" role="presentation" class="carousel-scroll carousel-scroll-right">
+					<svg xmlns="http://www.w3.org/2000/svg" width="54.26" height="54.26" viewBox="0 0 54.26 54.26">
+						<g id="Group_1689" data-name="Group 1689" transform="translate(-99.871 -1987.87)">
+							<g id="Decorative_Arrow" data-name="Decorative Arrow" transform="translate(99.871 1987.87)">
+								<path id="Path_146" data-name="Path 146" d="M299.1-65.334,271.967-38.2,299.1-11.074,326.227-38.2ZM274.139-38.2,299.1-63.16,324.051-38.2,299.1-13.248Z" transform="translate(-271.967 65.334)" fill="peachpuff"></path>
+								<path id="Path_147" data-name="Path 147" d="M294.993-61.71l-19.4,19.4,19.4,19.4,19.4-19.4Zm-17.25,19.4,17.25-17.25,17.25,17.25-17.25,17.251Z" transform="translate(-267.864 69.438)" fill="peachpuff"></path>
+								<path id="Path_149" data-name="Path 149" d="M301.958-45.208h-17.79l9.407-9.478-1.052-1.044-11.19,11.273,11.153,11.362,1.058-1.039-9.346-9.52h17.761Z" transform="translate(-265.909 71.547)" fill="green">
+								</path>
+							</g>
+						</g>
+					</svg>
+				</button>
+			</a>
 		</div>
 	</section>
 	{% endblock mini_shop %}
@@ -155,30 +200,7 @@
 	</section>
 	{% endblock account_creation %}
 
-	{% block mailing_list_split %}
-	<section class='content-section mailing-list-split row'>
 
-			<div class='img-split col-5 d-none d-sm-flex'>
-				<img class="section-image-container" src='{% static 'img/custom/dehy_ice2_filter.jpeg' %}'>
-			</div>
-			<div class="mailing-list mailing-list-container col-12 col-sm-7">
-				<div class="col-10">
-					<p class='subhead'>STAY IN DA L00pZ</p>
-					<h2>SUBSCRIBE FOR INSIDE ACCESS</h2>
-					<p class='monospace'>Get emails about special events, offers, and upcoming promotions. Unsubscribe whenever you want.</p>
-					<form id="mailing_list" class="form-inline" method="POST" enctype="application/x-www-form-urlencoded">
-						<input type="hidden" name="csrfmiddlewaretoken" value="">
-						<label class="sr-only" for="mailing_list_submit">Sign Up</label>
-						<input type="email" type="email" class="form-control form-control-sm mb-2 mr-2" id="mailing_list_email" placeholder="Enter Email Address">
-				   	 	<button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit"><i class="fas fa-paper-plane"></i></button>
-
-						<!-- <button type="submit" class="btn btn-sm mb-2" id="mailing_list_submit">Join the Mailing List</button> -->
-					</form>
-				</div>
-
-			</div>
-	</section>
-	{% endblock mailing_list_split %}
 
 	{% block recipe_list %}
 	<section class="content-section mini-recipe-section row justify-content-end">
@@ -198,4 +220,15 @@
 
 
 {% endblock content_wrapper %}
+
+
+{% block extrascripts %}
+    {{ block.super }}
+	<script src="{% static "js/home.js" %}"></script>
+{% endblock %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    dehy.home.init();
+{% endblock %}
 

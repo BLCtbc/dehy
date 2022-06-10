@@ -6,12 +6,18 @@ from dehy.appz.address.models import AbstractAddress
 from django.utils.translation import gettext_lazy as _
 
 class Order(AbstractOrder):
-	additional_info_questionnaire = models.ForeignKey('generic.AdditionalInfoQuestionnaire',
+	questionnaire = models.ForeignKey('generic.AdditionalInfoQuestionnaire',
 		on_delete=models.SET_NULL, null=True, blank=True)
 
 	@property
 	def total_tax(self):
 		return self.total_incl_tax - (self.total_excl_tax + self.shipping_excl_tax)
+
+	def save(self, *args, **kwargs):
+		if self.basket and self.basket.questionnaire:
+			self.questionnaire = self.basket.questionnaire
+			
+		super().save(*args, **kwargs)
 
 class BillingAddress(AbstractBillingAddress):
 	phone_number = PhoneNumberField(_("Phone number"), blank=True)
