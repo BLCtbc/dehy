@@ -49,6 +49,23 @@ window.addEventListener('load', function () {
     });
 	autoslug_handler();
 
+	// shelved for now
+	// var navbar_primary = document.querySelector('.navbar-primary');
+	// navbar_primary.addEventListener('click', e=>{
+	// 	if (e.target.matches('.dropdown-toggle')) {
+	// 		return;
+	// 	}
+	// 	var active_nav_links = document.querySelectorAll('.navbar-primary a.nav-link.active');
+	// 	active_nav_links.forEach(x=>{
+	// 		x.classList.toggle('active', false);
+	// 	});
+	// 	var elem = e.target;
+	// 	if (e.target.matches('a.dropdown-item')) {
+	// 		elem = e.target.closest('a.nav-link');
+	// 	}
+	// 	elem.classList.toggle('active', true);
+	// });
+
   });
 
 function autoslug_handler() {

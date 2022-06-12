@@ -36,6 +36,11 @@ class IndexView(ListView):
 
 	def get(self, request, *args, **kwargs):
 
+		print(dir(request))
+		print(request.path)
+		print(request.get_host())
+		print('request.scheme: ', request.scheme)
+		print(request.resolver_match)
 
 		if 'report_type' in request.GET:
 			form = self.report_form_class(request.GET)
