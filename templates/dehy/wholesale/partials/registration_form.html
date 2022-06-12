@@ -1,0 +1,203 @@
+{% load widget_tweaks %}
+{% load i18n %}
+<form class="mt-5" id="registration_form" method="post" action="{% url 'wholesale:register' %}">
+	{% csrf_token %}
+	<div class="row">
+		<div class="form-group col pr-2">
+			<label class="col-form-label {% if form.company_name.field.required %}required{% endif %}" for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label>
+			{% render_field form.company_name class+="form-control" %}
+			{{ form.company_name.errors }}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="form-group col pr-2">
+			<label class="col-form-label {% if form.organization.field.required %}required{% endif %}" for="{{ form.organization.id_for_label }}">{{ form.organization.label }}</label>
+			{% render_field form.organization class+="form-control" %}
+			{{ form.organization.errors }}
+		</div>
+	</div>
+	<hr>
+	<h2>{% trans "Contact Name" %}</h2>
+
+	<div class="row">
+		<div class="form-group col pr-2">
+			{% render_field form.first_name class+="form-control" %}
+			<label class="col-form-label {% if form.first_name.field.required %}required{% endif %}" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+
+			{{ form.first_name.errors }}
+		</div>
+
+		<div class="form-group col">
+			{% render_field form.last_name class+="form-control" %}
+			<label class="col-form-label {% if form.last_name.field.required %}required{% endif %}" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+
+			{{ form.last_name.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col pr-2">
+			<label class="col-form-label {% if form.position.field.required %}required{% endif %}" for="{{ form.position.id_for_label }}">{{ form.position.label }}</label>
+			{% render_field form.position class+="form-control" %}
+			{{ form.position.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col pr-2">
+			<label class="col-form-label {% if form.phone_number.field.required %}required{% endif %}" for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
+			{% render_field form.phone_number class+="form-control" %}
+			{{ form.phone_number.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			<label class="col-form-label required" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+			{% render_field form.email class+="form-control" autofill="email" %}
+			{{ form.email.errors }}
+		</div>
+	</div>
+
+	<hr>
+	<h2>{% trans "Billing Contact" %}</h2>
+	<div class="row">
+		<div class="form-group col pr-2">
+			{% render_field form.billing_first_name class+="form-control" %}
+			<label class="col-form-label {% if form.billing_first_name.field.required %}required{% endif %}" for="{{ form.billing_first_name.id_for_label }}">{{ form.billing_first_name.label }}</label>
+
+			{{ form.billing_first_name.errors }}
+		</div>
+
+		<div class="form-group col">
+			{% render_field form.billing_last_name class+="form-control" %}
+			<label class="col-form-label {% if form.billing_last_name.field.required %}required{% endif %}" for="{{ form.billing_last_name.id_for_label }}">{{ form.billing_last_name.label }}</label>
+
+			{{ form.billing_last_name.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.billing_email class+="form-control" autofill="email" %}
+			<label class="col-form-label {% if form.billing_email.field.required %}required{% endif %}" for="{{ form.billing_email.id_for_label }}">{{ form.billing_email.label }}</label>
+
+			{{ form.billing_email.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.billing_line1 class+="form-control" autofill="line1" %}
+			<label class="col-form-label {% if form.billing_line1.field.required %}required{% endif %}" for="{{ form.billing_line1.id_for_label }}">{{ form.billing_line1.label }}</label>
+
+			{{ form.billing_line1.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.billing_line2 class+="form-control" autofill="line2" %}
+			<label class="col-form-label {% if form.billing_line2.field.required %}required{% endif %}" for="{{ form.billing_line2.id_for_label }}">{{ form.billing_line2.label }}</label>
+
+			{{ form.billing_line2.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.billing_country class+="form-control" autofill="country" %}
+			<label class="col-form-label {% if form.billing_country.field.required %}required{% endif %}" for="{{ form.billing_country.id_for_label }}">{{ form.billing_country.label }}</label>
+
+			{{ form.billing_country.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.billing_postcode class+="form-control" %}
+			<label class="col-form-label {% if form.billing_postcode.field.required %}required{% endif %}" for="{{ form.billing_postcode.id_for_label }}">{{ form.billing_postcode.label }}</label>
+			{{ form.billing_postcode.errors }}
+		</div>
+
+		<div class="form-group col">
+			{% render_field form.billing_last_name class+="form-control" %}
+			<label class="col-form-label {% if form.billing_line4.field.required %}required{% endif %}" for="{{ form.billing_line4.id_for_label }}">{{ form.billing_line4.label }}</label>
+
+			{{ form.billing_line4.errors }}
+		</div>
+		<div class="form-group col">
+			{% render_field form.billing_state class+="form-control" %}
+			<label class="col-form-label {% if form.billing_state.field.required %}required{% endif %}" for="{{ form.billing_state.id_for_label }}">{{ form.billing_state.label }}</label>
+			{{ form.billing_state.errors }}
+		</div>
+	</div>
+
+	<hr>
+	<h2>{% trans "Shipping/Delivery Address" %}</h2>
+
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.shipping_line1 class+="form-control" autofill="line1" %}
+			<label class="col-form-label {% if form.shipping_line1.field.required %}required{% endif %}" for="{{ form.shipping_line1.id_for_label }}">{{ form.shipping_line1.label }}</label>
+
+			{{ form.shipping_line1.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.shipping_line2 class+="form-control" autofill="line2" %}
+			<label class="col-form-label {% if form.shipping_line2.field.required %}required{% endif %}" for="{{ form.shipping_line2.id_for_label }}">{{ form.shipping_line2.label }}</label>
+
+			{{ form.shipping_line2.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.shipping_country class+="form-control" autofill="country" %}
+			<label class="col-form-label {% if form.shipping_country.field.required %}required{% endif %}" for="{{ form.shipping_country.id_for_label }}">{{ form.shipping_country.label }}</label>
+
+			{{ form.shipping_country.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			{% render_field form.shipping_postcode class+="form-control" %}
+			<label class="col-form-label {% if form.shipping_postcode.field.required %}required{% endif %}" for="{{ form.shipping_postcode.id_for_label }}">{{ form.shipping_postcode.label }}</label>
+
+			{{ form.shipping_postcode.errors }}
+		</div>
+
+		<div class="form-group col">
+			{% render_field form.shipping_line4 class+="form-control" %}
+			<label class="col-form-label {% if form.shipping_line4.field.required %}required{% endif %}" for="{{ form.shipping_line4.id_for_label }}">{{ form.shipping_line4.label }}</label>
+
+			{{ form.shipping_line4.errors }}
+		</div>
+		<div class="form-group col">
+			{% render_field form.shipping_state class+="form-control" %}
+			<label class="col-form-label {% if form.shipping_state.field.required %}required{% endif %}" for="{{ form.shipping_state.id_for_label }}">{{ form.shipping_state.label }}</label>
+
+			{{ form.shipping_state.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col">
+			<label class="col-form-label {% if form.shipping_notes.field.required %}required{% endif %}" for="{{ form.shipping_notes.id_for_label }}">{{ form.shipping_notes.label }}</label>
+			<div><small>({{form.shipping_notes.help_text}})</small></div>
+			{% render_field form.shipping_notes class+="form-control" %}
+			{{ form.shipping_notes.errors }}
+		</div>
+	</div>
+	<hr>
+
+	<div class="row">
+		<div class="form-group col">
+			<label class="col-form-label {% if form.product_interests.field.required %}required{% endif %}" for="{{ form.product_interests.id_for_label }}">{{ form.product_interests.label }}</label>
+
+			{% render_field form.product_interests %}
+
+			{{ form.product_interests.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="requires-recaptcha"></div>
+	</div>
+	<div class="form-group text-center">
+		<button name="registration_submit" type="submit" value="Create" class="btn btn-lg" data-loading-text="{%trans 'Creating account...' %}">{% trans 'Submit' %}</button>
+	</div>
+
+</form>

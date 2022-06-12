@@ -1,0 +1,71 @@
+{% extends "dehy/layout_2_col.html" %}
+{% load static i18n image_tags %}
+
+{% block title %}
+{% trans "Wholesale" %} | {{ block.super }}
+{% endblock title %}
+
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/faq.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'css/wholesale.css' %}"/>
+{% endblock extrastyles %}
+
+{% block splash_container %}
+<div class="splash-image-container row justify-content-center" style="background-image: url({% static 'img/dehy-background.jpeg' %})">
+	<h1 class="splash-header col-sm-8 col-10">
+		{% block header_title %}
+		{% trans "Elevate your beverage program in a sustainable, profitable fashion." %}
+		{% endblock header_title %}
+	</h1>
+	<div class="col-sm-8 col-10 p-3">
+		<a target="_blank" class="btn btn-lg p-4 px-5 text-white" style="border-radius: 300px;letter-spacing:0.05em">{% trans "View Our Wholesale Pricing" %}</a>
+	</div>
+	<div class="col-sm-8 col-10 p-3">
+		<a href="{% url 'wholesale:register' %}" class="btn btn-lg p-4 px-5 text-white" style="border-radius: 300px;letter-spacing:0.05em">{% trans "Setup An Account" %}</a>
+	</div>
+	<div class="col-sm-8 col-10 p-3">
+		<a href="{% url 'contact' %}" class="btn btn-lg p-4 px-5 text-white" style="border-radius: 300px;letter-spacing:0.05em">{% trans "Contact Us" %}</a>
+	</div>
+
+</div>
+{% endblock splash_container %}
+
+{% block header %}
+{% endblock header %}
+
+{% block content_wrapper %}
+{% get_static_prefix as STATIC_PREFIX %}
+{% get_media_prefix as MEDIA_PREFIX %}
+
+
+<section class="content-section wholesale row justify-content-center">
+	<div class="col-11 p-0">
+		<div class="card-list-grid">
+			{% for card in card_list %}
+
+			<div class="card bg-light">
+				<div class="card-body">
+					<div class="image-container">
+						{% with image_url='http://'|add:request.get_host|add:STATIC_PREFIX|add:card.img %}
+						{% oscar_thumbnail image_url "1000x1000" as thumb %}
+						<img class="card-img" src="{{ thumb.url }}">
+						{% endwith %}
+					</div>
+					<h2 class="card-title font-avant-garde">{{card.title}}</h2>
+					<p class="card-text font-lydia">{{card.description}}</p>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	<div class="col-sm-8 col-10 p-3 text-center mt-4">
+		<a target="_blank" href="mailto:orders@{{request.get_host}}" class="btn btn-lg p-4 px-5 text-white" style="border-radius: 300px;letter-spacing:0.05em">{% trans "Order Now" %}</a>
+	</div>
+
+</section>
+
+{% endblock content_wrapper %}
+
+{% block extrascripts %}
+{{ block.super }}
+{% endblock extrascripts %}

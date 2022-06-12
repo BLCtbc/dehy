@@ -255,9 +255,6 @@ class InvoiceView(LoginRequiredMixin, DetailView):
 		if self.request.user.is_superuser or self.request.user.is_superuser or (object.user and object.user == self.request.user):
 			return object
 
-class WholesaleView(TemplateView):
-	template_name = "dehy/generic/wholesale.html"
-
 class PrivacyPolicyView(TemplateView):
 	template_name = "dehy/generic/privacy_policy.html"
 

@@ -6,6 +6,7 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('', include('dehy.appz.generic.urls'), name='generic'),
 	path('recipes/', include('dehy.appz.recipes.urls'), name='recipes'),
+	path('wholesale/', include('dehy.appz.wholesale.urls'), name='wholesale'),
 	path('', include(apps.get_app_config('dehy').urls[0])),
 ]
 
