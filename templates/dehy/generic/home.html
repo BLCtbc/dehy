@@ -186,16 +186,14 @@
 	{% oscar_thumbnail image_url "1500x" upscale=True as thumb %}
 	<section id="wholesale" class='content-section row justify-content-center' style="background-image: url('{{ thumb.url }}')">
 		{% endwith %}
-
 		<div class="col-8 my-5 mx-auto">
 			<div class="text-container frosted-glass">
-				<p><span class="text-light">Wholesale</span> account <span class="text-light">creation</span> </p>
-				<p>Interested in creating an account?
+				<p style="font-size:1.5rem"><span class="text-light">{% trans "Wholesale Account Creation" %}</span></p>
+				<p style="font-size:1.5rem"><span class="text-light">{% trans "Interested in creating an account?" %}</span>
 					<br>
-				 <a class="text-light" style="text-decoration: underline" href="{% url 'customer:register' %}">Clicky on this here button</a>
+				 <a class="text-light" style="text-decoration: underline" href="{% url 'wholesale:index' %}">{% trans "Click here" %}</a>
 				</p>
 			</div>
-
 		</div>
 	</section>
 	{% endblock account_creation %}

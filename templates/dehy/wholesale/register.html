@@ -1,0 +1,44 @@
+{% extends "dehy/layout.html" %}
+{% load static i18n image_tags %}
+
+{% block title %}
+{% trans "Account Setup Form" %} | {% trans "Wholesale" %} | {{ block.super }}
+{% endblock title %}
+
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/wholesale.css' %}"/>
+{% endblock extrastyles %}
+
+{% block splash_container %}
+{% endblock splash_container %}
+
+{% block header %}
+{% endblock header %}
+
+{% block content_wrapper %}
+
+<section class="content-section row justify-content-center navbar-padding">
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-lg-10">
+				<h1 class="text-center my-5">{% trans "Wholesale Account Setup" %}</h1>
+				<p>
+					{% trans "Welcome! To get started, please fill out the form below. If you are receiving local deliveries in the Austin, Texas area, be sure to include preferred delivery times/days." %}
+				</p>
+				<p>
+					{% trans "Once you submit this information, our team will reach out with further instructions for ordering, billing, and shipping. To place an order, email our fulfillment department at orders@dehygarnish.com. Local deliveries are made Monday-Saturday, and orders placed before 1pm will be shipped same day. If expedited shipping is required, please be sure to inform us when you order." %}
+				</p>
+				<p> {% trans "We see ourselves as an extension of your bar team, so don’t hesitate to email us at info@dehygarnish.com if you have any custom requests or need something on the fly." %}
+				</p>
+			</div>
+			<div class="col-lg-10">
+				{% include "dehy/wholesale/partials/registration_form.html" %}
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock content_wrapper %}
+
+{% block extrascripts %}
+{{ block.super }}
+{% endblock extrascripts %}

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 	'dehy',
 	'dehy.appz.generic.apps.GenericConfig',
 	'dehy.appz.recipes.apps.RecipesConfig',
+	'dehy.appz.wholesale.apps.WholesaleConfig',
 	'dehy.appz.dashboard.recipes.apps.RecipesDashboardConfig',
 	'dehy.appz.dashboard.faq.apps.FAQDashboardConfig',
 	# oscar overrides

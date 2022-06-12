@@ -84,6 +84,9 @@ p {
 	filter: saturate(0.5) !important;
 }
 
+.br-0 {
+	border-radius: 0 !important;
+}
 .br-1 {
 	border-radius: 1px !important;
 }
@@ -141,6 +144,7 @@ body.navbar-expanded {
 }
 
 form:not(#contact) select:not(#size_selector),
+form:not(#contact) textarea,
 form:not(#contact) input:not(#id_quantity, [type="radio"], [type='checkbox'], .product-quantity, .quantity) {
 	outline: 2px solid var(--gold);
 	outline-offset: 1px;
@@ -1056,6 +1060,9 @@ input, select, label {
 	.ig-img-grid {
 		grid-template-columns: repeat(2, 45%);
 	}
+	h1 {
+		font-size: calc(2.3 * 1rem);
+	}
 }
 
 
@@ -1094,10 +1101,11 @@ input[type=number] {
     right: 0;
     top: 0;
     bottom: 0;
-    background: rgba(127, 127, 127, 0.5);
-    background-image: radial-gradient(black 33%, transparent 33%);
-    background-size: 2px 2px;
+    background: rgba(127, 127, 127, 0);
+    background-image: radial-gradient(black 10%, transparent 10%);
+    background-size: 4px 4px;
 	z-index: 2;
+	pointer-events: none;
 }
 
 a.headerlink {

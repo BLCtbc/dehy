@@ -6,7 +6,6 @@ from dehy.appz.checkout import views as checkout_views
 urlpatterns = [
 	path('', views.HomeView.as_view(), name='home'),
 	path('returns-refunds/', views.ReturnsRefundsView.as_view(), name='returns'),
-	path('wholesale/', views.WholesaleView.as_view(), name='wholesale'),
 	path('faq/', views.FAQView.as_view(), name='faq'),
 	path('privacy-policy/', views.PrivacyPolicyView.as_view(), name='privacy_policy'),
 	path('contact/', views.contact_view, name='contact'),
