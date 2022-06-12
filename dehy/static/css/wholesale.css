@@ -14,7 +14,7 @@
 	background-repeat: no-repeat;
 	background-position: left bottom;
 	background-size: cover;
-	background-image: url('/static/img/custom/dehy-340_copy.jpg');
+	background-image: url('/static/img/custom/dehy-340.small.jpg');
 }
 
 .content-section:not(.wholesale) p{
