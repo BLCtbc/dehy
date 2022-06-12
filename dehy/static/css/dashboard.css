@@ -9,3 +9,20 @@
 	top: 0.5rem;
 	left: 0.5rem;
 }
+
+.navbar.navbar-accounts .navbar-brand {
+	width: auto;
+	background-image: none;
+	text-indent: 0;
+}
+
+.navbar.navbar-accounts .navbar-brand img {
+	width: auto;
+	max-height: 35px;
+}
+
+.navbar-primary .nav-link.active {
+	background-image: linear-gradient(to bottom, #000000 0%, #343a40 100%);
+	font-style: italic;
+	color: white !important;
+}

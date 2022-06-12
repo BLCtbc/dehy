@@ -25,7 +25,10 @@
 {% block layout %}
     {% block navbar %}
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-accounts">
-            <a class="navbar-brand" href="#">{{ shop_name }}</a>
+            <!-- <a class="navbar-brand" href="#">{{ shop_name }}</a> -->
+			<a class="navbar-brand" href="{% url 'dashboard:index' %}" title="dehygarnish.com"><small> {{ shop_tagline }}</small>
+				<img src="{% static 'img/brand.png' %}" alt="Dehy logo">
+			</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#top_nav_bar" aria-controls="top_nav_bar" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>

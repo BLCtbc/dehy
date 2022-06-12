@@ -1,14 +1,17 @@
 {% extends 'oscar/dashboard/reports/index.html' %}
 {% load currency_filters %}
 {% load i18n %}
+{% load sorting_tags %}
 
 {% block report %}
 <table class="table table-striped table-bordered table-hover">
     <tr>
-        <th>{% trans "Product" %}</th>
-        <th>{% trans "Views" %}</th>
-        <th>{% trans "Basket additions" %}</th>
-        <th>{% trans "Purchases" %}</th>
+        <th>{% anchor 'product__title' _("Product") %}</th>
+        <th>{% anchor 'num_views' _("Views") %}</th>
+        <th>{% anchor 'num_basket_additions' _("Basket additions") %}</th>
+        <th>{% anchor 'num_purchases' _("Purchases") %}</th>
+		<th>{% anchor 'total_revenue' _("Total Revenue") %}</th>
+
     </tr>
     {% for product in objects %}
     <tr>
@@ -23,6 +26,7 @@
         <td>{{ product.num_views }}</td>
         <td>{{ product.num_basket_additions }}</td>
         <td>{{ product.num_purchases }}</td>
+		<td>{{ product.total_revenue|currency }}</td>
     </tr>
     {% endfor %}
 </table>

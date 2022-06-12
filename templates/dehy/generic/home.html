@@ -182,7 +182,7 @@
 	{% endblock mini_shop %}
 
 	{% block account_creation %}
-	{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/home/dehy-1279.jpg' %}
+	{% with image_url='http://'|add:request.get_host|add:MEDIA_PREFIX|add:'images/home/dehy-1279.small.jpg' %}
 	{% oscar_thumbnail image_url "1500x" upscale=True as thumb %}
 	<section id="wholesale" class='content-section row justify-content-center' style="background-image: url('{{ thumb.url }}')">
 		{% endwith %}
