@@ -186,10 +186,8 @@
 
 	<div class="row">
 		<div class="form-group col">
-			<label class="col-form-label {% if form.product_interests.field.required %}required{% endif %}" for="{{ form.product_interests.id_for_label }}">{{ form.product_interests.label }}</label>
-
+			<label style="font-size:1.45rem;" class="col-form-label {% if form.product_interests.field.required %}required{% endif %}" for="{{ form.product_interests.id_for_label }}">{{ form.product_interests.label }}</label>
 			{% render_field form.product_interests %}
-
 			{{ form.product_interests.errors }}
 		</div>
 	</div>
