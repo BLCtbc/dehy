@@ -6,6 +6,7 @@ import base64, datetime, json, requests, xmltodict
 from oscar.core.loading import get_class, get_model, get_classes
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib import messages
 
 import asyncio, logging
 from asgiref.sync import sync_to_async
@@ -18,9 +19,6 @@ Basket = get_model('basket', 'Basket')
 
 logger = logging.getLogger(__name__)
 # https://django-oscar.readthedocs.io/en/latest/howto/how_to_configure_shipping.html?highlight=shipping%20method#shipping-methods
-
-# class Repository(repository.Repository):
-# 	methods = (shipping_methods.Standard(), shipping_methods.Express())
 
 class Repository(repository.Repository):
 	methods = [shipping_methods.FedexGround()]
@@ -77,7 +75,7 @@ class Repository(repository.Repository):
 
 			weight = basket.total_weight
 			# methods += self.shipstation_get_shipping_methods(basket, weight)
-			methods,data = self.fedex_get_rates_and_transit_times(basket, weight, shipping_addr)
+			methods,data = self.fedex_get_rates_and_transit_times(basket, weight, shipping_addr, request=request)
 			###############################################################################
 			## will need to implement some sort of API here to properly configure which  ##
 			## shipping methods are available to a user based on their geo location      ##
@@ -434,7 +432,7 @@ class Repository(repository.Repository):
 		response = requests.post(url, data=json.dumps(payload), headers=headers)
 		status_code = response.status_code
 
-	def fedex_get_rates_and_transit_times(self, basket, weight, shipping_addr, max_retries=1):
+	def fedex_get_rates_and_transit_times(self, basket, weight, shipping_addr, max_retries=1, request=None,):
 		# shipping_addr = usps_validate_address(shipping_addr)
 		methods = []
 		data = {'status_code': 200}
@@ -551,7 +549,7 @@ class Repository(repository.Repository):
 				if retries < max_retries:
 					retries -= 1
 					shipping_addr,corrections = self.make_address_corrections(shipping_addr)
-					methods,_data = self.fedex_get_rates_and_transit_times(basket, weight, shipping_addr, max_retries=retries)
+					methods,_data = self.fedex_get_rates_and_transit_times(basket, weight, shipping_addr, max_retries=retries, request=request)
 					if _data:
 						data.update(_data)
 
@@ -560,35 +558,40 @@ class Repository(repository.Repository):
 
 
 			if status_code == 400:
-				print('\n BAD REQUEST')
+				error_text = 'BAD REQUEST'
 
 			elif status_code == 403:
-				print('\n FORBIDDEN')
+				error_text = 'FORBIDDEN'
 
 			elif status_code == 404:
-				print('\n NOT FOUND')
+				error_text = 'NOT FOUND'
 
 			elif status_code == 429:
-				print('\n RATE LIMITED')
+				error_text = 'RATE LIMITED'
 
 			elif status_code == 500:
-				print('\n FAILURE')
+				error_text = 'INTERNAL SERVER ERROR'
 
 			elif status_code == 503:
-				print('\n SERVICE UNAVAILABLE')
-
+				error_text = 'SERVICE UNAVAILABLE'
 				print(' *** ATTEMPTING TO GET METHODS FROM SHIPSTATION ***')
 
-				methods, _data = self.shipstation_get_shipping_methods(weight, shipping_addr)
+				methods, _data = self.shipstation_get_shipping_methods(weight, shipping_addr, request)
 				if _data:
 					data.update(_data)
+
+			error_text = f'({status_code}): {error_text}'
+			print(error_text)
+
+			if request:
+				messages.warning(request, error_text)
 
 
 		return methods, data
 
 
 
-	def fedex_update_auth_token(self, FedexAuthToken=FedexAuthTokenModel.objects.first()):
+	def fedex_update_auth_token(self, FedexAuthToken=FedexAuthTokenModel.objects.first(), request=None):
 
 		payload = f"grant_type=client_credentials&client_id={settings.FEDEX_API_KEY}&client_secret={settings.FEDEX_SECRET_KEY}"
 		url = settings.FEDEX_API_URL + "oauth/token"
@@ -614,25 +617,28 @@ class Repository(repository.Repository):
 			logger.error(f'Fedex API: Error authorizing ({status_code}). \n{error["message"]}')
 
 			if status_code == 400:
-				print('\n BAD REQUEST')
-
-			elif status_code == 401:
-				print('\n UNAUTHORIZED')
+				error_text = 'BAD REQUEST'
 
 			elif status_code == 403:
-				print('\n FORBIDDEN')
+				error_text = 'FORBIDDEN'
 
 			elif status_code == 404:
-				print('\n NOT FOUND')
+				error_text = 'NOT FOUND'
 
 			elif status_code == 429:
-				print('\n RATE LIMITED')
+				error_text = 'RATE LIMITED'
 
 			elif status_code == 500:
-				print('\n INTERNAL.SERVER.ERROR')
+				error_text = 'INTERNAL SERVER ERROR'
 
 			elif status_code == 503:
-				print('\n SERVICE UNAVAILABLE')
+				error_text = 'SERVICE UNAVAILABLE'
+
+			error_text = f'({status_code}): {error_text}'
+			print(error_text)
+
+			if request:
+				messages.warning(request, error_text)
 
 		return FedexAuthToken
 
@@ -669,7 +675,7 @@ class Repository(repository.Repository):
 		response = requests.post(url, headers=headers, data=json.dumps(payload))
 		return response
 
-	def shipstation_get_shipping_methods(self, weight, shipping_addr):
+	def shipstation_get_shipping_methods(self, weight, shipping_addr, request=None):
 
 		# documentation: https://www.shipstation.com/docs/api/shipments/get-rates/
 		methods = []
@@ -716,24 +722,30 @@ class Repository(repository.Repository):
 			print('Error retrieving shipping methods from shipstation')
 			print('Error message: ', error['message'])
 			print('Error code: ', error['code'])
-
 			if status_code == 400:
-				print('\n BAD REQUEST')
+				error_text = 'BAD REQUEST'
 
-			if status_code == 403:
-				print('\n FORBIDDEN')
+			elif status_code == 403:
+				error_text = 'FORBIDDEN'
 
-			if status_code == 404:
-				print('\n NOT FOUND')
+			elif status_code == 404:
+				error_text = 'NOT FOUND'
 
 			elif status_code == 429:
-				print('\n RATE LIMITED')
+				error_text = 'RATE LIMITED'
 
 			elif status_code == 500:
-				print('\n FAILURE')
+				error_text = 'INTERNAL SERVER ERROR'
 
 			elif status_code == 503:
-				print('\n SERVICE UNAVAILABLE')
+				error_text = 'SERVICE UNAVAILABLE'
+
+
+			error_text = f'({status_code}): {error_text}'
+			print(error_text)
+
+			if request:
+				messages.warning(request, error_text)
 
 		data.update({'status_code': status_code})
 		return methods, data

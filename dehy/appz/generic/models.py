@@ -23,7 +23,7 @@ class FedexAuthToken(models.Model):
 	scope = models.CharField(_("Scope"), max_length=20, default="")
 
 	def __str__(self):
-		return f"Token: {self.access_token}, created: {self.date_created}"
+		return f"Fedex Auth token: {self.access_token}, created: {self.date_created}"
 
 	@property
 	def expiration(self):
@@ -35,9 +35,18 @@ class FedexAuthToken(models.Model):
 
 	def save(self, *args, **kwargs):
 		if not self.pk and FedexAuthToken.objects.exists():
-			raise ValidationError('There is can be only one FedexAuthToken instance')
+			raise ValidationError('There can only be one instance of this token')
 
 		return super().save(*args, **kwargs)
+
+
+class QuickbooksAuthToken(FedexAuthToken):
+	refresh_token = models.CharField(_("Token"), max_length=2000, default="")
+	refresh_expires_in = models.IntegerField(_("Refresh Expires in"), default=0, help_text=_("Seconds"))
+	
+	def __str__(self):
+		return f"Quickbooks access token: {self.access_token}, created: {self.date_created}"
+
 
 
 class FAQ(models.Model):

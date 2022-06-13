@@ -3,6 +3,10 @@ from django.views import generic
 from django.utils.translation import gettext_lazy as _
 from oscar.core.loading import get_class, get_model
 from django.contrib.sites.shortcuts import get_current_site
+import requests
+from django.conf import settings
+
+from dehy.utils import quickbooks
 
 WholesaleAccountCreationForm = get_class('dehy.appz.wholesale.forms', 'WholesaleAccountCreationForm')
 # Create your views here.
@@ -24,4 +28,42 @@ class WholesaleRegisterView(generic.edit.FormView):
 	template_name = 'dehy/wholesale/register.html'
 	form_class = WholesaleAccountCreationForm
 
+	def post(self, request, *args, **kwargs):
+		response = super().post(request, *args, **kwargs)
 
+
+	def form_valid(self, form):
+
+		return super().form_valid(form)
+
+
+def auth_code_handler(request):
+	state = request.GET.get('state', None)
+	error = request.GET.get('error', None)
+
+	if error == 'access_denied':
+		print('access denied')
+		# return redirect('sampleAppOAuth2:index')
+
+	if state is None:
+		return HttpResponseBadRequest()
+
+	elif state != get_CSRF_token(request):  # validate against CSRF attacks
+		return HttpResponse('unauthorized', status=401)
+
+	auth_code = request.GET.get('code', None)
+	if auth_code is None:
+		return HttpResponseBadRequest()
+
+	bearer = quickbooks.get_bearer_token(auth_code)
+	realm_id = request.GET.get('realm_id', None)
+	quickbooks.update_session(request, bearer.access_token, bearer.refresh_token, realm_id)
+
+	# Validate JWT tokens only for OpenID scope
+	if bearer.id_token is not None:
+		if not quickbooks.validate_jwt_token(bearer.id_token):
+			return HttpResponse('JWT Validation failed. Please try signing in again.')
+		else:
+			return redirect('sampleAppOAuth2:connected')
+	else:
+		return redirect('sampleAppOAuth2:connected')
