@@ -6,6 +6,7 @@ from oscar.core.loading import get_class, get_model
 from django.contrib.sites.shortcuts import get_current_site
 import os, requests
 from django.conf import settings
+from django.urls import reverse_lazy
 # from dehy.utils import quickbooks
 
 WholesaleAccountCreationForm = get_class('dehy.appz.wholesale.forms', 'WholesaleAccountCreationForm')
@@ -27,6 +28,7 @@ class WholesaleView(generic.TemplateView):
 class WholesaleRegisterView(generic.edit.FormView):
 	template_name = 'dehy/wholesale/register.html'
 	form_class = WholesaleAccountCreationForm
+	success_url = reverse_lazy('wholesale:index')
 
 	def post(self, request, *args, **kwargs):
 		response = super().post(request, *args, **kwargs)
