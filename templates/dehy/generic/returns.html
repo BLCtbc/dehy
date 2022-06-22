@@ -107,8 +107,7 @@
 		<p>If you have any questions about our Returns and Refunds Policy, please contact us:</p>
 		<ul>
 			<li>By email: <a href="mailto:info@dehygarnish.com" target="_blank" aria-hidden="true">orders@dehygarnish.com</a></li>
-			<li>By visiting this page on our website: <a href="{% url 'contact' %}">http://www.dehygarnish.com/contact</a></li>
-			<li>By visiting this page on our website: <a href="{% url 'contact' %}">{{request.scheme}}://{{request.get_host}}{% url 'contact' %}</a></li>
+			<li>By visiting this page on our website: <a href="{% url 'contact' %}"><span style="color: var(--gold);">{{request.scheme}}://{{request.get_host}}{% url 'contact' %}</span></a></li>
 
 		</ul>
 	</div>
