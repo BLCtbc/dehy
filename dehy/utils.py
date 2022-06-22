@@ -1,7 +1,6 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import six, base64, requests, json
 from dehy.appz.shipping.methods import BaseFedex, FreeShipping
-from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from jose import jwk
@@ -11,6 +10,7 @@ from intuitlib.enums import Scopes
 
 from oscar.core.loading import get_class, get_model
 QuickbooksAuthToken = get_model('generic', 'QuickbooksAuthToken')
+# from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 
 class TokenGenerator(PasswordResetTokenGenerator):
 
@@ -176,8 +176,9 @@ class Fedex(object):
 		self.secret_key = settings.FEDEX_SECRET_KEY
 		self.api_key = settings.FEDEX_API_KEY
 
+	# def update_auth_token(self, auth_token=FedexAuthTokenModel.objects.first()):
 
-	def update_auth_token(self, auth_token=FedexAuthTokenModel.objects.first()):
+	def update_auth_token(self, auth_token):
 
 		payload = f"grant_type=client_credentials&client_id={settings.FEDEX_API_KEY}&client_secret={settings.FEDEX_SECRET_KEY}"
 		url = self.base_url + "oauth/token"
