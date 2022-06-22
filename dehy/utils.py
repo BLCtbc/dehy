@@ -9,7 +9,7 @@ from intuitlib.client import AuthClient
 from intuitlib.enums import Scopes
 
 from oscar.core.loading import get_class, get_model
-QuickbooksAuthToken = get_model('generic', 'QuickbooksAuthToken')
+# QuickbooksAuthToken = get_model('generic', 'QuickbooksAuthToken')
 # from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 
 class TokenGenerator(PasswordResetTokenGenerator):
@@ -306,4 +306,4 @@ class OAuth2Config(object):
 		self.jwks_uri = jwks_uri
 
 
-quickbooks = qb = QuickBooks()
+# quickbooks = qb = QuickBooks()

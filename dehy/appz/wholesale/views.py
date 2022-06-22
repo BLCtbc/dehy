@@ -6,7 +6,7 @@ from oscar.core.loading import get_class, get_model
 from django.contrib.sites.shortcuts import get_current_site
 import os, requests
 from django.conf import settings
-from dehy.utils import quickbooks
+# from dehy.utils import quickbooks
 
 WholesaleAccountCreationForm = get_class('dehy.appz.wholesale.forms', 'WholesaleAccountCreationForm')
 # Create your views here.
