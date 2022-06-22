@@ -10,9 +10,10 @@ header {
 	box-shadow: 2px 3px 6px rgb(28 28 28 / 60%);
     -webkit-box-shadow: rgb(28 28 28 / 60%) 2px 3px 6px;
 	margin: 0.5rem 0.75rem;
-	background-color: var(--hg);
+	background: linear-gradient(45deg, var(--dark-hg), var(--hg), var(--dark-hg));
 	padding: 2rem;
 }
+
 
 .recipe-card:not(.preview) {
 	padding: 3% 5%;
@@ -44,8 +45,12 @@ header {
 }
 
 #recipe_list, .mini-recipe-section {
-	background: url(/static/img/textures/bg_subtle_dots.png) repeat scroll 0 0;
-	border-top: 12px solid white;
+	/* background: url(/static/img/textures/bg_subtle_dots.png) repeat scroll 0 0; */
+	background: rgba(0, 0, 0, 0.75) no-repeat 60% 50% url(/static/img/custom/dehy-1303.resize.jpeg);
+
+	border-top: 22px solid #000000fc;
+	background-size: cover;
+	padding-bottom: 16px;
 }
 
 .recipe-description {

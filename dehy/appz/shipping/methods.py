@@ -29,7 +29,7 @@ class FreeShipping(methods.FixedPrice, Base):
 class FedexGround(methods.FixedPrice, Base):
 
 	code = 'FEDEX_GROUND'
-	name = 'FedEx Ground®'
+	name = 'FedEx Ground® - FREE For Orders Over $50 (continental US)'
 
 	def calculate(self, basket):
 		pp = 5

@@ -6,6 +6,12 @@ from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from jose import jwk
 
+from intuitlib.client import AuthClient
+from intuitlib.enums import Scopes
+
+from oscar.core.loading import get_class, get_model
+QuickbooksAuthToken = get_model('generic', 'QuickbooksAuthToken')
+
 class TokenGenerator(PasswordResetTokenGenerator):
 
 	def _make_hash_value(self, user, timestamp):
@@ -43,6 +49,38 @@ class QuickBooks(object):
 		self.secret_key = settings.QUICKBOOKS_SECRET_KEY
 		self.discovery_document = get_discovery_document()
 		self.redirect_uri = settings.QUICKBOOKS_REDIRECT_URI
+		self.base_url = settings.QUICKBOOKS_BASE_URL
+		self.environment = settings.QUICKBOOKS_ENVIRONMENT
+		self.auth_token = QuickbooksAuthToken.objects.get()
+		self.auth_client = AuthClient(
+			self.api_key, self.secret_key, self.redirect_uri, self.environment,
+			realm_id=self.auth_token.realm_id, access_token=self.auth_token.access_token,
+			refresh_token=self.auth_token.refresh_token,
+		)
+
+
+		self.refresh_auth_token()
+
+	def update_auth_token(self):
+		self.auth_token.access_token = self.auth_client.access_token
+		self.auth_token.refresh_token = self.auth_client.refresh_token
+		self.auth_token.save()
+
+	def api_call(self, call_name='customer', payload={}):
+		url = self.base_url + f'/v3/company/{self.auth_client.realm_id}/{call_name}?minorversion=65'
+		auth_header = 'Bearer {0}'.format(self.auth_client.access_token)
+		headers = {
+		    'Authorization': auth_header,
+		    'Accept': 'application/json'
+		}
+
+		response = request.post(url, data=payload, headers=headers)
+		return response
+
+	def refresh_auth_token(self):
+		self.auth_client.refresh()
+		self.update_auth_token()
+
 
 	@property
 	def auth_header(self):

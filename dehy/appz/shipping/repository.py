@@ -1,6 +1,5 @@
 from oscar.apps.shipping import repository
 from dehy.appz.shipping import methods as shipping_methods
-from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
 
 import base64, datetime, json, requests, xmltodict
 from oscar.core.loading import get_class, get_model, get_classes
@@ -13,6 +12,7 @@ from asgiref.sync import sync_to_async
 from decimal import Decimal as D
 TWOPLACES = D(10) ** -2
 
+FedexAuthTokenModel = get_model('generic', 'FedexAuthToken')
 Order = get_model('order', 'Order')
 Basket = get_model('basket', 'Basket')
 (TaxExclusiveOfferDiscount, TaxInclusiveOfferDiscount) = get_classes('shipping.methods', ['TaxExclusiveOfferDiscount', 'TaxInclusiveOfferDiscount'])
@@ -538,7 +538,6 @@ class Repository(repository.Repository):
 		else:
 			response_text = json.loads(response.text)
 			error = response_text['errors'][0]
-			# error_code = errors[0]['code']
 			print('Error message: ', error['message'])
 			print('Error code: ', error['code'])
 
@@ -588,7 +587,6 @@ class Repository(repository.Repository):
 
 
 		return methods, data
-
 
 
 	def fedex_update_auth_token(self, FedexAuthToken=FedexAuthTokenModel.objects.first(), request=None):

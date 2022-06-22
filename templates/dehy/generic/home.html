@@ -203,7 +203,7 @@
 	{% block recipe_list %}
 	<section class="content-section mini-recipe-section row justify-content-end">
 		<div class="recipe-link-container">
-			<a role='button' class="temp shop-link btn btn-black" href="{% url 'recipes' %}">All Recipes</a>
+			<a role='button' class="temp shop-link btn btn-black" href="{% url 'recipes:browse' %}">All Recipes</a>
 		</div>
 		<div class="mini-recipe-list" id="mini_recipe_list">
 			{% for recipe in recipes %}

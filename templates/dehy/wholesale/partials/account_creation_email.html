@@ -1,0 +1,31 @@
+{% extends "oscar/communication/emails/orders_base.html" %}
+{% load currency_filters i18n %}
+
+{% block header_content %}
+	<tr>
+		<td>
+			<h2 style="font-weight: 200">
+				{% trans "Wholesale Account Creation Request"}
+			</h2>
+		</td>
+	</tr>
+
+{% endblock header_content %}
+
+{% block order_text_content %}
+	{% for field in form.fields %}
+	<tr>
+		<td>
+			<span>{{ field.label }}: </span><span>{{ field.value }}</span>
+
+		</td>
+	</tr>
+	{% endfor %}
+{% endblock order_text_content %}
+
+
+{% block order_summary_block %}
+{% endblock order_summary_block %}
+
+{% block order_contents %}
+{% endblock order_contents %}

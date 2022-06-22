@@ -8,6 +8,7 @@ def upload_to_slug(instance, filename):
 	return f"images/recipes/{instance.slug}/{filename}"
 
 class Recipe(models.Model):
+	creator = models.ForeignKey('generic.User', on_delete=models.SET_NULL, null=True)
 	name = models.CharField(max_length=100, default="", help_text='Name of the recipe')
 	description = models.TextField(help_text='A short introduction about the recipe, origin, summary, etc.', default="", blank=True, null=True)
 	ingredients = dbaa.ArrayField(models.CharField(max_length=150), default=list, help_text='Ingredient list')
@@ -18,6 +19,7 @@ class Recipe(models.Model):
 	last_modified = models.DateTimeField(auto_now=True, editable=False)
 	featured = models.BooleanField(default=False, help_text='Feature this recipe on the homepage?')
 	image = models.ImageField(upload_to=upload_to_slug, blank=True)
+	tags = models.ManyToManyField('Tag')
 
 	class Meta:
 		ordering = ['-date_created']
@@ -25,7 +27,9 @@ class Recipe(models.Model):
 	def __str__(self):
 		return f"{self.name}, Date created: {self.date_created}, Last edited: {self.last_modified}"
 
-#
+class Tag(models.Model):
+	name = models.CharField(max_length=50, unique=True)
+
 # class RecipeCategory(models.Model):
 # 	name = models.CharField(max_length=100, default="", help_text="Name of the category, eg. whiskey, wine, etc.")
 #

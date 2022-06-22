@@ -254,6 +254,9 @@ class InvoiceView(LoginRequiredMixin, DetailView):
 		if self.request.user.is_superuser or self.request.user.is_superuser or (object.user and object.user == self.request.user):
 			return object
 
+class AboutUsView(TemplateView):
+	template_name = "dehy/generic/about_us.html"
+
 class PrivacyPolicyView(TemplateView):
 	template_name = "dehy/generic/privacy_policy.html"
 
@@ -304,7 +307,6 @@ class FAQView(ListView, FormView):
 			recipients = [f'faq+contact@{current_site}']
 			subject = f'[CONTACT FORM] FROM: {email} SUBJECT: {subject}'
 			sent = send_mail(subject, message, settings.OSCAR_FROM_EMAIL, recipients, fail_silently=False)
-			print('emails sent: ', sent)
 			request.session['notifications'] = _('Successfully sent message!')
 			response = redirect(self.success_url)
 

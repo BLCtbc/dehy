@@ -15,12 +15,14 @@
 	</a>
 </li>
 
+{% comment %}
 <li class="nav-item">
     <a href="{% url 'customer:payment' %}" class="nav-link account-tab{% if active_tab == 'payment' %} active{% endif %}">
 		<span class="fa-icon"><i class="fas fa-credit-card"></i></span>
 		<span>{% trans "Payment" %}</span>
 	</a>
 </li>
+{% endcomment %}
 
 <li class="nav-item">
     <a href="{% url 'customer:order-list' %}" class="nav-link account-tab{% if active_tab == 'orders' %} active{% endif %}">

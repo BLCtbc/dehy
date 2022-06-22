@@ -2,14 +2,10 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, TemplateView
 from .models import Recipe
 
-# class RecipesView(TemplateView):
-# 	template_name = "dehy/recipes/recipes.html"
-
 class RecipeListView(ListView):
 	model = Recipe
 	context_object_name = "recipes"
-	template_name = "dehy/recipes/recipes.html"
-
+	template_name = "dehy/recipes/browse.html"
 
 	def get_context_data(self, *args, **kwargs):
 		context_data = super().get_context_data(*args, **kwargs)

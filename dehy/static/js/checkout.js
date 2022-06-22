@@ -350,11 +350,12 @@ dehy.ch = {
 					'elems': [
 						{
 							'tag': 'div',
-							'classes': 'input-group col',
+							'classes': 'input-group col mt-2',
 							'elems': [
 								radio_elem,
 								{
 									'tag': 'label',
+									'classes': 'shipping-method-label',
 									'text': `${method.name} — $${cost}`,
 									'attrs': {
 										'for': id,
@@ -1130,7 +1131,6 @@ dehy.ch.forms = {
 		var discounts_container = document.getElementById('discounts_container');
 		dehy.utils.remove_children(discounts_container);
 
-		console.log('response.discounts: ', response.discounts);
 		if (response.discounts) {
 			var div_col = dehy.utils.create_element({tag:'div', classes:'col text-right'}),
 				disc_span = dehy.utils.create_element({tag:'span', text:dehy.translations.discounts}),
@@ -1139,7 +1139,8 @@ dehy.ch.forms = {
 
 			div_col.append(disc_span);
 			price_col.append(price_span);
-			discounts_container.append(div_col, price_col)
+			discounts_container.append(div_col, price_col);
+
 		}
 
 		if (response.order_client_secret) {
@@ -1196,10 +1197,18 @@ dehy.ch.forms = {
 			dehy.ch.shipping.billing_same_as_shipping_handler(checked);
 			dehy.ch.stripe.init(response.stripe_pkey, response.client_secret, response);
 		}
+
 		dehy.basket.basket_updated_handlers.success(response);
 		if (response.hasOwnProperty('shipping_methods')) {
 			dehy.ch.shipping.update_shipping_methods(response);
+			if (response.discounts && response.discounts.shipping) {
+				var fedex_ground = document.querySelector("input[value='FEDEX_GROUND']");
+				var fedex_ground_label = document.querySelector(`label[for='${fedex_ground.id}']`);
+				fedex_ground_label.innerHTML = fedex_ground_label.textContent.replace(`${dehy.basket.currency_symbol}0.00`, `<span style="text-decoration:line-through">${dehy.basket.currency_symbol}${response.discounts.shipping}</span> ${dehy.basket.currency_symbol}0.00`);
+			}
 		}
+
+
 
 		//dehy.utils.unfreeze_forms();
 	},
