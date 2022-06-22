@@ -109,12 +109,12 @@ class WholesaleAccountCreationForm(forms.Form, PhoneNumberMixin):
 		current_site = get_current_site(request)
 		recipients = [f'info@{current_site}']
 		email_subject = 'DEHY: Wholesale Account Creation Request'
-
 		email_body = render_to_string('dehy/wholesale/partials/account_creation_email.html', {
 			'form': self.cleaned_data,
 		})
+		
 		email = EmailMessage(subject=email_subject, body=email_body,
-			from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=[user.email])
+			from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=recipients)
 
 		try:
 			email.send()
