@@ -1,8 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import generic
+from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
 from oscar.core.loading import get_class, get_model
 from django.contrib.sites.shortcuts import get_current_site
+import os, requests
+from django.conf import settings
+from dehy.utils import quickbooks
 
 WholesaleAccountCreationForm = get_class('dehy.appz.wholesale.forms', 'WholesaleAccountCreationForm')
 # Create your views here.
@@ -24,4 +28,59 @@ class WholesaleRegisterView(generic.edit.FormView):
 	template_name = 'dehy/wholesale/register.html'
 	form_class = WholesaleAccountCreationForm
 
+	def post(self, request, *args, **kwargs):
+		response = super().post(request, *args, **kwargs)
 
+	def form_valid(self, form):
+		# form.create_customer()
+		form.send_email(self.request)
+		return super().form_valid(form)
+
+
+def wholesale_pricing_pdf_view(request):
+	file_path = os.path.join('static', 'pdf/dehy_wholesale_pricing_2022.pdf')
+	response = FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+	return response
+
+# def oauth(request):
+#     auth_client = AuthClient(
+#         quickbooks.api_key,
+#         quickbooks.secret_key,
+#         quickbooks.redirect_uri,
+#         quickbooks.environment,
+#     )
+#
+#     url = auth_client.get_authorization_url([Scopes.ACCOUNTING])
+#     request.session['state'] = auth_client.state_token
+#     return redirect(url)
+#
+# def auth_code_handler(request):
+# 	state = request.GET.get('state', None)
+# 	error = request.GET.get('error', None)
+#
+# 	if error == 'access_denied':
+# 		print('access denied')
+# 		# return redirect('sampleAppOAuth2:index')
+#
+# 	if state is None:
+# 		return HttpResponseBadRequest()
+#
+# 	elif state != get_CSRF_token(request):  # validate against CSRF attacks
+# 		return HttpResponse('unauthorized', status=401)
+#
+# 	auth_code = request.GET.get('code', None)
+# 	if auth_code is None:
+# 		return HttpResponseBadRequest()
+#
+# 	bearer = quickbooks.get_bearer_token(auth_code)
+# 	realm_id = request.GET.get('realm_id', None)
+# 	quickbooks.update_session(request, bearer.access_token, bearer.refresh_token, realm_id)
+#
+# 	# Validate JWT tokens only for OpenID scope
+# 	if bearer.id_token is not None:
+# 		if not quickbooks.validate_jwt_token(bearer.id_token):
+# 			return HttpResponse('JWT Validation failed. Please try signing in again.')
+# 		else:
+# 			return redirect('sampleAppOAuth2:connected')
+# 	else:
+# 		return redirect('sampleAppOAuth2:connected')

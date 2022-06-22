@@ -392,6 +392,7 @@ li {
 
 nav#navbar {
 	padding: 3vh 4vw;
+	background: linear-gradient(var(--hg) 0, var(--dark-hg) 90%);
 }
 
 #navbar a.nav-link {
@@ -569,7 +570,7 @@ nav.scrolled-top a.nav-link.active {
 	border-color: var(--beige);
 } */
 .scrolled-up .cart-quantity-container {
-	color: black;
+	color: white;
 }
 .scrolled-top .nav-link,
 .scrolled-top .socials a,
@@ -753,12 +754,15 @@ span.ig{
 
 #nav_primary {
 	/* margin-left: var(--bs-gutter-x,1.5rem); */
-	background-color: var(--dark-hg);
+	/* background-color: var(--beige); */
+	background: linear-gradient(45deg, var(--beige) 0, #d6cebc);
 	padding: 0.5rem 1rem;
 	border-radius: 1px;
 	font-size: 1.3rem;
-	font-weight: 400;
-	min-height: 50px;
+	font-weight: 600;
+	border-top: 1px solid rgba(255, 255, 255, 0.3);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+	/* min-height: 50px; */
 }
 
 
@@ -792,7 +796,7 @@ li.breadcrumb-item {
     display: grid;
     grid-template-columns: repeat(4, minmax(0,1fr));
     grid-column-gap: 2vw;
-    grid-row-gap: 2vw;
+    grid-row-gap: 4vw;
 }
 
 .image-container {
@@ -849,7 +853,7 @@ li.breadcrumb-item {
 }
 
 .product-figure {
-	margin-top: 2rem;
+	/* margin-top: 2rem; */
 }
 
 .pagination-container {

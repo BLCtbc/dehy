@@ -36,8 +36,17 @@
 }
 
 .shipping-method-option {
+	position: absolute;
+	top: 2px;
     align-self: center;
-    margin-bottom: 0.5rem;
+    /* margin-bottom: 0.5rem; */
+}
+
+.shipping-method-label {
+	line-height: 20px;
+	margin-left: 26px !important;
+	margin-bottom: 0.5rem;
+	padding-left: 0 !important;
 }
 
 #logout {

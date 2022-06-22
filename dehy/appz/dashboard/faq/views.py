@@ -72,17 +72,14 @@ class FAQCreateView(generic.CreateView):
 		context_data = super().get_context_data(**kwargs)
 		context_data['title'] = _('Create new FAQ')
 		form = context_data['form']
-		print(f'\n** VIEWS get_context_data: {context_data}')
 
 		return context_data
 
 	def forms_invalid(self, form, inlines):
-		print(f'\n *** forms_invalid ')
 		messages.error(self.request, "Your submitted data was not valid - please correct the below errors")
 		return super().forms_invalid(form, inlines)
 
 	def forms_valid(self, form, inlines):
-		print(f'\n *** forms_valid ')
 		response = super().forms_valid(form, inlines)
 		msg = render_to_string('oscar/dashboard/faq/messages/faq_saved.html', {'faq': self.object})
 		messages.success(self.request, msg, extra_tags='safe')
@@ -94,11 +91,9 @@ class FAQUpdateView(generic.UpdateView):
 	form_class = FAQCreateUpdateForm
 	success_url = reverse_lazy('dashboard:faq-list')
 
-
 	def get_context_data(self, **kwargs):
 		context_data = super().get_context_data(**kwargs)
 		context_data['title'] = self.object.name
-		print(f'\n** VIEWS get_context_data: {context_data}')
 
 		return context_data
 

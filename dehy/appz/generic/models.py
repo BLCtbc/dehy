@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from oscar.apps.customer.abstract_models import AbstractUser
+from django.core.exceptions import ValidationError
 
 import datetime
 
@@ -16,29 +17,51 @@ class User(AbstractUser):
             ("can_receive_new_order_notifications", "Gives the user permission to receive notification emails anytime a new order is placed."),
         ]
 
-class FedexAuthToken(models.Model):
+class AuthToken(models.Model):
 	access_token = models.CharField(_("Token"), max_length=2000, default="")
 	expires_in = models.IntegerField(_("Expires in"), default=0, help_text=_("Seconds"))
-	date_created = models.DateTimeField(auto_now=True, editable=False)
-	scope = models.CharField(_("Scope"), max_length=20, default="")
+	date_created = models.DateTimeField(auto_now_add=True, editable=False)
+	last_updated = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
-		return f"Token: {self.access_token}, created: {self.date_created}"
+		return f"Auth token: {self.access_token}, created: {self.last_updated}"
 
 	@property
 	def expiration(self):
-		return self.date_created + datetime.timedelta(seconds=self.expires_in)
+		return self.last_updated + datetime.timedelta(seconds=self.expires_in)
 
 	@property
 	def expired(self):
 		return datetime.datetime.now().astimezone() > self.expiration
 
+	class Meta:
+		abstract = True
+
+class FedexAuthToken(AuthToken):
+	scope = models.CharField(_("Scope"), max_length=20, default="")
+	def __str__(self):
+		return f"Fedex Auth token: {self.access_token}, updated: {self.last_updated}"
+
 	def save(self, *args, **kwargs):
 		if not self.pk and FedexAuthToken.objects.exists():
-			raise ValidationError('There is can be only one FedexAuthToken instance')
+			raise ValidationError('There can only be one instance of this token')
 
 		return super().save(*args, **kwargs)
 
+
+class QuickbooksAuthToken(AuthToken):
+	refresh_token = models.CharField(_("Token"), max_length=200, default="")
+	refresh_expires_in = models.IntegerField(_("Refresh Expires in"), default=0, help_text=_("Seconds"))
+	realm_id = models.BigIntegerField('Realm ID', default=0)
+
+	def __str__(self):
+		return f"Quickbooks access token: {self.access_token}, created: {self.last_updated}"
+
+	def save(self, *args, **kwargs):
+		if not self.pk and QuickbooksAuthToken.objects.exists():
+			raise ValidationError('There can only be one instance of this token')
+
+		return super().save(*args, **kwargs)
 
 class FAQ(models.Model):
 	"""

@@ -1,0 +1,54 @@
+{% extends "dehy/layout_2_col.html" %}
+{% load static %}
+{% load i18n %}
+{% load product_tags %}
+{% load thumbnail %}
+{% load image_tags %}
+
+{% block title %}
+{% trans "About Us" %} | {{ block.super }}
+{% endblock title %}
+
+{% block extrastyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/faq.css' %}"/>
+{% endblock extrastyles %}
+
+{% block splash_container %}
+<header class="faq navbar-padding justify-content-center row">
+	<div class="col-10 section-divider">
+		{% block header_title %}
+		<h1 class="faq-title font-lydia">{% trans "Our Story" %}</h1>
+		{% endblock header_title %}
+	</div>
+</header>
+{% endblock splash_container %}
+
+{% block header %}{% endblock header %}
+{% block content_wrapper %}
+
+{% get_static_prefix as STATIC_PREFIX %}
+{% get_media_prefix as MEDIA_PREFIX %}
+
+<div class="row justify-content-center faq-page-inner" style='background-image: url({% static "img/custom/dehy_hero_rotated.jpeg" %}); background-size:cover;'>
+	<section class="col-8 faq-item p-5">
+		{% blocktrans %}
+		It all began at a bar, as most good stories do. A bartender noticed the mounds of sliced
+fruit being thrown out daily and the few that made it to a cocktail were sub par — the sight
+of a lifeless orange slouched over a drink’s rim all too familiar. DEHY wasn’t written in the
+stars but it was scribbled on a napkin and to mixologists and cocktail connoisseurs, well,
+that’s pretty much the same thing. At DEHY, we don’t just make artful, dehydrated garnishes
+to decorate your refreshments. We make the experience of a great cocktail attainable,
+sustainable and downright good-looking because we — the bartender, the drinker
+and said orange — deserve better from and for our spirits. We aren’t pretentious and we
+don’t think a good — no, great — cocktail has to be either. We simply uphold the virtue of
+a cocktail for gathering’s sake. And gathering for memories’ sake. And of memories for
+life’s sake. So quit shaking and stirring with rubbish disguised as garnish and come have a
+real drink with us. DEHY. Want for nothing more.
+	{% endblocktrans %}
+	</section>
+</div>
+{% endblock content_wrapper %}
+
+{% block extrascripts %}
+{{ block.super }}
+{% endblock extrascripts %}

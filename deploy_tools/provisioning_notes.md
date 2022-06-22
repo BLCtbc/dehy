@@ -33,6 +33,7 @@
 15. [creating oscar email template via backend](#create_oscar_email_template)
 16. [adding new/custom communication event type](#adding_new_communication_event_type)
 17. [creating a custom conditional for specific shipping code and value requirement](#custom_shipping_condition)
+18. [quickbooks API setup](#quickbooks_api_setup)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1875,3 +1876,22 @@ https://stackoverflow.com/a/40078116/6158303
 			}
 		)
 	```
+
+<a name="quickbooks_api_setup"></a>
+1. ####### Quickbooks API setup
+
+	- generate initial tokens via https://developer.intuit.com/app/developer/playground?code=AB11655164630b8uPwdL5WqHTsXzH4IdmQm0kR0RTltsh6eEyo&state=PlaygroundAuth&realmId=4620816365229458310
+
+	- realm id can also be attained in the previous link, or from https://developer.intuit.com/app/developer/qbo/docs/api/accounting/most-commonly-used/account (the account dropdown near the top will have an account name and a large number next to it)
+
+	```py
+	from oscar.core.loading import get_model, get_class
+	QB = get_model('generic', 'QuickbooksAuthToken')
+	qb_auth_token,created = QB.objects.update_or_create(
+		expires_in=3600, refresh_expires_in=8726400, realm_id=4620816365229458310,
+		defaults={'expires_in':3600, 'realm_id':4620816365229458310,'refresh_expires_in':8726400, 'refresh_token': 'AB11664206361T35EVnpFD1aElG6H3qhIwvMo2DOhCpXbxpUdq', 'access_token':'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..hVT23JqoEslENhnVKxnmSQ.2k5UlXuhIg3MGQFecRXAXSgwzlSPoFLkZmIAMNN5CQn29tuhUpEYzo4l5fzy2YUoLXXbTOH_o_D2UQIN5dbDcIObPytzhTmfG2No3WWV9V2gaxo2V0zOFS3fnrbiqB20yFzTjAV9WrKAZitF8krjAmdROJzfvUgcr-hhllcbbTj66fe32tGTVMdWr8JfbGSny2gmO90i9VNXEPBR_Huzy7bbNXZRafKtq-Y37Fowvlx_ZsVzqnRwmy_-gocASxGsiGOrSmyg0nW_XHPKxj-Z8Zy8rORQ_rzfrnrCszKfTzCJDk6QMCpu0PL6pktdXdpk8t6EHhKWvRvBZ_T3z21nfdh2zNHlINsSxT5mqX8LLYRDor8Kc4sbnAXaHpnlbRaRHSrA1h-8tLZvWkvCc-qvnpMX632gtDF76GpCNVefA61M76PDV2SIWdm34i2qn5qjtZoXtOI0k9Ra1hqZjpZ0lkx3WV1gH7qz1H6zGr8SVqdI8sCSmAQRLeVVvwwcDug94-8yRcUIA2-csE8HvaaRpvWhbUBFO_Ju-okoKqRjB8GKUntKd3pPxdcGIXb4qK5Ooq7AW9ykRLoaTVc17Qh7DoVxfObffun-NogQJJudwL_20cQ8okqsKg_CEOrb6Y0Fvz6HTkm2PjIQuOpVHtDfe2BSxajBGBRr_ZsR-MVshqErMXf-RR8YGCChYE3f0273ENBM3bL-w4JQF_ZNJAeKfqfniXC1ljdeSvDLY1ffvZgDAtjEdMuNiQAzUF-UsFZ4.xKbxulybew5WAEqftLpNZQ'
+		}
+	)
+
+	qb_auth_token.save()
+		```

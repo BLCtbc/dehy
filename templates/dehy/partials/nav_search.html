@@ -7,7 +7,16 @@
         <div class="container-fluid">
 			<div class="row">
 		        <ol class="col breadcrumb d-md-inline-flex d-none py-0 mb-0" style="width: fit-content">
-		            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Shop" %}</a></li>
+					{% with app_name=request.resolver_match.app_names|first %}
+						{% if app_name == 'catalogue' %}
+			            <li class="breadcrumb-item">
+							<a href="{{ homepage_url }}">{% trans "Shop" %}</a>
+						</li>
+						{% elif app_name == 'recipes' %}
+						<li class="breadcrumb-item">
+							<a href="{% url 'recipes:browse' %}">{% trans "Recipes" %}</a>
+						</li>
+						{% endif %}
 						{% if category.name %}
 				            {% for category in category.get_ancestors %}
 				            <li class="breadcrumb-item"><a href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
@@ -17,6 +26,7 @@
 						<li class="breadcrumb-item active" aria-current="page">{{ summary }}</li>
 						{% endif %}
 		        	</ol>
+					{% endwith %}
 
 					<ul class="d-md-none d-inline-flex navbar-nav category-dropdown">
 	                    {% block nav_items %}
@@ -44,9 +54,9 @@
 
 
 		    {% comment %}
-			{# search is shelved for now #}
+			{# search feature is shelved for now #}
 			{# does not work proper out out of the box #}
-			{# not really needed for this project #}
+			{# also not really needed for this project #}
 
             {% block nav_extra %}
 				<div class="col d-inline-flex justify-content-end">

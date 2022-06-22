@@ -1,9 +1,15 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.template.loader import render_to_string
 from dehy.appz.generic.models import Message, MessageUser
 from oscar.forms.mixins import PhoneNumberMixin
 from oscar.core.loading import get_class, get_model
 from django.db.models import Q
+from django.contrib import messages
+import datetime
+
+from phonenumber_field.formfields import PhoneNumberField
+# from phonenumber_field.phonenumber import PhoneNumber
 
 Country = get_model('address', 'Country')
 
@@ -27,20 +33,7 @@ class WholesaleAccountCreationForm(forms.Form, PhoneNumberMixin):
 		("thick_cut_citrus", "Thick Cut Citrus"),
 		("custom_garnishes", "Custom Garnishes"),
 	)
-	phone_number_fields = {
-        'phone_number': {
-            'required': True,
-            'help_text': '',
-            'max_length': 32,
-            'label': _('Phone Number')
-        },
-		'billing_phone_number': {
-            'required': True,
-            'help_text': '',
-            'max_length': 32,
-            'label': _('Billing Phone Number')
-        },
-    }
+
 	organization_choices = (
 		('bar', 'Bar'),
 		('restaurant', 'Restaurant'),
@@ -49,9 +42,11 @@ class WholesaleAccountCreationForm(forms.Form, PhoneNumberMixin):
 		('restaurant_group', 'Restaurant Group'),
 		('retailer', 'Retailer'),
 		('other', 'Other'),
-
 	)
 	email = forms.EmailField(required=True, label=_("Email"))
+	phone_number = PhoneNumberField(required=True, max_length=32, label=('Phone Number'))
+	billing_phone_number = PhoneNumberField(required=True, max_length=32, label=('Billing Phone Number'))
+
 	company_name = forms.CharField(required=True, label=_('Company Name'))
 	organization = forms.ChoiceField(label=_('Type of Organization'), required=True, choices=organization_choices)
 	position = forms.CharField(required=True, label=_('Position'))
@@ -109,3 +104,62 @@ class WholesaleAccountCreationForm(forms.Form, PhoneNumberMixin):
 		self.adjust_country_field()
 
 		self.fields['position'].widget.attrs.update({'placeholder': _('Bar Manager, Beverage Director, etc.')})
+
+	def send_email(self, request):
+		current_site = get_current_site(request)
+		recipients = [f'info@{current_site}']
+		email_subject = 'DEHY: Wholesale Account Creation Request'
+
+		email_body = render_to_string('dehy/wholesale/partials/account_creation_email.html', {
+			'form': self.cleaned_data,
+		})
+		email = EmailMessage(subject=email_subject, body=email_body,
+			from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=[user.email])
+
+		try:
+			email.send()
+			request.session['notifications'] = _('Account creation request sent!')
+
+		except Exception as e:
+			error_msg =  _('Uh oh! A problem occurred while sending your account creation request email. Please try again later')
+			request.session['notifications'] = error_msg
+			messages.error(self.request, error_msg)
+
+	def create_customer(self):
+		cleaned_data = self.cleaned_data
+		payload = {
+			"Customer": {
+				"GivenName": cleaned_data['first_name'],
+				"FamilyName": cleaned_data['last_name'],
+
+				"PrimaryEmailAddr": {
+					"Address": cleaned_data['email']
+				},
+				"Mobile": {
+					"FreeFormNumber": cleaned_data['phone_number']
+				},
+				"ShipAddr": {
+					"PostalCode": cleaned_data['shipping_postcode'],
+					"City": cleaned_data['shipping_line4'],
+					"Country": cleaned_data['shipping_country'],
+					"Line1": cleaned_data["shipping_line1"],
+					"Line2": cleaned_data["shipping_line2"],
+					"CountrySubDivisionCode": cleaned_data['shipping_state'],
+					"Id": "3"
+				},
+				"CompanyName": cleaned_data["company_name"],
+				"Active": True,
+				"BillAddr": {
+					"PostalCode": cleaned_data['billing_postcode'],
+					"City": cleaned_data['billing_line4'],
+					"Country": cleaned_data['billing_country'],
+					"Line1": cleaned_data["billing_line1"],
+					"Line2": cleaned_data["billing_line2"],
+					"CountrySubDivisionCode": cleaned_data['billing_state'],
+					"Id": "3"
+				},
+				"Notes": f"Position: {cleaned_data['position']}, Product Interests: {cleaned_data['product_interests']}"
+			}
+		}
+
+		response = quickbooks.api_call('customer', payload)

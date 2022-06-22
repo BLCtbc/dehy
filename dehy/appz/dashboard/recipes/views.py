@@ -28,7 +28,6 @@ class RecipeListView(SingleTableView):
 	filterform_class = RecipeSearchForm
 	form_class = RecipeSearchForm
 
-
 	def get_title(self):
 		data = getattr(self.filterform, 'cleaned_data', {})
 		name = data.get('name', None)
@@ -61,31 +60,18 @@ class RecipeCreateView(generic.CreateView):
 	form_class = RecipeCreateUpdateForm
 	success_url = reverse_lazy('dashboard:recipe-list')
 
-	# def post(self, *args, **kwargs):
-	# 	form = self.form_class(self.request.POST)
-	# 	print(f'form.is_valid: {form.is_valid()}')
-	#
-	# 	# response = super().post(*args, **kwargs)
-	# 	print(f'\n *** POST ')
-	#
-	# 	response = render(self.request, self.template_name, context=self.get_context_data())
-	# 	return response
-
 	def get_context_data(self, **kwargs):
 		context_data = super().get_context_data(**kwargs)
 		context_data['title'] = _('Create new recipe')
 		form = context_data['form']
-		print(f'\n** VIEWS get_context_data: {context_data}')
-
 		return context_data
 
 	def forms_invalid(self, form, inlines):
-		print(f'\n *** forms_invalid ')
 		messages.error(self.request, "Your submitted data was not valid - please correct the below errors")
 		return super().forms_invalid(form, inlines)
 
 	def forms_valid(self, form, inlines):
-		print(f'\n *** forms_valid ')
+		# form.instance.creator = self.request.user
 		response = super().forms_valid(form, inlines)
 		msg = render_to_string('oscar/dashboard/recipes/messages/recipe_saved.html', {'recipe': self.object})
 		messages.success(self.request, msg, extra_tags='safe')

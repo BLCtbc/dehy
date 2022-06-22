@@ -3,7 +3,6 @@
 {% load image_tags %}
 {% load i18n %}
 
-
 <footer class="justify-content-center container-fluid footer-container">
 	<div class="row justify-content-center mx-auto">
 		<div class="brand-logo-big col-12 col-sm-5 col-lg-3">
@@ -33,11 +32,13 @@
 		<div class="about-us col-11 col-sm-5 col-lg-2 order-lg-2 order-sm-3">
 			<h3>About Us</h3>
 			<ul class="pl-0">
-				<li><a href="{% url 'recipes' %}">Recipes</a></li>
-				<li><a href="{% url 'returns' %}">Returns &amp; Refund Policy</a></li>
-				<li><a href="{% url 'terms_of_service' %}">Terms of Service</a></li>
-				<li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
-
+				<li><a href="{% url 'about_us' %}">{% trans "Our Story" %}</a></li>
+				<li><a href="{% url 'recipes:browse' %}">{% trans "Recipes" %}</a></li>
+				<li><a href="{% url 'returns' %}">{% trans "Returns &amp; Refund Policy" %}</a></li>
+				{% comment %}
+				<li><a href="{% url 'terms_of_service' %}">{% trans "Terms of Service" %}</a></li>
+				<li><a href="{% url 'privacy_policy' %}">{% trans "Privacy Policy" %}</a></li
+				{% endcomment %}
 			</ul>
 		</div>
 		<div class="contact-us col-11 col-sm-6 col-lg-3 order-3">

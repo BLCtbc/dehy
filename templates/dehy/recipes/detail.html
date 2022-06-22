@@ -1,6 +1,5 @@
-{% extends "dehy/layout.html" %}
-{% load static %}
-{% load i18n %}
+{% extends "dehy/recipes/browse.html" %}
+{% load static i18n %}
 {% load product_tags %}
 
 {% block title %}
@@ -18,15 +17,16 @@
 
 {% block content_wrapper %}
 <section class="row justify-content-center" id="recipe_list">
+
 	<article class="recipe-card col-12 col-lg-7">
 		{% load image_tags %}
 
 			<!-- <div class="card card-body" style="padding: 3% 10%;"> -->
 				<h4 class="card-title">{{recipe.name}}</h4>
-				<a href="{% url 'recipe_details' recipe.slug %}"></a>
+				<a href="{% url 'recipes:detail' recipe.slug %}"></a>
 				{% if not preview %}
 				<div class='recipe-info row'>
-					<div class="col-6"><span>By: Jimberly McJanklin</span></div>
+					<div class="col-6"><span>By: {{recipe.creator.get_full_name|default:recipe.creator.email}}</span></div>
 					<div class="col-6"><span>Udpated: {{recipe.last_modified}}</span></div>
 				</div>
 				{% endif %}

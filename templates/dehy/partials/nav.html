@@ -6,7 +6,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-3 col-lg-4 site-navigation-container site-nav">
-				{% with url_name=request.resolver_match.url_name %}
+				{% with url_name=request.resolver_match.url_name app_name=request.resolver_match.app_names|first %}
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
 					data-bs-target="#mobile_site_nav" aria-controls="#mobile_site_nav" aria-expanded="false"
 					aria-label="Toggle navigation">
@@ -18,7 +18,7 @@
 				<div class="collapse navbar-collapse mt-2">
 					<ul class="navbar flex-lg-row">
 						<li class="nav-item">
-							<a class="nav-link{% if url_name == 'index' or url_name == 'detail' or url_name == 'category' %} active{% endif %}"  href="{% url 'catalogue:index' %}">Shop</a>
+							<a class="nav-link{% if app_name == 'catalogue' %}{% if url_name == 'index' or url_name == 'detail' or url_name == 'category' %} active{% endif %}{% endif %}"  href="{% url 'catalogue:index' %}">Shop</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="{% url 'contact' %}">Contact</a>
@@ -27,7 +27,7 @@
 							<a class="nav-link{% if url_name == 'faq' %} active{% endif %}" href="{% url 'faq' %}">FAQ</a>
 						</li>
 						<li class="nav-item d-lg-none">
-							<a class="nav-link{% if url_name == 'recipes' %} active{% endif %}" href="{% url 'recipes' %}">Recipes</a>
+							<a class="nav-link{% if app_name == 'recipes' %} active{% endif %}" href="{% url 'recipes:browse' %}">Recipes</a>
 						</li>
 						<li class="nav-item d-lg-none">
 							<a class="nav-link{% if url_name == 'faq' %} active{% endif %}" href="{% url 'faq' %}">Test</a>
@@ -76,23 +76,23 @@
 		</div> <!--  row -->
 
 		<div class="row d-block d-lg-none">
-			{% with url_name=request.resolver_match.url_name %}
+			{% with url_name=request.resolver_match.url_name app_name=request.resolver_match.app_names|first %}
 			<div class="collapse navbar-collapse mt-3" id="mobile_site_nav">
 				<ul class="navbar flex-column">
 					<li class="nav-item">
-						<a class="nav-link{% if url_name == 'index' or url_name == 'detail' or url_name == 'category' %} active{% endif %}"  href="{% url 'catalogue:index' %}">Shop</a>
+						<a class="nav-link{% if app_name == 'catalogue' and url_name == 'index' or url_name == 'detail' or url_name == 'category' %} active{% endif %}"  href="{% url 'catalogue:index' %}">{% trans "Shop" %}</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="{% url 'contact' %}">Contact</a>
+						<a class="nav-link" href="{% url 'contact' %}">{% trans "Contact" %}</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link{% if url_name == 'faq' %} active{% endif %}" href="{% url 'faq' %}">FAQ</a>
 					</li>
 					<li class="nav-item d-lg-none">
-						<a class="nav-link{% if url_name == 'recipes' %} active{% endif %}" href="{% url 'faq' %}">Recipes</a>
+						<a class="nav-link{% if app_name == 'recipes' %} active{% endif %}" href="{% url 'recipes:browse' %}">{% trans "Recipes" %}</a>
 					</li>
 					<li class="nav-item d-lg-none">
-						<a class="nav-link{% if url_name == 'faq' %} active{% endif %}" href="{% url 'faq' %}">Test</a>
+						<a class="nav-link{% if url_name == 'about_us' %} active{% endif %}" href="{% url 'about_us' %}">{% trans "About Us" %}</a>
 					</li>
 				</ul>
 			</div>

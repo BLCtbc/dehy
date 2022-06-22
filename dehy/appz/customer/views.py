@@ -81,12 +81,18 @@ def send_verification_email(request, user):
 		'uid': urlsafe_base64_encode(force_bytes(user.pk)),
 		'token': generate_token.make_token(user)
 	})
-	email = EmailMessage(subject=email_subject, body=email_body,
-		from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=[user.email])
+	try:
 
-	email.send()
+		email = EmailMessage(subject=email_subject, body=email_body,
+			from_email=settings.AUTO_REPLY_EMAIL_ADDRESS, to=[user.email])
 
-	messages.info(request, _("An account verification email has been sent to the email address provided, if such an email account exists. Please check your inbox."))
+		email.send()
+		messages.info(request, _("An account verification email has been sent to the email address provided, if such an email account exists. Please check your inbox."))
+
+	except Exception as e:
+		msg = f"An error occurred when attempting to send verification email: {e}"
+		messages.error(request, _(msg))
+
 
 
 
@@ -193,7 +199,6 @@ class AccountRegistrationView(views.AccountRegistrationView):
 		return response
 
 	def form_valid(self, form):
-		print('form.is_valid(): ', form.is_valid())
 		user = self.register_user(form)
 		customer = facade.stripe.Customer.create(email=user.email, metadata={'uid':user.id})
 		user.stripe_customer_id = customer.id
@@ -248,7 +253,6 @@ class AccountAuthView(views.AccountAuthView, UserPassesTestMixin):
 				if msg:
 					messages.success(self.request, msg)
 
-				print('get_login_success_url: ', self.get_login_success_url(form))
 				return redirect(self.get_login_success_url(form))
 
 			else:
@@ -328,13 +332,6 @@ class PaymentMethodEditView(PageTitleMixin, generic.FormView):
 
 		return initial
 
-
-
-	# def get(self, request, card_id, *args, **kwargs):
-	# 	context = self.get_context_data(request, *args, **kwargs)
-	# 	print('context: ', context)
-	# 	return self.render_to_response(context)
-	#
 	def form_valid(self, form):
 		card_id = self.request.POST.get('card_id', None)
 		card_id = self.kwargs.get('card_id', None)
@@ -368,40 +365,6 @@ class PaymentMethodEditView(PageTitleMixin, generic.FormView):
 			return super().form_valid(form)
 
 		return redirect(reverse('customer:payment'))
-
-
-	#
-	# def post(self, request, *args, **kwargs):
-	# 	status_code = 400
-	# 	context_data = self.get_context_data(*args, **kwargs)
-	# 	msg = _('Failed to remove card.')
-	# 	card_id = request.POST.get('card_id', None)
-	# 	form = self.form_class(request.POST)
-	# 	if card_id and form.is_valid():
-	# 		print('form: ', form)
-	# 		card_parameters = {
-	# 			"name": "",
-	#
-	# 		}
-	# 		#
-	# 		# card = facade.stripe.Customer.modify_source(
-	# 		# 	request.user.stripe_customer_id,
-	# 		# 	card_id,
-	# 		# )
-	# 		if card:
-	# 			status_code = 200
-	# 			msg = _('Successfully updated billing info!')
-	# 			messages.success(request, msg)
-	#
-	# 			# return redirect(reverse('customer:billing'))
-	# 		else:
-	# 			pass
-	#
-	# 	context_data.update({'message': msg})
-
-
-
-
 
 class PaymentMethodListView(PageTitleMixin, TemplateView):
 	page_title = _('Payment')
