@@ -12,7 +12,7 @@ from asgiref.sync import sync_to_async
 from decimal import Decimal as D
 TWOPLACES = D(10) ** -2
 
-# FedexAuthTokenModel = get_model('generic', 'FedexAuthToken')
+FedexAuthTokenModel = get_model('generic', 'FedexAuthToken')
 Order = get_model('order', 'Order')
 Basket = get_model('basket', 'Basket')
 (TaxExclusiveOfferDiscount, TaxInclusiveOfferDiscount) = get_classes('shipping.methods', ['TaxExclusiveOfferDiscount', 'TaxInclusiveOfferDiscount'])
@@ -207,13 +207,10 @@ class Repository(repository.Repository):
 		}
 		if address.phone_number:
 			address_fields['phone'] = address.phone_number.as_international
-
 		if address.line2:
 			address_fields['street2'] = address.line2
-
 		if address.line3:
 			address_fields['street3'] = address.line3
-
 		if address.state:
 			address_fields['state'] = address.state
 
@@ -592,8 +589,7 @@ class Repository(repository.Repository):
 		return methods, data
 
 
-	# def fedex_update_auth_token(self, FedexAuthToken=FedexAuthTokenModel.objects.first(), request=None):
-	def fedex_update_auth_token(self, FedexAuthToken, request=None):
+	def fedex_update_auth_token(self, FedexAuthToken=FedexAuthTokenModel.objects.first(), request=None):
 
 		payload = f"grant_type=client_credentials&client_id={settings.FEDEX_API_KEY}&client_secret={settings.FEDEX_SECRET_KEY}"
 		url = settings.FEDEX_API_URL + "oauth/token"
@@ -646,12 +642,12 @@ class Repository(repository.Repository):
 
 	def fedex_get_auth_token(self):
 
-		# FedexAuthToken = FedexAuthTokenModel.objects.first()
-		#
-		# if not FedexAuthToken:
-		# 	FedexAuthToken = FedexAuthTokenModel.objects.create()
-		# 	FedexAuthToken.save()
-		# 	self.fedex_update_auth_token(FedexAuthToken)
+		FedexAuthToken = FedexAuthTokenModel.objects.first()
+
+		if not FedexAuthToken:
+			FedexAuthToken = FedexAuthTokenModel.objects.create()
+			FedexAuthToken.save()
+			self.fedex_update_auth_token(FedexAuthToken)
 
 		if FedexAuthToken.expired:
 			self.fedex_update_auth_token(FedexAuthToken)
