@@ -72,7 +72,7 @@
 
 		<div class="row w-100 bg-beige text-dark-hg container-fluid font-lydia">
 			<div class="col-12">
-				<small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small> | <small><a href="#">SITEMAP</a></small>
+				<small>© <span class='font-serif'>2022 </span><a href="{% url 'home' %}">DEHY</a></small> | <small><a href="{{request.scheme}}://{{request.get_host}}/sitemap.xml">SITEMAP</a></small>
 			</div>
 		</div>
 	<!-- </div> -->
