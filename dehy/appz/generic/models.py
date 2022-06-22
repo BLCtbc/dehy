@@ -37,16 +37,16 @@ class AuthToken(models.Model):
 	class Meta:
 		abstract = True
 
-# class FedexAuthToken(AuthToken):
-# 	scope = models.CharField(_("Scope"), max_length=20, default="")
-# 	def __str__(self):
-# 		return f"Fedex Auth token: {self.access_token}, updated: {self.last_updated}"
-#
-# 	def save(self, *args, **kwargs):
-# 		if not self.pk and FedexAuthToken.objects.exists():
-# 			raise ValidationError('There can only be one instance of this token')
-#
-# 		return super().save(*args, **kwargs)
+class FedexAuthToken(AuthToken):
+	scope = models.CharField(_("Scope"), max_length=20, default="")
+	def __str__(self):
+		return f"Fedex Auth token: {self.access_token}, updated: {self.last_updated}"
+
+	def save(self, *args, **kwargs):
+		if not self.pk and FedexAuthToken.objects.exists():
+			raise ValidationError('There can only be one instance of this token')
+
+		return super().save(*args, **kwargs)
 
 
 class QuickbooksAuthToken(AuthToken):
