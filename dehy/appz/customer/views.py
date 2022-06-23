@@ -8,7 +8,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseBadRequest
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMessage
 from django.conf import settings
 from django.shortcuts import redirect, render, reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode

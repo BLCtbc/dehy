@@ -3,7 +3,7 @@ from django.views import generic
 from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
 from oscar.core.loading import get_class, get_model
-from django.contrib.sites.shortcuts import get_current_site
+
 import os, requests
 from django.conf import settings
 from django.urls import reverse_lazy
@@ -14,6 +14,7 @@ WholesaleAccountCreationForm = get_class('dehy.appz.wholesale.forms', 'Wholesale
 
 class WholesaleView(generic.TemplateView):
 	template_name = 'dehy/wholesale/wholesale.html'
+
 	def get_context_data(self, *args, **kwargs):
 		img_names = ['img/custom/dehy_cocktail_lemon_rough.jpeg', 'img/custom/dehy_strain_pouring.jpeg', 'img/custom/rose_cocktail_closeup.jpeg', 'img/custom/tall_pink_cocktail_lime_on_mirror.jpeg', 'img/custom/dehy_tiki_fire.jpeg', 'img/custom/dehy_cocktail_kiwi.jpeg']
 		titles = ["Elevate & Refine","Reduce Labor","Reduce Waste","Increase Profits","Instagrammable & Inspirational","Increase Value"]
@@ -30,9 +31,12 @@ class WholesaleRegisterView(generic.edit.FormView):
 	form_class = WholesaleAccountCreationForm
 	success_url = reverse_lazy('wholesale:index')
 
-	def post(self, request, *args, **kwargs):
-		response = super().post(request, *args, **kwargs)
+	def form_invalid(self, form):
+		response = super().form_invalid(form)
+		return response
 
+
+	# needs to return a url
 	def form_valid(self, form):
 		# form.create_customer()
 		form.send_email(self.request)

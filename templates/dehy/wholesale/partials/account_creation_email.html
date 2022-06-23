@@ -5,21 +5,14 @@
 	<tr>
 		<td>
 			<h2 style="font-weight: 200">
-				{% trans "Wholesale Account Creation Request"}
+				{% trans "Wholesale Account Creation Request" %}
 			</h2>
 		</td>
 	</tr>
 {% endblock header_content %}
 
 {% block order_text_content %}
-	{% for field in form.fields %}
-	<tr>
-		<td>
-			<span>{{ field.label }}: </span><span>{{ field.value }}</span>
-
-		</td>
-	</tr>
-	{% endfor %}
+	{{ form.as_table }}
 {% endblock order_text_content %}
 
 
