@@ -1,6 +1,6 @@
 {% load widget_tweaks %}
 {% load i18n %}
-<form class="mt-5" id="registration_form" method="post" action="{% url 'wholesale:register' %}">
+<form class="mt-5" id="registration_form" method="post" data-action="{% url 'wholesale:register' %}">
 	{% csrf_token %}
 	{{ form.non_field_errors }}
 

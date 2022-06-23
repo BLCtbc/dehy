@@ -50,6 +50,18 @@ var dehy = {
 		init() {
 			dehy.handlers.shop.init();
 			dehy.handlers.home.init();
+			dehy.handlers.spam_filter()
+		},
+		spam_filter() {
+			var forms = document.querySelectorAll('form:not(.basket_summary)');
+			forms.forEach(form=>{
+				form.addEventListener('click', e=>{
+					if (form.dataset.action) {
+						form.action = form.dataset.action;
+						delete form.dataset.action;
+					}
+				});
+			})
 		},
 		home: {
 			init() {

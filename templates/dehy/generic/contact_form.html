@@ -1,7 +1,7 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
-<form class="p-4 card card-body" id="contact" method="post" action="{% url 'faq' %}">
+<form class="p-4 card card-body" id="contact" method="post" data-action="{% url 'faq' %}">
 	{% csrf_token %}
 	<h3>Waddup!</h3>
 	<div class="form-row">
