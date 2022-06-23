@@ -1,3 +1,7 @@
+.scrolled-top {
+	background: none !important;
+}
+
 :root {
 	--shop-input-padding: 1.5rem;
 	--shop-input-border: 1px solid grey;

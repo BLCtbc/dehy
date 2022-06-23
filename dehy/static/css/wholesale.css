@@ -1,3 +1,7 @@
+.scrolled-top {
+	background: none !important;
+}
+
 .card-list-grid {
 	grid-gap: 20px 20px;
 	display: grid;

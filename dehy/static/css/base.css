@@ -589,6 +589,7 @@ nav.scrolled-top a.nav-link.active {
 .scrolled-top {
 	background-color: transparent;
 	border-bottom: none;
+	transition: background 200ms ease;
 }
 
 .splash-header {

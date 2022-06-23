@@ -131,7 +131,6 @@ def shipstation_webhook_order_received(request):
 
 					recipients = list(user.email for user in User.objects.filter(receive_new_order_notifications=True))
 					recipients += [f'orders@{current_site}']
-					logger.debug(f'recipients: {recipients}')
 
 					sent = send_mail(email_subject, email_body, settings.AUTO_REPLY_EMAIL_ADDRESS, recipients, fail_silently=False, html_message=email_body_html)
 

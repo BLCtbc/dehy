@@ -1,7 +1,9 @@
 {% load widget_tweaks %}
 {% load i18n %}
-<form class="mt-5" id="registration_form" method="post" action="{% url 'wholesale:register' %}">
+<form class="mt-5" id="registration_form" method="post" data-action="{% url 'wholesale:register' %}">
 	{% csrf_token %}
+	{{ form.non_field_errors }}
+
 	<div class="row">
 		<div class="form-group col pr-2">
 			<label class="col-form-label {% if form.company_name.field.required %}required{% endif %}" for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label>
@@ -63,15 +65,20 @@
 		<div class="form-group col pr-2">
 			{% render_field form.billing_first_name class+="form-control" %}
 			<label class="col-form-label {% if form.billing_first_name.field.required %}required{% endif %}" for="{{ form.billing_first_name.id_for_label }}">{{ form.billing_first_name.label }}</label>
-
 			{{ form.billing_first_name.errors }}
 		</div>
 
 		<div class="form-group col">
 			{% render_field form.billing_last_name class+="form-control" %}
 			<label class="col-form-label {% if form.billing_last_name.field.required %}required{% endif %}" for="{{ form.billing_last_name.id_for_label }}">{{ form.billing_last_name.label }}</label>
-
 			{{ form.billing_last_name.errors }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="form-group col pr-2">
+			{% render_field form.billing_phone_number class+="form-control" %}
+			<label class="col-form-label {% if form.billing_phone_number.field.required %}required{% endif %}" for="{{ form.billing_phone_number.id_for_label }}">{{ form.billing_phone_number.label }}</label>
+			{{ form.billing_phone_number.errors }}
 		</div>
 	</div>
 	<div class="row">
@@ -102,7 +109,6 @@
 		<div class="form-group col">
 			{% render_field form.billing_country class+="form-control" autofill="country" %}
 			<label class="col-form-label {% if form.billing_country.field.required %}required{% endif %}" for="{{ form.billing_country.id_for_label }}">{{ form.billing_country.label }}</label>
-
 			{{ form.billing_country.errors }}
 		</div>
 	</div>
@@ -114,9 +120,8 @@
 		</div>
 
 		<div class="form-group col">
-			{% render_field form.billing_last_name class+="form-control" %}
+			{% render_field form.billing_line4 class+="form-control" %}
 			<label class="col-form-label {% if form.billing_line4.field.required %}required{% endif %}" for="{{ form.billing_line4.id_for_label }}">{{ form.billing_line4.label }}</label>
-
 			{{ form.billing_line4.errors }}
 		</div>
 		<div class="form-group col">
