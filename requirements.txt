@@ -1,3 +1,4 @@
+amqp==5.1.1
 asgiref==3.5.0
 astroid==2.9.3
 async-generator==1.10
@@ -5,12 +6,18 @@ attrs==21.4.0
 autopep8==1.6.0
 Babel==2.9.1
 beautifulsoup4==4.10.0
+billiard==3.6.4.0
 boto3==1.21.38
 botocore==1.24.38
 cached-property==1.5.2
+celery==5.2.7
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.11
+click==8.1.3
+click-didyoumean==0.3.0
+click-plugins==1.1.1
+click-repl==0.2.0
 cryptography==36.0.2
 Django==3.2.12
 django-better-admin-arrayfield==1.4.2
@@ -41,6 +48,7 @@ isort==5.10.1
 jedi==0.17.2
 jmespath==1.0.0
 jsonfield==3.1.0
+kombu==5.2.4
 lazy-object-proxy==1.7.1
 mccabe==0.6.1
 mypy==0.931
@@ -55,6 +63,7 @@ phonenumbers==8.12.41
 Pillow==9.0.0
 platformdirs==2.4.1
 pluggy==1.0.0
+prompt-toolkit==3.0.30
 psycopg2-binary==2.9.3
 purl==1.6
 pycodestyle==2.8.0
@@ -88,6 +97,7 @@ sortedcontainers==2.4.0
 soupsieve==2.3.1
 sqlparse==0.4.2
 stripe==2.65.0
+supervisor==4.2.4
 text-unidecode==1.3
 toml==0.10.2
 tomli==2.0.0
@@ -97,6 +107,8 @@ typed-ast==1.5.2
 typing_extensions==4.0.1
 ujson==5.1.0
 urllib3==1.26.8
+vine==5.0.0
+wcwidth==0.2.5
 wrapt==1.13.3
 wsproto==1.1.0
 xmltodict==0.12.0

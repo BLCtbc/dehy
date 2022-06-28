@@ -34,6 +34,7 @@
 16. [adding new/custom communication event type](#adding_new_communication_event_type)
 17. [creating a custom conditional for specific shipping code and value requirement](#custom_shipping_condition)
 18. [quickbooks API setup](#quickbooks_api_setup)
+19. [installing and setting up celery+rabbitmq](#celery_rabbitmq)
 ---
 
 Note, any changes made to `settings.py` might require restarting the server in order to take affect
@@ -1895,3 +1896,130 @@ https://stackoverflow.com/a/40078116/6158303
 
 	qb_auth_token.save()
 		```
+
+
+<a name="celery_rabbitmq"></a>
+1. ###### Installing celery and it's dependencies (rabbitMQ)
+
+	guides:
+		celery: https://docs.celeryq.dev/en/master/getting-started/first-steps-with-celery.html
+		rabbitMQ: https://www.rabbitmq.com/install-debian.html#apt-quick-start-cloudsmith
+
+	1. rabbitMQ installation:
+
+		1. create a new file from the home directory on the remote server `nano rabbitmq_install_script.sh`
+		2. save the following snippet to the file
+		3. give the file execute permissions: `sudo chmod +x rabbitmq_install_script.sh`
+		4. run the script: `./rabbitmq_install_script.sh`
+
+			```
+			#!/usr/bin/sh
+			sudo apt-get install curl gnupg apt-transport-https -y
+
+			## Team RabbitMQ's main signing key
+			curl -1sLf "https://keys.openpgp.org/vks/v1/by-fingerprint/0A9AF2115F4687BD29803A206B73A36E6026DFCA" | sudo gpg --dearmor | sudo tee /usr/share/keyrings/com.rabbitmq.team.gpg > /dev/null
+			## Cloudsmith: modern Erlang repository
+			curl -1sLf https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/gpg.E495BB49CC4BBE5B.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/io.cloudsmith.rabbitmq.E495BB49CC4BBE5B.gpg > /dev/null
+			## Cloudsmith: RabbitMQ repository
+			curl -1sLf https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/gpg.9F4587F226208342.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/io.cloudsmith.rabbitmq.9F4587F226208342.gpg > /dev/null
+			## Add apt repositories maintained by Team RabbitMQ
+			sudo tee /etc/apt/sources.list.d/rabbitmq.list <<EOF
+
+			## Provides modern Erlang/OTP releases
+			deb [signed-by=/usr/share/keyrings/io.cloudsmith.rabbitmq.E495BB49CC4BBE5B.gpg] https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/deb/ubuntu bionic main
+			deb-src [signed-by=/usr/share/keyrings/io.cloudsmith.rabbitmq.E495BB49CC4BBE5B.gpg] https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-erlang/deb/ubuntu bionic main
+
+			## Provides RabbitMQ
+			deb [signed-by=/usr/share/keyrings/io.cloudsmith.rabbitmq.9F4587F226208342.gpg] https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/deb/ubuntu bionic main
+			deb-src [signed-by=/usr/share/keyrings/io.cloudsmith.rabbitmq.9F4587F226208342.gpg] https://dl.cloudsmith.io/public/rabbitmq/rabbitmq-server/deb/ubuntu bionic main
+			EOF
+
+			## Update package indices
+			sudo apt-get update -y
+
+			## Install Erlang packages
+			sudo apt-get install -y erlang-base \
+			                        erlang-asn1 erlang-crypto erlang-eldap erlang-ftp erlang-inets \
+			                        erlang-mnesia erlang-os-mon erlang-parsetools erlang-public-key \
+			                        erlang-runtime-tools erlang-snmp erlang-ssl \
+			                        erlang-syntax-tools erlang-tftp erlang-tools erlang-xmerl
+
+			## Install rabbitmq-server and its dependencies
+			sudo apt-get install rabbitmq-server -y --fix-missing
+			```
+
+	2. [setting up rabbitmq](https://docs.celeryq.dev/en/master/getting-started/backends-and-brokers/rabbitmq.html#setting-up-rabbitmq):
+
+		get the user,pass,and vhost names from .prod and replace them in the export line below
+			```sh
+			export RABBITMQ_USER=myuser && RABBITMQ_PASS=mypass && RABBITMQ_VHOST=myvhost
+			sudo rabbitmqctl add_user $RABBITMQ_USER $RABBITMQ_PASS
+			sudo rabbitmqctl add_vhost $RABBITMQ_VHOST
+			sudo rabbitmqctl set_permissions -p $RABBITMQ_VHOST $RABBITMQ_USER ".*" ".*" ".*"
+			```
+
+		in `settings.py`, add the following line to configure the broker url using the settings created above:
+		`CELERY_BROKER_URL = f"amqp://{env.str('RABBITMQ_USER')}:{env.str('RABBITMQ_PASS')}@localhost:5672/{env.str('RABBITMQ_VHOST')}"`
+
+	3. installing celery:
+		`pip install celery`
+
+	4. setup celery:
+
+			create celery config file `dehy/celery.py`, should be same directory as `settings.py`
+			```py
+			import os
+
+			from celery import Celery
+
+			# Set the default Django settings module for the 'celery' program.
+			os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dehy.settings')
+
+			app = Celery('dehy')
+
+			# Using a string here means the worker doesn't have to serialize
+			# the configuration object to child processes.
+			# - namespace='CELERY' means all celery-related configuration keys
+			#   should have a `CELERY_` prefix.
+			app.config_from_object('django.conf:settings', namespace='CELERY')
+
+			# Load task modules from all registered Django apps.
+			app.autodiscover_tasks()
+
+
+			@app.task(bind=True, ignore_result=True)
+			def debug_task(self):
+			    print(f'Request: {self.request!r}')
+			```
+
+			add the following to `dehy/__init__.py`, again, same directory as `settings.py`:
+
+				```py
+				from .celery import app as celery_app
+				__all__ = ('celery_app',)
+				```
+
+	4. installing supervisor
+		`sudo apt install supervisor`
+		`pip install supervisor`
+
+	5. daemonizing celery via supervisor
+
+		1. Get configuration from the [Official Celery](https://raw.githubusercontent.com/celery/celery/master/extra/supervisord/celeryd.conf) and save it to supervisor's default file discovery folder:
+			```
+			$ cd /etc/supervisor/conf.d/
+			$ sudo wget https://raw.githubusercontent.com/celery/celery/master/extra/supervisord/celeryd.conf
+			$ ls
+			celeryd.conf
+			```
+
+		2. Edit `command`, `directory` and `user` according to your project.
+			```sh
+			directory=/home/admin/dehy/dehy
+			user=admin
+			command=/home/admin/dehy/dehy/venv/bin/celery -A dehy worker --loglevel=info
+			```
+
+		3. Save
+
+
