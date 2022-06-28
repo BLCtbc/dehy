@@ -6,8 +6,8 @@ After=network.target
 [Service]
 User=admin
 Group=www-data
-WorkingDirectory=/home/admin/dehy
-ExecStart=/home/admin/dehy/venv/bin/gunicorn \
+WorkingDirectory=/home/admin/dehy/dehy
+ExecStart=/home/admin/dehy/dehy/venv/bin/gunicorn \
 --access-logfile logs/access.log \
 --error-logfile logs/error.log \
 --workers 3 \
