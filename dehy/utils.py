@@ -305,4 +305,4 @@ class OAuth2Config(object):
 		self.jwks_uri = jwks_uri
 
 
-quickbooks = qb = QuickBooks()
+# quickbooks = qb = QuickBooks()
