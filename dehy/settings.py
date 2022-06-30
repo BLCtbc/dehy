@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 	'django.contrib.staticfiles',
 	'django.contrib.sitemaps',
 	'django.contrib.postgres',
+	'django_celery_beat',
 	'dehy',
 	'dehy.appz.generic.apps.GenericConfig',
 	'dehy.appz.recipes.apps.RecipesConfig',
@@ -393,11 +394,11 @@ QUICKBOOKS_REALM_ID = env.str('QUICKBOOKS_REALM_ID')
 CELERY_BROKER_URL = f"amqp://{env.str('RABBITMQ_USER')}:{env.str('RABBITMQ_PASS')}@localhost:5672/{env.str('RABBITMQ_VHOST')}"
 CELERY_BEAT_SCHEDULE = {
 	'fedex-auth-token-every-5-minutes': {
-        'task': 'tasks.update_fedex_auth_token',
+        'task': 'dehy.tasks.update_fedex_auth_token',
         'schedule': crontab(minute='*/5'),
     },
 	'quickbooks-auth-token-every-5-minutes': {
-        'task': 'tasks.update_quickbooks_auth_token',
+        'task': 'dehy.tasks.update_quickbooks_auth_token',
         'schedule': crontab(minute='*/5'),
     },
 }
