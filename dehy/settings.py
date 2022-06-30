@@ -13,6 +13,7 @@ from pygit2 import Repository
 from django.utils.translation import gettext_lazy as _
 import logging
 from sorl.thumbnail.log import ThumbnailLogHandler
+from celery.schedules import crontab
 
 ENV_FILE = '.env-prod' if Repository('.').head.shorthand == 'main' else '.env'
 
@@ -261,7 +262,7 @@ AUTO_REPLY_EMAIL_ADDRESS = f'no-reply@{SITE_DOMAIN}'
 OSCAR_GOOGLE_ANALYTICS_ID = 'G-W6L54G8SQ1'
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = CELERY_TIMEZONE = 'America/Chicago'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -390,3 +391,13 @@ QUICKBOOKS_ENVIRONMENT = 'sandbox'
 QUICKBOOKS_REALM_ID = env.str('QUICKBOOKS_REALM_ID')
 
 CELERY_BROKER_URL = f"amqp://{env.str('RABBITMQ_USER')}:{env.str('RABBITMQ_PASS')}@localhost:5672/{env.str('RABBITMQ_VHOST')}"
+CELERY_BEAT_SCHEDULE = {
+	'fedex-auth-token-every-5-minutes': {
+        'task': 'tasks.update_fedex_auth_token',
+        'schedule': crontab(minute='*/5'),
+    },
+	'quickbooks-auth-token-every-5-minutes': {
+        'task': 'tasks.update_quickbooks_auth_token',
+        'schedule': crontab(minute='*/5'),
+    },
+}
