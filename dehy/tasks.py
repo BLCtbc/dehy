@@ -6,8 +6,8 @@ app = Celery()
 
 from .utils import quickbooks, fedex
 
-# QuickbooksAuthToken = get_model('generic', 'QuickbooksAuthToken')
-# FedexAuthToken = get_model('generic', 'FedexAuthToken')
+QuickbooksAuthToken = get_model('generic', 'QuickbooksAuthToken')
+FedexAuthToken = get_model('generic', 'FedexAuthToken')
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
@@ -19,12 +19,12 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # Executes every Monday morning at 7:30 a.m.
     sender.add_periodic_task(
-        crontab(minute=*/5),
+        crontab(minute='*/5'),
         update_quickbooks_auth_token.s(),
     )
 
 	sender.add_periodic_task(
-        crontab(minute=*/5),
+        crontab(minute='*/5'),
         update_fedex_auth_token.s(),
     )
 
