@@ -7,7 +7,7 @@ from oscar.core.loading import get_class, get_model
 import os, requests
 from django.conf import settings
 from django.urls import reverse_lazy
-# from dehy.utils import quickbooks
+from dehy.utils import quickbooks
 
 WholesaleAccountCreationForm = get_class('dehy.appz.wholesale.forms', 'WholesaleAccountCreationForm')
 # Create your views here.

@@ -51,16 +51,20 @@ class QuickBooks(object):
 		self.redirect_uri = settings.QUICKBOOKS_REDIRECT_URI
 		self.base_url = settings.QUICKBOOKS_BASE_URL
 		self.environment = settings.QUICKBOOKS_ENVIRONMENT
-		self.auth_token = QuickbooksAuthToken.objects.get()
+
+		self.auth_token, created = QuickbooksAuthToken.objects.get_or_create(
+    		defaults={'refresh_token': 'AB116653372077kwFWf7nnUi6nZn0O83O6HSZJVruf2syzfipD', 'access_token':'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..J3uJ3kOf0vVzmoGDpzg8dw.UieTPbxIzjG3Kq8-3e5jmSiJGuW_kCfgT-XIYPvBStJlRkmhEKufRcWxYy4M11LLAKho0Ud_q77MoZmKO6YE89uv5mdXSHD50DSQW26kMuKG5cBOU14QgGNyXXjaiYr4nUQC2OGMbxEsIyfBfQxJ5WJKp6Q7u4CPlO1AQdivffyUks3CrHSw5fzp34spzwwnQjZTSIOGR9X7K2gsFlwlcpQibQowyMzuEvkbEnq2qqfPw-FHpxnWMNeosfsdabHc0BN6tCLQYreQ0Xo3cv1YQ3CHRwk3PtKF5oB98wt34_IDTcLcCoyabmIISeGoXOKjPTyHitvIBUb0TlLkJEmarLdu9fFsuc1FZ47oGXevaDDyfu7OUV49IOBQ-pnqUU6HUtNjIHSVnHr2qpfPhvmwT5hnX26TuRXXNY8PWs7u3lMX4wUKdF09Mj7nZdP010u4DnJywC_pBzQC4Fro13GUAdPwq9ym0vhgFuO8vgfl1FviQP6Q5RIp5qU_lcSGfMp12VlIcRs-twcHW2dGFQef_ik5uZar0AkVfeWDYCahz6aSVYv9bLPhKfzu2nxWJl9Qb-NYRPf5FfZ7C8FiArmDUe3eGYB19AQRDLHXF8vM0ne1iLy2BzDRvmY42FPRHCB0C86BAvwW6jWVvi0lvu7BL6jgaI947WlBhYC3xGGl5sGYdTTr320z57N0zHRX4n5SjPW1U15KBOdXvjSOBIEjwm5KxnucPBhsbb0BBeNqpU_JQVK_hgwskBeXxVRUDRqz.xG4C40QzL0_YDPebSt27DA'},
+		)
+
+	# auth_client should not be set until auth_token has been set
+	def set_auth_client(self):
 		self.auth_client = AuthClient(
 			self.api_key, self.secret_key, self.redirect_uri, self.environment,
 			realm_id=self.auth_token.realm_id, access_token=self.auth_token.access_token,
 			refresh_token=self.auth_token.refresh_token,
 		)
 
-
-		self.refresh_auth_token()
-
+	# cannot update auth_token until auth_client is set
 	def update_auth_token(self):
 		self.auth_token.access_token = self.auth_client.access_token
 		self.auth_token.refresh_token = self.auth_client.refresh_token
@@ -179,7 +183,7 @@ class Fedex(object):
 
 	def update_auth_token(self, auth_token=FedexAuthTokenModel.objects.first()):
 
-		payload = f"grant_type=client_credentials&client_id={settings.FEDEX_API_KEY}&client_secret={settings.FEDEX_SECRET_KEY}"
+		payload = f"grant_type=client_credentials&client_id={self.api_key}&client_secret={self.secret_key}"
 		url = self.base_url + "oauth/token"
 
 		headers = {
@@ -221,7 +225,6 @@ class Fedex(object):
 			elif status_code == 503:
 				print('\n SERVICE UNAVAILABLE')
 
-		return auth_token
 
 	def get_auth_token(self):
 
@@ -305,4 +308,5 @@ class OAuth2Config(object):
 		self.jwks_uri = jwks_uri
 
 
-# quickbooks = qb = QuickBooks()
+quickbooks = qb = QuickBooks()
+fedex = Fedex()
