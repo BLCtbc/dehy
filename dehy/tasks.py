@@ -5,7 +5,6 @@ app = Celery()
 
 from .utils import quickbooks, fedex
 from oscar.core.loading import get_class, get_model
-
 QuickbooksAuthToken = get_model('generic', 'QuickbooksAuthToken')
 FedexAuthToken = get_model('generic', 'FedexAuthToken')
 
