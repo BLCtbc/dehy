@@ -1,7 +1,7 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import six, base64, requests, json
 from dehy.appz.shipping.methods import BaseFedex, FreeShipping
-from dehy.appz.generic.models import FedexAuthToken as FedexAuthTokenModel
+
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from jose import jwk
@@ -10,6 +10,7 @@ from intuitlib.client import AuthClient
 from intuitlib.enums import Scopes
 
 from oscar.core.loading import get_class, get_model
+FedexAuthToken = get_model('generic', 'FedexAuthToken')
 QuickbooksAuthToken = get_model('generic', 'QuickbooksAuthToken')
 
 class TokenGenerator(PasswordResetTokenGenerator):
@@ -179,10 +180,10 @@ class Fedex(object):
 		self.base_url = settings.FEDEX_API_URL
 		self.secret_key = settings.FEDEX_SECRET_KEY
 		self.api_key = settings.FEDEX_API_KEY
+		self.auth_token = FedexAuthToken.objects.first()
 
-
-	def update_auth_token(self, auth_token=FedexAuthTokenModel.objects.first()):
-
+	def update_auth_token(self):
+		
 		payload = f"grant_type=client_credentials&client_id={self.api_key}&client_secret={self.secret_key}"
 		url = self.base_url + "oauth/token"
 
@@ -196,10 +197,10 @@ class Fedex(object):
 		status_code = response.status_code
 		if status_code == 200:
 
-			auth_token.access_token = response_text["access_token"]
-			auth_token.scope = response_text["scope"]
-			auth_token.expires_in = response_text["expires_in"]
-			auth_token.save()
+			self.auth_token.access_token = response_text["access_token"]
+			self.auth_token.scope = response_text["scope"]
+			self.auth_token.expires_in = response_text["expires_in"]
+			self.auth_token.save()
 
 		else:
 			logger.error(f'Fedex API: Error authorizing ({status_code}). \n{error["message"]}')
@@ -225,20 +226,6 @@ class Fedex(object):
 			elif status_code == 503:
 				print('\n SERVICE UNAVAILABLE')
 
-
-	def get_auth_token(self):
-
-		auth_token = FedexAuthTokenModel.objects.first()
-
-		if not AuthToken:
-			auth_token = FedexAuthTokenModel.objects.create()
-			auth_token.save()
-			self.update_fedex_auth_token(auth_token)
-
-		if auth_token.expired:
-			self.update_fedex_auth_token(auth_token)
-
-		return auth_token.access_token
 
 	def validate_address(self):
 		pass
