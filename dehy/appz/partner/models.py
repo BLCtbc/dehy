@@ -10,7 +10,7 @@ class StockRecord(AbstractStockRecord):
 
 		super().save(*args, **kwargs)
 		print('dir(self): ', dir(self))
-		update_stripe_product_price.delay(self)
+		update_stripe_product_price.delay(self.partner_sku, int(stock_record.price*100))
 
 
 	class Meta:
