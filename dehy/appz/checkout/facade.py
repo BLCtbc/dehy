@@ -278,6 +278,7 @@ def upload_catalog():
 		name = f"{product.title}"
 		if 'wholesale' in product.title.lower():
 			tax_code = 'txcd_40040000'
+			
 		if product.parent and product.parent.product_class and product.parent.product_class.name != 'Merchandise':
 			name = f"{product.parent.title}: {product.title}"
 			description = product.parent.description

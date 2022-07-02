@@ -64,7 +64,8 @@ form {
 }
 
 .checkout-quantity {
-	min-width: 4em
+	min-width: 4em;
+	width: 100%;
 }
 
 .product-quantity {
