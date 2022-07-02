@@ -13,6 +13,7 @@
     {% endfor %}
 {% endif %}
 
+{% if 'basket' not in request.resolver_match.app_names %}
 <div class="row" id="upsell_messages">
 {% if upsell_messages %}
     {% for upsell in upsell_messages %}
@@ -51,20 +52,15 @@
 
 {% endif %}
 </div>
-
-{# old upsell_messages #}
-{% comment %}
-{% if upsell_messages %}
-    <div class="card card-body">
-        <h3>{% trans "You could be missing out on offers!" %}</h3>
-        {% for upsell in upsell_messages %}
-            {% blocktrans with message=upsell.message url=upsell.offer.get_absolute_url offer_name=upsell.offer.name %}
-                <div class="warning">{{ message }} to qualify for the <a href="{{ url }}">{{ offer_name }}</a> special offer</div>
-            {% endblocktrans %}
-        {% endfor %}
-    </div>
+{% else %}
+<div class="row mt-md-5 justify-content-center">
+	<div class="col-12 col-lg-10 d-none d-md-block">
+		<div class="row">
+			<h2 class="col-md-12 font-freefrm">{% trans "Shopping Cart" %}</h2>
+		</div>
+	</div>
+</div>
 {% endif %}
-{% endcomment %}
 
 {% if basket and not basket.is_empty %}
 
@@ -72,6 +68,7 @@
 
 	{% if 'basket' in request.resolver_match.app_names %}
 
+		{% comment %}
         <div class="basket_title col-12 col-lg-10 d-none d-md-block">
             <div class="row">
                 <h4 class="col-md-8">{% trans "Item" %}</h4>
@@ -79,6 +76,7 @@
                 <h4 class="col-md-2 text-right">{% trans "Price" %}</h4>
             </div>
         </div>
+		{% endcomment %}
 	{% else %}
 	<div id="basket_status_container">
 	</div>
@@ -86,90 +84,98 @@
 	{% endblock %}
 
     {% block basket_form_main %}
-		<div class="row">
-		<form method="post" class="basket_summary col-12 {% if 'basket' in request.resolver_match.app_names %}col-lg-10{% else %}compact{% endif %}" id="basket_formset" action="{% url 'basket:summary' %}">
+		{% if 'basket' not in request.resolver_match.app_names %}<div class="row">{% endif %}
+			<form method="post" class="basket_summary col-12 compact{% if 'basket' in request.resolver_match.app_names %} col-lg-10{% endif %}" id="basket_formset" action="{% url 'basket:summary' %}">
 
-            {% csrf_token %}
-            {{ formset.management_form }}
-			<input type="hidden" name="app_name" id="app_name" value="{{request.resolver_match.app_names|first}}">
+	            {% csrf_token %}
+	            {{ formset.management_form }}
+				<input type="hidden" name="app_name" id="app_name" value="{{request.resolver_match.app_names|first}}">
 
-            {% for form in formset %}
-                {% with line=form.instance product=form.instance.product %}
-                    {% purchase_info_for_line request line as session %}
-                    <div class="basket-items row" data-product-id="{{line.product_id}}">
-							{% with image=product.primary_image %}
-							{{ form.id }}
-							{% if 'basket' in request.resolver_match.app_names %}
-							{% oscar_thumbnail image.original "400x" crop=center upscale=False as thumb %}
+	            {% for form in formset %}
+	                {% with line=form.instance product=form.instance.product %}
+	                    {% purchase_info_for_line request line as session %}
+	                    <div class="basket-items row" data-product-id="{{line.product_id}}">
+								{% with image=product.primary_image %}
+								{{ form.id }}
+								{% if 'basket' in request.resolver_match.app_names %}
+								{% oscar_thumbnail image.original "400x" crop=center upscale=False as thumb %}
 
-                            <div class="col-3 col-md-2 px-0">
-								<div class="image-container">
-									<img class="img-thumbnail" src="{{ thumb.url }}" alt="{{ product.parent.title|default:product.title }}"/>
-								</div>
-
-							{% else %}
-							{% oscar_thumbnail image.original "200x" upscale=False as thumb %}
-
-							<div class="col-3 px-0">
-								<div class="image-container">
-									<img class="" src="{{ thumb.url }}" alt="{{ product.parent.title|default:product.title }}"/>
-								</div>
-							{% endif %}
-                            {% endwith %}
-                            </div>
-
-								{% if 'checkout' in request.resolver_match.app_names %}
-								<div class="col-6 mt-2 pr-0">
-								<h4>{{ product.parent.title|default:product.title }}</h4>
+	                            <div class="col-3 col-md-2 px-0">
+									<div class="image-container">
+										<img class="img-thumbnail" src="{{ thumb.url }}" alt="{{ product.parent.title|default:product.title }}"/>
+									</div>
 
 								{% else %}
-								<div class="col-6 col-md-5 mt-3">
-                                <h3><a href="{{ product.get_absolute_url }}">{{ product.parent.title|default:product.title }}</a></h3>
-								{% endif %}
+								{% oscar_thumbnail image.original "200x" upscale=False as thumb %}
 
-								{% if product.is_child %}
-                                <p class="size-variant">Size: {{line.description}}</p>
-								{% endif %}
-
-                            	</div>
-
-							{% if 'basket' in request.resolver_match.app_names %}
-                            <div class="col-2">
-                                <div class="checkout-quantity">
-                                    <div class="input-group {% if form.errors %}error{% endif %}">
-                                        {% render_field form.quantity pattern="[0-9]*" type="text" class+="product-quantity" %}
+								<div class="col-3 px-0">
+									<div class="image-container">
+										<img class="" src="{{ thumb.url }}" alt="{{ product.parent.title|default:product.title }}"/>
 									</div>
-									<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
-                                </div>
-                            </div>
+								{% endif %}
+	                            {% endwith %}
+	                            </div>
 
-                            <div class="col-2">
-                                <p class="price-text text-right">
-                                    {{ line.line_price_excl_tax|currency:line.price_currency }}
-                                </p>
-                            </div>
+									{% if 'checkout' in request.resolver_match.app_names %}
+									<div class="col-6 mt-2 pr-0">
+									<h4>{{ product.parent.title|default:product.title }}</h4>
 
-							{% else %}
-							<div class="col-3">
-								<p class="price-text">
-									{{ line.line_price_excl_tax|currency:line.price_currency }}
-								</p>
-										{% include 'dehy/shop/partials/quantity_select_container.html' with field=form.quantity product=product %}
+									{% else %}
+									<div class="col-6 col-md-5 mt-3">
+	                                <h3><a href="{{ product.get_absolute_url }}">{{ product.parent.title|default:product.title }}</a></h3>
+									{% endif %}
 
-										{% comment %}
-										<input type="number"pattern="[0-9]*" name="{{form.quantity.html_name}}" id="{{form.quantity.id_for_label}}" value="{{form.quantity.value}}">
-										{% render_field form.quantity pattern="[0-9]*" type="text" class+="product-quantity" %}
-										{% endcomment %}
-									<p class="remove-container">
-										<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
+									{% if product.is_child %}
+	                                <p class="size-variant">Size: {{line.description}}</p>
+									{% endif %}
+
+	                            	</div>
+
+								<div class="col-3">
+									<p class="price-text">
+										{{ line.line_price_excl_tax|currency:line.price_currency }}
 									</p>
-                            </div>
-							{% endif %}
-                    </div>
-                {% endwith %}
-            {% endfor %}
-        </form>
-		</div>
+											{% include 'dehy/shop/partials/quantity_select_container.html' with field=form.quantity product=product %}
+										<p class="remove-container">
+											<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
+										</p>
+	                            </div>
+								{% comment %}
+								{% if 'basket' in request.resolver_match.app_names %}
+	                            <div class="col-md-2">
+	                                <div class="checkout-quantity">
+	                                    <div class="{% if form.errors %}error{% endif %}">
+	                                        {% render_field form.quantity pattern="[0-9]*" type="text" class+="product-quantity" %}
+										</div>
+										<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
+	                                </div>
+	                            </div>
+
+	                            <div class="col-2">
+	                                <p class="price-text text-right">
+	                                    {{ line.line_price_excl_tax|currency:line.price_currency }}
+	                                </p>
+	                            </div>
+
+								{% else %}
+								<div class="col-3">
+									<p class="price-text">
+										{{ line.line_price_excl_tax|currency:line.price_currency }}
+									</p>
+											{% include 'dehy/shop/partials/quantity_select_container.html' with field=form.quantity product=product %}
+
+
+										<p class="remove-container">
+											<a class="remove-basket-item" role="button" data-id="{{ forloop.counter0 }}" data-behaviours="remove">{% trans "Remove" %}</a>
+										</p>
+	                            </div>
+								{% endif %}
+								{% endcomment %}
+	                    </div>
+	                {% endwith %}
+	            {% endfor %}
+	        </form>
+	{% if 'basket' not in request.resolver_match.app_names %}</div>{% endif %}
     {% endblock %}
 
         {% block vouchers %}
@@ -283,8 +289,8 @@
 
     {% block formactions %}
 	{% if 'basket' in request.resolver_match.app_names %}
-	<div class="col-12 col-lg-10 text-right">
-		<a style="margin-top:2rem;" href="{% url 'checkout:checkout' %}" class="btn">{% trans "CHECKOUT" %}</a>
+	<div class="col-12 col-lg-10 text-right my-5">
+		<a href="{% url 'checkout:checkout' %}" class="btn br-2 px-4">{% trans "CHECKOUT" %}</a>
 	</div>
 	{% else %}
 	{% endif %}

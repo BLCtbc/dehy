@@ -939,6 +939,10 @@ footer .site-directory * {
 	font-family: Futura,serif;
 }
 
+.font-freefrm {
+	font-family: 'freefrm' !important;
+}
+
 .footer-container {
 	display: flex;
 	flex-wrap: wrap;

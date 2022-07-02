@@ -1,5 +1,6 @@
 from celery import shared_task, Celery
 from celery.schedules import crontab
+from dehy.appz.checkout.facade import facade
 
 app = Celery()
 
@@ -27,6 +28,11 @@ FedexAuthToken = get_model('generic', 'FedexAuthToken')
 # 		update_fedex_auth_token.s(),
 # 	)
 #
+
+@shared_task
+def update_stripe_product_price(stock_record):
+	product = facade.stripe.Product.retrieve(stock_record.partner_sku)
+	price = facade.stripe.Price.modify(product.default_price, unit_amount=int(stock_record.price*100))
 
 
 @shared_task

@@ -155,6 +155,7 @@ class BasketView(CoreBasketView):
 	template_name = 'dehy/basket/basket.html'
 
 	def get(self, request, *args, **kwargs):
+		print('\n test \n')
 		response = super().get(request, *args, **kwargs)
 		print('dir(response): ', dir(response))
 		return response

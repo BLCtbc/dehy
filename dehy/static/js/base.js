@@ -272,6 +272,9 @@ var dehy = {
 						if (mini_basket_container && !e.path.includes(mini_basket) && !e.path.includes(confirm_item_removal) && !e.path.includes(loading_modal)) {
 							document.body.classList.toggle("modal-open", false);
 							mini_basket_container.classList.toggle("show", false);
+							setTimeout(function(){
+								mini_basket_container.classList.toggle("d-none", true);
+							}, 500);
 						}
 					});
 				}
