@@ -3,7 +3,9 @@
 {% load currency_filters %}
 
 <!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" class="{% block html_class %}{% endblock %}">
+
     <head>
         <title>{% block title %}{{ shop_name }} {{ shop_tagline }}{% endblock title %}</title>
 
