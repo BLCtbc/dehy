@@ -11,11 +11,13 @@ FedexAuthToken = get_model('generic', 'FedexAuthToken')
 
 @shared_task
 def update_stripe_product_price(sku, price):
-	try:
-		product = facade.stripe.Product.retrieve(sku)
-		price = facade.stripe.Price.modify(product.default_price, unit_amount=price)
-	except Exception as e:
-		print('Error updating stripe product price: ', e)
+	# try:
+	# 	product = facade.stripe.Product.retrieve(sku)
+	# 	price = facade.stripe.Price.modify(product.default_price, unit_amount=price)
+	# except Exception as e:
+	# 	print('Error updating stripe product price: ', e)
+	product = facade.stripe.Product.retrieve(sku)
+	price = facade.stripe.Price.modify(product.default_price, unit_amount=price)
 
 @shared_task
 def update_quickbooks_auth_token():
