@@ -7,9 +7,9 @@ from oscar.apps.partner.abstract_models import AbstractStockRecord
 class StockRecord(AbstractStockRecord):
 
 	def save(self, *args, **kwargs):
-
-		super().save(*args, **kwargs)
+		print('updating stripe product price')
 		update_stripe_product_price.delay(self.partner_sku, int(self.price*100))
+		super().save(*args, **kwargs)
 
 
 	class Meta:
